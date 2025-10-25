@@ -1,0 +1,18 @@
+course_name: "TG2 Leistungskurs"
+course_type: "math_bg2_lk"
+
+current: 13_ebenen_lagebeziehung
+current_worksheets:
+  -
+
+topics:
+  trigonometrie:
+    - 00_einheitskreis
+    - 01_sinus_kosinus
+  vektorgeometrie:
+    - 10_geraden
+    - 11_geraden_lagebeziehung
+    - 12_ebenen
+    - 13_ebenen_lagebeziehung
+    - 14_abstaende
+    - 15_volumen

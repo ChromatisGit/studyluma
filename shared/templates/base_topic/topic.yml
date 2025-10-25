@@ -1,0 +1,7 @@
+slug: topic
+title: Name des Themenblock
+chapters:
+  - slug: 00_chapter
+    title: Name des Kapitels
+  - slug: 01_chapter
+    title: Name des Kapitels

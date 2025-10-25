@@ -1,0 +1,9 @@
+# Dependencies
+/website/node_modules/
+/node_modules/
+
+# Website production
+/website/build/
+/website/.generated/
+/website/.docusaurus/
+

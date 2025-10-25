@@ -1,0 +1,99 @@
+/* @theme minimal */
+@import 'default';
+
+/* ===== Design Tokens ===== */
+:root {
+  --bg: #f7efe4;         /* warmes Beige */
+  --fg: #1a1b2f;         /* dunkles Marineblau (Text) */
+  --muted: #616376;
+  --accent: #8b2c2f;     /* Weinrot */
+  --accent-2: #353A5A;   /* tiefes Marine für Akzentflächen */
+
+  --radius: 14px;
+  --space-1: .25rem;
+  --space-2: .5rem;
+  --space-3: .75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  --h1: 2em;
+  --h2: 1.4em;
+  --base: 28px;
+  --small: .6em;
+
+  --font-sans: Inter, ui-sans-serif, system-ui, Arial;
+  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+/* ===== Grundlayout ===== */
+section {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--base);
+  line-height: 1.5;
+  padding: 3.2em;
+  position: relative;
+}
+
+/* Flacher Eck-Akzent unten rechts (ohne Schatten) */
+section::after {
+  content: "";
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 200px;
+  height: 200px;
+  background: var(--accent-2);
+  clip-path: polygon(100% 0, 0 100%, 100% 100%); /* Dreieck */
+}
+
+/* Kopf-/Fußzeile */
+header, footer {
+  position: absolute;
+  left: 2.2em; right: 2.2em;
+  font-size: var(--small);
+  color: var(--muted);
+}
+header { top: 1em; }
+footer { bottom: 1em; text-align: left; }
+
+/* ===== Typografie ===== */
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  color: var(--fg);
+  letter-spacing: .2px;
+  margin: 0 0 .4em 0;
+  line-height: 1.15;
+}
+h1 { font-size: var(--h1); }
+h2 { font-size: var(--h2); color: var(--accent); }
+
+p { margin: 0 0 var(--space-4) 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+
+/* Listen – dezente Markerfarbe */
+ul, ol { margin: 0 0 var(--space-4) 1.1em; }
+li { margin: .35em 0; }
+ul li::marker { color: var(--accent); }
+ol li::marker { color: var(--accent); }
+
+/* Blockquote – flach, ohne Schatten */
+blockquote {
+  margin: var(--space-5) 0;
+  padding: var(--space-4);
+  border-left: 4px solid var(--accent);
+  background: rgba(139,44,47,.06);
+  color: var(--fg);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-style: italic;
+}
+
+/* Bilder – nur leichte Abrundung, kein Shadow */
+img { border-radius: var(--radius); }
+
+section .katex-display {
+    text-align: left !important;
+    margin-left: 0 !important;
+  }

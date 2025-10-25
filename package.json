@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "gen": "node shared/scripts/build-site.mjs",
+    "dev": "pnpm run gen && pnpm --dir website start",
+    "build": "pnpm run gen && pnpm --dir website build",
+    "serve": "pnpm --dir website serve",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  }
+}
