@@ -6,25 +6,36 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #6b2fa0;          /* main violet */
+  --ifm-color-primary-dark: #5f2990;
+  --ifm-color-primary-darker: #552681;
+  --ifm-color-primary-darkest: #431e67;
+  --ifm-color-primary-light: #7a3cb0;
+  --ifm-color-primary-lighter: #8a4fc0;
+  --ifm-color-primary-lightest: #a269d6;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #b47aff;
+  --ifm-color-primary-dark: #a25bee;
+  --ifm-color-primary-darker: #924edd;
+  --ifm-color-primary-darkest: #7b3fc0;
+  --ifm-color-primary-light: #c593ff;
+  --ifm-color-primary-lighter: #d4a8ff;
+  --ifm-color-primary-lightest: #e3c8ff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* DocCards Icon Invisible */
+h2[class*="cardTitle"]::first-letter {
+  font-size: 0 !important;
+  line-height: 0 !important;
+}
+
+h2[class*="cardTitle"] {
+  position: relative;
+  left: -0.5ch;
 }

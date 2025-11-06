@@ -13,16 +13,13 @@ const docsPlugins: PluginConfig[] = COURSES.flatMap(course =>
         id: `${course.slug}-${subj.slug}`,
         path: `./.generated/courses/${course.slug}/${subj.slug}`,
         routeBasePath: `${course.slug}/${subj.slug}`,
-        sidebarPath: require.resolve(`./.generated/sidebars/${course.slug}.${subj.slug}.ts`),
+        sidebarPath: require.resolve(`./sidebars.ts`),
         remarkPlugins: [require('remark-math')],
         rehypePlugins: [require('rehype-katex')],
-        showLastUpdateAuthor: true,
-        showLastUpdateTime: true,
       },
     ] satisfies PluginConfig
   ))
 );
-
 
 const config: Config = {
   title: 'Learnspace',
@@ -60,16 +57,17 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
-    navbar: { title: 'Learnspace', items: [] },
+    sidebar: {
+      hideable: true,
+    },
+    navbar: {
+      title: 'Learnspace',
+      items: [{ type: 'plugin-based-elements', position: 'left' }],
+      hideOnScroll: true},
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
       additionalLanguages: ['python','typescript','sql'],
-    },
-    customFields: {
-      courseNavbars: Object.fromEntries(
-        COURSES.map(c => [`/${c.slug}/`, c.navbar.items])
-      ),
     },
   } satisfies Preset.ThemeConfig,
 };

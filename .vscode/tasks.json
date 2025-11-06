@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "autopull",
+      "type": "shell",
+      "command": "git pull",
+      "runOptions": { "runOn": "folderOpen" }
+    }
+  ]
+}
