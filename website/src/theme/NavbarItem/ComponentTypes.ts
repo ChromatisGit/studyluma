@@ -1,7 +1,7 @@
 import ComponentTypes from '@theme-original/NavbarItem/ComponentTypes';
-import PluginBasedNavbar from '@site/src/components/PluginBasedNavbar';
+import GroupBasedNavbar from '@site/src/components/GroupBasedNavbar';
 
 export default {
   ...ComponentTypes,
-  'plugin-based-elements': PluginBasedNavbar,
+  'custom-navbar': GroupBasedNavbar,
 };

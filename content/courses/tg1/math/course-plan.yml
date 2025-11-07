@@ -1,0 +1,21 @@
+course:
+  label: "Mathe"
+  group: tg1
+  subject: math
+
+current_topic: 13_ebenen_lagebeziehung
+current_worksheets:
+  - hi.pdf
+
+topics:
+  trigonometrie:
+    - 00_einheitskreis
+    - 01_sinus_kosinus
+  statistik_grundlagen:
+  vektorgeometrie:
+    - 10_geraden
+    - 11_geraden_lagebeziehung
+    - 12_ebenen
+    - 13_ebenen_lagebeziehung
+    - 14_abstaende
+    - 15_volumen

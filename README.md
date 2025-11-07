@@ -6,61 +6,91 @@ Digitale Unterrichtsplattform für Mathematik und Informatik auf Basis von **Doc
 
 ## Ordnerstruktur
 
-```
 
-base/                          # Allgemeine Unterrichtsinhalte (unabhängig von Kursen)
-├─ math/                       # Mathematik
-│  ├─ <topic>/                 # z. B. vektorgeometrie, trigonometrie, stochastik
-│  │  ├─ chapters/             # Kapitel des Themenblocks
-│  │  │  ├─ <chapter>/         # z. B. 00_geraden, 01_geraden_lagebeziehung
-│  │  │  │  ├─ presentations/  # Foliensätze-Vorlagen
-│  │  │  │  ├─ worksheets/     # Arbeitsbögen-Vorlagen
-│  │  │  │  ├─ current.md      # (optional) Webseite während das Kapitel bearbeitet wird
-│  │  │  │  └─ summary.md      # Zusammenfassung auf Website nach Abschluss des Kapitels
-│  │  │  └─ ...
-│  │  │
-│  │  ├─ content-pool/         # Wiederverwendbare Lernelemente (Aufgaben, Texte, Checkpoints)
-│  │  ├─ images/               # Abbildungen für diesen Themenblock
-│  │  ├─ notes.md              # Interne Lehrernotizen
-│  │  └─ topic.yaml            # Interne Planungsstruktur, Lernziele, Kapitelreihenfolge
-│  └─ ...
-│
-└─ info/                       # Informatik (gleicher Aufbau wie Mathematik)
-│  └─ ...
-│
-└─ presentations/              # Überfachliche Foliensätze (z. B. Einführung, Organisation)
 
-courses/                       # Kursspezifische Inhalte
-├─ <coursename>/               # z. B. bg2_gk, tgtm3, bk1
-│  ├─ math/                    # Mathematik
-│  │  ├─ <topic>/              # z. B. vektorgeometrie
-│  │  │  └─ chapters/
-│  │  │     ├─ <chapter>/         # z. B. 10_geraden, 11_geraden_lagebeziehung
-│  │  │     │  ├─ presentations/  # Kursfolien
-│  │  │     │  ├─ worksheets/     # Arbeitsbögen und Lösungen
-│  │  │     │  ├─ current.md      # (optional) Überschreibt base/current.md
-│  │  │     │  └─ summary.md      # (optional) Überschreibt base/summary.md
-│  │  │     └─ ...
-│  │  │
-│  │  └─ progress.yaml         # Themenliste und Fortschritt des Kurses
-│  │
-│  ├─ info/                    # Informatik (gleicher Aufbau wie Mathematik)
-│  │  ├─ <topic>/
-│  │  └─ progress.yaml
-│  │
-│  └─ website.md               # Startseite des Kurses
-│
-└─ ...
-
-shared/                        # Globale Ressourcen
-├─ styles/                     # CSS, Marp, Website-Themes
-├─ tools/                      # Skripte, Generatoren, Parser
-└─ templates/                  # Vorlagen (progress.yml für verschiedene Stufen, Themenblöcke etc.)
-
-website/                       # Docusaurus Website mit eigenen Komponenten
+### Content
 
 ```
 
+content/
+│
+├─ base/                             # Allgemeine Unterrichtsinhalte (kursunabhängig)
+│  ├─ math/                          # Mathematik
+│  │  └─ <topic>/                    # z. B. vektorgeometrie, trigonometrie
+│  │     ├─ chapters/
+│  │     │  └─ <chapter>/            # z. B. 00_geraden, 01_geraden_lagebeziehung
+│  │     │     ├─ slides/            # Foliensätze-Vorlagen
+│  │     │     ├─ worksheets/        # Arbeitsbögen-Vorlagen
+│  │     │     ├─ current.md         # Website während Bearbeitung
+│  │     │     └─ summary.md         # Website nach Abschluss
+│  │     │
+│  │     ├─ resources/               # Wiederverwendbare Aufgaben, Texte, Checkpoints
+│  │     ├─ images/                  # Abbildungen für Webseite und Arbeitsbögen
+│  │     ├─ notes.md                 # Interne Notizen
+│  │     └─ plan.yml                 # Lernziele + Kapitelreihenfolge (Systemdatei)
+│  │
+│  ├─ info/                          # Informatik (gleicher Aufbau wie Mathematik)
+│  │
+│  └─ slides/                        # Überfachliche Foliensätze
+│
+├─ courses/                          # Konkrete Kurse (sichtbar für Schüler)
+│  └─ <group>/                       # z. B. tg2, bk1
+│     ├─ group-info.md               # Leitsätze & Informationen für gesamte Gruppe
+│     │
+│     └─ <subject_variant>/          # z. B. math-lk, info-tm
+│        ├─ course-plan.yml          # Themenliste + aktiver Fortschritt
+│        │
+│        └─ <topic>/                 # Kurs-spezifische Themen
+│           └─ chapters/
+│              └─ <chapter>/         # z.B. 10_geraden, 11_geraden_lagebeziehung
+│                 ├─ slides/         # Generierte Kursfolien
+│                 ├─ worksheets/     # Generierte Arbeitsbögen + Lösungen
+│                 ├─ current.md      # (optional) überschreibt base/current.md
+│                 └─ summary.md      # (optional) überschreibt base/summary.md
+│
+└─ templates/                        # Vorlagen zum Kopieren
+   ├─ base_topic/                    # Topic + Chapter Skelett
+   └─ course-plans/                  # course-plan.yml Vorlagen für Kursvarianten
+
+```
+
+### Src
+```
+src/
+│
+├─ builder/                          # Node-Buildtools
+│  │  ├─ build-site-config.ts        # erzeugt .generated/*
+│  │  ├─ io.ts                       # YAML lesen, Configs schreiben
+│  │  ├─ transforms.ts               # reine Daten-Transformationen
+│  │  └─ logger.ts                   # Logging
+│  
+│
+├─ schemas/                          # Zod-Schemas (Quellcode)
+│  └─ course-plan.ts              # Schema + Types für course-plan.yml
+│  
+│
+└─ marp-styling/                     # CSS/Themes für Marp Foliensätze
+```
+
+### Weitere
+
+```
+website/                             # Docusaurus-Website
+│
+├─ src/                              # Darstellung & Interaktion der Webseite
+├─ static/                           # Vom Builder abgelegte PDFs/Bilder
+└─ .generated/                       # Vom Builder generiertes Layout
+   ├─ ...
+   ├─ navbar.config.json
+   └─ courses.config.json
+```
+
+.vscode/
+│
+├─ settings.json                     # YAML Schema-Zuweisungen
+│
+└─ .schemas/                         # Generierte JSON-Schemas (für IntelliSense)
+   └─ course-plan.schema.json
 ---
 
 ## Begriffe
@@ -103,8 +133,5 @@ website/                       # Docusaurus Website mit eigenen Komponenten
 ## ToDo Liste
 
 - Warnung wenn Lernelemente die bereits veröffentlicht sind bearbeitet werden (Willst du das nicht lieber in einem neuen Branch machen?)
-
-**Sprachlicher Hinweis**
-Auf dieser Seite wird bewusst auf Genderzeichen wie den Doppelpunkt oder Doppelnennungen verzichtet, da sie sprachlich eine Trennung der Geschlechter betonen. Stattdessen werden substantivierte Adjektive oder das generische Maskulinum verwendet, um eine flüssige, verständliche und zugleich inklusive Sprache zu fördern.
 
 © 2025 Christian Holst

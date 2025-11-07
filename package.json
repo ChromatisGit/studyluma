@@ -1,12 +1,21 @@
 {
   "scripts": {
-    "gen": "node shared/scripts/build-site.mjs",
+    "gen-schema": "pnpm ts-node -r tsconfig-paths/register src/dev/export-schema.ts",
+    "gen": "pnpm ts-node -r tsconfig-paths/register src/builder/main.ts",
     "dev": "pnpm run gen && pnpm --dir website start",
-    "build": "pnpm run gen && pnpm --dir website build",
-    "serve": "pnpm --dir website serve",
-    "test": "vitest run"
+    "start": "pnpm --dir website start",
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json && pnpm --dir website build",
+    "serve": "pnpm --dir website serve"
   },
   "dependencies": {
-    "yaml": "^2.8.1"
+    "yaml": "^2.8.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3"
   }
 }

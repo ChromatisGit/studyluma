@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "@schema/*": ["src/schema/*"]
+    },
+    "outDir": ".build",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src"]
+}

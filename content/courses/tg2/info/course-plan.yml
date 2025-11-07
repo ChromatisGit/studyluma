@@ -1,0 +1,20 @@
+course:
+  label: "Informatik"
+  group: tg2
+  subject: info
+
+current_topic: 13_ebenen_lagebeziehung
+current_worksheets:
+
+topics:
+  trigonometrie:
+    - 00_einheitskreis
+    - 01_sinus_kosinus
+  statistik_grundlagen:
+  vektorgeometrie:
+    - 10_geraden
+    - 11_geraden_lagebeziehung
+    - 12_ebenen
+    - 13_ebenen_lagebeziehung
+    - 14_abstaende
+    - 15_volumen

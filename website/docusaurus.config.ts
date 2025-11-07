@@ -1,24 +1,21 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config, PluginConfig} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
-import {COURSES} from './.generated/courses.config';
+import COURSES from './.generated/courses.config.json';
 
-// This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
-
-const docsPlugins: PluginConfig[] = COURSES.flatMap(course =>
-  course.subjects.map(subj => (
+const docsPlugins: PluginConfig[] = COURSES.map(c => (
     [
       '@docusaurus/plugin-content-docs',
       {
-        id: `${course.slug}-${subj.slug}`,
-        path: `./.generated/courses/${course.slug}/${subj.slug}`,
-        routeBasePath: `${course.slug}/${subj.slug}`,
-        sidebarPath: require.resolve(`./sidebars.ts`),
+        id: `${c.group}-${c.course_variant}`,
+        path: `./.generated/courses/${c.group}/${c.course_variant}`,
+        routeBasePath: `${c.group}/${c.course_variant}`,
+        sidebarPath: require.resolve('./sidebars.ts'),
         remarkPlugins: [require('remark-math')],
         rehypePlugins: [require('rehype-katex')],
       },
     ] satisfies PluginConfig
-  ))
+  )
 );
 
 const config: Config = {
@@ -50,6 +47,14 @@ const config: Config = {
 
   plugins: [
     ...docsPlugins,
+    [
+    '@docusaurus/plugin-content-pages',
+      {
+        path: './.generated/shared',
+        routeBasePath: '/',
+        id: 'generated-pages',
+      },
+    ],
     [require.resolve('@cmfcmf/docusaurus-search-local'), { language: ['de'] }],
   ],
 
@@ -62,7 +67,7 @@ const config: Config = {
     },
     navbar: {
       title: 'Learnspace',
-      items: [{ type: 'plugin-based-elements', position: 'left' }],
+      items: [{ type: 'custom-navbar', position: 'left' }],
       hideOnScroll: true},
     prism: {
       theme: prismThemes.github,
