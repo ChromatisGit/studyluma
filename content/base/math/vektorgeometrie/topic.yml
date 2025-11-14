@@ -1,44 +1,44 @@
-slug: vektorgeometrie
+id: vektorgeometrie
 title: Vektorgeometrie
 chapters:
-  - slug: 00_vektor
+  - id: 00_vektor
     title: Vektoren
     goals:
       - Unterschied zwischen Punkt und Vektor
       - Punkte und Vektoren im zweidimesionalen Raum darstellen
       - Besondere Vektoren Gegenvektor, Nullvektor
       - Addition von Vektoren und Multiplikation mit Skalar
-  - slug: 01_strecken
+  - id: 01_strecken
     title: Strecken
     goals:
       - Unterschied Ortsvektor und Verbindungsvektor mit Verkürzungsfaktor
       - Abstand zweier Punkte, Länge einer Strecke berechnen
-  - slug: 02_vektoren_3d
+  - id: 02_vektoren_3d
     title: Vektoren im dreimensionalen Raum
     goals:
       - Vektoren im dreidimensionalen Raum zeichnen und mit ihnen rechnen
       - Senkrechte Projektion und Spiegelung an Koordinatenebenen
-  - slug: 03_skalarprodukt
+  - id: 03_skalarprodukt
     title: Winkel mit Skalarprodukt bestimmen
     goals:
       - Orthogonalität von Vektoren
       - Winkel zwischen zwei Vektoren
       - Anwendung bei Figuren
-  - slug: 04_zusammenfassung
+  - id: 04_zusammenfassung
     title: Zusammenfassung
     goals:
       - Gelernte Inhalte zu Vektoren wiederholen
-  - slug: 10_geraden
+  - id: 10_geraden
     title: Geraden im Raum
-  - slug: 11_geraden_lagebeziehung
+  - id: 11_geraden_lagebeziehung
     title: Gegenseitige Lage von Geraden
-  - slug: 12_ebenen
+  - id: 12_ebenen
     title: Ebenen
-  - slug: 13_ebenen_lagebeziehung
+  - id: 13_ebenen_lagebeziehung
     title: Lage von Geraden und Ebenen
-  - slug: 14_abstaende
+  - id: 14_abstaende
     title: Abstände und Winkel
-  - slug: 15_volumen
+  - id: 15_volumen
     title: Volumen
-  - slug: 16_zusammenfassung
+  - id: 16_zusammenfassung
     title: Zusammenfassung

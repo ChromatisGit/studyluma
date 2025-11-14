@@ -1,19 +1,17 @@
 import type { ComponentProps } from "react";
-import DocCard from "@theme/DocCard";
 import React from "react";
+import ThemeDocCard from "@theme/DocCard";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
-type DocCardItem = ComponentProps<typeof DocCard>["item"];
+type DocCardItem = ComponentProps<typeof ThemeDocCard>["item"];
 
-export default function DocCardSmartLink({
+export type DocCardResource = {href: string, label: string, description?: string}
+
+export default function DocCard({
   href,
   label,
   description,
-}: {
-  href: string;
-  label: string;
-  description?: string;
-}) {
+}: DocCardResource) {
   const isExternal = /^(https?:|mailto:|tel:)/.test(href);
   const isFile = /\.(pdf|zip)$/.test(href);
 
@@ -35,7 +33,7 @@ export default function DocCardSmartLink({
   const item: DocCardItem = { type: "link", href: resolved, label, description, };
   return (
     <div className={"col col--6"} style={{ marginBottom: "1rem" }}>
-      <DocCard item={item} />
+      <ThemeDocCard item={item} />
     </div>
   );
 }

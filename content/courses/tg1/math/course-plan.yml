@@ -3,7 +3,7 @@ course:
   group: tg1
   subject: math
 
-current_topic: 13_ebenen_lagebeziehung
+current_chapter: 13_ebenen_lagebeziehung
 current_worksheets:
   - hi.pdf
 

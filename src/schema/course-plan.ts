@@ -4,7 +4,7 @@ const Subject = z.enum(["math", "info"]);
 const Group = z.string().regex(/^[a-z0-9]+$/i, "use letters/numbers only");
 
 const TopicValue = z.array(z.string()).nullable();
-const Topics = z.record(z.string(), TopicValue);
+const TopicsSchema = z.record(z.string(), TopicValue);
 
 export const YamlCoursePlanSchema = z.object({
   course: z.object({
@@ -13,12 +13,26 @@ export const YamlCoursePlanSchema = z.object({
     label: z.string(),
     variant: z.string().optional(),
   }).strict(),
-  current_topic: z.string(),
+  current_chapter: z.string().nullable(),
   current_worksheets: z.array(z.string()).nullable(),
-  topics: Topics,
+  topics: TopicsSchema,
 }).strict();
 
 export type YamlCoursePlan = z.infer<typeof YamlCoursePlanSchema>;
+
+
+type Topics = z.infer<typeof TopicsSchema>
+
+function flattenTopics(topics: Topics) {
+  return Object.entries(topics).flatMap(([topic, chapters]) => {
+    if (!chapters) {
+      return [{ topic, chapter: topic }]
+    }
+    return chapters.map(chapter => {
+      return { topic, chapter }
+    })
+  })
+}
 
 export const CoursePlanSchema = YamlCoursePlanSchema.transform(v => ({
   group: v.course.group,
@@ -27,11 +41,18 @@ export const CoursePlanSchema = YamlCoursePlanSchema.transform(v => ({
   course_variant: v.course.variant
     ? `${v.course.subject}-${v.course.variant}`
     : v.course.subject,
-  current_topic: v.current_topic,
+  current_chapter: v.current_chapter,
   current_worksheets: v.current_worksheets ?? [],
-  topics: Object.fromEntries(
-    Object.entries(v.topics).map(([k, val]) => [k, val ?? []])
-  ),
-}));
+  topics: flattenTopics(v.topics)
+}))
+  .refine(
+  ({ topics, current_chapter }) =>
+    current_chapter === null ||
+    topics.some(t => t.chapter === current_chapter),
+  {
+    message: "current_chapter must be null or exist inside of topics!",
+    path: ["current_chapter"]
+  }
+);
 
 export type CoursePlan = z.infer<typeof CoursePlanSchema>;

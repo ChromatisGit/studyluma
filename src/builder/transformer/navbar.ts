@@ -8,10 +8,7 @@ function updateLabelIfUnique(data: CoursePlan[], subject: string, newLabel: stri
     }
 }
 
-
 export function buildNavbar(courses: CoursePlan[]) {
-
-
     return Object.fromEntries(
         Object.entries(Object.groupBy(courses, c => c.group)).map(([group, list = []]) => {
 

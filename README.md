@@ -1,4 +1,4 @@
-# StudySpace
+# StudyNode
 
 Digitale Unterrichtsplattform für Mathematik und Informatik auf Basis von **Docusaurus**.
 
@@ -38,7 +38,7 @@ content/
 │     ├─ group-info.md               # Leitsätze & Informationen für gesamte Gruppe
 │     │
 │     └─ <subject_variant>/          # z. B. math-lk, info-tm
-│        ├─ course-plan.yml          # Themenliste + aktiver Fortschritt
+│        ├─ course-plan.yml          # Themenliste + aktueller Fortschritt
 │        │
 │        └─ <topic>/                 # Kurs-spezifische Themen
 │           └─ chapters/
@@ -54,20 +54,17 @@ content/
 
 ```
 
-### Src
+### Source (Quellcode)
 ```
 src/
 │
 ├─ builder/                          # Node-Buildtools
-│  │  ├─ build-site-config.ts        # erzeugt .generated/*
-│  │  ├─ io.ts                       # YAML lesen, Configs schreiben
-│  │  ├─ transforms.ts               # reine Daten-Transformationen
-│  │  └─ logger.ts                   # Logging
-│  
+│  └─ main.ts                        # erzeugt .generated/*
 │
-├─ schemas/                          # Zod-Schemas (Quellcode)
-│  └─ course-plan.ts              # Schema + Types für course-plan.yml
-│  
+├─ dev/                              # Development Tools
+│  └─ export-schema.ts               # Erzeugt Schema für YAML Validierung in VSCode
+│
+├─ schema/                           # Zod-Schemas (Quellcode)
 │
 └─ marp-styling/                     # CSS/Themes für Marp Foliensätze
 ```
@@ -77,10 +74,9 @@ src/
 ```
 website/                             # Docusaurus-Website
 │
-├─ src/                              # Darstellung & Interaktion der Webseite
+├─ src/                              # Darstellung & Interaktion mit der Webseite
 ├─ static/                           # Vom Builder abgelegte PDFs/Bilder
 └─ .generated/                       # Vom Builder generiertes Layout
-   ├─ ...
    ├─ navbar.config.json
    └─ courses.config.json
 ```

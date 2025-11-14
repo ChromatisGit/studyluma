@@ -19,7 +19,7 @@ const docsPlugins: PluginConfig[] = COURSES.map(c => (
 );
 
 const config: Config = {
-  title: 'Learnspace',
+  title: 'StudyNode',
   tagline: 'Learning is great',
   favicon: 'img/favicon.ico',
 
@@ -66,7 +66,7 @@ const config: Config = {
       hideable: true,
     },
     navbar: {
-      title: 'Learnspace',
+      title: 'StudyNode',
       items: [{ type: 'custom-navbar', position: 'left' }],
       hideOnScroll: true},
     prism: {

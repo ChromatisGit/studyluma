@@ -1,5 +1,5 @@
 ---
-title: "Prinzipien"
+title: "Leitsätze"
 ---
 
-# Prinzipien respektvoller Umgang
+# Leitsätze respektvoller Umgang
