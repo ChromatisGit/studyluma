@@ -27,7 +27,7 @@ content/
 │  │     ├─ resources/               # Wiederverwendbare Aufgaben, Texte, Checkpoints
 │  │     ├─ images/                  # Abbildungen für Webseite und Arbeitsbögen
 │  │     ├─ notes.md                 # Interne Notizen
-│  │     └─ plan.yml                 # Lernziele + Kapitelreihenfolge (Systemdatei)
+│  │     └─ plan.yml                 # Stoffverteilungsplan eines Themenblocks (Lernziele + Kapitel)
 │  │
 │  ├─ info/                          # Informatik (gleicher Aufbau wie Mathematik)
 │  │
@@ -95,8 +95,8 @@ website/                             # Docusaurus-Website
 |----------|------------|
 | **Stunde** | Kleinste Unterrichtseinheit (Einzel- oder Doppelstunde). Eine Stunde behandelt einen klar abgegrenzten Teilaspekt des aktuellen Kapitels. |
 | **Kapitel (chapter)** | Didaktisch abgeschlossene Einheit mit 1–6 Stunden. |
-| **Themenblock (topic)** | Übergeordnete oder eigenständige thematische Einheit. Kann mehrere Kapitel zusammenfassen (z. B. *Vektorgeometrie*) oder als einzelnes Thema ohne Unterkapitel stehen. |
-| **Roadmap** | Fortschrittsübersicht über alle Themenblöcke und Kapitel einer Klasse. Zeigt aktuelle, abgeschlossene und kommende Themen. Wird über die Datei `progress.yaml` pro Klasse gesteuert. |
+| **Themenblock (topic)** | Eigenständige thematische Einheit meist in Anlehnung einer Bil­dungs­plan­ein­hei­t. Kann mehrere Kapitel zusammenfassen (z. B. *Vektorgeometrie*) oder als einzelnes Thema ohne Unterkapitel stehen. |
+| **Roadmap** | Fortschrittsübersicht über alle Themenblöcke und Kapitel eines Kurses. Zeigt aktuelle, abgeschlossene und kommende Themen. Wird über die Datei `course-plan.yaml` pro Kurs gesteuert. |
 | **Arbeitsblatt (worksheet)** | Besteht aus mehreren Lernelementen (z. B. Basisaufgaben, Checkpoints, Challenges, Infotexten) und kann als PDF oder interaktive Web-Seite vorliegen. |
 | **Lernelement** | Kleinste Einheit innerhalb eines Arbeitsblatts. Lernelemente werden im Content-Pool gepflegt und zu Arbeitsblättern zusammengesetzt. |
 | **Basisaufgabe (task)** | Aufgabe, die alle Schüler während der Stunde bearbeiten. Sie bildet das erwartete Mindestlernziel ab. |

@@ -1,14 +1,14 @@
-import type { CoursePlan } from "@schema/course-plan"
+import type { CoursePlan } from "@schema/coursePlan"
 
-
-function updateLabelIfUnique(data: CoursePlan[], subject: string, newLabel: string) {
-    const items = data.filter(item => item.subject === subject);
-    if (items.length === 1) {
-        items[0].label = newLabel;
-    }
+export function buildNavbarConfig(courses: CoursePlan[]) {
+    return {
+        relativePath: `navbar.config.json`,
+        content:  JSON.stringify(buildNavbarJSON(courses), null, 2)
+    };
 }
 
-export function buildNavbar(courses: CoursePlan[]) {
+
+function buildNavbarJSON(courses: CoursePlan[]) {
     return Object.fromEntries(
         Object.entries(Object.groupBy(courses, c => c.group)).map(([group, list = []]) => {
 
@@ -30,4 +30,11 @@ export function buildNavbar(courses: CoursePlan[]) {
             return [group, navbar];
         })
     );
+}
+
+function updateLabelIfUnique(data: CoursePlan[], subject: string, newLabel: string) {
+    const items = data.filter(item => item.subject === subject);
+    if (items.length === 1) {
+        items[0].label = newLabel;
+    }
 }

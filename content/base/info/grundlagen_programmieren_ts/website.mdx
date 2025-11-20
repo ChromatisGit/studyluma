@@ -1,0 +1,37 @@
+# Was ist TypeScript?
+
+TypeScript ist eine **Erweiterung von JavaScript**, die statische Typen einführt.
+Das bedeutet: Fehler werden bereits **beim Schreiben** sichtbar noch bevor das
+Programm ausgeführt wird.
+
+:::tip Merke
+TypeScript ändert nur das Schreiben, nicht das Ausführen deines Codes.
+Vor dem Start wird jede `.ts`-Datei in eine `.js`-Datei umgewandelt.
+:::
+
+## Warum TypeScript?
+
+- Verhindert typische Fehler bei Zahlen, Texten und anderen Datentypen
+- Code wird lesbarer, weil Datentypen zeigen, was gemeint ist
+- VS Code gibt passendere Vorschläge
+- Bleibt JavaScript: Jede `.ts` Datei wird zu `.js` übersetzt
+
+## JS vs TS - Vergleich
+
+### JavaScript akzeptiert Fehler:
+
+```js
+function add(a, b) {
+  return a + b;
+}
+console.log(add("4", 2)); // → "42"
+```
+
+### TypeScript erkennt Fehler:
+
+```ts
+function add(a: number, b: number): number {
+  return a + b;
+}
+console.log(add("4", 2)); // ❌ Fehler
+```

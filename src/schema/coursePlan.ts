@@ -26,11 +26,20 @@ type Topics = z.infer<typeof TopicsSchema>
 function flattenTopics(topics: Topics) {
   return Object.entries(topics).flatMap(([topic, chapters]) => {
     if (!chapters) {
-      return [{ topic, chapter: topic }]
+      return [{ topic, chapter: topic, label: topic }]
     }
     return chapters.map(chapter => {
-      return { topic, chapter }
+      return { topic, chapter, label: chapter }
     })
+  })
+}
+
+function addTitlesToTopics(topics: Topics) {
+  return Object.keys(topics).map(topic => {
+    return {
+      topic,
+      label: topic
+    }
   })
 }
 
@@ -43,16 +52,16 @@ export const CoursePlanSchema = YamlCoursePlanSchema.transform(v => ({
     : v.course.subject,
   current_chapter: v.current_chapter,
   current_worksheets: v.current_worksheets ?? [],
-  topics: flattenTopics(v.topics)
+  topics: addTitlesToTopics(v.topics),
+  chapters: flattenTopics(v.topics)
 }))
   .refine(
-  ({ topics, current_chapter }) =>
-    current_chapter === null ||
-    topics.some(t => t.chapter === current_chapter),
-  {
-    message: "current_chapter must be null or exist inside of topics!",
-    path: ["current_chapter"]
-  }
-);
+    ({ chapters, current_chapter }) =>
+      current_chapter === null ||
+      chapters.some(c => c.chapter === current_chapter),
+    {
+      error: "current_chapter must be null or exist inside of topics!",
+    }
+  );
 
 export type CoursePlan = z.infer<typeof CoursePlanSchema>;

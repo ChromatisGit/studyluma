@@ -5,7 +5,7 @@
     "moduleResolution": "Node",
     "baseUrl": ".",
     "paths": {
-      "@schema/*": ["src/schema/*"]
+      "@schema/*": ["src/schema/*"],
     },
     "outDir": ".build",
     "strict": true,

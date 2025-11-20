@@ -1,25 +1,34 @@
-import { buildCoursesList } from "./transformer/courses";
-import { buildCourseFileMappings } from "./transformer/fileMapping";
-import { buildPage, copyFile, readAllCourses, writeConfig } from "./io";
-import { buildNavbar } from "./transformer/navbar";
+import { buildCoursesConfig } from "./transformer/courses";
+import { getAllPagePaths } from "./transformer/pagePaths";
+import { writeFile, readAllCourses, deleteGeneratedWebsite, readAllTopics } from "./io";
+import { buildNavbarConfig } from "./transformer/navbar";
 import { buildOverview } from "./transformer/overview";
+import { buildSidebar } from "./transformer/sidebar";
+import { processPageFile } from "./processPage";
+import { setCourseLabels } from "./transformer/courseLabels";
 
 async function main() {
-  const courses = await readAllCourses();
+  await deleteGeneratedWebsite()
 
-  const filesPaths = buildCourseFileMappings(courses);
-  await Promise.all(
-    filesPaths.map(({ source, target }) => copyFile(source, target))
-  );
+  const coursesData = await readAllCourses();
+  const topicsData = await readAllTopics();
 
-  courses.map(course => buildPage(buildOverview(course)));
+  const courses = setCourseLabels(coursesData, topicsData)
 
-  writeConfig('courses', buildCoursesList(courses));
-  writeConfig('navbar', buildNavbar(courses));
+  const filePaths = getAllPagePaths(courses);
 
-  console.log(
-    `[builder] OK - ${courses.length} course(s)`
-  );
+  await Promise.all([
+
+    ...filePaths.map(file => processPageFile(file)),
+
+    ...courses.map(course => writeFile(buildSidebar(course))),
+    ...courses.map(course => writeFile(buildOverview(course))),
+
+    writeFile(buildCoursesConfig(courses)),
+    writeFile(buildNavbarConfig(courses)),
+  ])
+
+  console.log(`[builder] OK - ${courses.length} course(s)`);
 }
 
 main().catch((err) => {

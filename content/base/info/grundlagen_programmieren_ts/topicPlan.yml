@@ -1,0 +1,58 @@
+title: Grundlagen Typescript
+chapters:
+  - id: 00_variablen_und_datentypen
+    title: Variablen und Datentypen
+    goals:
+      - Variablen, Werte und Zuweisungen als Grundbausteine von Programmen verstehen
+      - Primitive Datentypen in TypeScript (number, string, boolean) unterscheiden und einsetzen
+      - Einfache Ausgaben (console.log) zur Programmkontrolle nutzen
+      - Typannotationen für Variablen anwenden, wenn es die Fehlersuche erleichtert
+
+  - id: 01_ausdruecke_und_operatoren
+    title: Ausdrücke und Operatoren
+    goals:
+      - Arithmetische, Vergleichs- und logische Operatoren anwenden
+      - Ausdrücke korrekt bilden und verstehen, wie sie ausgewertet werden
+      - Boolesche Ausdrücke für spätere Bedingungen vorbereiten
+      - Typische Fehlerquellen bei Ausdrücken erkennen (z. B. Typmischungen)
+
+  - id: 02_bedingungen
+    title: Bedingungen
+    goals:
+      - if-, else-if- und else-Strukturen sicher anwenden
+      - Entscheidungslogik aus Alltagssituationen in Code übersetzen
+      - Vergleichsoperatoren und logische Operatoren in Bedingungen sinnvoll kombinieren
+      - einfache Fehlersuche in Entscheidungsstrukturen durchführen
+
+  - id: 03_schleifen
+    title: Schleifen
+    goals:
+      - for- und while-Schleifen zur Wiederholung benutzen
+      - Zähler-, Summen- und Suchaufgaben mit Schleifen lösen
+      - Abbruchbedingungen verstehen und korrekt formulieren
+      - Endlosschleifen und Off-By-One-Fehler erkennen und vermeiden
+
+  - id: 04_funktionen
+    title: Funktionen
+    goals:
+      - Funktionen als wiederverwendbare Bausteine verstehen
+      - Parameter und Rückgabewerte definieren und in Programmen einsetzen
+      - Typannotationen für Parameter und Rückgabewerte nutzen
+      - Programme in sinnvolle, gut lesbare Funktionsblöcke strukturieren
+
+  - id: 05_arrays
+    title: Arrays
+    goals:
+      - Arrays als geordnete Sammlungen gleichartiger Werte anlegen und verändern
+      - Elemente lesen, verändern, hinzufügen und entfernen
+      - Über Arrays iterieren (for, for…of)
+      - typische Aufgaben wie Suchen, Zählen, Summieren mit Arrays lösen
+
+  - id: 06_objekte
+    title: Objekte
+    goals:
+      - Objekte als Sammlung benannter Eigenschaften verstehen
+      - Eigene Datenstrukturen mit Objekten erstellen
+      - Objektwerte lesen und verändern
+      - Objekte in Funktionen übergeben und als Rückgabewerte verwenden
+      - den Nutzen strukturierter Daten für spätere Webanwendungen erkennen

@@ -1,0 +1,38 @@
+course:
+  label: "Informatik"
+  group: tg2
+  subject: info
+
+current_chapter: 00_variablen_und_datentypen
+current_worksheets: []
+
+topics:
+
+  grundlagen_programmieren_ts:
+    - 00_variablen_und_datentypen
+    - 01_ausdruecke_und_operatoren
+    - 02_bedingungen
+    - 03_schleifen
+    - 04_funktionen
+    - 05_arrays
+    - 06_objekte
+
+  clientseitige_anwendung:
+    - 00_einfuehrung_vs_code
+    - 01_modulare_webseiten
+    - 02_interaktive_module
+    - 03_eigene_webseite
+
+  profilabhängiges_thema_1:
+
+  profilabhängiges_thema_2:
+
+  datenbanken:
+
+  serverseitige_anwendung:
+
+  profilabhängiges_thema_3:
+
+  profilabhängiges_thema_4:
+
+  projekt:

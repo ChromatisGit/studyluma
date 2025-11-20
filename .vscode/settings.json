@@ -3,9 +3,13 @@
     "./src/marp-styles/minimal.css"
   ],
   "yaml.schemas": {
-    "./.vscode/.schema/course-plan.json": [
-      "**/course-plan.yaml",
-      "**/course-plan.yml"
+    "./.vscode/.schema/coursePlan.json": [
+      "**/coursePlan.yaml",
+      "**/coursePlan.yml"
+    ],
+    "./.vscode/.schema/topicPlan.json": [
+      "**/topicPlan.yaml",
+      "**/topicPlan.yml"
     ]
   }
 }

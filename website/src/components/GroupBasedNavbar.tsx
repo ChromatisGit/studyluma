@@ -9,7 +9,7 @@ export default function GroupBasedNavbar() {
   const {pathname} = useLocation();
   const group = pathname.split('/')[1];
   const items = (group && NAVBAR[group]) || [];
-  if (!items.length) return null;
+  if (!items) return null;
 
   return (
     <>

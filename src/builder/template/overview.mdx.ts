@@ -1,14 +1,14 @@
-import type { CoursePlan } from "@schema/course-plan";
-import type { OverviewModel, Topic } from "../types/overview";
+import type { CoursePlan } from "@schema/coursePlan";
+import type { OverviewModel, RoadmapTopic } from "@schema/overview";
 
 export function renderOverview(model: OverviewModel): string {
   const mdx = [
     frontMatter(model.title),
     imports(),
     intro(model.title, model.label),
-    currentTopicSection(model.inProgress),
+    currentTopicSection(model.current),
     worksheetsSection(model.worksheets),
-    roadmapSection(model.finished, model.inProgress, model.planned),
+    roadmapSection(model.roadmap),
   ]
     .filter(Boolean)
     .map((str) => dedent(str))
@@ -20,9 +20,9 @@ export function renderOverview(model: OverviewModel): string {
 function frontMatter(title: string) {
   return `
     ---
+    title: "${title}"
     sidebar_position: 1
     sidebar_label: "Übersicht"
-    title: "${title}"
     ---
   `;
 }
@@ -30,6 +30,7 @@ function frontMatter(title: string) {
 function imports() {
   return `
     import DocCard from '@site/src/components/DocCard';
+    import Roadmap from '@site/src/components/Roadmap';
   `;
 }
 
@@ -43,13 +44,15 @@ function intro(title: string, label: string) {
   `;
 }
 
-function currentTopicSection(inProgress?: Topic) {
-  if (!inProgress) return "";
+function currentTopicSection(current: OverviewModel["current"]) {
+  if (!current) return "";
 
   return `
+    ---
+
     ## Aktuelles Thema
 
-    ### ${inProgress.topic}
+    ### ${current}
   `;
 }
 
@@ -74,13 +77,14 @@ function worksheetsSection(worksheets: CoursePlan["current_worksheets"]) {
   `;
 }
 
-function roadmapSection(
-  finished: Topic[],
-  inProgress: Topic | undefined,
-  planned: Topic[]
-) {
-  // TODO: implement roadmap component
-  return "";
+function roadmapSection(roadmap: RoadmapTopic[]) {
+  return `
+  ---
+
+  ## Roadmap
+
+  <Roadmap roadmap={${JSON.stringify(roadmap)}} />
+  `;
 }
 
 function dedent(str: string): string {

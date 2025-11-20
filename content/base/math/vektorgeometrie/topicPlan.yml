@@ -1,4 +1,3 @@
-id: vektorgeometrie
 title: Vektorgeometrie
 chapters:
   - id: 00_vektor
@@ -30,15 +29,29 @@ chapters:
       - Gelernte Inhalte zu Vektoren wiederholen
   - id: 10_geraden
     title: Geraden im Raum
+    goals:
+      - a
   - id: 11_geraden_lagebeziehung
     title: Gegenseitige Lage von Geraden
+    goals:
+      - a
   - id: 12_ebenen
     title: Ebenen
+    goals:
+      - a
   - id: 13_ebenen_lagebeziehung
     title: Lage von Geraden und Ebenen
+    goals:
+      - a
   - id: 14_abstaende
     title: Abstände und Winkel
+    goals:
+      - a
   - id: 15_volumen
     title: Volumen
+    goals:
+      - a
   - id: 16_zusammenfassung
     title: Zusammenfassung
+    goals:
+      - a

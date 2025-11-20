@@ -1,13 +1,15 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 
-import { YamlCoursePlanSchema } from "@schema/course-plan";
+import { YamlCoursePlanSchema } from "@schema/coursePlan";
 import { resolve } from "node:path";
 import { toJSONSchema } from "zod";
+import { TopicPlanSchema } from "@schema/topicPlan";
 
 const OUT_DIR = resolve(process.cwd(), ".vscode/.schema");
 
 const SCHEMAS = [
-  { name: 'course-plan', schema: YamlCoursePlanSchema }
+  { name: 'coursePlan', schema: YamlCoursePlanSchema },
+  { name: 'topicPlan', schema: TopicPlanSchema }
 ]
 
 mkdirSync(OUT_DIR, { recursive: true });

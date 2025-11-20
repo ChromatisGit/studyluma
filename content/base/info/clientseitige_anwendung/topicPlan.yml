@@ -1,0 +1,30 @@
+title: Interaktive Webanwendungen im Browser
+chapters:
+  - id: 00_einfuehrung_vs_code
+    title: Arbeitsumgebung VS Code und Projektstruktur
+    goals:
+      - Eine einfache Projektstruktur für TypeScript im Browser anlegen (HTML, TS, Build-Schritt)
+      - VS Code für TypeScript-Entwicklung nutzen (Dateien, Terminal, einfache Debug-Ausgaben)
+      - Das Zusammenspiel von HTML, CSS und TypeScript im Projekt überblicken
+      - Ein minimales "Hello World" im Browser lauffähig machen
+
+  - id: 01_modulare_webseiten
+    title: Webseiten aus Komponenten bauen
+    goals:
+      - Das Konzept von UI-Bausteinen / Komponenten an einfachen Beispielen verstehen
+      - Mit TypeScript Funktionen schreiben, die HTML-Strukturen erzeugen oder verändern
+      - Eine einfache Seite aus mehreren Bausteinen zusammensetzen
+
+  - id: 02_interaktive_komponenten
+    title: Interaktive Komponenten
+    goals:
+      - Einfache Zustände (z. B. ein- / ausgeklappt, aktiv / inaktiv) in Komponenten verwalten
+      - Kleine interaktive Elemente umsetzen (z. B. Button, Counter, einfache Navigation)
+
+  - id: 03_eigene_webseite
+    title: Eigene Webseite bauen
+    goals:
+      - Eine einfache, mehrteilige Webseite mit Bausteinen planen
+      - Inhalt, Layout und Interaktivität zu einer stimmigen Webanwendung verbinden
+      - Eigenständig ein kleines Browser-Projekt umsetzen
+      - Das Projekt präsentieren und den Aufbau der Anwendung erläutern

@@ -1,10 +1,9 @@
 course:
-  label: "Mathe (LK)"
-  group: tg2
+  label: "Mathe"
+  group: tg1
   subject: math
-  variant: lk
 
-current_chapter: null
+current_chapter: 12_ebenen
 current_worksheets:
   - hi.pdf
 
@@ -12,7 +11,6 @@ topics:
   trigonometrie:
     - 00_einheitskreis
     - 01_sinus_kosinus
-  statistik_grundlagen:
   vektorgeometrie:
     - 10_geraden
     - 11_geraden_lagebeziehung
@@ -20,3 +18,17 @@ topics:
     - 13_ebenen_lagebeziehung
     - 14_abstaende
     - 15_volumen
+  neues_thema:
+    - a
+    - b
+    - c
+    - d
+    - e
+    - f
+  neues_thema2:
+    - aa
+    - bb
+    - cc
+    - dd
+    - ee
+    - ff
