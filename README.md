@@ -21,8 +21,8 @@ content/
 │  │     │  └─ <chapter>/            # z. B. 00_geraden, 01_geraden_lagebeziehung
 │  │     │     ├─ slides/            # Foliensätze-Vorlagen
 │  │     │     ├─ worksheets/        # Arbeitsbögen-Vorlagen
-│  │     │     ├─ current.md         # Website während Bearbeitung
-│  │     │     └─ summary.md         # Website nach Abschluss
+│  │     │     ├─ preview.md         # (optional) Website vor/während Bearbeitung
+│  │     │     └─ website.md         # Website
 │  │     │
 │  │     ├─ resources/               # Wiederverwendbare Aufgaben, Texte, Checkpoints
 │  │     ├─ images/                  # Abbildungen für Webseite und Arbeitsbögen
@@ -99,7 +99,7 @@ website/                             # Docusaurus-Website
 | **Roadmap** | Fortschrittsübersicht über alle Themenblöcke und Kapitel eines Kurses. Zeigt aktuelle, abgeschlossene und kommende Themen. Wird über die Datei `course-plan.yaml` pro Kurs gesteuert. |
 | **Arbeitsblatt (worksheet)** | Besteht aus mehreren Lernelementen (z. B. Basisaufgaben, Checkpoints, Challenges, Infotexten) und kann als PDF oder interaktive Web-Seite vorliegen. |
 | **Lernelement** | Kleinste Einheit innerhalb eines Arbeitsblatts. Lernelemente werden im Content-Pool gepflegt und zu Arbeitsblättern zusammengesetzt. |
-| **Basisaufgabe (task)** | Aufgabe, die alle Schüler während der Stunde bearbeiten. Sie bildet das erwartete Mindestlernziel ab. |
+| **Grundaufgabe (core)** | Aufgabe, die alle Schüler während der Stunde bearbeiten. Sie bildet das erwartete Mindestlernziel ab. |
 | **Checkpoint** | Verständnisfrage mit sofortiger Rückmeldung (Check for Understanding). Dient der Selbstkontrolle und Lernstandserhebung. |
 | **Challenge** | Vertiefungs- oder Transferaufgabe für schnelle oder besonders leistungsstarke Schüler. Fördert Anwendung und Transfer. |
 
