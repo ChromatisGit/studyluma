@@ -1,0 +1,24 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.title {
+  font-size: 1.1rem;
+  margin: 0.35rem 0 0;
+}
+
+.text {
+  color: var(--sn-text-muted);
+  margin: 0.4rem 0 0;
+}

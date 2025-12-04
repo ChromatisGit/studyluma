@@ -1,12 +1,12 @@
 course:
-  label: "Mathe (LK)"
   group: tg2
   subject: math
   variant: lk
 
+worksheet:
+  format: web
+
 current_chapter: 12_ebenen
-current_worksheets:
-  - hi.pdf
 
 topics:
   trigonometrie:

@@ -1,0 +1,31 @@
+.linkHoverBox {
+  padding: 0.5rem 0.5rem;
+  border-radius: var(--ifm-global-radius);
+  transition: background-color 0.15s ease;
+}
+
+.linkHoverBox:hover {
+  background-color: var(--sn-purple-accent-selection);
+}
+
+/* Chevron hover area */
+.chevronHoverBox {
+  padding: 0.35rem;
+  border-radius: var(--ifm-global-radius);
+  transition: background-color 0.15s ease;
+}
+
+.chevronHoverBox:hover {
+  background-color: var(--sn-purple-accent-selection);
+}
+
+/* Chapters */
+.chapterHoverBox {
+  border-radius: var(--ifm-global-radius);
+  padding: 0.3rem 0.5rem;
+  transition: background-color 0.15s ease;
+}
+
+.chapterHoverBox:hover {
+  background-color: var(--sn-purple-accent-selection);
+}

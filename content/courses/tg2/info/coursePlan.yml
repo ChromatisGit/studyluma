@@ -1,10 +1,12 @@
 course:
-  label: "Informatik"
   group: tg2
+  variant: tgtm
   subject: info
 
+worksheet:
+  format: web
+
 current_chapter: 00_variablen_und_datentypen
-current_worksheets: []
 
 topics:
 

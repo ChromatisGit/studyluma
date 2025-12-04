@@ -1,0 +1,34 @@
+groups:
+  tg:
+    name: Technisches Gymnasium
+    color: blue
+  ts:
+    name: Technikerschule
+    color: green
+  bs:
+    name: Berufsschule
+    color: orange
+
+subjects:
+  math:
+    name: Mathematik
+    icon: calculator
+  info:
+    name: Informatik
+    icon: code
+
+variants:
+  gk:
+    name: Grundkurs
+    short: Gk
+  lk:
+    name: Leistungskurs
+    short: Lk
+  tgtm:
+    name: Technik und Management
+    short: TM
+  tgm:
+    name: Mechatronik
+    short: M
+
+schoolyear_start: sep

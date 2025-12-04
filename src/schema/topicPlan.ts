@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const TopicPlanSchema = z.object({
+export const topicPlanSchema = z.object({
   title: z.string(),
   chapters: z.array(
     z.object({
@@ -11,4 +11,4 @@ export const TopicPlanSchema = z.object({
   ),
 }).strict();
 
-export type TopicPlan = z.infer<typeof TopicPlanSchema>;
+export type TopicPlan = z.infer<typeof topicPlanSchema>;

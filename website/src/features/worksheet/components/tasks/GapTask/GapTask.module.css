@@ -1,0 +1,82 @@
+.stackSmall {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.stackTight {
+  margin-top: 0.3rem;
+}
+
+.bodyText {
+  color: var(--sn-text);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.inlineText {
+  color: var(--sn-text);
+  white-space: pre-wrap;
+}
+
+.gapField {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  --gap-base-surface: var(--sn-surface);
+  --gap-text: var(--sn-text);
+  z-index: 1;
+}
+
+.gapControl {
+  width: 100%;
+  padding: 0.12rem 0.2rem;
+  border: 0;
+  border-bottom: 2px solid var(--gap-border, var(--sn-purple-accent));
+  background: var(--gap-bg, var(--sn-surface));
+  color: var(--gap-text);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+  z-index: 2;
+}
+
+.gapSelect {
+  appearance: none;
+  padding-right: 1.2rem;
+  cursor: pointer;
+}
+
+.gapChevron {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--sn-text-muted);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.gapActive {
+  --gap-border: var(--sn-gray-border);
+}
+
+.gapCorrect {
+  --gap-bg: var(--sn-green-accent-soft-bg);
+  --gap-border: var(--sn-green-accent);
+  --gap-text: var(--sn-green-accent-strong);
+}
+
+.gapWrong {
+  --gap-bg: var(--sn-red-accent-soft-bg);
+  --gap-border: var(--sn-red-accent);
+  --gap-text: var(--sn-red-accent-strong);
+}
+
+.gapInCode {
+  --gap-base-surface: var(--sn-code-bg);
+  --gap-text: var(--sn-code-text);
+}

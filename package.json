@@ -1,9 +1,10 @@
 {
   "scripts": {
     "file": "pnpm ts-node -r tsconfig-paths/register",
-    "gen-schema": "pnpm ts-node -r tsconfig-paths/register src/dev/export-schema.ts",
+    "gen:schema": "pnpm ts-node -r tsconfig-paths/register src/dev/export-schema.ts",
     "gen": "pnpm ts-node -r tsconfig-paths/register src/builder/main.ts",
-    "dev": "pnpm run gen && pnpm --dir website start",
+    "gen:ignore-missing": "node -r ts-node/register -r tsconfig-paths/register -e \"process.env.IGNORE_MISSING_FILES='true'; require('./src/builder/main.ts')\"",
+    "dev": "pnpm run gen:ignore-missing && pnpm --dir website start",
     "start": "pnpm --dir website start",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json && pnpm --dir website build",
     "serve": "pnpm --dir website serve"
@@ -22,5 +23,8 @@
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=22.0.0"
   }
 }

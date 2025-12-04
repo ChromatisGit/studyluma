@@ -1,5 +1,5 @@
-import type { CoursePlan } from "@schema/coursePlan";
 import type { OverviewModel, RoadmapTopic } from "@schema/overview";
+import { worksheetCards } from "./worksheetCards";
 
 export function renderOverview(model: OverviewModel): string {
   const mdx = [
@@ -7,7 +7,7 @@ export function renderOverview(model: OverviewModel): string {
     imports(),
     intro(model.title, model.label),
     currentTopicSection(model.current),
-    worksheetsSection(model.worksheets),
+    worksheetCards(model.worksheets),
     roadmapSection(model.roadmap),
   ]
     .filter(Boolean)
@@ -21,7 +21,6 @@ function frontMatter(title: string) {
   return `
     ---
     title: "${title}"
-    sidebar_position: 1
     sidebar_label: "Übersicht"
     ---
   `;
@@ -29,8 +28,7 @@ function frontMatter(title: string) {
 
 function imports() {
   return `
-    import DocCard from '@site/src/components/DocCard';
-    import Roadmap from '@site/src/components/Roadmap';
+    import Roadmap from '@site/src/features/overview/Roadmap';
   `;
 }
 
@@ -53,27 +51,6 @@ function currentTopicSection(current: OverviewModel["current"]) {
     ## Aktuelles Thema
 
     ### ${current}
-  `;
-}
-
-function worksheetsSection(worksheets: CoursePlan["current_worksheets"]) {
-  if (worksheets.length === 0) return "";
-
-  const cards = worksheets
-    .map(
-      (worksheet) => `
-      <DocCard
-        href="${worksheet}"
-        label="Placeholder"
-        description="Placeholder"
-      />`
-    )
-    .join("\n");
-
-  return `
-    <div className="row">
-      ${cards}
-    </div>
   `;
 }
 

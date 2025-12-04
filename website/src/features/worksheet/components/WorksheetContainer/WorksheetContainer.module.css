@@ -1,0 +1,22 @@
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+.sheetHeader {
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--sn-border);
+}
+
+.sheetTitle {
+  margin: 0;
+  font-size: 2.2rem;
+  color: var(--sn-text);
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}

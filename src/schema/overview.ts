@@ -1,3 +1,4 @@
+import { WorksheetRef } from "@worksheet/worksheetFiles";
 import type { CoursePlan } from "./coursePlan"
 
 export type Status = "finished" | "current" | "planned" | "locked";
@@ -20,7 +21,7 @@ export type OverviewModel = {
   label: string;
   group: string;
   subject: CoursePlan["subject"];
-  current: string | null;
+  current?: CoursePlan["currentChapter"];
   roadmap: RoadmapTopic[];
-  worksheets: CoursePlan["current_worksheets"];
+  worksheets: WorksheetRef[];
 };

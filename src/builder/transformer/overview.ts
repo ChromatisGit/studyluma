@@ -1,170 +1,69 @@
-import type { CoursePlan } from "@schema/coursePlan";
 import path from "node:path";
-import { renderOverview } from "../template/overview.mdx";
-import type {
-  OverviewModel,
-  RoadmapChapter,
-  RoadmapTopic,
-  Status,
-} from "@schema/overview";
+import { renderOverview } from "@builder/template/overview.mdx";
+import type { OverviewModel, RoadmapChapter, RoadmapTopic } from "@schema/overview";
+import type { ResolvedCourseTopic, ResolvedCourse } from "../prepareCourses";
 
-export function buildOverview(course: CoursePlan) {
-  const model = toOverviewModel(course);
+export function buildOverview(
+  course: ResolvedCourse,
+  groupCourses: ResolvedCourse[],
+) {
+  const model = toOverviewModel(course, groupCourses);
 
   return {
-    relativePath: path.join(
-      "courses",
-      course.group,
-      course.course_variant,
-      "index.mdx",
-    ),
+    relativePath: path.join("docs", course.group.id, course.slug, "index.mdx"),
     content: renderOverview(model),
   };
 }
 
-const subjects = {
-  math: "Mathe",
-  info: "Informatik",
-} as const;
+function toOverviewModel(
+  course: ResolvedCourse,
+  allCourses: ResolvedCourse[],
+): OverviewModel {
+  const { group, subject, slug, courseVariant, topics, currentChapter } = course;
 
-type Chapter = CoursePlan["chapters"][number];
+  const hasMultipleSameSubject = allCourses.some(
+    c => c.group.id === group.id && c.subject.id === subject.id && c.slug !== slug
+  );
 
-function makeChapterStatusFactory(
-  courseVariant: CoursePlan["course_variant"],
-  topic: string,
-) {
-  return (chapter: Chapter, status: Status): RoadmapChapter => ({
-    label: chapter.label,
-    link: [courseVariant,
-      topic,
-      chapter.chapter.slice(3) // Removes first two digits e.g '01_geraden' -> 'geraden'
-    ].join("/"),
-    status,
-  });
-}
+  const label = hasMultipleSameSubject && courseVariant?.short
+    ? `${subject.label} (${courseVariant.short})`
+    : subject.label;
 
-function toOverviewModel(course: CoursePlan): OverviewModel {
-  const {
-    group,
-    subject,
-    course_variant,
-    label,
-    chapters,
-    topics,
-    current_worksheets,
-    current_chapter,
-  } = course;
+  const title = `${subject.label} ${group.id.toUpperCase()}`;
 
-  let currentChapterLabel: string = '';
-  const subjectLabel = subjects[subject];
-  const title = `${subjectLabel} ${group.toUpperCase()}`;
-
-  let currentTopicIndex = 0;
-
-  if (current_chapter !== null) {
-    const currentChapterEntry = chapters.find(
-      (c) => c.chapter === current_chapter,
-    );
-
-    if (currentChapterEntry) {
-      const topicForCurrentChapter = currentChapterEntry.topic;
-      const topicIndex = topics.findIndex(
-        (t) => t.topic === topicForCurrentChapter,
-      );
-
-      if (topicIndex !== -1) {
-        currentTopicIndex = topicIndex;
-      }
-    }
-  }
-
-  const roadmap: RoadmapTopic[] = topics.map((topic, topicIndex) => {
-    const setChapterStatus = makeChapterStatusFactory(
-      course_variant,
-      topic.topic,
-    );
-
-    const topicBase = {
-      label: topic.label,
-      link: [course_variant, topic.topic].join("/"),
-    };
-
-    const currentChapters = chapters.filter(
-      (c) => c.topic === topic.topic,
-    );
-
-    const relativeIndex = topicIndex - currentTopicIndex;
-
-    // 1) Finished topics
-    if (relativeIndex < 0) {
-      return {
-        ...topicBase,
-        status: "finished",
-        chapters: currentChapters.map((chapter) =>
-          setChapterStatus(chapter, "finished"),
-        ),
-      };
-    }
-
-    // 2) Current topic
-    if (relativeIndex === 0) {
-      const currentChapterIndex = currentChapters.findIndex(
-        (c) => c.chapter === current_chapter,
-      );
-
-      const chaptersForRoadmap: RoadmapChapter[] = currentChapters.map(
-        (chapter, chapterIndex): RoadmapChapter => {
-
-          if (currentChapterIndex >= 0) {
-            if (chapterIndex < currentChapterIndex) {
-              return setChapterStatus(chapter, "finished");
-            }
-
-            if (chapterIndex === currentChapterIndex) {
-              currentChapterLabel = chapter.label;
-              return setChapterStatus(chapter, "current");
-            }
-          }
-
-          return setChapterStatus(chapter, "planned");
-        },
-      );
-
-      return {
-        ...topicBase,
-        status: "current",
-        chapters: chaptersForRoadmap,
-      };
-    }
-
-    // 3) Next topic: preview first two chapters
-    if (relativeIndex === 1) {
-      const preview = currentChapters.slice(0, 2);
-
-      return {
-        ...topicBase,
-        status: "planned",
-        chapters: preview.map((chapter) =>
-          setChapterStatus(chapter, "planned"),
-        ),
-      };
-    }
-
-    // 4) All later topics are locked
-    return {
-      label: topic.label,
-      status: "locked",
-      chapters: [],
-    };
-  });
+  const roadmap: RoadmapTopic[] = topics.map((topic) =>
+    buildRoadmapTopic(topic, group.id, slug),
+  );
 
   return {
     title,
     label,
-    group,
-    subject,
-    current: currentChapterLabel,
+    group: group.id,
+    subject: subject.id,
+    current: currentChapter?.label ?? undefined,
     roadmap,
-    worksheets: current_worksheets,
+    worksheets: currentChapter?.worksheets ?? [],
+  };
+}
+
+function buildRoadmapTopic(
+  topic: ResolvedCourseTopic,
+  group: string,
+  slug: string,
+): RoadmapTopic {
+  const topicLink = ["", group, slug, topic.topic].join("/");
+  const chapters: RoadmapChapter[] = topic.chapters.map((chapter) => {
+    return {
+      label: chapter.label,
+      link: [topicLink, chapter.slug].join("/"),
+      status: chapter.status,
+    }
+  });
+
+  return {
+    label: topic.label,
+    status: topic.status,
+    link: topicLink,
+    chapters
   };
 }

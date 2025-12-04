@@ -1,37 +1,47 @@
+import { deleteGeneratedWebsite, writeGeneratedFile } from "./io";
+import { loadContent } from "./loadContent";
 import { buildCoursesConfig } from "./transformer/courses";
 import { getAllPagePaths } from "./transformer/pagePaths";
-import { writeFile, readAllCourses, deleteGeneratedWebsite, readAllTopics } from "./io";
+import { buildPageFile } from "./transformer/pages";
 import { buildNavbarConfig } from "./transformer/navbar";
 import { buildOverview } from "./transformer/overview";
 import { buildSidebar } from "./transformer/sidebar";
-import { processPageFile } from "./processPage";
-import { setCourseLabels } from "./transformer/courseLabels";
+import { buildGroupsAndSubjects } from "./transformer/groupsAndSubjects";
+import { validateCourses } from "./validateCourses";
+import { prepareCourses } from "./prepareCourses";
+import { getAllWorksheets } from "./loadWorksheets";
+import { buildWorksheet } from "@worksheet/buildWorksheet";
 
 async function main() {
   await deleteGeneratedWebsite()
 
-  const coursesData = await readAllCourses();
-  const topicsData = await readAllTopics();
+  const { groupsAndSubjects, topics, courses } = await loadContent();
 
-  const courses = setCourseLabels(coursesData, topicsData)
+  validateCourses(courses, groupsAndSubjects);
 
-  const filePaths = getAllPagePaths(courses);
+  const resolvedCourses = prepareCourses(courses, groupsAndSubjects, topics);
+
+  const worksheetLocations  = await getAllWorksheets(resolvedCourses);
 
   await Promise.all([
+    writeGeneratedFile(buildGroupsAndSubjects(groupsAndSubjects)),
 
-    ...filePaths.map(file => processPageFile(file)),
+    ...getAllPagePaths(resolvedCourses).map(async file => writeGeneratedFile(await buildPageFile(file))),
 
-    ...courses.map(course => writeFile(buildSidebar(course))),
-    ...courses.map(course => writeFile(buildOverview(course))),
+    ...worksheetLocations.map(async file => buildWorksheet(file)),
 
-    writeFile(buildCoursesConfig(courses)),
-    writeFile(buildNavbarConfig(courses)),
+    ...resolvedCourses.map(course => writeGeneratedFile(buildSidebar(course))),
+    ...resolvedCourses.map(course => writeGeneratedFile(buildOverview(course, resolvedCourses))),
+
+    writeGeneratedFile(buildCoursesConfig(resolvedCourses)),
+    writeGeneratedFile(buildNavbarConfig(resolvedCourses)),
   ])
 
-  console.log(`[builder] OK - ${courses.length} course(s)`);
+  console.log(`[builder] OK - ${resolvedCourses.length} course(s)`);
 }
 
 main().catch((err) => {
   console.error("[builder] FAILED\n", err instanceof Error ? err.stack ?? err.message : err);
   process.exit(1);
 });
+

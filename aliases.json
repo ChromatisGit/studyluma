@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@builder/*": ["src/builder/*"],
+      "@css/*": ["website/src/css/*"],
+      "@dev/*": ["src/dev/*"],
+      "@features/*": ["website/src/features/*"],
+      "@generated-configs/*": ["website/.generated/configs/*"],
+      "@marp-styles/*": ["src/marp-styles/*"],
+      "@pages/*": ["website/src/pages/*"],
+      "@schema/*": ["src/schema/*"],
+      "@site/*": ["website/*"],
+      "@theme/*": ["website/src/theme/*"],
+      "@worksheet/*": ["src/worksheet/*"]
+    }
+  }
+}

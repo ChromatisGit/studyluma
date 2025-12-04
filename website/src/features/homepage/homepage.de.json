@@ -1,0 +1,50 @@
+{
+  "hero": {
+    "title": "Willkommen bei StudyNode",
+    "lead": "Lernen neu gedacht - mit Sinn und Struktur",
+    "primaryCta": {
+      "label": "Kurse entdecken",
+      "ariaLabel": "Zu den Kursen"
+    },
+    "secondaryCta": {
+      "label": "Mehr über StudyNode",
+      "ariaLabel": "Mehr über StudyNode"
+    }
+  },
+  "about": {
+    "title": "Was ist StudyNode?",
+    "subtitle": "StudyNode ist eine zentrale Lernplattform für den Informatik- und Mathematikunterricht von Herrn Holst.",
+    "intro": "StudyNode soll mehr als nur ein Ablageort für Unterrichtsmaterialien sein. Die Plattform macht Wissen sichtbar und zeigt, wie die Themen zusammenhängen und sich gegenseitig ergänzen - wie Knoten in einem Netzwerk! Sie basiert auf Docusaurus und modernen Web-Standards, die für eine zugängliche und zeitgemäße Lernumgebung sorgen. Denn im Fokus steht das erfolgreiche Lernen, ohne Werbung, ohne Schnickschnack.",
+    "note": "Die Plattform befindet sich noch in der Aufbauphase. Ich freue mich über sämtliches Feedback!",
+    "goals": {
+      "clearStructure": {
+        "title": "Klare Strukturen",
+        "description": "Alle Materialien und Aufgaben sind übersichtlich organisiert."
+      },
+      "forStudents": {
+        "title": "Für meine Schüler",
+        "description": "Ergänzt den Unterricht und unterstützt beim eigenständigen Lernen."
+      },
+      "connectedKnowledge": {
+        "title": "Vernetztes Wissen",
+        "description": "Ermöglicht Zusammenhänge zu erkennen und Verbindungen zu verstehen."
+      }
+    }
+  },
+  "courses": {
+    "title": "Alle Kurse",
+    "subtitle": "Wähle deinen Kurs aus, um auf alle Inhalte zuzugreifen.",
+    "openActionLabel": "Kurs öffnen"
+  },
+  "footer": {
+    "description": "Eine digitale Lernplattform für Informatik- und Mathematikunterricht von Herr Holst.",
+    "contactHeading": "Kontakt",
+    "contactPrompt": "Fragen zu der Webseite oder den Inhalten? Melde dich gerne bei mir!",
+    "tagline": "Gebaut mit 💜 fürs Lernen",
+    "copyright": "© {year} Christian Holst. Powered by Docusaurus."
+  },
+  "meta": {
+    "title": "StudyNode",
+    "description": "Lernplattform für Informatik und Mathematik"
+  }
+}

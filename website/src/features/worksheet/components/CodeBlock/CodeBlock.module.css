@@ -1,0 +1,42 @@
+.codeBlock {
+  margin: 0.35rem 0;
+  border-radius: 10px;
+  overflow: visible;
+  border: 1px solid var(--sn-border);
+  background: var(--sn-code-bg);
+  color: var(--sn-code-text);
+  padding: 0.35rem 0.65rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.98rem;
+}
+
+.codeBlockInline {
+  display: inline-block;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--sn-border);
+  background: var(--sn-code-bg);
+  color: var(--sn-code-text);
+  padding: 0.2rem 0.55rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.98rem;
+}
+
+.codeLine {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.95rem;
+  padding: 0.05rem 0;
+  color: var(--sn-code-text);
+  background: transparent;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.inlineCode {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.95rem;
+  background: var(--sn-purple-accent-selection);
+  color: var(--sn-text);
+  padding: 0.05rem 0.25rem;
+  border-radius: 6px;
+}

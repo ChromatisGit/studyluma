@@ -1,16 +1,16 @@
 {
+  "extends": "./aliases.json",
   "compilerOptions": {
     "target": "ES2024",
     "module": "CommonJS",
-    "moduleResolution": "Node",
     "jsx": "react-jsx",
-    "baseUrl": ".",
-    "paths": {
-      "@schema/*": ["src/schema/*"],
-    },
     "outDir": ".build",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
-    "esModuleInterop": true
+    "baseUrl": "."
   },
   "include": ["src"]
 }

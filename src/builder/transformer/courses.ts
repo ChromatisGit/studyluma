@@ -1,13 +1,43 @@
-import type { CoursePlan } from "@schema/coursePlan"
+import type { AccentColor } from "@schema/colors";
+import type { ResolvedCourse } from "../prepareCourses";
 
-export function buildCoursesConfig(courses: CoursePlan[]) {
-    const content = courses.map(c => {
-        const { group, course_variant } = c
-        return { group, course_variant }
+export type Course = {
+  group: string;
+  slug: string;
+  title: string;
+  description: string;
+  tags: string[];
+  color: AccentColor;
+  icon: string;
+};
+
+
+export function buildCoursesConfig(courses: ResolvedCourse[]) {
+    const content: Course[] = courses.map((course) => {
+        const descriptionBase =
+          course.currentChapter?.label ??
+          course.topics.find((t) => t.chapters.length)?.chapters[0]?.label ??
+          course.topics[0]?.label ??
+          "";
+
+        const tags = [course.group.label, course.subject.label];
+        if (course.courseVariant) {
+            tags.push(course.courseVariant.label);
+        }
+
+        return {
+            group: course.group.id,
+            slug: course.slug,
+            title: `${course.subject.label} ${course.group.id.toUpperCase()}`,
+            description: `Aktuelles Thema: ${descriptionBase}`,
+            tags,
+            color: course.group.color,
+            icon: course.subject.icon
+        }
     })
 
     return {
-        relativePath: `courses.config.json`,
-        content:  JSON.stringify(content, null, 2)
+        relativePath: `configs/courses.config.json`,
+        content: JSON.stringify(content, null, 2)
     };
 }

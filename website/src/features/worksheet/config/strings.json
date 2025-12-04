@@ -1,0 +1,30 @@
+{
+  "categories": {
+    "info": "Info",
+    "checkpoint": "Checkpoint",
+    "core": "Aufgaben",
+    "challenge": "Challenges"
+  },
+  "buttons": {
+    "checkSolution": "Lösung vergleichen",
+    "runCode": "Code ausführen"
+  },
+  "sections": {
+    "hint": "Hinweis anzeigen",
+    "solution": "Musterlösung anzeigen"
+  },
+  "codeTask": {
+    "editorTitle": "Code editor",
+    "diagnosticsTitle": "TypeScript errors",
+    "resultSuccess": "Well done! Your solution is correct.",
+    "resultFailure": "Not quite right. Check your output below.",
+    "consoleOutput": "Console output",
+    "noOutput": "Code executed successfully (no output)"
+  },
+  "freeResponseTask": {
+    "placeholder": "Type your answer here..."
+  },
+  "gapTask": {
+    "textPlaceholder": "..."
+  }
+}

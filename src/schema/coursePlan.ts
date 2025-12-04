@@ -1,67 +1,96 @@
 import { z } from "zod";
+import type { GroupsAndSubjects } from "./groupsAndSubjects";
 
-const Subject = z.enum(["math", "info"]);
 const Group = z.string().regex(/^[a-z0-9]+$/i, "use letters/numbers only");
 
 const TopicValue = z.array(z.string()).nullable();
 const TopicsSchema = z.record(z.string(), TopicValue);
 
-export const YamlCoursePlanSchema = z.object({
+export const yamlCoursePlanSchema = z.object({
   course: z.object({
     group: Group,
-    subject: Subject,
-    label: z.string(),
+    subject: z.string(),
     variant: z.string().optional(),
+    icon: z.string().optional(),
   }).strict(),
+  worksheet : z.object({
+    format: z.enum(["web", "pdf"]),
+  }),
   current_chapter: z.string().nullable(),
-  current_worksheets: z.array(z.string()).nullable(),
   topics: TopicsSchema,
 }).strict();
 
-export type YamlCoursePlan = z.infer<typeof YamlCoursePlanSchema>;
+export type YamlCoursePlan = z.infer<typeof yamlCoursePlanSchema>;
 
 
 type Topics = z.infer<typeof TopicsSchema>
 
-function flattenTopics(topics: Topics) {
-  return Object.entries(topics).flatMap(([topic, chapters]) => {
-    if (!chapters) {
-      return [{ topic, chapter: topic, label: topic }]
-    }
-    return chapters.map(chapter => {
-      return { topic, chapter, label: chapter }
-    })
-  })
-}
+function toTopics(topics: Topics) {
+  return Object.entries(topics).map(([topic, chapters]) => {
+    const chapterList = chapters && chapters.length > 0 ? chapters : [topic];
 
-function addTitlesToTopics(topics: Topics) {
-  return Object.keys(topics).map(topic => {
     return {
       topic,
-      label: topic
-    }
-  })
+      label: topic,
+      chapters: chapterList.map((chapter) => ({
+        topic,
+        chapter,
+        label: chapter,
+      })),
+    };
+  });
 }
 
-export const CoursePlanSchema = YamlCoursePlanSchema.transform(v => ({
+export const CoursePlanSchema = yamlCoursePlanSchema.transform(v => ({
   group: v.course.group,
   subject: v.course.subject,
-  label: v.course.label,
-  course_variant: v.course.variant
+  courseVariant: v.course.variant,
+  slug: v.course.variant
     ? `${v.course.subject}-${v.course.variant}`
     : v.course.subject,
-  current_chapter: v.current_chapter,
-  current_worksheets: v.current_worksheets ?? [],
-  topics: addTitlesToTopics(v.topics),
-  chapters: flattenTopics(v.topics)
+  currentChapter: v.current_chapter,
+  worksheetFormat: v.worksheet.format,
+  topics: toTopics(v.topics),
 }))
   .refine(
-    ({ chapters, current_chapter }) =>
-      current_chapter === null ||
-      chapters.some(c => c.chapter === current_chapter),
+    ({ topics, currentChapter }) =>
+      currentChapter === null ||
+      topics.some((topic) =>
+        topic.chapters.some((chapter) => chapter.chapter === currentChapter),
+      ),
     {
       error: "current_chapter must be null or exist inside of topics!",
     }
   );
 
 export type CoursePlan = z.infer<typeof CoursePlanSchema>;
+
+export function createCoursePlanSchema(groupsAndSubjects: GroupsAndSubjects) {
+  return CoursePlanSchema.superRefine((course, ctx) => {
+    const groupId = course.group.replace(/[0-9]/g, "");
+
+    if (!groupsAndSubjects.groups[groupId]) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["group"],
+        message: `Group '${course.group}' is not defined in groupsAndSubjects.yml`,
+      });
+    }
+
+    if (!groupsAndSubjects.subjects[course.subject]) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["subject"],
+        message: `Subject '${course.subject}' is not defined in groupsAndSubjects.yml`,
+      });
+    }
+
+    if (course.courseVariant && !groupsAndSubjects.variants[course.courseVariant]) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["courseVariant"],
+        message: `Variant '${course.courseVariant}' is not defined in groupsAndSubjects.yml`,
+      });
+    }
+  });
+}

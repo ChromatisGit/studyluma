@@ -1,0 +1,48 @@
+.codeEditor {
+  position: relative;
+  font-family: var(--ifm-font-family-monospace);
+  background: var(--sn-code-bg);
+  color: var(--sn-code-text);
+  overflow: hidden;
+  padding: 0;
+}
+
+.codeEditorBackdrop {
+  position: absolute;
+  inset: 0;
+  padding: 0.85rem 1rem;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.highlightedCode {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  line-height: 1.5;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.98rem;
+  color: var(--sn-code-text);
+  background: transparent;
+  white-space: pre-wrap;
+}
+
+.codeEditorTextarea {
+  position: relative;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  color: transparent;
+  border: 0;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.5;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.98rem;
+  outline: none;
+  caret-color: var(--sn-text-on-accent);
+}
+
+.codeEditorTextarea::selection {
+  background: var(--sn-purple-accent-selection);
+}
