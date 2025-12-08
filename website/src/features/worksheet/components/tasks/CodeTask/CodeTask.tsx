@@ -26,20 +26,27 @@ export function CodeTask({ task, isSingleTask = false, triggerCheck }: CodeTaskP
     consoleOutput,
     runtimeError,
     lastPassed,
+    hadRuntime,
     runCode,
   } = useTsRunner();
 
+  const hasValidation = Boolean(task.validation?.trim());
   // Compute number of rows for editor from solution length
   const solutionLines = task.solution ? task.solution.split('\n').length : 10;
   const codeRows = Math.max(6, solutionLines + 1);
+  const hasTypeErrors = diagnostics.some(diag => diag.category === 'error');
 
   // Derive testResult from lastPassed + showValidation
-  const testResult: 'success' | 'failure' | null =
-    showValidation && lastPassed !== null
-      ? lastPassed
-        ? 'success'
-        : 'failure'
-      : null;
+  const testResult: 'success' | 'failure' | null = (() => {
+    if (!showValidation || isLoading) return null;
+    if (hasValidation) {
+      if (lastPassed === null) return null;
+      return lastPassed ? 'success' : 'failure';
+    }
+    if (hasTypeErrors || runtimeError) return 'failure';
+    if (hadRuntime) return 'success';
+    return null;
+  })();
 
   // Reset state when code changes
   const handleCodeChange = (value: string) => {
@@ -64,7 +71,7 @@ export function CodeTask({ task, isSingleTask = false, triggerCheck }: CodeTaskP
       runCode({
         code,
         validation: task.validation,
-        validate: true,
+        validate: hasValidation,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,7 +100,9 @@ export function CodeTask({ task, isSingleTask = false, triggerCheck }: CodeTaskP
   };
 
   const renderResultPanel = () => {
-    const hasAnyOutput = consoleOutput || runtimeError !== null || showValidation;
+    const showNoOutput = hadRuntime && !runtimeError && !consoleOutput;
+    const hasConsoleData = runtimeError !== null || consoleOutput || showNoOutput;
+    const hasAnyOutput = Boolean(testResult || hasConsoleData);
 
     if (!hasAnyOutput) return null;
 
@@ -104,24 +113,31 @@ export function CodeTask({ task, isSingleTask = false, triggerCheck }: CodeTaskP
     if (isSuccess) resultClasses.push(styles.resultSuccess);
     if (isFailure) resultClasses.push(styles.resultFailure);
 
+    const resultLabel = (() => {
+      if (isSuccess) {
+        return hasValidation
+          ? strings.codeTask.resultSuccess
+          : strings.codeTask.resultCompiled;
+      }
+      if (isFailure) {
+        return hasValidation
+          ? strings.codeTask.resultFailure
+          : strings.codeTask.resultCompileError;
+      }
+      if (hasConsoleData) {
+        return strings.codeTask.consoleOutput;
+      }
+      return null;
+    })();
+
     return (
       <div className={resultClasses.join(' ')}>
-        {isSuccess && (
-          <div className={styles.resultLabel}>{strings.codeTask.resultSuccess}</div>
-        )}
-        {isFailure && (
-          <div className={styles.resultLabel}>{strings.codeTask.resultFailure}</div>
-        )}
-        {!testResult && (
-          <div className={styles.resultLabel}>{strings.codeTask.consoleOutput}</div>
-        )}
-        {runtimeError ? (
-          <pre className={`${styles.consoleOutput} ${styles.consoleError}`}>
-            {runtimeError}
-          </pre>
-        ) : (
-          <pre className={styles.consoleOutput}>
-            {consoleOutput || strings.codeTask.noOutput}
+        {resultLabel && <div className={styles.resultLabel}>{resultLabel}</div>}
+        {hasConsoleData && (
+          <pre
+            className={`${styles.consoleOutput} ${runtimeError ? styles.consoleError : ''}`}
+          >
+            {runtimeError || consoleOutput || strings.codeTask.noOutput}
           </pre>
         )}
       </div>

@@ -1,7 +1,6 @@
 import { TaskHandlerArgs } from "@worksheet/taskRegistry";
 import { deterministicShuffle } from "@worksheet/utils/simpleHash";
 import {
-  collapseNewlinePadding,
   dedentFencedCodeBlocks,
   stripSharedIndentation,
 } from "@worksheet/utils/text";
@@ -27,9 +26,7 @@ export function gapTaskHandler({
   body,
   params,
 }: TaskHandlerArgs): GapTask {
-  const content = collapseNewlinePadding(
-    dedentFencedCodeBlocks(stripSharedIndentation(body))
-  );
+  const content = dedentFencedCodeBlocks(stripSharedIndentation(body));
 
   const textMode = params?.empty === true;
 
@@ -49,9 +46,7 @@ export function gapTaskHandler({
     const matchIndex = match.index;
 
     if (matchIndex > lastIndex) {
-      const textPart = collapseNewlinePadding(
-        content.slice(lastIndex, matchIndex)
-      );
+      const textPart = content.slice(lastIndex, matchIndex);
       parts.push({ type: "text", content: textPart });
     }
 
@@ -62,7 +57,7 @@ export function gapTaskHandler({
 
     const baseOptions = rawEntries.length ? rawEntries : [""];
 
-    const correct = textMode ? baseOptions : [baseOptions[0]];
+    const correct = textMode ? baseOptions.map(t => t.toLowerCase()) : [baseOptions[0]];
 
     const options = textMode
       ? baseOptions
@@ -81,7 +76,7 @@ export function gapTaskHandler({
   }
 
   if (lastIndex < content.length) {
-    const trailing = collapseNewlinePadding(content.slice(lastIndex));
+    const trailing = content.slice(lastIndex);
     parts.push({ type: "text", content: trailing });
   }
 

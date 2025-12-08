@@ -46,3 +46,7 @@
 .codeEditorTextarea::selection {
   background: var(--sn-purple-accent-selection);
 }
+
+.codeEditorTextareaReadOnly {
+  cursor: default;
+}

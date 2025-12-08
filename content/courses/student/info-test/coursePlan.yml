@@ -1,6 +1,6 @@
 course:
-  group: tg2
-  variant: tgtm
+  group: student
+  variant: test
   subject: info
 
 worksheet:

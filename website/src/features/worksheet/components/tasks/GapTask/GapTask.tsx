@@ -140,16 +140,22 @@ export function GapTask({ task, isSingleTask = false, triggerCheck }: GapTaskPro
       } else {
         // Gap field
         const currentGapIndex = gapCounter++;
+        const answerValue = answers[currentGapIndex] || '';
+        const valueToCompare = part.gap.mode === 'text' ? answerValue.toLowerCase() : answerValue;
+        const correctOptions =
+          part.gap.mode === 'text'
+            ? part.gap.correct.map(option => option.toLowerCase())
+            : part.gap.correct;
         const gapElement = (
           <GapField
             key={`gap-${partIndex}`}
             gap={part.gap}
             gapIndex={currentGapIndex}
-            value={answers[currentGapIndex] || ''}
+            value={answerValue}
             onChange={(value) => handleAnswerChange(currentGapIndex, value)}
             isInCodeBlock={isInCodeBlock}
             isValidated={validatedGaps.has(currentGapIndex)}
-            isCorrect={part.gap.correct.includes(answers[currentGapIndex] || '')}
+            isCorrect={correctOptions.includes(valueToCompare)}
           />
         );
 
@@ -189,15 +195,16 @@ interface GapFieldProps {
   isCorrect?: boolean;
 }
 
-function GapField({ gap, gapIndex, value, onChange, isInCodeBlock = false, isValidated = false, isCorrect }: GapFieldProps) {
+function GapField({ gap, value, onChange, isInCodeBlock = false, isValidated = false, isCorrect }: GapFieldProps) {
   const options = gap.options ?? gap.correct;
   const longestText = options.reduce<string>(
     (longest, option) => option.length > longest.length ? option : longest,
     ""
   );
 
-  const baseWidth = Math.max(longestText.length * 0.6, 3);
-  const inputWidth = gap.mode === "mcq" ? `${baseWidth + 1.5}rem` : `${baseWidth}rem`;
+  const baseWidth = Math.max(longestText.length * 0.71, 1.45) ;
+  const inputWidth = gap.mode === "mcq" ? `${baseWidth + 1.1}rem` : `${baseWidth}rem`;
+  const widthStyle = { width: inputWidth, minWidth: inputWidth };
 
   // Determine validation state - only show validation if gap has been validated
   const showWrong = isValidated && value && !isCorrect;
@@ -211,14 +218,16 @@ function GapField({ gap, gapIndex, value, onChange, isInCodeBlock = false, isVal
 
   if (gap.mode === "text") {
     return (
-      <span className={`${styles.gapField} ${isInCodeBlock ? styles.gapInCode : ''}`} style={{ width: inputWidth }}>
+      <span
+        className={`${styles.gapField} ${isInCodeBlock ? styles.gapInCode : ''} ${stateClass}`}
+        style={widthStyle}
+      >
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`${styles.gapControl} ${stateClass}`}
+          className={styles.gapControl}
           placeholder={strings.gapTask.textPlaceholder}
-          style={{ minWidth: '3rem' }}
         />
       </span>
     );
@@ -226,13 +235,16 @@ function GapField({ gap, gapIndex, value, onChange, isInCodeBlock = false, isVal
 
   // MCQ mode - dropdown
   return (
-    <span className={`${styles.gapField} ${isInCodeBlock ? styles.gapInCode : ''}`} style={{ width: inputWidth }}>
+    <span
+      className={`${styles.gapField} ${isInCodeBlock ? styles.gapInCode : ''} ${stateClass}`}
+      style={widthStyle}
+    >
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`${styles.gapControl} ${styles.gapSelect} ${stateClass}`}
+        className={`${styles.gapControl} ${styles.gapSelect}`}
       >
-        <option value="" disabled hidden></option>
+        <option value="" disabled hidden/>
         {options.map((option: string, index: number) => (
           <option key={index} value={option}>
             {option}

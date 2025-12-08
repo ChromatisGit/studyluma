@@ -42,8 +42,9 @@ export function parseGroupMacro({
 
   introParts.push(macro.body.slice(cursor));
 
+
   const introText = introParts
-    .map((part) => stripSharedIndentation(part).trim())
+    .map((part) => stripSharedIndentation(part))
     .filter(Boolean)
     .join("\n\n");
 

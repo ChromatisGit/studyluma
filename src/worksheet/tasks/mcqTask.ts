@@ -15,6 +15,8 @@ export type McqTask = {
   correct: string[];
   options: string[];
   single: boolean;
+  shuffleSolutions: boolean;
+  wideLayout: boolean;
 };
 
 export function mcqTaskHandler({
@@ -57,13 +59,20 @@ export function mcqTaskHandler({
     throw new Error("@mcq must include at least one option.");
   }
 
+  const wideLayout = params?.wideLayout === true;
+  const shuffleSolutions = params?.shuffleSolutions !== false;
   const single = params?.single === true;
+  const finalOptions = shuffleSolutions
+    ? deterministicShuffle(options, `${question}?`)
+    : options;
 
   return {
     type: "mcq",
     question,
-    options: deterministicShuffle(options, `${question}?`),
+    options: finalOptions,
     correct,
     single,
+    shuffleSolutions,
+    wideLayout,
   };
 }

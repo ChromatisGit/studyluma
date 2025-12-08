@@ -69,7 +69,7 @@ const config: Config = {
         id: 'additional-resources',
       },
     ],
-    [require.resolve('@cmfcmf/docusaurus-search-local'), { language: ['de'] }],
+    [require.resolve('@cmfcmf/docusaurus-search-local'), { language: ['de'], indexBlog: false }],
     function aliasPlugin() {
       return {
         name: 'studynode-aliases',

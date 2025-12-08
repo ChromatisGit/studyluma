@@ -4,6 +4,7 @@ import { worksheetCards } from "./worksheetCards";
 type PageTemplateInput = {
   label: string;
   isIndexPage: boolean;
+  sidebar?: string;
   body: string;
   worksheets: WorksheetRef[];
 };

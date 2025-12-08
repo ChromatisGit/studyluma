@@ -6,6 +6,17 @@ import styles from './McqTask.module.css';
 import type { McqTask as McqTaskType } from '@worksheet/worksheetModel';
 import { chunkSections } from '@features/homepage/sections/CourseSection/sectionSplitter';
 
+function chunkIntoColumns<T>(items: T[], maxPerRow: number): T[][] {
+  const rows: T[][] = [];
+  const size = Math.max(1, Math.floor(maxPerRow));
+
+  for (let i = 0; i < items.length; i += size) {
+    rows.push(items.slice(i, i + size));
+  }
+
+  return rows;
+}
+
 interface McqTaskProps {
   task: McqTaskType;
   isSingleTask?: boolean;
@@ -28,7 +39,9 @@ export function McqTask({ task, isSingleTask = false, triggerCheck }: McqTaskPro
 
   // Determine if task should be locked
   const isLocked = isChecked;
-  const optionRows = chunkSections(task.options);
+  const optionRows = task.wideLayout
+    ? chunkIntoColumns(task.options, 2)
+    : chunkSections(task.options);
 
   const handleSelect = (option: string) => {
     if (isLocked) return;

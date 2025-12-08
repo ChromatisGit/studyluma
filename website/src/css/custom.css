@@ -162,14 +162,3 @@
 
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
-
-/* DocCards Icon Invisible */
-h2[class*="cardTitle"]::first-letter {
-  font-size: 0 !important;
-  line-height: 0 !important;
-}
-
-h2[class*="cardTitle"] {
-  position: relative;
-  left: -0.5ch;
-}

@@ -28,7 +28,7 @@ export function buildCoursesConfig(courses: ResolvedCourse[]) {
         return {
             group: course.group.id,
             slug: course.slug,
-            title: `${course.subject.label} ${course.group.id.toUpperCase()}`,
+            title: `${course.subject.label} ${course.group.label}`,
             description: `Aktuelles Thema: ${descriptionBase}`,
             tags,
             color: course.group.color,

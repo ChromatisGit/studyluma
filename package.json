@@ -3,10 +3,10 @@
     "file": "pnpm ts-node -r tsconfig-paths/register",
     "gen:schema": "pnpm ts-node -r tsconfig-paths/register src/dev/export-schema.ts",
     "gen": "pnpm ts-node -r tsconfig-paths/register src/builder/main.ts",
-    "gen:ignore-missing": "node -r ts-node/register -r tsconfig-paths/register -e \"process.env.IGNORE_MISSING_FILES='true'; require('./src/builder/main.ts')\"",
-    "dev": "pnpm run gen:ignore-missing && pnpm --dir website start",
+    "gen:ignoreMissing": "node -r ts-node/register -r tsconfig-paths/register -e \"process.env.IGNORE_MISSING_FILES='true'; require('./src/builder/main.ts')\"",
+    "dev": "pnpm run gen:ignoreMissing && pnpm --dir website start",
     "start": "pnpm --dir website start",
-    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json && pnpm --dir website build",
+    "build": "pnpm run gen:ignoreMissing && pnpm --dir website install && pnpm --dir website build",
     "serve": "pnpm --dir website serve"
   },
   "dependencies": {

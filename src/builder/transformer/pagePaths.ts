@@ -40,7 +40,7 @@ function buildCoursePagePaths(course: ResolvedCourse): PageSource[] {
 
       files.push({
         source: path.join(baseDir, "chapters", chapter.chapter, pickSourceFile(chapter.status)),
-        target: path.join(targetDir, `${chapter.slug}.md`),
+        target: path.join(targetDir, `${chapter.chapter}.md`),
         label: chapter.label,
         worksheets: chapter.worksheets
       });

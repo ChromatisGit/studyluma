@@ -6,6 +6,7 @@ export const topicPlanSchema = z.object({
     z.object({
       id: z.string(),
       title: z.string(),
+      time: z.number().optional(),
       goals: z.array(z.string()),
     }).strict()
   ),

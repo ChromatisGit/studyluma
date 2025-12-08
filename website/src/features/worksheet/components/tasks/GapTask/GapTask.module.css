@@ -23,12 +23,14 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  flex-shrink: 0;
   --gap-base-surface: var(--sn-surface);
   --gap-text: var(--sn-text);
   z-index: 1;
 }
 
 .gapControl {
+  box-sizing: border-box;
   width: 100%;
   padding: 0.12rem 0.2rem;
   border: 0;
@@ -61,7 +63,7 @@
 }
 
 .gapActive {
-  --gap-border: var(--sn-gray-border);
+  --gap-border: var(--sn-purple);
 }
 
 .gapCorrect {
@@ -76,7 +78,47 @@
   --gap-text: var(--sn-red-accent-strong);
 }
 
+.gapWrong .gapControl {
+  border-bottom: 0;
+}
+
+.gapWrong::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 6px;
+  pointer-events: none;
+  z-index: 3;
+  background-color: var(--gap-border);
+  -webkit-mask-image: url("/img/swiggle.svg");
+  mask-image: url("/img/swiggle.svg");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 12px 6px;
+  mask-size: 12px 6px;
+  -webkit-mask-position: left bottom;
+  mask-position: left bottom;
+}
+
 .gapInCode {
-  --gap-base-surface: var(--sn-code-bg);
+  --gap-bg: var(--sn-code-bg);
   --gap-text: var(--sn-code-text);
+}
+
+.gapInCode.gapCorrect,
+.gapCorrect.gapInCode {
+  /* Use dark theme success palette even in light mode for code blocks */
+  --gap-bg: #10211b;
+  --gap-border: #63d49a;
+  --gap-text: #46b87d;
+}
+
+.gapInCode.gapWrong,
+.gapWrong.gapInCode {
+  /* Use dark theme danger palette even in light mode for code blocks */
+  --gap-bg: #2a1218;
+  --gap-border: #ff6b8c;
+  --gap-text: #f24369;
 }

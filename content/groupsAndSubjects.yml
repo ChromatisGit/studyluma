@@ -8,6 +8,12 @@ groups:
   bs:
     name: Berufsschule
     color: orange
+  student:
+    name: Schüleransicht
+    color: blue
+  teacher:
+    name: Lehreransicht
+    color: red
 
 subjects:
   math:
@@ -30,5 +36,8 @@ variants:
   tgm:
     name: Mechatronik
     short: M
+  test:
+    name: Test
+    short: Test
 
 schoolyear_start: sep

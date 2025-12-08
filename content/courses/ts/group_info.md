@@ -1,1 +1,0 @@
-# Leitsätze respektvoller Umgang

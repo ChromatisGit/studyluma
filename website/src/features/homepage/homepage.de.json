@@ -14,7 +14,7 @@
   "about": {
     "title": "Was ist StudyNode?",
     "subtitle": "StudyNode ist eine zentrale Lernplattform für den Informatik- und Mathematikunterricht von Herrn Holst.",
-    "intro": "StudyNode soll mehr als nur ein Ablageort für Unterrichtsmaterialien sein. Die Plattform macht Wissen sichtbar und zeigt, wie die Themen zusammenhängen und sich gegenseitig ergänzen - wie Knoten in einem Netzwerk! Sie basiert auf Docusaurus und modernen Web-Standards, die für eine zugängliche und zeitgemäße Lernumgebung sorgen. Denn im Fokus steht das erfolgreiche Lernen, ohne Werbung, ohne Schnickschnack.",
+    "intro": "Wissen entsteht als Netzwerk: Jede Idee ist ein Knoten, der mit anderen verbunden ist. Die Plattform macht diese Zusammenhänge sichtbar, bietet strukturierte Aufgaben mit direktem Feedback und fördert selbstbestimmtes Arbeiten. Sie basiert auf modernen Web-Standards, die für eine zugängliche und zeitgemäße Lernumgebung sorgen. Denn im Fokus steht das erfolgreiche Lernen, ohne Werbung, ohne Schnickschnack.",
     "note": "Die Plattform befindet sich noch in der Aufbauphase. Ich freue mich über sämtliches Feedback!",
     "goals": {
       "clearStructure": {
@@ -27,7 +27,7 @@
       },
       "connectedKnowledge": {
         "title": "Vernetztes Wissen",
-        "description": "Ermöglicht Zusammenhänge zu erkennen und Verbindungen zu verstehen."
+        "description": "Hilft, Themen einzuordnen und Konzepte als Ganzes zu verstehen."
       }
     }
   },
@@ -37,7 +37,7 @@
     "openActionLabel": "Kurs öffnen"
   },
   "footer": {
-    "description": "Eine digitale Lernplattform für Informatik- und Mathematikunterricht von Herr Holst.",
+    "description": "Eine digitale Lernplattform für den Informatik- und Mathematikunterricht von Herr Holst.",
     "contactHeading": "Kontakt",
     "contactPrompt": "Fragen zu der Webseite oder den Inhalten? Melde dich gerne bei mir!",
     "tagline": "Gebaut mit 💜 fürs Lernen",

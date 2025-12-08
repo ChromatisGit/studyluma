@@ -4,6 +4,7 @@ import { TopicPlan, topicPlanSchema } from "@schema/topicPlan";
 import yaml from "yaml";
 import { ZodError, type ZodType } from "zod";
 import { globContent, readContentFile } from "./io";
+import path from "path";
 
 export type LoadedContent = {
   groupsAndSubjects: GroupsAndSubjects;
@@ -46,8 +47,8 @@ async function loadTopicPlans(): Promise<Record<string, TopicPlan>> {
   for await (const relPath of globContent("base/*/*/topicPlan.yml")) {
     const parsed = await parseYamlAndValidate(relPath, topicPlanSchema);
 
-    const folderPath = relPath.substring(0, relPath.lastIndexOf("/"));
-    const id = folderPath.substring(folderPath.lastIndexOf("/") + 1);
+    const folderPath = path.dirname(relPath);
+    const id = path.basename(folderPath);
 
     res[id] = parsed;
   }

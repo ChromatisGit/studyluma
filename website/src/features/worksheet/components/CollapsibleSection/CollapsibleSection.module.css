@@ -54,6 +54,10 @@
   background: var(--sn-yellow-accent-soft-bg);
 }
 
+.collapsibleSolution .collapsibleContent {
+  background: var(--sn-green-accent-soft-bg);
+}
+
 .collapsibleContent > :first-child {
   margin-top: 0;
 }

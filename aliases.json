@@ -10,7 +10,6 @@
       "@pages/*": ["website/src/pages/*"],
       "@schema/*": ["src/schema/*"],
       "@site/*": ["website/*"],
-      "@theme/*": ["website/src/theme/*"],
       "@worksheet/*": ["src/worksheet/*"]
     }
   }

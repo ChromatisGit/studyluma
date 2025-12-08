@@ -52,6 +52,7 @@ export function useTsRunner() {
   const [consoleOutput, setConsoleOutput] = useState('');
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const [lastPassed, setLastPassed] = useState<boolean | null>(null);
+  const [hadRuntime, setHadRuntime] = useState(false);
 
   const workerRef = useRef<Worker | null>(null);
   const pendingRequestRef = useRef<{ id: number; validate: boolean } | null>(null);
@@ -67,6 +68,7 @@ export function useTsRunner() {
       setConsoleOutput('');
       setRuntimeError(null);
       setLastPassed(null);
+      setHadRuntime(false);
 
       pendingRequestRef.current = { id: requestId, validate };
 
@@ -106,6 +108,7 @@ export function useTsRunner() {
         const runtime = event.data.runtime;
         if (!runtime) return;
 
+        setHadRuntime(true);
         setConsoleOutput(runtime.output || '');
 
         if (runtime.error) {
@@ -155,6 +158,7 @@ export function useTsRunner() {
     consoleOutput,
     runtimeError,
     lastPassed,
+    hadRuntime,
     runCode,
   };
 }

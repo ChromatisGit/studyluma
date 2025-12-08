@@ -7,9 +7,10 @@ interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
   rows?: number;
+  readOnly?: boolean;
 }
 
-export function CodeEditor({ value, onChange, rows = 10 }: CodeEditorProps) {
+export function CodeEditor({ value, onChange, rows = 10, readOnly = false }: CodeEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
@@ -29,6 +30,7 @@ export function CodeEditor({ value, onChange, rows = 10 }: CodeEditorProps) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (readOnly) return;
     adjustHeight();
     onChange(e.target.value);
   };
@@ -67,9 +69,19 @@ export function CodeEditor({ value, onChange, rows = 10 }: CodeEditorProps) {
         value={value}
         onChange={handleChange}
         onScroll={handleScroll}
-        className={styles.codeEditorTextarea}
+        onFocus={() => {
+          if (readOnly && textareaRef.current) {
+            textareaRef.current.blur();
+          }
+        }}
+        className={[
+          styles.codeEditorTextarea,
+          readOnly ? styles.codeEditorTextareaReadOnly : '',
+        ].join(' ')}
         rows={rows}
         spellCheck={false}
+        readOnly={readOnly}
+        tabIndex={readOnly ? -1 : undefined}
         style={{
           caretColor: 'white',
           minHeight: `${rows * 1.5}em`,

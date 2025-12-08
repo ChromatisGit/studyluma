@@ -20,12 +20,12 @@ content/
 │  │     │  └─ <chapter>/            # z. B. 00_geraden, 01_geraden_lagebeziehung
 │  │     │     ├─ slides/            # Folien (Marp)
 │  │     │     ├─ worksheets/        # Arbeitsblätter
-│  │     │     ├─ preview.md         # Vorschauseite (vor/während der Behandlung)
-│  │     │     └─ overview.md        # Übersichtsseite (nach Abschluss)
+│  │     │     ├─ preview.md         # (optional) Vorschauseite (vor/während der Behandlung)
+│  │     │     └─ overview.md        # Übersichtsseite
 │  │     │
 │  │     ├─ images/                  # Abbildungen für Webseite & Materialien
 │  │     ├─ notes.md                 # Interne Notizen für die Lehrperson
-│  │     ├─ preview.md               # Vorschauseite zum Themenblock
+│  │     ├─ preview.md               # (optional) Vorschauseite zum Themenblock
 │  │     ├─ overview.md              # Übersichtsseite zum Themenblock
 │  │     └─ topicPlan.yml            # Stoffverteilungsplan des Themenblocks (Lernziele & Kapitel)
 │  │
