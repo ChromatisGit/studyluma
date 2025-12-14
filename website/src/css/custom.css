@@ -53,6 +53,10 @@
   --sn-teal-accent: #32989a;
   --sn-teal-accent-strong: #148488;
 
+  /* --- run action (fixed across themes) --- */
+  --sn-run-accent: #2e8555;
+  --sn-run-accent-strong: #276c46;
+
   /* --- yellow (hint) --- */
   --sn-yellow-accent: #f2c94c;
   --sn-yellow-accent-strong: #d3a52f;
@@ -135,6 +139,15 @@
   --sn-teal-accent: #148488;
   --sn-teal-accent-strong: #32989a;
 
+  /* --- run action (fixed across themes) --- */
+  --sn-run-accent: #2e8555;
+  --sn-run-accent-strong: #276c46;
+
+  /* --- yellow (hint) --- */
+  --sn-yellow-accent: #e6c347;
+  --sn-yellow-accent-strong: #c4a030;
+  --sn-yellow-accent-soft-bg: #5f4f1c;
+
   /* --- gray --- */
   --sn-gray: #7c8291;
   --sn-gray-hover: #9499a8;
@@ -161,4 +174,8 @@
   --ifm-color-emphasis-200: var(--sn-border);
 
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+.prism-code {
+  background-color: var(--sn-code-bg) !important;
 }

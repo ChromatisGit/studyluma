@@ -1,5 +1,5 @@
-#import "worksheet-style.typ": *
-#show: worksheetStyle
+#import "/src/typst-style/worksheet-style.typ": *
+#show: worksheet-style
 
 #title[Übungen Variablen]
 
@@ -162,8 +162,8 @@
 ]
 
 #codeTask[
-  Überlege bei den folgenden Variablen, ob sie besser mit `const` oder mit `let` deklariert werden sollten.
-  Füge jeweils einen Kommentar hinzu, der deine Entscheidung begründet.
+  Überlege bei den folgenden Variablen, ob es sinvoller ist, sie mit `const` oder mit `let` zu deklarieren.
+  Füge Kommentare hinzu, um deine Entscheidung zu begründen.
 
   #starter[
     ```ts

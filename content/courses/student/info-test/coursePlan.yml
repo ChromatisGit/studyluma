@@ -12,7 +12,7 @@ topics:
 
   grundlagen_programmieren_ts:
     - 00_variablen_und_datentypen
-    - 01_ausdruecke_und_operatoren
+    - 01_operatoren
     - 02_bedingungen
     - 03_schleifen
     - 04_funktionen

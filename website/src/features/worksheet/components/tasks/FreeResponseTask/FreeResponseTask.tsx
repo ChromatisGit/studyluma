@@ -4,6 +4,7 @@ import { parseTextWithCode } from '@features/worksheet/components/CodeBlock/pars
 import { strings } from '@features/worksheet/config/strings';
 import styles from './FreeResponseTask.module.css';
 import type { MathTask as MathTaskType, TextTask as TextTaskType } from '@worksheet/worksheetModel';
+import { useTaskPersistence } from '@features/worksheet/storage/useTaskPersistence';
 
 type FreeResponseTaskType = TextTaskType | MathTaskType;
 
@@ -12,6 +13,7 @@ interface FreeResponseTaskProps {
   isSingleTask?: boolean;
   triggerCheck: number;
   placeholder?: string;
+  taskKey: string;
 }
 
 export function FreeResponseTask({
@@ -19,14 +21,19 @@ export function FreeResponseTask({
   isSingleTask = false,
   triggerCheck,
   placeholder = strings.freeResponseTask.placeholder,
+  taskKey,
 }: FreeResponseTaskProps) {
-  const [answer, setAnswer] = useState('');
+  const { value: answer, setValue: setAnswer, worksheetId } = useTaskPersistence<string>(taskKey, '');
   const [isChecked, setIsChecked] = useState(false);
 
   const textareaRows = useMemo(() => {
     const solutionLines = task.solution ? task.solution.split('\n').length : 0;
     return Math.max(3, solutionLines + 1);
   }, [task.solution]);
+
+  useEffect(() => {
+    setIsChecked(false);
+  }, [worksheetId]);
 
   useEffect(() => {
     if (triggerCheck > 0 && answer.trim()) {

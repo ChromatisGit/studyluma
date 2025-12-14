@@ -99,6 +99,7 @@ export function TaskSetComponent({ taskSet, categoryType, taskCounterRef }: Task
                   task={task}
                   isSingleTask={!hasMultipleTasks}
                   triggerCheck={triggerCheck}
+                  taskKey={taskKey}
                 />
               </div>
             </div>
@@ -137,29 +138,30 @@ function buildTaskKey(task: Task, index: number) {
   return `task-${index}`;
 }
 
-function TaskRenderer({ task, isSingleTask, triggerCheck }: {
+function TaskRenderer({ task, isSingleTask, triggerCheck, taskKey }: {
   task: Task;
   isSingleTask: boolean;
   triggerCheck: number;
+  taskKey: string;
 }) {
   if (task.type === "mcq") {
-    return <McqTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} />;
+    return <McqTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} taskKey={taskKey} />;
   }
 
   if (task.type === "gap") {
-    return <GapTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} />;
+    return <GapTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} taskKey={taskKey} />;
   }
 
   if (task.type === "text") {
-    return <TextTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} />;
+    return <TextTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} taskKey={taskKey} />;
   }
 
   if (task.type === "math") {
-    return <MathTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} />;
+    return <MathTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} taskKey={taskKey} />;
   }
 
   if (task.type === "code") {
-    return <CodeTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} />;
+    return <CodeTask task={task} isSingleTask={isSingleTask} triggerCheck={triggerCheck} taskKey={taskKey} />;
   }
 
   return null;

@@ -2,6 +2,7 @@
   "compilerOptions": {
     "paths": {
       "@builder/*": ["src/builder/*"],
+      "@components/*": ["website/src/components/*"],
       "@css/*": ["website/src/css/*"],
       "@dev/*": ["src/dev/*"],
       "@features/*": ["website/src/features/*"],

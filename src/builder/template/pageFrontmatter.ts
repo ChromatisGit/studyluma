@@ -19,7 +19,7 @@ export function renderPageWithFrontmatter(input: PageTemplateInput) {
     "---",
     ...frontmatterLines,
     "---",
-    worksheetCards(input.worksheets),
+    worksheetCards(input.worksheets, "Aufgaben"),
     input.body.trim(),
     "",
   ].join("\n");

@@ -29,7 +29,7 @@ function toOverviewModel(
     ? `${subject.label} (${courseVariant.short})`
     : subject.label;
 
-  const title = `${subject.label} ${group.id.toUpperCase()}`;
+  const title = `${subject.label} ${group.label}`;
 
   const roadmap: RoadmapTopic[] = topics.map((topic) =>
     buildRoadmapTopic(topic, group.id, slug),

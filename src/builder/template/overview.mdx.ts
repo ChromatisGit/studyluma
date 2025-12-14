@@ -7,7 +7,7 @@ export function renderOverview(model: OverviewModel): string {
     imports(),
     intro(model.title, model.label),
     currentTopicSection(model.current),
-    worksheetCards(model.worksheets),
+    worksheetCards(model.worksheets, "Aktuelle Aufgaben"),
     roadmapSection(model.roadmap),
   ]
     .filter(Boolean)
@@ -51,6 +51,7 @@ function currentTopicSection(current: OverviewModel["current"]) {
     ## Aktuelles Thema
 
     ### ${current}
+
   `;
 }
 

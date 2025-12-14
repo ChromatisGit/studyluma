@@ -8,21 +8,27 @@ import styles from './GapTask.module.css';
 import type { GapField as GapFieldType, GapTask as GapTaskType } from '@worksheet/worksheetModel';
 import { Highlight } from 'prism-react-renderer';
 import { transparentCodeTheme } from '@features/worksheet/components/CodeBlock/codeTheme';
+import { useTaskPersistence } from '@features/worksheet/storage/useTaskPersistence';
 
 interface GapTaskProps {
   task: GapTaskType;
   isSingleTask?: boolean;
   triggerCheck: number;
+  taskKey: string;
 }
 
-export function GapTask({ task, isSingleTask = false, triggerCheck }: GapTaskProps) {
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+export function GapTask({ task, isSingleTask = false, triggerCheck, taskKey }: GapTaskProps) {
+  const { value: answers, setValue: setAnswers, worksheetId } = useTaskPersistence<Record<number, string>>(taskKey, {});
   const [validatedGaps, setValidatedGaps] = useState<Set<number>>(new Set());
   const answersRef = useRef(answers);
 
   useEffect(() => {
     answersRef.current = answers;
   }, [answers]);
+
+  useEffect(() => {
+    setValidatedGaps(new Set());
+  }, [worksheetId]);
 
   const handleAnswerChange = (gapIndex: number, value: string) => {
     setAnswers(prev => ({ ...prev, [gapIndex]: value }));

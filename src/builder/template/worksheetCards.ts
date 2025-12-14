@@ -1,6 +1,6 @@
 import { WorksheetRef } from "@worksheet/worksheetFiles";
 
-export function worksheetCards(worksheets: WorksheetRef[]) {
+export function worksheetCards(worksheets: WorksheetRef[], title: string) {
   if (worksheets.length === 0) return "";
 
   const cards = worksheets
@@ -15,7 +15,7 @@ export function worksheetCards(worksheets: WorksheetRef[]) {
 
   return `import WorksheetCard from '@features/worksheet/components/WorksheetCard/WorksheetCard';
 
-  ## Aufgaben
+  ## ${title}
 <div className="row">
   ${cards}
 </div>

@@ -1,11 +1,11 @@
-import { Category, Worksheet } from "@worksheet/worksheetModel";
+import { Worksheet } from "@worksheet/worksheetModel";
 
 export function renderWorksheet(worksheet: Worksheet): string {
   const mdx = [
     frontMatter(worksheet.title),
     imports(),
     title(worksheet.title),
-    worksheetSection(worksheet.content),
+    worksheetSection(worksheet),
   ]
     .filter(Boolean)
     .map((str) => dedent(str))
@@ -34,9 +34,9 @@ function title(title: string) {
   `;
 }
 
-function worksheetSection(content: Category[]) {
+function worksheetSection(worksheet: Worksheet) {
   return `
-  <WorksheetContainer content={${JSON.stringify(content)}} />
+  <WorksheetContainer title=${JSON.stringify(worksheet.title)} content={${JSON.stringify(worksheet.content)}} />
   `;
 }
 

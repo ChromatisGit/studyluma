@@ -100,8 +100,8 @@ const config: Config = {
       hideOnScroll: false
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.vsDark,
+      darkTheme: prismThemes.vsDark,
       additionalLanguages: ['typescript'],
     },
   } satisfies Preset.ThemeConfig,

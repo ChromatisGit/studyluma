@@ -62,13 +62,7 @@ export function useTsRunner() {
     ({ code, validation, validate = false }: RunOptions) => {
       const requestId = Date.now();
 
-      // Reset state for this run
       setIsLoading(true);
-      setDiagnostics([]);
-      setConsoleOutput('');
-      setRuntimeError(null);
-      setLastPassed(null);
-      setHadRuntime(false);
 
       pendingRequestRef.current = { id: requestId, validate };
 
@@ -83,6 +77,9 @@ export function useTsRunner() {
         }
         pendingRequestRef.current = null;
         setIsLoading(false);
+        setDiagnostics([]);
+        setHadRuntime(false);
+        setConsoleOutput('');
         setRuntimeError('Execution timed out');
         setLastPassed(validate ? false : null);
       }, WORKER_TIMEOUT_MS);
@@ -99,21 +96,30 @@ export function useTsRunner() {
         const incomingDiagnostics = event.data.diagnostics || [];
         setDiagnostics(incomingDiagnostics);
 
+        // Reset runtime-related state once we have a response so the previous
+        // output stays visible while the worker runs.
+        setHadRuntime(false);
+        setConsoleOutput('');
+        setRuntimeError(null);
+
         const hasErrors = incomingDiagnostics.some(d => d.category === 'error');
         if (hasErrors) {
-          if (pendingValidate) setLastPassed(false);
+          setLastPassed(pendingValidate ? false : null);
           return;
         }
 
         const runtime = event.data.runtime;
-        if (!runtime) return;
+        if (!runtime) {
+          setLastPassed(pendingValidate ? false : null);
+          return;
+        }
 
         setHadRuntime(true);
         setConsoleOutput(runtime.output || '');
 
         if (runtime.error) {
           setRuntimeError(runtime.error);
-          if (pendingValidate) setLastPassed(false);
+          setLastPassed(pendingValidate ? false : null);
           return;
         }
 
@@ -129,6 +135,9 @@ export function useTsRunner() {
         setIsLoading(false);
         clearTimeoutRef(timeoutRef);
 
+        setDiagnostics([]);
+        setHadRuntime(false);
+        setConsoleOutput('');
         setRuntimeError(error.message || 'Worker failed to execute code');
         setLastPassed(validate ? false : null);
       };
@@ -142,8 +151,10 @@ export function useTsRunner() {
     []
   );
 
-  // Cleanup on unmount
+  // Preload worker on mount and clean up on unmount
   useEffect(() => {
+    ensureWorker(workerRef);
+
     return () => {
       if (workerRef.current) {
         workerRef.current.terminate();

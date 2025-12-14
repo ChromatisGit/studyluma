@@ -1,5 +1,5 @@
 import ComponentTypes from '@theme-original/NavbarItem/ComponentTypes';
-import GroupBasedNavbar from '@features/overview/GroupBasedNavbar';
+import GroupBasedNavbar from '@components/Navbar/GroupBasedNavbar';
 
 export default {
   ...ComponentTypes,

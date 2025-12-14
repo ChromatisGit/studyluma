@@ -18,7 +18,7 @@ Hier sagen wir dem Programm, welchen Wert `meineVariable` haben soll:
 meineVariable = "Hii";
 ```
 
-Wir können auch in einer Zeile eine Variable initialisieren und einen Wert zuweisen:
+Wir können auch in einer Zeile eine Variable deklarieren und einen Wert zuweisen:
 
 ```ts
 let meineZweiteVariable: string = "Heyy";
@@ -62,8 +62,7 @@ console.log(eineVariable);
 eineVariable = 16;
 </CodeExample>
 
-Tipp
-Versuche undefined zu vermeiden, indem du Variablen früh mit sinnvollen Startwerten belegst.
+> **Tipp:** Versuche undefined zu vermeiden, indem du Variablen früh mit sinnvollen Startwerten belegst.
 
 ## Konstanten
 

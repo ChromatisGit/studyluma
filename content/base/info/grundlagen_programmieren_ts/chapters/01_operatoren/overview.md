@@ -1,54 +1,56 @@
 
 Operatoren sind **Symbole**, mit denen wir Werte **verändern oder verknüpfen** können.
 
-```ts
+<CodeExample>
 let x: number = 2;
 x = x + 5;
-console.log(x); // Ausgabe: 7
-```
+console.log(x);
+</CodeExample>
 
 Hier wird die Zahl `5` zu `x` addiert und das Ergebnis wieder in `x` gespeichert.
-→ `x = x + 5` bedeutet also: „Erhöhe den alten Wert von `x` um 5“.
 
-### Arithmetische Operatoren
+→ `x = x + 5` bedeutet also: "Erhöhe den alten Wert von `x` um 5".
+
+## Arithmetische Operatoren
 
 Wir haben in TypeScript die Grundrechenarten aus der Mathematik:
 
 | Operator | Bedeutung      | Beispiel | Ergebnis |
 | -------- | -------------- | -------- | -------- |
-| `+`      | Addition       | `5 + 3`  | `8`      |
-| `-`      | Subtraktion    | `5 - 3`  | `2`      |
-| `*`      | Multiplikation | `5 * 3`  | `15`     |
-| `/`      | Division       | `6 / 3`  | `2`      |
+| `+`      | Addition       | `5 + 2`  | `7`      |
+| `-`      | Subtraktion    | `5 - 2`  | `3`      |
+| `*`      | Multiplikation | `5 * 2`  | `10`     |
+| `/`      | Division       | `5 / 2`  | `2.5`    |
+| `%`      | Modulo (Rest bei Division)| `5 % 2`  | `1`    |
 
-#### Operator + mit Text (Strings)
+### Operator + mit string
 
-Mit dem `+`-Operator können wir nicht nur Zahlen, sondern auch **Texte (Strings)** verbinden.
+Mit dem `+`-Operator können wir nicht nur Zahlen, sondern auch Texte (Strings) verbinden.
 
-```ts
+<CodeExample>
 let nachricht: string = "Hallo ";
 nachricht = nachricht + "Welt!";
-console.log(nachricht); // Ausgabe: Hallo Welt!
-```
+console.log(nachricht);
+</CodeExample>
 
-> Merke:
-> Wenn mindestens einer der beiden Werte ein String ist, **verbindet `+` die Texte** anstatt sie zu addieren.
+> **Merke:** Wenn mindestens einer der beiden Werte ein String ist, verbindet `+` die Texte anstatt sie zu addieren.
 
-#### Kurzschreibweise
+### Kurzschreibweise
 
 Alle arithmetische Operatoren können auch in Kurzschreibweise geschrieben werden
 
-```ts
-x -= 5; // Das Gleiche wie: x = x - 5
-```
+<CodeExample>
+// Das Gleiche wie: x = x - 5;
+x -= 5;
+</CodeExample>
 
 
-### Vergleichsoperatoren
+## Vergleichsoperatoren
 
-Vergleichsoperatoren prüfen, **wie  das Verhältnis von zwei Werte zueinander ist.** Zum Beispiel, ob sie gleich, ungleich, größer oder kleiner sind.
-Das Ergebnis eines Vergleichs ist **immer** ein Wahrheitswert (`true` oder `false`).
+Vergleichsoperatoren prüfen, wie das Verhältnis von zwei Werte zueinander ist.
+Das Ergebnis eines Vergleichs ist immer ein Wahrheitswert (`true` oder `false`).
 
-#### Beispiele
+### Übersicht
 
 | Operator | Bedeutung                                       | Beispiel  | Ergebnis |
 | -------- | ----------------------------------------------- | --------- | -------- |
@@ -60,7 +62,7 @@ Das Ergebnis eines Vergleichs ist **immer** ein Wahrheitswert (`true` oder `fals
 | `<=`     | kleiner oder gleich                             | `3 <= 5`  | `true`   |
 
 
-#### Beispiel im Code
+### Beispiel im Code
 
 ```ts
 let a: number = 10;
@@ -69,7 +71,8 @@ let b: number = 5;
 console.log(a > b);   // true
 console.log(a === b); // false
 ```
-#### Warum `===` statt `==`?
+
+### Warum `===` statt `==`?
 
 In TypeScript gibt es auch `==`, aber das wandelt Werte **automatisch** in einen gemeinsamen Typ um.
 Das kann zu **unerwarteten Ergebnissen** führen:
@@ -79,24 +82,4 @@ console.log("5" == 5);  // true
 console.log("5" === 5); // false
 ```
 
-> Merke:
-> In TypeScript verwenden wir **immer `===` und `!==`**,
-> damit wir sicher sein können, dass **Wert und Typ** wirklich übereinstimmen.
-
----
-
-#### **Typischer Fehler**
-
-```ts
-let zahl = 5;
-
-if (zahl = 10) {
-  console.log("Zahl ist 10");
-}
-```
-
-Hier wurde **=** (Zuweisung) statt **===** (Vergleich) verwendet.
-Dadurch wird `zahl` den Wert `10` bekommen, und die Bedingung ist **immer true**!
-
-> **Tipp:**
-> Verwende bei Vergleichen **immer `===`** und **niemals nur ein Gleichzeichen.**
+> **Merke:** In TypeScript verwenden wir **immer `===` und `!==`**, damit wir sicher sein können, dass Wert und Typ verglichen werden.

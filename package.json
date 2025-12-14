@@ -12,6 +12,7 @@
   "dependencies": {
     "react": "^19.2.0",
     "react-dom": "^19.0.0",
+    "sucrase": "^3.35.1",
     "yaml": "^2.8.1",
     "zod": "^4.1.12"
   },

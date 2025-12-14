@@ -1,4 +1,4 @@
-import type { NavbarConfig } from "@features/overview/GroupBasedNavbar";
+import type { NavbarConfig } from "@components/Navbar/GroupBasedNavbar";
 import type { ResolvedCourse } from "../prepareCourses";
 
 export function buildNavbarConfig(courses: ResolvedCourse[]) {

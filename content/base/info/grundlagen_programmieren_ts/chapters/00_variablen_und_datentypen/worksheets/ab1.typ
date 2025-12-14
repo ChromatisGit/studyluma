@@ -1,5 +1,5 @@
-#import "worksheet-style.typ": *
-#show: worksheetStyle
+#import "/src/typst-style/worksheet-style.typ": *
+#show: worksheet-style
 
 #title[Einstieg Variablen]
 

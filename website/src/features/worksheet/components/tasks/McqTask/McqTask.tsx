@@ -5,6 +5,7 @@ import { parseTextWithCode } from '@features/worksheet/components/CodeBlock/pars
 import styles from './McqTask.module.css';
 import type { McqTask as McqTaskType } from '@worksheet/worksheetModel';
 import { chunkSections } from '@features/homepage/sections/CourseSection/sectionSplitter';
+import { useTaskPersistence } from '@features/worksheet/storage/useTaskPersistence';
 
 function chunkIntoColumns<T>(items: T[], maxPerRow: number): T[][] {
   const rows: T[][] = [];
@@ -21,10 +22,11 @@ interface McqTaskProps {
   task: McqTaskType;
   isSingleTask?: boolean;
   triggerCheck: number;
+  taskKey: string;
 }
 
-export function McqTask({ task, isSingleTask = false, triggerCheck }: McqTaskProps) {
-  const [selected, setSelected] = useState<string[]>([]);
+export function McqTask({ task, isSingleTask = false, triggerCheck, taskKey }: McqTaskProps) {
+  const { value: selected, setValue: setSelected, worksheetId } = useTaskPersistence<string[]>(taskKey, []);
   const [isChecked, setIsChecked] = useState(false);
   const isSingleChoice = task.single;
   const groupName = useId();
@@ -36,6 +38,10 @@ export function McqTask({ task, isSingleTask = false, triggerCheck }: McqTaskPro
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [triggerCheck]); // Only trigger on check button press, not on selection changes
+
+  useEffect(() => {
+    setIsChecked(false);
+  }, [worksheetId]);
 
   // Determine if task should be locked
   const isLocked = isChecked;

@@ -1,4 +1,4 @@
-import * as ts from 'typescript';
+import { transform, type Options as SucraseOptions } from 'sucrase';
 
 // =========================
 // Types
@@ -32,16 +32,13 @@ type WorkerResponse = {
 };
 
 // =========================
-// Compiler options
+// Transpiler options
 // =========================
 
-const compilerOptions: ts.TranspileOptions['compilerOptions'] = {
-  target: ts.ScriptTarget.ES2020,
-  module: ts.ModuleKind.ESNext,
-  moduleResolution: ts.ModuleResolutionKind.Bundler,
-  strict: true,
-  esModuleInterop: true,
-  jsx: ts.JsxEmit.ReactJSX,
+const sucraseOptions: SucraseOptions = {
+  transforms: ['typescript', 'jsx'],
+  jsxRuntime: 'automatic',
+  production: true,
 };
 
 // =========================
@@ -49,6 +46,8 @@ const compilerOptions: ts.TranspileOptions['compilerOptions'] = {
 // =========================
 
 const formatArg = (arg: unknown): string => {
+  if (arg === undefined) return 'undefined';
+  if (arg === null) return 'null';
   if (typeof arg === 'string') return arg;
   if (typeof arg === 'number' || typeof arg === 'boolean') return String(arg);
 
@@ -57,30 +56,6 @@ const formatArg = (arg: unknown): string => {
   } catch {
     return String(arg);
   }
-};
-
-const normalizeDiagnostics = (diagnostics: readonly ts.Diagnostic[] = []): DiagnosticInfo[] => {
-  return diagnostics.map(diagnostic => {
-    const position = diagnostic.file
-      ? diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start ?? 0)
-      : undefined;
-
-    const category: DiagnosticCategory =
-      diagnostic.category === ts.DiagnosticCategory.Error
-        ? 'error'
-        : diagnostic.category === ts.DiagnosticCategory.Warning
-        ? 'warning'
-        : diagnostic.category === ts.DiagnosticCategory.Suggestion
-        ? 'suggestion'
-        : 'message';
-
-    return {
-      message: ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'),
-      line: position ? position.line + 1 : undefined,
-      character: position ? position.character + 1 : undefined,
-      category,
-    };
-  });
 };
 
 const respondWithError = (requestId: number, message: string) => {
@@ -95,6 +70,18 @@ const respondWithError = (requestId: number, message: string) => {
   };
 
   self.postMessage(response);
+};
+
+const buildDiagnosticsFromError = (error: any): DiagnosticInfo[] => {
+  const loc = error?.loc;
+  return [
+    {
+      message: error?.message || 'Failed to transpile code',
+      line: typeof loc?.line === 'number' ? loc.line : undefined,
+      character: typeof loc?.column === 'number' ? loc.column + 1 : undefined,
+      category: 'error',
+    },
+  ];
 };
 
 /**
@@ -137,6 +124,21 @@ const createFakeConsole = (outputBuffer: string[]) => {
 };
 
 /**
+ * Transpile with Sucrase (fast, TS + JSX only).
+ */
+const transpile = (source: string): { code: string | null; diagnostics: DiagnosticInfo[] } => {
+  try {
+    const { code } = transform(source, sucraseOptions);
+    return { code, diagnostics: [] };
+  } catch (error: any) {
+    return {
+      code: null,
+      diagnostics: buildDiagnosticsFromError(error),
+    };
+  }
+};
+
+/**
  * Execute transpiled JS code with a fake console and return
  * the validation result + potential runtime error.
  */
@@ -170,15 +172,10 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   try {
     const wrappedSource = buildWrappedSource(code, validation);
 
-    const transpileResult = ts.transpileModule(wrappedSource, {
-      compilerOptions,
-      reportDiagnostics: true,
-    });
+    const { code: transpiledJs, diagnostics } = transpile(wrappedSource);
+    const hasErrors = diagnostics.some(d => d.category === 'error') || !transpiledJs;
 
-    const diagnostics = normalizeDiagnostics(transpileResult.diagnostics);
-    const hasErrors = diagnostics.some(d => d.category === 'error');
-
-    // If there are TypeScript errors, we don't execute the code.
+    // If there are transpilation errors, we don't execute the code.
     if (hasErrors) {
       const response: WorkerResponse = {
         requestId,
@@ -192,7 +189,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
     const fakeConsole = createFakeConsole(consoleOutput);
 
     const { passed, error: runtimeError } = executeTranspiledCode(
-      transpileResult.outputText,
+      transpiledJs,
       fakeConsole,
     );
 
