@@ -7,7 +7,7 @@ export function renderOverview(model: OverviewModel): string {
     imports(),
     intro(model.title, model.label),
     currentTopicSection(model.current),
-    worksheetCards(model.worksheets, "Aktuelle Aufgaben"),
+    worksheetCards(model.worksheets, "Unterrichtsaufgaben"),
     roadmapSection(model.roadmap),
   ]
     .filter(Boolean)

@@ -16,7 +16,7 @@
     - [x] Deklariert die Variable `schulort`
     - [x] Weist der Variable `schulort` einen Wert zu
     - [ ] Gibt den Wert der Variable in der Konsolenausgabe aus
-    - [ ] Der Code wirft einen Fehler
+    - [ ] Der Code gibt eine Fehlermeldung
   ]
 
   #mcq(wideLayout: true, shuffleSolutions: false)[
@@ -28,30 +28,30 @@
     - [x] Deklariert die Variable `wohnort`
     - [ ] Legt den Wert der Variable `wohnort` fest
     - [ ] Gibt den Wert der Variable in der Konsolenausgabe aus
-    - [ ] Der Code wirft einen Fehler
+    - [ ] Der Code gibt eine Fehlermeldung
   ]
 
   #mcq(wideLayout: true, shuffleSolutions: false)[
     ```ts
-    let strasse: string;
+    let adresse: string;
     ```
 
-    - [x] Deklariert die Variable `strasse`
-    - [ ] Weist der Variable `strasse` einen Wert zu
+    - [x] Deklariert die Variable `adresse`
+    - [ ] Weist der Variable `adresse` einen Wert zu
     - [ ] Gibt den Wert der Variable in der Konsolenausgabe aus
-    - [ ] Der Code wirft einen Fehler
+    - [ ] Der Code gibt eine Fehlermeldung
   ]
 
   #mcq(wideLayout: true, shuffleSolutions: false)[
     ```ts
-    strasse = "Hauptstraße 17";
+    adresse = "Hauptstraße 17";
     console.log(adresse);
     ```
 
-    - [ ] Deklariert die Variable `strasse`
-    - [x] Legt den Wert der Variable `strasse` fest
+    - [ ] Deklariert die Variable `adresse`
+    - [x] Legt den Wert der Variable `adresse` fest
     - [x] Gibt den Wert der Variable in der Konsolenausgabe aus
-    - [ ] Der Code wirft einen Fehler
+    - [ ] Der Code gibt eine Fehlermeldung
   ]
 
   #mcq(wideLayout: true, shuffleSolutions: false)[
@@ -62,7 +62,7 @@
     - [ ] Deklariert die Variable `hausnummer`
     - [ ] Legt den Wert der Variable `hausnummer` fest
     - [ ] Gibt den Wert der Variable in der Konsolenausgabe aus
-    - [x] Der Code wirft einen Fehler
+    - [x] Der Code gibt eine Fehlermeldung
   ]
 ]
 
