@@ -1,0 +1,79 @@
+.optionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.optionRow {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(var(--columns, 1), minmax(0, 1fr));
+}
+
+.optionCard {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--sn-radius-sm);
+  border: 1px solid var(--sn-border);
+  background: var(--sn-surface);
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.optionInteractive:hover {
+  border-color: var(--sn-purple-accent);
+  box-shadow: var(--sn-shadow-lw);
+  cursor: pointer;
+}
+
+.optionStateActive {
+  border-color: var(--sn-purple-accent-strong);
+  background: var(--sn-purple-accent-soft-bg);
+}
+
+.optionStateCorrect {
+  border-color: var(--sn-green-accent);
+  background: var(--sn-green-accent-soft-bg);
+  color: var(--sn-green-accent-strong);
+}
+
+.optionStateWrong {
+  border-color: var(--sn-red-accent);
+  background: var(--sn-red-accent-soft-bg);
+  color: var(--sn-red-accent-strong);
+}
+
+.optionStateMissed {
+  border-style: dashed;
+  border-color: var(--sn-green-accent-strong);
+  background: var(--sn-green-accent-soft-bg);
+  color: var(--sn-green-accent);
+}
+
+.optionLocked {
+  cursor: default;
+}
+
+.optionInput {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  accent-color: var(--sn-purple-accent);
+}
+
+.optionLabel {
+  flex: 1;
+  color: var(--sn-text-muted);
+}
+
+.optionIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media screen and (max-width: 640px) {
+  .optionRow {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}

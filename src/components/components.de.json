@@ -1,0 +1,15 @@
+{
+    "buttons": {
+        "runCode": "Code ausführen"
+    },
+    "codeRunner": {
+        "editorTitle": "Code-Editor",
+        "diagnosticsTitle": "TypeScript-Fehler",
+        "resultSuccess": "Deine Lösung ist richtig!",
+        "resultFailure": "Code wurde ausgeführt. Der Code ist noch nicht korrekt.",
+        "resultCompiled": "Code wurde ausgeführt. Vergleiche deine Lösung mit der Musterlösung.",
+        "resultCompileError": "Der Code konnte nicht ausgeführt werden.",
+        "consoleOutput": "Konsolenausgabe",
+        "noOutput": "Code wurde ausgeführt. (Keine Ausgabe)"
+    }
+}

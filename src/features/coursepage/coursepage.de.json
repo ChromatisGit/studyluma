@@ -1,0 +1,16 @@
+{
+  "intro": {
+    "titleSuffix": "Übersicht",
+    "welcome": "Willkommen im Kurs {label}!",
+    "description": "Hier findest du alle Materialien, Erklärungen und Übungen zu den Themen des Schuljahres."
+  },
+  "currentTopic": {
+    "heading": "Aktuelles Thema"
+  },
+  "worksheets": {
+    "title": "Aktuelle Aufgaben"
+  },
+  "roadmap": {
+    "heading": "Roadmap"
+  }
+}

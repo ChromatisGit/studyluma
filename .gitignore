@@ -1,25 +1,45 @@
-# Dependencies
-/website/node_modules/
-/node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Website production
-/website/build/
-/website/.generated/
-/website/.docusaurus/
-/website/.cache-loader
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Dev tools
-/build/
-/.vscode/.schema/
+# testing
+/coverage
 
-# Misc
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
 .DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+*.pem
 
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
 *.pdf
+.vscode
+.generated

@@ -1,0 +1,71 @@
+.hero {
+  position: relative;
+  padding: 5rem var(--sn-page-padding) 3.5rem;
+  z-index: 1;
+}
+
+.heroShell {
+  position: relative;
+  max-width: var(--sn-content-width-narrow, 960px);
+  margin: 0 auto;
+  text-align: center;
+  padding: 2.75rem 2.5rem;
+  border-radius: var(--sn-radius-xl);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  box-shadow: var(--sn-shadow-lw);
+  overflow: hidden;
+}
+
+.heroGlow {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--sn-purple-accent) 32%, transparent) 0%, transparent 60%),
+    radial-gradient(circle at 80% 0%, color-mix(in srgb, var(--sn-purple-accent) 18%, transparent) 0%, transparent 45%);
+  opacity: 0.65;
+  filter: blur(30px);
+}
+
+:global([data-theme='dark']) .heroGlow {
+  background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--sn-purple-accent) 24%, transparent) 0%, transparent 55%),
+    radial-gradient(circle at 75% 0%, color-mix(in srgb, var(--sn-purple-accent) 16%, transparent) 0%, transparent 45%);
+  opacity: 0.5;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+}
+
+.heroTitle {
+  font-size: clamp(2.4rem, 3vw, 3rem);
+  margin-bottom: 0.75rem;
+  color: var(--sn-text);
+}
+
+.heroLead {
+  font-size: 1.15rem;
+  margin-bottom: 1.25rem;
+  color: var(--sn-text-muted);
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+@media screen and (max-width: 768px) {
+  .hero {
+    padding: 3.5rem 1.25rem 2.5rem;
+  }
+
+  .heroShell {
+    padding: 2.25rem 1.75rem;
+  }
+}

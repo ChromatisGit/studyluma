@@ -1,0 +1,37 @@
+.section {
+  position: relative;
+  padding: var(--sn-section-padding, 3rem var(--sn-page-padding, 1.5rem));
+}
+
+.inner {
+  max-width: var(--sn-section-max-width, var(--sn-content-width-wide, 1120px));
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  box-shadow: var(--sn-shadow-lw);
+  border-radius: var(--sn-section-card-radius, var(--sn-radius-lg, 14px));
+  padding: var(--sn-section-card-padding, 2rem);
+}
+
+.header {
+  margin-bottom: var(--sn-section-header-margin, 1.25rem);
+  text-align: var(--sn-section-header-align, left);
+}
+
+.title {
+  margin: 0 0 var(--sn-section-title-gap, 0.5rem);
+  font-size: var(--sn-section-title-size, 1.6rem);
+  color: var(--sn-text);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--sn-text-muted);
+}
+
+.alignCenter {
+  --sn-section-header-align: center;
+}

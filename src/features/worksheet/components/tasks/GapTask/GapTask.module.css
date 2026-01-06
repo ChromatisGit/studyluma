@@ -1,0 +1,108 @@
+.inlineText {
+  color: var(--sn-text);
+  white-space: pre-wrap;
+}
+
+.gapField {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  --gap-base-surface: var(--sn-surface);
+  --gap-text: var(--sn-text);
+  z-index: 1;
+}
+
+.gapControl {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.12rem 0.2rem;
+  border: 0;
+  border-bottom: 2px solid var(--gap-border, var(--sn-purple-accent));
+  background: var(--gap-bg, var(--sn-surface));
+  color: var(--gap-text);
+  font-family: var(--sn-font-mono);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+  z-index: 2;
+}
+
+.gapSelect {
+  appearance: none;
+  padding-right: 1.2rem;
+  cursor: pointer;
+}
+
+.gapChevron {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--sn-text-muted);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.gapActive {
+  --gap-border: var(--sn-purple-accent);
+}
+
+.gapCorrect {
+  --gap-bg: var(--sn-green-accent-soft-bg);
+  --gap-border: var(--sn-green-accent);
+  --gap-text: var(--sn-green-accent-strong);
+}
+
+.gapWrong {
+  --gap-bg: var(--sn-red-accent-soft-bg);
+  --gap-border: var(--sn-red-accent);
+  --gap-text: var(--sn-red-accent-strong);
+}
+
+.gapWrong .gapControl {
+  border-bottom: 0;
+}
+
+.gapWrong::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 6px;
+  pointer-events: none;
+  z-index: 3;
+  background-color: var(--gap-border);
+  -webkit-mask-image: url("/img/swiggle.svg");
+  mask-image: url("/img/swiggle.svg");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 12px 6px;
+  mask-size: 12px 6px;
+  -webkit-mask-position: left bottom;
+  mask-position: left bottom;
+}
+
+.gapInCode {
+  --gap-bg: var(--sn-code-bg);
+  --gap-text: var(--sn-code-text);
+}
+
+.gapInCode.gapCorrect,
+.gapCorrect.gapInCode {
+  /* Use dark theme success palette even in light mode for code blocks */
+  --gap-bg: #10211b;
+  --gap-border: #63d49a;
+  --gap-text: #46b87d;
+}
+
+.gapInCode.gapWrong,
+.gapWrong.gapInCode {
+  /* Use dark theme danger palette even in light mode for code blocks */
+  --gap-bg: #2a1218;
+  --gap-border: #ff6b8c;
+  --gap-text: #f24369;
+}

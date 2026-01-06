@@ -1,0 +1,21 @@
+{
+  "categories": {
+    "info": "Info",
+    "checkpoint": "Checkpoint",
+    "core": "Aufgaben",
+    "challenge": "Challenges"
+  },
+  "buttons": {
+    "checkSolution": "Mit Lösung vergleichen"
+  },
+  "sections": {
+    "hint": "Hinweis anzeigen",
+    "solution": "Musterlösung anzeigen"
+  },
+  "freeResponseTask": {
+    "placeholder": "Schreibe deine Antwort hier..."
+  },
+  "gapTask": {
+    "textPlaceholder": "…"
+  }
+}

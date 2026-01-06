@@ -1,0 +1,33 @@
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent-border, var(--sn-border));
+  border-radius: var(--sn-radius-lg);
+  background: var(--accent-surface, var(--sn-surface-raised));
+  color: var(--accent-strong, var(--sn-text));
+}
+
+.icon svg {
+  width: 55%;
+  height: 55%;
+}
+
+.iconSm {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.iconMd {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.iconLg {
+  width: 3.6rem;
+  height: 3.6rem;
+}
+
+.iconCircle {
+  border-radius: 999px;
+}

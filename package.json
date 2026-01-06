@@ -1,31 +1,31 @@
 {
+  "name": "studynode",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "file": "pnpm ts-node -r tsconfig-paths/register",
-    "gen:schema": "pnpm ts-node -r tsconfig-paths/register src/dev/export-schema.ts",
-    "gen": "pnpm ts-node -r tsconfig-paths/register src/builder/main.ts",
-    "gen:ignoreMissing": "node -r ts-node/register -r tsconfig-paths/register -e \"process.env.IGNORE_MISSING_FILES='true'; require('./src/builder/main.ts')\"",
-    "dev": "pnpm run gen:ignoreMissing && pnpm --dir website start",
-    "start": "pnpm --dir website start",
-    "build": "pnpm run gen:ignoreMissing && pnpm --dir website install && pnpm --dir website build",
-    "serve": "pnpm --dir website serve"
+    "dev": "bun x next dev",
+    "build": "bun x next build",
+    "start": "bun x next start",
+    "lint": "bun x eslint"
   },
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.0.0",
-    "sucrase": "^3.35.1",
-    "yaml": "^2.8.1",
-    "zod": "^4.1.12"
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.462.0",
+    "next": "16.0.10",
+    "prism-react-renderer": "^2.4.1",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "sonner": "^2.0.7",
+    "sucrase": "^3.35.0",
+    "zod": "^4.3.4"
   },
   "devDependencies": {
-    "@types/node": "^24.10.0",
-    "@types/react": "^19.0.4",
-    "@types/react-dom": "^19.0.2",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.16",
-    "tsconfig-paths": "^4.2.0",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "bun-types": "^1.3.5",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.10",
     "typescript": "^5.9.3"
-  },
-  "engines": {
-    "node": ">=22.0.0"
   }
 }
