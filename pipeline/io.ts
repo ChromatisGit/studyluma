@@ -1,4 +1,5 @@
 import { Glob } from "bun";
+import { existsSync } from "fs";
 import { rm } from "fs/promises";
 import type { ZodType } from "zod";
 import {
@@ -11,15 +12,50 @@ import {
 } from "./errorHandling";
 
 
-const SOURCE_PATH = "content"
-const EXPORT_PATH = ".generated"
+const WEBSITE_ROOT = normalizeSlashes(`${import.meta.dir}/..`);
+const SOURCE_PATH = resolveContentPath();
+const EXPORT_PATH = joinPath(WEBSITE_ROOT, ".generated");
+
+function resolveContentPath(): string {
+  const envPath = process.env.CONTENT_PATH;
+  if (envPath) {
+    return isAbsolutePath(envPath)
+      ? normalizeSlashes(envPath)
+      : joinPath(WEBSITE_ROOT, envPath);
+  }
+
+  const candidates = [
+    joinPath(WEBSITE_ROOT, "content"),
+    joinPath(WEBSITE_ROOT, "..", "content"),
+  ];
+
+  return candidates.find((candidate) => existsSync(candidate)) ?? candidates[0];
+}
+
+function joinPath(...parts: string[]): string {
+  const raw = parts.map(normalizeSlashes).join("/");
+  const cleaned = raw.replace(/\/{2,}/g, "/");
+  return raw.startsWith("//") ? `/${cleaned}` : cleaned;
+}
+
+function normalizeSlashes(input: string): string {
+  return input.replace(/\\/g, "/");
+}
+
+function isAbsolutePath(input: string): boolean {
+  return (
+    /^[A-Za-z]:[\\/]/.test(input) ||
+    input.startsWith("/") ||
+    input.startsWith("\\\\")
+  );
+}
 
 export async function readTypFile(filePath: string): Promise<string> {
   if (!filePath.toLowerCase().endsWith(".typ")) {
     throw new Error("Expected a .typ file path.");
   }
 
-  const fullPath = `${SOURCE_PATH}/${filePath}`;
+  const fullPath = joinPath(SOURCE_PATH, filePath);
   try {
     return await Bun.file(fullPath).text();
   } catch (err) {
@@ -33,7 +69,7 @@ export async function readTypFile(filePath: string): Promise<string> {
 
 export function writeJSONFile(path: string, content: unknown) {
   const filePath = path.toLowerCase().endsWith(".json") ? path : `${path}.json`;
-  const fullPath = `${EXPORT_PATH}/${filePath}`;
+  const fullPath = joinPath(EXPORT_PATH, filePath);
   void Bun.write(fullPath, JSON.stringify(content), { createPath: true });
 }
 
@@ -49,7 +85,7 @@ export async function parseYamlAndValidate<T>(
     throw new Error("Expected a .yml file path.");
   }
 
-  const fullPath = `${SOURCE_PATH}/${relativePath}`;
+  const fullPath = joinPath(SOURCE_PATH, relativePath);
 
   let text: string;
   try {
@@ -86,12 +122,12 @@ export async function parseYamlAndValidate<T>(
 
 
 export async function getFolderNames(filePath: string): Promise<string[]> {
-  const rootPath = `${SOURCE_PATH}/${filePath}`;
+  const rootPath = joinPath(SOURCE_PATH, filePath);
   const glob = new Glob("*");
   const folders: string[] = [];
 
   for await (const entry of glob.scan({ cwd: rootPath, onlyFiles: false })) {
-    const stats = await Bun.file(`${rootPath}/${entry}`).stat();
+    const stats = await Bun.file(joinPath(rootPath, entry)).stat();
     if (stats.isDirectory()) {
       folders.push(entry);
     }
@@ -104,7 +140,7 @@ export async function getFileNames(
   filePath: string,
   extension?: string
 ): Promise<string[]> {
-  const rootPath = `${SOURCE_PATH}/${filePath}`;
+  const rootPath = joinPath(SOURCE_PATH, filePath);
   const suffix = extension ? extension.replace(/^\./, "") : "";
   const pattern = suffix ? `*.${suffix}` : "*";
   const glob = new Glob(pattern);
