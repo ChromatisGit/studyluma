@@ -18,7 +18,7 @@ export type CourseId = string
 
 export function ensureCourseId(value: string): CourseId {
   if (value in coursesById) return value as CourseId;
-  return notFound();
+  notFound();
 }
 
 export function getCourseId(groupKey: string, subjectKey: string): CourseId {
@@ -30,7 +30,9 @@ export function getSubject(courseId: CourseId) {
 }
 
 export function getTopic({ courseId, topicId }: { courseId: string; topicId: string }) {
-  return getTopicData(resolveCourse(courseId), topicId) ?? notFound();
+  const topic = getTopicData(resolveCourse(courseId), topicId);
+  if (!topic) notFound();
+  return topic;
 }
 
 export function courseListed(courseId: CourseId) {
@@ -41,12 +43,18 @@ export function coursePublic(courseId: CourseId) {
   return resolveCourse(courseId).isPublic;
 }
 
-export function getCourseGroupAndSubjectKey(courseId: CourseId) {
-  const course = resolveCourse(courseId)
-  return {groupKey: course.group.key, subjectKey: course.subject.key} ;
+export function getPublicCourses(): CourseId[] {
+  return courses
+    .filter((course) => course.isPublic && course.isListed)
+    .map((course) => course.id as CourseId);
 }
 
-export function getWorksheetRefs({
+export function getCourseGroupAndSubjectKey(courseId: CourseId) {
+  const course = resolveCourse(courseId)
+  return { groupKey: course.group.key, subjectKey: course.subject.key };
+}
+
+export async function getWorksheetRefs({
   courseId,
   topicId,
   chapterId,
@@ -55,10 +63,24 @@ export function getWorksheetRefs({
   topicId: string;
   chapterId: string;
 }) {
+  // Import getProgressDTO to check chapter access
+  const { getProgressDTO } = await import("./getProgressDTO");
+  const progressDTO = await getProgressDTO(courseId);
+
+  // Find the topic and chapter in the progress data
+  const topic = progressDTO.topics.find((t) => t.topicId === topicId);
+  const chapter = topic?.chapters.find((c) => c.chapterId === chapterId);
+
+  // If chapter is locked or doesn't exist, return null
+  if (!chapter || chapter.status === "locked") {
+    return null;
+  }
+
+  // Chapter is accessible, get worksheets from raw course data
   const course = resolveCourse(courseId);
-  const topic = getTopicData(course, topicId);
-  const chapter = getChapterData(topic, chapterId);
-  const worksheets = chapter?.worksheets;
+  const rawTopic = getTopicData(course, topicId);
+  const rawChapter = getChapterData(rawTopic, chapterId);
+  const worksheets = rawChapter?.worksheets;
 
   if (!worksheets || worksheets.length === 0) return null;
   return worksheets;
@@ -84,16 +106,16 @@ type CourseAccessGroups = {
   hidden: string[];
 };
 
-export function getCoursesByAccess(user: User): CourseAccessGroups {
+export function getCoursesByAccess(user: User | null): CourseAccessGroups {
   return courses.reduce<CourseAccessGroups>(
     (groups, course) => {
       if (!course.isListed) {
-        if (isAdmin(user)) groups.hidden.push(course.id);
+        if (user && isAdmin(user)) groups.hidden.push(course.id);
 
         return groups;
       }
 
-      if (canUserAccessPage(user, course.group.id, course.id)) {
+      if (canUserAccessPage(user, course.group.key, course.id)) {
         groups.accessible.push(course.id);
         return groups;
       }

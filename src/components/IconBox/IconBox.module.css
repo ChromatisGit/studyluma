@@ -1,0 +1,65 @@
+.iconBox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--sn-radius-md);
+  flex-shrink: 0;
+}
+
+.circle {
+  border-radius: 999px;
+}
+
+/* === Sizes === */
+
+.size-sm {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.size-md {
+  width: 3rem;
+  height: 3rem;
+}
+
+.size-lg {
+  width: 3.5rem;
+  height: 3.5rem;
+}
+
+/* === Colors === */
+
+.color-purple {
+  background: var(--sn-purple-accent-soft-bg);
+  color: var(--sn-purple-accent-strong);
+}
+
+.color-blue {
+  background: var(--sn-blue-accent-soft-bg);
+  color: var(--sn-blue-accent-strong);
+}
+
+.color-green {
+  background: var(--sn-green-accent-soft-bg);
+  color: var(--sn-green-accent-strong);
+}
+
+.color-orange {
+  background: var(--sn-orange-accent-soft-bg);
+  color: var(--sn-orange-accent-strong);
+}
+
+.color-teal {
+  background: var(--sn-teal-accent-soft-bg);
+  color: var(--sn-teal-accent-strong);
+}
+
+.color-red {
+  background: var(--sn-red-accent-soft-bg);
+  color: var(--sn-red-accent-strong);
+}
+
+.color-neutral {
+  background: var(--sn-surface-raised);
+  color: var(--sn-text);
+}

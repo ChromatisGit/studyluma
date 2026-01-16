@@ -40,13 +40,13 @@
 }
 
 .heroTitle {
-  font-size: clamp(2.4rem, 3vw, 3rem);
+  font-size: var(--sn-font-size-hero);
   margin-bottom: 0.75rem;
   color: var(--sn-text);
 }
 
 .heroLead {
-  font-size: 1.15rem;
+  font-size: var(--sn-font-size-1-15);
   margin-bottom: 1.25rem;
   color: var(--sn-text-muted);
 }

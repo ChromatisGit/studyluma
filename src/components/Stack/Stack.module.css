@@ -1,0 +1,28 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.gap-xs {
+  gap: var(--sn-space-xs);
+}
+
+.gap-sm {
+  gap: var(--sn-space-sm);
+}
+
+.gap-md {
+  gap: var(--sn-space-md);
+}
+
+.gap-lg {
+  gap: var(--sn-space-lg);
+}
+
+.gap-xl {
+  gap: var(--sn-space-xl);
+}
+
+.gap-2xl {
+  gap: var(--sn-space-2xl);
+}

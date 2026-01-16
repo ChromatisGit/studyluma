@@ -39,7 +39,7 @@
   --sn-section-max-width: var(--sn-content-width-wide, 1120px);
   --sn-section-card-padding: 2rem;
   --sn-section-header-margin: 1.75rem;
-  --sn-section-title-size: 1.9rem;
+  --sn-section-title-size: var(--sn-font-size-1-9);
   --sn-section-title-gap: 0.5rem;
 }
 

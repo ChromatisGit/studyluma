@@ -1,5 +1,22 @@
+.goalCard {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.goalTitle {
+  font-size: var(--sn-font-size-1-1);
+  margin: 0.35rem 0 0;
+}
+
+.goalText {
+  color: var(--sn-text-muted);
+  margin: 0.4rem 0 0;
+}
+
 .infoNote {
-  margin-top: 1.5rem;
+  margin-top: var(--sn-space-lg);
   padding: 1.25rem 1.4rem;
   border-radius: var(--sn-radius-md);
   border: 1px dashed var(--sn-border);
@@ -13,5 +30,5 @@
 }
 
 .infoNote p + p {
-  margin-top: 0.75rem;
+  margin-top: var(--sn-space-sm);
 }

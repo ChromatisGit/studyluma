@@ -1,0 +1,19 @@
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--sn-page-padding);
+  padding-right: var(--sn-page-padding);
+}
+
+.narrow {
+  max-width: var(--sn-content-width-narrow);
+}
+
+.wide {
+  max-width: var(--sn-content-width-wide);
+}
+
+.full {
+  max-width: none;
+}

@@ -1,0 +1,69 @@
+.header {
+  text-align: center;
+  margin-bottom: var(--sn-space-md);
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--sn-space-sm);
+}
+
+.title {
+  font-size: var(--sn-font-size-3);
+  font-weight: var(--sn-font-bold);
+  color: var(--sn-text);
+  margin: 0 0 var(--sn-space-xs);
+}
+
+.description {
+  font-size: var(--sn-font-size-1);
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+.codeBox {
+  background: var(--sn-surface-raised);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-sm);
+  padding: var(--sn-space-md);
+  margin-bottom: var(--sn-space-md);
+}
+
+.codeLabel {
+  font-size: var(--sn-font-size-0);
+  color: var(--sn-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--sn-space-xs);
+}
+
+.code {
+  font-size: var(--sn-font-size-4);
+  font-weight: var(--sn-font-bold);
+  font-family: var(--sn-font-mono);
+  color: var(--sn-purple-accent);
+  letter-spacing: 0.1em;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sn-space-sm);
+  margin-bottom: var(--sn-space-md);
+}
+
+.checkbox {
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sn-purple-accent);
+  cursor: pointer;
+}
+
+.checkboxLabel {
+  font-size: var(--sn-font-size-1);
+  color: var(--sn-text);
+  cursor: pointer;
+  user-select: none;
+}

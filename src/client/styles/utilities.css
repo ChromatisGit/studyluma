@@ -1,0 +1,108 @@
+/* === Raw Text / Markdown Rendering === */
+
+.sn-markdown {
+  color: var(--sn-text);
+  line-height: 1.6;
+}
+
+.sn-markdown > * + * {
+  margin-top: 0.5rem;
+}
+
+.sn-markdown p {
+  margin: 0;
+}
+
+.sn-markdown pre:not(.sn-code-block) {
+  margin: 0;
+}
+
+.sn-markdown ul,
+.sn-markdown ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.sn-markdown blockquote {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--sn-border);
+  color: var(--sn-text-muted);
+}
+
+.sn-markdown code {
+  background: var(--sn-surface-raised);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--sn-radius-xs);
+  font-family: var(--sn-font-mono);
+}
+
+.sn-markdown a {
+  color: var(--sn-primary);
+  text-decoration: none;
+}
+
+.sn-markdown a:hover {
+  text-decoration: underline;
+}
+
+.sn-markdown hr {
+  border: none;
+  border-top: 1px solid var(--sn-border);
+  margin: 1rem 0;
+}
+
+/* === Code Block === */
+
+.sn-code-block {
+  background: var(--sn-code-bg);
+  border: 1px solid var(--sn-code-bg-border);
+  border-radius: var(--sn-radius-xs);
+  padding: var(--sn-space-xs);
+  overflow-x: auto;
+  font-family: var(--sn-font-mono);
+  font-size: var(--sn-font-size-0-95);
+  margin: var(--sn-space-xs) 0;
+  line-height: 1.6;
+  color: var(--sn-code-text);
+}
+
+/* === Utility Classes === */
+
+.sn-underline {
+  text-decoration: underline;
+}
+
+/* === Prism Code Highlighting === */
+
+.prism-code {
+  background-color: var(--sn-code-bg) !important;
+}
+
+/* === Sonner Toast Animations === */
+
+body [data-sonner-toast] {
+  transform: translateX(var(--sn-toast-x, 0)) var(--sn-toast-y, var(--y));
+}
+
+body [data-sonner-toast][data-x-position='right'][data-y-position='top'] {
+  --sn-toast-x: 120%;
+  --sn-toast-y: translateY(0);
+}
+
+body [data-sonner-toast][data-x-position='right'][data-y-position='top'][data-expanded='true'] {
+  --sn-toast-y: translateY(calc(var(--lift) * var(--offset)));
+}
+
+body [data-sonner-toast][data-x-position='right'][data-y-position='top'][data-expanded='false'][data-front='false'] {
+  --sn-toast-y: translateY(calc(var(--lift-amount) * var(--toasts-before)))
+    scale(calc(-1 * var(--scale)));
+}
+
+body [data-sonner-toast][data-x-position='right'][data-y-position='top'][data-mounted='true'] {
+  --sn-toast-x: 0;
+}
+
+body [data-sonner-toast][data-x-position='right'][data-y-position='top'][data-removed='true'] {
+  --sn-toast-x: 120%;
+}

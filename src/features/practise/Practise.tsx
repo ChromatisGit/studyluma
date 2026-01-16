@@ -1,9 +1,8 @@
 import type { PracticeTask } from "@data/practice";
-import type { CourseId } from "@domain/ids";
 import styles from "./Practise.module.css";
 
 interface PractiseProps {
-  courseId: CourseId;
+  courseId: string;
   topicTitle: string;
   tasks: PracticeTask[];
 }

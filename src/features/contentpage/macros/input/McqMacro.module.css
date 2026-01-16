@@ -1,0 +1,183 @@
+.mcq {
+  display: flex;
+  flex-direction: column;
+}
+
+.question {
+  font-weight: var(--sn-font-medium);
+}
+
+.question :global(.sn-markdown),
+.question :global(.sn-markdown) > * {
+  margin: 0;
+}
+
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 4), 1fr);
+  gap: var(--sn-space-sm);
+}
+
+@media (max-width: 640px) {
+  .optionGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  border: 2px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  background: var(--sn-surface);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: var(--sn-font-size-1-05);
+}
+
+.option:hover:not(:disabled) {
+  border-color: var(--sn-purple-accent);
+}
+
+/* Show validation states on hover when checked */
+.option--correct:hover:disabled {
+  border-color: var(--sn-green-accent);
+}
+
+.option--wrong:hover:disabled {
+  border-color: var(--sn-red-accent);
+}
+
+.option--missed:hover:disabled {
+  border-color: var(--sn-green-accent);
+}
+
+.option--default {
+  border-color: var(--sn-border);
+  background: var(--sn-surface);
+}
+
+.option--active {
+  border-color: var(--sn-purple-accent);
+  background: var(--sn-purple-accent-soft-bg);
+}
+
+.option--correct {
+  border-color: var(--sn-green-accent);
+  background: var(--sn-green-accent-soft-bg);
+}
+
+.option--wrong {
+  border-color: var(--sn-red-accent);
+  background: var(--sn-red-accent-soft-bg);
+}
+
+.option--missed {
+  border-color: var(--sn-green-accent);
+  background: var(--sn-surface);
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+/* Checkbox/Radio indicator */
+.indicator {
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  min-height: 14px;
+  flex-shrink: 0;
+  border: 2px solid var(--sn-border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sn-surface);
+  transition: all 0.15s ease;
+}
+
+.indicatorRadio {
+  border-radius: 50%;
+}
+
+.indicator--default {
+  border-color: var(--sn-border);
+  background: var(--sn-surface);
+}
+
+.indicator--active {
+  border-color: var(--sn-purple-accent);
+  background: var(--sn-purple-accent);
+}
+
+.checkbox {
+  width: 12px;
+  height: 12px;
+  display: block;
+  color: var(--sn-text-on-accent);
+  stroke-width: 4;
+}
+
+.indicator--missed .checkbox {
+  color: var(--sn-green-accent);
+}
+
+.radioDot {
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
+  min-height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--sn-text-on-accent);
+}
+
+.indicator--missed .radioDot {
+  background: var(--sn-green-accent);
+}
+
+/* Option text */
+.optionText {
+  flex: 1;
+  min-width: 0;
+}
+
+.optionText :global(.sn-markdown),
+.optionText :global(.sn-markdown) > * {
+  margin: 0;
+}
+
+/* Result icon on the right */
+.resultIcon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultIconSvg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  stroke-width: 3;
+}
+
+.option--correct .resultIconSvg {
+  color: var(--sn-green-accent);
+}
+
+.option--wrong .resultIconSvg {
+  color: var(--sn-red-accent);
+}
+
+.option--missed .resultIconSvg {
+  color: var(--sn-green-accent);
+}

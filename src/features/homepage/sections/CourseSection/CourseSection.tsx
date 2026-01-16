@@ -1,31 +1,43 @@
-"use client";
-
-import { useMemo } from "react";
-
-import { useMockAuth } from "@client/contexts/MockAuthContext";
-import styles from "@homepage/sections/CourseSection/CourseSection.module.css";
+import { getSession } from "@/server/auth/auth";
 import HOMEPAGE_TEXT from "@homepage/homepage.de.json";
 import { HomeSection } from "@homepage/Homepage";
 import { getCoursesByAccess } from "@/server/data/courses";
+import { getCourseDTO } from "@/server/data/getCourseDTO";
+import type { CourseDTO } from "@/domain/courseDTO";
 import { isAdmin } from "@/domain/userTypes";
+import { Stack } from "@components/Stack";
 import { CourseGroup } from "./CourseGroup";
 
-const EMPTY_GROUPS = {
+type CourseGroups = {
+  accessible: CourseDTO[];
+  restricted: CourseDTO[];
+  hidden: CourseDTO[];
+};
+
+const EMPTY_GROUPS: CourseGroups = {
   accessible: [],
   restricted: [],
   hidden: [],
 };
 
-export function CourseSection() {
+export async function CourseSection() {
   const { courses } = HOMEPAGE_TEXT;
-  const { user } = useMockAuth();
+  const session = await getSession();
+  const user = session?.user ?? null;
 
-  const groups = useMemo(() => (user ? getCoursesByAccess(user) : EMPTY_GROUPS), [user]);
+  const accessGroups = getCoursesByAccess(user);
+  const groups = accessGroups
+    ? {
+        accessible: accessGroups.accessible.map((courseId) => getCourseDTO(courseId)),
+        restricted: accessGroups.restricted.map((courseId) => getCourseDTO(courseId)),
+        hidden: accessGroups.hidden.map((courseId) => getCourseDTO(courseId)),
+      }
+    : EMPTY_GROUPS;
   const admin = user ? isAdmin(user) : false;
 
   return (
     <HomeSection id="courses" title={courses.title} subtitle={courses.subtitle}>
-      <div className={styles.courseGroups}>
+      <Stack gap="xl">
         <CourseGroup
           title={admin? courses.accessibleCoursesAdmin : courses.accessibleCourses}
           courses={groups.accessible}
@@ -48,7 +60,7 @@ export function CourseSection() {
             accessable={true}
           />
         )}
-      </div>
+      </Stack>
     </HomeSection>
   );
 }

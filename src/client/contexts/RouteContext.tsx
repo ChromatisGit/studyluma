@@ -3,7 +3,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
-import { CourseId, getCourseId } from "@data/courses";
+type CourseId = string;
 
 type RouteContextValue = {
   pathname: string;
@@ -13,23 +13,24 @@ type RouteContextValue = {
   topic?: string;
   chapter?: string;
   worksheet?: string;
-  isLibraryRoute: boolean;
   depth: number;
   hasTopicContext: boolean;
   groupKey?: string;
   subjectKey?: string;
   courseId?: CourseId;
-  subject?: string;
   isHome: boolean;
-  isLibrary: boolean;
   isPrinciples: boolean;
   isGroupOverview: boolean;
 };
 
 const RouteContext = createContext<RouteContextValue | undefined>(undefined);
 
-const RESERVED_ROOTS = new Set(["library", "access", "worksheet"]);
+const RESERVED_ROOTS = new Set(["access", "worksheet"]);
 const RESERVED_COURSE_SEGMENTS = new Set(["practice"]);
+
+function buildCourseId(groupKey: string, subjectKey: string): CourseId {
+  return `${groupKey}-${subjectKey}`;
+}
 
 function buildRouteContext(pathname: string, isAuthenticated: boolean): RouteContextValue {
   const segments = pathname.split("/").filter(Boolean);
@@ -39,20 +40,15 @@ function buildRouteContext(pathname: string, isAuthenticated: boolean): RouteCon
   const rawChapter = segments[3];
   const rawWorksheet = segments[4];
 
-  const isLibraryRoute = routeParam1 === "library";
   const isHome = segments.length === 0 || pathname === "/";
-  const isLibrary = isLibraryRoute;
-  const isPrinciples =
-    !isLibraryRoute && segments.length >= 2 && segments[1] === "principles";
+  const isPrinciples = segments.length >= 2 && segments[1] === "principles";
   const isGroupOverview =
     segments.length === 1 && !!routeParam1 && !RESERVED_ROOTS.has(routeParam1);
 
-  const groupKey = !isLibraryRoute ? routeParam1 : undefined;
-  const subjectKey =
-    !isLibraryRoute && routeParam2 && !isPrinciples ? routeParam2 : undefined;
+  const groupKey = routeParam1;
+  const subjectKey = routeParam2 && !isPrinciples ? routeParam2 : undefined;
   const courseId =
-    groupKey && subjectKey ? getCourseId(groupKey, subjectKey) : undefined;
-  const subject = isLibraryRoute ? routeParam2 : undefined;
+    groupKey && subjectKey ? buildCourseId(groupKey, subjectKey) : undefined;
 
   const isReservedTopicSegment = rawTopic ? RESERVED_COURSE_SEGMENTS.has(rawTopic) : false;
   const isReservedChapterSegment = rawChapter
@@ -75,15 +71,12 @@ function buildRouteContext(pathname: string, isAuthenticated: boolean): RouteCon
     topic,
     chapter,
     worksheet,
-    isLibraryRoute,
     depth,
     hasTopicContext,
     groupKey,
     subjectKey,
     courseId,
-    subject,
     isHome,
-    isLibrary,
     isPrinciples,
     isGroupOverview,
   };

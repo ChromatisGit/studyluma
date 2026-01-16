@@ -1,0 +1,11 @@
+.highlight {
+  padding: var(--sn-space-md);
+  border-radius: var(--sn-radius-md);
+  background: var(--sn-blue-accent-soft-bg);
+  border: 1px solid var(--sn-blue-accent-soft-border);
+}
+
+.warning {
+  background: var(--sn-orange-accent-soft-bg);
+  border-color: var(--sn-orange-accent-soft-border);
+}

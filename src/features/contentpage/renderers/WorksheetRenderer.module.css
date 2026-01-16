@@ -1,0 +1,19 @@
+.worksheet {
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--sn-font-size-2-2);
+  color: var(--sn-text);
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--sn-border);
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}

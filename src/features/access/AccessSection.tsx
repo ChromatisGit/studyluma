@@ -1,15 +1,18 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
-import styles from "./AccessPage.module.css";
+import { Button } from "@components/Button";
+import { Input } from "@components/Input";
+import { Stack } from "@components/Stack";
+import { IconBox } from "@components/IconBox";
+import styles from "./AccessSection.module.css";
 import { useMockAuth } from "@/client/contexts/MockAuthContext";
-import type { User } from "@domain/userTypes";
-import { isAdmin } from "@domain/userTypes";
 import { continueAccessAction } from "@/server/auth/accessAction";
+import { AccessCodeModal } from "./AccessCodeModal";
 
 type AccessSectionProps = {
   isCourseJoin: boolean;
@@ -18,13 +21,8 @@ type AccessSectionProps = {
   courseRoute: string | null;
   courseName: string;
   isRegistrationOpen: boolean;
+  currentUserAccessCode: string | null;
 };
-
-function hasCourseAccessClient(user: User, groupKey: string, courseId: string): boolean {
-  if (isAdmin(user)) return true;
-  if (user.groupKey !== groupKey) return false;
-  return user.courseIds.includes(courseId);
-}
 
 export default function AccessSection({
   isCourseJoin,
@@ -33,39 +31,17 @@ export default function AccessSection({
   courseRoute,
   courseName,
   isRegistrationOpen,
+  currentUserAccessCode,
 }: AccessSectionProps) {
-  const [accessCode, setAccessCode] = useState("");
+  const [accessCode, setAccessCode] = useState(currentUserAccessCode ?? "");
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [newAccessCode, setNewAccessCode] = useState<string | null>(null);
+  const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   const router = useRouter();
   const auth = useMockAuth();
-
-  // If already logged in and already has access to the course, redirect directly
-  useEffect(() => {
-    if (
-      !auth.isAuthenticated ||
-      !auth.user ||
-      !isCourseJoin ||
-      !groupKey ||
-      !courseId ||
-      !courseRoute
-    ) {
-      return;
-    }
-
-    if (!hasCourseAccessClient(auth.user, groupKey, courseId)) return;
-    router.push(courseRoute);
-  }, [
-    auth.isAuthenticated,
-    auth.user,
-    courseRoute,
-    courseId,
-    router,
-    groupKey,
-    isCourseJoin,
-  ]);
 
   const handleContinue = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -95,24 +71,32 @@ export default function AccessSection({
         return;
       }
 
-      // Update mock auth with the user that the server action decided on
-      const needsLoginChange = !auth.user || auth.user.id !== result.session.user.id;
+      auth.setSession(result.session);
 
-      if (needsLoginChange) {
-        auth.setSession(result.session);
+      // If this is a new registration, show the access code modal before redirecting
+      if (result.accessCode) {
+        setNewAccessCode(result.accessCode);
+        setPendingRedirect(result.redirectTo);
+      } else {
+        // Hard navigation to ensure fresh server data (session cookie changed)
+        window.location.href = result.redirectTo;
       }
-
-      router.push(result.redirectTo);
     });
+  };
+
+  const handleModalConfirm = () => {
+    setNewAccessCode(null);
+    if (pendingRedirect) {
+      // Hard navigation to ensure fresh server data (session cookie changed)
+      window.location.href = pendingRedirect;
+    }
   };
 
   return (
     <div className={styles.page}>
       <div className={styles.card}>
         <header className={styles.header}>
-          <div className={styles.logo}>
-            <BookOpen size={28} aria-hidden />
-          </div>
+          <IconBox icon={BookOpen} color="purple" size="lg" />
           <h1 className={styles.title}>
             {isCourseJoin ? `Join ${courseName}` : "Welcome to StudyNode"}
           </h1>
@@ -123,65 +107,61 @@ export default function AccessSection({
           </p>
         </header>
 
-        <form onSubmit={handleContinue} className={styles.form}>
-          <div>
-            <label htmlFor="accessCode" className={styles.labelRow}>
-              Access Code
-              {isCourseJoin ? <span className={styles.optional}>(Optional)</span> : null}
-            </label>
-            <input
-              id="accessCode"
-              type="text"
+        <form onSubmit={handleContinue}>
+          <Stack gap="md">
+            <Input
+              label="Access Code"
+              hint={isCourseJoin && !currentUserAccessCode ? "(Optional)" : undefined}
               value={accessCode}
               onChange={(event) => setAccessCode(event.target.value)}
-              className={styles.input}
               placeholder={
-                isCourseJoin ? "Enter access code if you have one" : "Enter your access code"
+                isCourseJoin && !currentUserAccessCode
+                  ? "Enter access code if you have one"
+                  : "Enter your access code"
               }
-              disabled={isPending}
+              disabled={isPending || !!currentUserAccessCode}
+              helperText={
+                isCourseJoin && !currentUserAccessCode
+                  ? "If registration is open, you can use only your PIN."
+                  : undefined
+              }
             />
-            {isCourseJoin ? (
-              <p className={styles.helper}>If registration is open, you can use only your PIN.</p>
-            ) : null}
-          </div>
 
-          <div>
-            <label htmlFor="pin" className={styles.labelRow}>
-              PIN
-            </label>
-            <input
-              id="pin"
+            <Input
+              label="PIN"
               type="password"
               value={pin}
               onChange={(event) => setPin(event.target.value)}
-              className={styles.input}
               placeholder="Enter your PIN"
               disabled={isPending}
             />
-          </div>
 
-          {error ? <div className={styles.message}>{error}</div> : null}
+            {error ? <div className={styles.message}>{error}</div> : null}
 
-          <button
-            type="submit"
-            className={`${styles.submitButton} button button--primary`}
-            disabled={isPending}
-          >
-            {isPending ? "Processing..." : "Continue"}
-          </button>
+            <Button type="submit" variant="primary" fullWidth disabled={isPending}>
+              {isPending ? "Processing..." : "Continue"}
+            </Button>
 
-          <button
-            type="button"
-            onClick={() => router.push("/")}
-            className={styles.linkButton}
-            disabled={isPending}
-          >
-            Back to home
-          </button>
+            <Button
+              type="button"
+              variant="ghost"
+              fullWidth
+              onClick={() => router.push("/")}
+              disabled={isPending}
+            >
+              Back to home
+            </Button>
+          </Stack>
         </form>
 
         <p className={styles.footer}>Need help? Contact your instructor.</p>
       </div>
+
+      <AccessCodeModal
+        accessCode={newAccessCode ?? ""}
+        isOpen={!!newAccessCode}
+        onConfirm={handleModalConfirm}
+      />
     </div>
   );
 }

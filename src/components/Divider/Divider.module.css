@@ -1,0 +1,20 @@
+.divider {
+  border: none;
+  border-top: 1px solid var(--sn-border);
+  width: 100%;
+}
+
+.spacing-sm {
+  margin-top: var(--sn-space-sm);
+  margin-bottom: var(--sn-space-sm);
+}
+
+.spacing-md {
+  margin-top: var(--sn-space-md);
+  margin-bottom: var(--sn-space-md);
+}
+
+.spacing-lg {
+  margin-top: var(--sn-space-lg);
+  margin-bottom: var(--sn-space-lg);
+}

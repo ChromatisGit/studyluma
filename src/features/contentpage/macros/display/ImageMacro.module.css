@@ -1,0 +1,22 @@
+.figure {
+  margin: var(--sn-space-md) 0;
+  text-align: center;
+}
+
+.image {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--sn-radius-md);
+}
+
+.small {
+  max-width: 300px;
+}
+
+.medium {
+  max-width: 500px;
+}
+
+.large {
+  max-width: 100%;
+}

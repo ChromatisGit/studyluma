@@ -1,19 +1,18 @@
 .page {
-  position: relative;
-  min-height: 100vh;
-  background: var(--sn-bg);
-  color: var(--sn-text);
-  padding: 3rem var(--sn-page-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-lg);
 }
 
 .header {
-  max-width: var(--sn-content-width-narrow, 960px);
-  margin: 0 auto 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
 }
 
 .pageTitle {
   margin: 0 0 0.35rem;
-  font-size: 2.2rem;
+  font-size: var(--sn-font-size-2-2);
   color: var(--sn-text);
 }
 
@@ -30,24 +29,19 @@
 
 .courseSection {
   --sn-section-padding: 1rem 0 2.5rem;
-  --sn-section-max-width: var(--sn-content-width-narrow, 960px);
   --sn-section-card-padding: 1.75rem;
-  --sn-section-title-size: 1.5rem;
+  --sn-section-title-size: var(--sn-font-size-1-5);
   --sn-section-title-gap: 1rem;
   --sn-section-header-margin: 0;
 }
 
 .currentTopicTitle {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: var(--sn-font-size-1-3);
   color: var(--sn-purple-accent);
 }
 
 @media screen and (max-width: 768px) {
-  .page {
-    padding: 2.25rem 1.25rem;
-  }
-
   .courseSection {
     --sn-section-padding: 0.5rem 0 2rem;
   }

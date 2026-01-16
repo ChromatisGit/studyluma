@@ -1,83 +1,83 @@
-import { RawText } from "./page";
+import { Markdown } from "./page";
 
-type CodeLanguage = "ts" | "python";
+export type CodeLanguage = "ts" | "python";
 
-type NoteMacro = {
+export type NoteMacro = {
   type: "note";
-  content: RawText;
+  content: Markdown;
 };
 
-type CodeRunnerMacro = {
+export type CodeRunnerMacro = {
   type: "codeRunner";
   code: string;
   language: CodeLanguage;
 };
 
-type CodeTaskMacro = {
+export type CodeTaskMacro = {
   type: "codeTask";
-  instruction: RawText;
-  hint: RawText;
-  solution: RawText;
+  instruction: Markdown;
+  hint: Markdown;
+  solution: Markdown;
   starter: string;
   validation?: string;
   language: CodeLanguage;
 };
 
-type GapField = {
+export type GapField = {
   mode: "text" | "mcq";
   correct: string[];
   options?: string[];
 };
 
-type GapPart =
+export type GapPart =
   | { type: "text"; content: string }
   | { type: "gap"; gap: GapField };
 
-type GapMacro = {
+export type GapMacro = {
   type: "gap";
   parts: GapPart[];
 };
 
-type MathTaskMacro = {
+export type MathTaskMacro = {
   type: "mathTask";
-  instruction: RawText;
-  hint: RawText;
-  solution: RawText;
+  instruction: Markdown;
+  hint: Markdown;
+  solution: Markdown;
 };
 
-type McqMacro = {
+export type McqMacro = {
   type: "mcq";
-  question: RawText;
-  correct: RawText[];
-  options: RawText[];
+  question: Markdown;
+  correct: Markdown[];
+  options: Markdown[];
   single: boolean;
   shuffleOptions: boolean;
   wideLayout: boolean;
 };
 
-type TextTaskMacro = {
+export type TextTaskMacro = {
   type: "textTask";
-  instruction: RawText;
-  hint: RawText;
-  solution: RawText;
+  instruction: Markdown;
+  hint: Markdown;
+  solution: Markdown;
 };
 
-type TableMacro = {
+export type TableMacro = {
   type: "table";
-  headers: RawText[];
-  rows: RawText[][];
+  headers: Markdown[];
+  rows: Markdown[][];
 };
 
-type ImageMacro = {
+export type ImageMacro = {
   type: "image";
   source: string;
   size: "S" | "M" | "L";
 };
 
-type HighlightMacro = {
+export type HighlightMacro = {
   type: "highlight";
   icon: "info" | "warning";
-  content: RawText
+  content: Markdown
 };
 
 export type Macro =

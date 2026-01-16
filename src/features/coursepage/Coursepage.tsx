@@ -1,10 +1,20 @@
 import { SectionShell } from "@components/SectionShell";
-import type { CoursepageModel } from "@client/viewModel/roadmap";
+import { PageHeader } from "@components/PageHeader/PageHeader";
+import type { ProgressTopicDTO } from "@domain/progressDTO";
+import type { WorksheetRef } from "@domain/courseContent";
 import Roadmap from "./components/Roadmap/Roadmap";
 import { WorksheetCards } from "./components/WorksheetCard/WorksheetCards";
 import styles from "./layout/CoursepageLayout.module.css";
 import COURSEPAGE_TEXT from "@coursepage/coursepage.de.json";
 
+
+type CoursepageModel = {
+  title: string;
+  label: string;
+  current?: string | null;
+  worksheets?: WorksheetRef[];
+  roadmap: ProgressTopicDTO[];
+};
 
 interface CoursepagePageProps {
   model: CoursepageModel;
@@ -20,7 +30,7 @@ export function CoursepagePage({ model }: CoursepagePageProps) {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <h1 className={styles.pageTitle}>{pageTitle}</h1>
+        <PageHeader title={pageTitle} />
         <p className={styles.pageWelcome}>{welcomeText}</p>
         <p className={styles.pageDescription}>{COURSEPAGE_TEXT.intro.description}</p>
       </header>

@@ -1,4 +1,4 @@
-import { Topic } from "@/domain/courseContent";
+import { worksheetFormatEnum, type Topic, type WorksheetFormat } from "@/domain/courseContent";
 
 export type Courses = Course[];
 
@@ -14,3 +14,6 @@ export type Course = {
     isPublic: boolean;
     topics: Topic[]
 };
+
+export { worksheetFormatEnum };
+export type { Topic, WorksheetFormat };

@@ -1,0 +1,38 @@
+.infoBlock {
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--sn-shadow-lw);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.infoBlockHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.infoBadge {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--sn-radius-xs);
+  background: var(--sn-surface-deep);
+  color: var(--sn-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.infoBadgeSymbol {
+  font-size: var(--sn-font-size-0-95);
+}
+
+.infoHeading {
+  margin: 0;
+  font-size: var(--sn-font-size-1-05);
+  color: var(--sn-text);
+}

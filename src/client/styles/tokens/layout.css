@@ -1,0 +1,25 @@
+:root {
+  /* === Layout Dimensions === */
+  --sn-page-padding: 1.5rem;
+  --sn-navbar-height: 60px;
+  --sn-content-width-narrow: 960px;
+  --sn-content-width-wide: 1120px;
+
+  /* === Border Radius Scale === */
+  --sn-radius-xxs: 6px;
+  --sn-radius-xs: 8px;
+  --sn-radius-sm: 10px;
+  --sn-radius-md: 12px;
+  --sn-radius-lg: 14px;
+  --sn-radius-xl: 18px;
+
+  /* === Shadows === */
+  --sn-shadow-lw: 0 4px 12px color-mix(in srgb, var(--sn-text) 8%, transparent);
+  --sn-shadow-md: 0 10px 30px color-mix(in srgb, var(--sn-text) 12%, transparent);
+}
+
+[data-theme='dark'] {
+  /* === Shadows (dark mode) === */
+  --sn-shadow-lw: 0 4px 12px color-mix(in srgb, var(--sn-text) 16%, transparent);
+  --sn-shadow-md: 0 10px 30px color-mix(in srgb, var(--sn-text) 24%, transparent);
+}

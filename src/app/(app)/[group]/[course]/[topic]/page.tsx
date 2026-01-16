@@ -1,28 +1,29 @@
 import { getSession, assertCanAccessPage } from "@/server/auth/auth";
-import { getCourseId, getTopic } from "@/server/data/courses";
+import { getCourseId } from "@/server/data/courses";
+import { getTopicDTO } from "@/server/data/getTopicDTO";
+import { PageHeader } from "@components/PageHeader/PageHeader";
 import Link from "next/link";
 
 type PageParams = {
-  params: {
-    groupKey: string;
-    subjectKey: string;
-    topicId: string;
-  };
+  params: Promise<{
+    group: string;
+    course: string;
+    topic: string;
+  }>;
 };
 
 export default async function ChapterPage({ params }: PageParams) {
-  const { groupKey, subjectKey, topicId } = params
+  const { group: groupKey, course: subjectKey, topic: topicId } = await params;
 
   const session = await getSession();
-  assertCanAccessPage(session, groupKey, subjectKey);
+  const courseId = getCourseId(groupKey, subjectKey);
+  assertCanAccessPage(session, groupKey, courseId);
 
-  const courseId = getCourseId(groupKey, subjectKey)
-  const topic = getTopic({ courseId, topicId });
+  const topic = await getTopicDTO({ courseId, topicId });
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>{topic.label}</h1>
-      <h2>Kapitelübersicht</h2>
+    <main>
+      <PageHeader title={topic.label} subtitle="Kapitelübersicht" />
 
       {topic.chapters.length > 0 ? (
         <ul>

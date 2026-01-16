@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import HOMEPAGE_TEXT from "@features/homepage/homepage.de.json";
+import { Button } from "@components/Button";
 import styles from "@features/homepage/sections/Hero/Hero.module.css";
 
 export function Hero() {
@@ -14,14 +15,14 @@ export function Hero() {
 
           <p className={styles.heroLead}>{hero.lead}</p>
           <div className={styles.heroActions}>
-            <a href="#courses" className="button button--primary button--lg" aria-label={hero.primaryCta.ariaLabel}>
+            <Button href="#courses" variant="primary" size="lg" aria-label={hero.primaryCta.ariaLabel}>
               {hero.primaryCta.label}
               <ArrowRight size={18} aria-hidden />
-            </a>
+            </Button>
 
-            <a href="#about" className="button button--ghost button--lg" aria-label={hero.secondaryCta.ariaLabel}>
+            <Button href="#about" variant="ghost" size="lg" aria-label={hero.secondaryCta.ariaLabel}>
               {hero.secondaryCta.label}
-            </a>
+            </Button>
           </div>
         </div>
       </div>

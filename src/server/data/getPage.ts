@@ -1,8 +1,8 @@
-/// <reference types="bun-types" />
-
 import { Page } from "@/domain/page";
 import { notFound } from "next/navigation";
 import "server-only";
+import { readFile } from "fs/promises";
+import { join } from "path";
 
 type Args = {
     subject: string;
@@ -16,18 +16,16 @@ export async function getPage(args: Args): Promise<Page> {
 
     let sourcePath = [".generated", subject, topicId].join("/");
 
-    sourcePath += worksheetId ? `/${chapterId}/worksheet/${worksheetId}.json` : `${chapterId}.json`;
+    sourcePath += worksheetId ? `/${chapterId}/worksheets/${worksheetId}.json` : `/${chapterId}.json`;
 
-    const file = Bun.file(sourcePath);
-    if (!(await file.exists())) {
-        return notFound()
-    }
+    const fullPath = join(process.cwd(), sourcePath);
 
     let page: Page;
     try {
-        page = await file.json();
+        const fileContent = await readFile(fullPath, "utf-8");
+        page = JSON.parse(fileContent);
     } catch {
-        return notFound()
+        notFound();
     }
 
     return page;

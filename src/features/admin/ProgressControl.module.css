@@ -1,0 +1,75 @@
+.form {
+  padding: 1.5rem;
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-lg);
+  box-shadow: var(--sn-shadow-lw);
+}
+
+.grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.currentCard {
+  padding: 1rem 1.1rem;
+  border-radius: var(--sn-radius-md);
+  border: 1px solid var(--sn-blue-accent-soft-border);
+  background: var(--sn-blue-accent-soft-bg);
+}
+
+.currentLabel {
+  margin: 0 0 0.4rem;
+  font-weight: 600;
+  color: var(--sn-text);
+}
+
+.currentValue {
+  margin: 0;
+  font-weight: 600;
+  color: var(--sn-blue-accent);
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.label {
+  font-weight: 600;
+  color: var(--sn-text);
+}
+
+.select {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--sn-radius-md);
+  border: 1px solid var(--sn-border);
+  background: var(--sn-surface);
+  color: var(--sn-text);
+  font-size: var(--sn-font-size-0-95);
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--sn-purple-accent-focus-ring);
+  outline-offset: 2px;
+  border-color: var(--sn-purple-accent-soft-border);
+}
+
+.select:disabled {
+  background: var(--sn-surface-raised);
+  color: var(--sn-text-muted);
+  cursor: not-allowed;
+}
+
+.submitButton {
+  width: 100%;
+  border: none;
+}
+
+.submitButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}

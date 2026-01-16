@@ -4,21 +4,23 @@ import { ChevronRight, House } from "lucide-react";
 
 import { AppLink } from "@components/AppLink";
 import { useRouteContext } from "@/client/contexts/RouteContext";
-import { getCourseOverview } from "@data/overview";
+import type { SidebarDTO } from "@domain/sidebarDTO";
 import styles from "./Breadcrumbs.module.css";
 
-export function Breadcrumbs() {
+type BreadcrumbsProps = {
+  data: SidebarDTO;
+};
+
+export function Breadcrumbs({ data }: BreadcrumbsProps) {
   const {
     hasTopicContext,
-    isLibraryRoute,
-    subject,
     courseId,
     groupKey,
     subjectKey,
     topic,
     chapter,
-  } =
-    useRouteContext();
+    worksheet,
+  } = useRouteContext();
 
   if (!hasTopicContext) {
     return null;
@@ -27,29 +29,28 @@ export function Breadcrumbs() {
   const items: Array<{ label: string; href: string }> = [];
 
   let homeUrl = "/";
-  if (isLibraryRoute && subject) {
-    homeUrl = `/library/${subject}`;
-  } else if (!isLibraryRoute && courseId) {
-    const overview = getCourseOverview(courseId);
-    homeUrl = overview?.slug ?? (groupKey && subjectKey ? `/${groupKey}/${subjectKey}` : "/");
+  if (courseId) {
+    homeUrl = groupKey && subjectKey ? `/${groupKey}/${subjectKey}` : "/";
   }
 
   let topicLabel = topic;
   let chapterLabel = chapter;
+  let worksheetLabel = worksheet;
 
-  if (!isLibraryRoute && courseId) {
-    const overview = getCourseOverview(courseId);
-    const topicData = overview?.topics.find((entry) => entry.id === topic);
-    topicLabel = topicData?.title ?? topicLabel;
-    const chapterData = topicData?.chapters.find((entry) => entry.id === chapter);
-    chapterLabel = chapterData?.title ?? chapterLabel;
+  if (courseId) {
+    const topicData = data.topics.find((entry) => entry.topicId === topic);
+    topicLabel = topicData?.label ?? topicLabel;
+    const chapterData = topicData?.chapters.find((entry) => entry.chapterId === chapter);
+    chapterLabel = chapterData?.label ?? chapterLabel;
+    const worksheetData = chapterData?.worksheets?.find(
+      (entry) => entry.worksheetId === worksheet
+    );
+    worksheetLabel = worksheetData?.label ?? worksheetLabel;
   }
 
   if (topic) {
     const topicUrl =
-      isLibraryRoute && subject
-        ? `/library/${subject}/${topic}`
-        : groupKey && subjectKey
+      groupKey && subjectKey
         ? `/${groupKey}/${subjectKey}/${topic}`
         : "/";
 
@@ -61,15 +62,25 @@ export function Breadcrumbs() {
 
   if (chapter) {
     const chapterUrl =
-      isLibraryRoute && subject && topic
-        ? `/library/${subject}/${topic}/${chapter}`
-        : groupKey && subjectKey && topic
+      groupKey && subjectKey && topic
         ? `/${groupKey}/${subjectKey}/${topic}/${chapter}`
         : "/";
 
     items.push({
       label: chapterLabel || chapter,
       href: chapterUrl,
+    });
+  }
+
+  if (worksheet) {
+    const worksheetUrl =
+      groupKey && subjectKey && topic && chapter
+        ? `/${groupKey}/${subjectKey}/${topic}/${chapter}/${worksheet}`
+        : "/";
+
+    items.push({
+      label: worksheetLabel || worksheet,
+      href: worksheetUrl,
     });
   }
 

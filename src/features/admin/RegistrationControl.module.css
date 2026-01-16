@@ -1,0 +1,77 @@
+.container {
+  display: grid;
+  gap: var(--sn-space-lg);
+}
+
+.statusCard {
+  padding: var(--sn-space-lg);
+  border-radius: var(--sn-radius-lg);
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.statusOpen {
+  background: var(--sn-green-accent-soft-bg);
+  border-color: var(--sn-green-accent-soft-border);
+}
+
+.statusClosed {
+  background: var(--sn-surface-raised);
+  border-color: var(--sn-border);
+}
+
+.statusHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sn-space-xs);
+}
+
+.statusIndicator {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-xs);
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.dotOpen {
+  background: var(--sn-green-accent);
+}
+
+.dotClosed {
+  background: var(--sn-text-muted);
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.statusLabel {
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text);
+}
+
+.timer {
+  font-weight: var(--sn-font-bold);
+  font-size: var(--sn-font-size-1-1);
+  color: var(--sn-green-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.statusText {
+  margin: 0;
+  color: var(--sn-text-muted);
+  font-size: var(--sn-font-size-0-9);
+}

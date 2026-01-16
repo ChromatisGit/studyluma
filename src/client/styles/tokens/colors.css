@@ -1,0 +1,133 @@
+:root {
+  /* === Neutrals === */
+  --sn-bg: #f2f3f7;
+  --sn-surface: #f9fafb;
+  --sn-surface-raised: #eceef4;
+  --sn-surface-deep: #e2e4ec;
+  --sn-text: #1d1f27;
+  --sn-text-muted: #4b5162;
+  --sn-border: #d5d8e3;
+
+  /* === Primary / Brand (purple) === */
+  --sn-purple-accent: #6b2fa0;
+  --sn-purple-accent-strong: #5f2990;
+  --sn-purple-accent-soft-bg: #f4e9ff;
+  --sn-purple-accent-soft-border: #9e5cdf;
+  --sn-purple-accent-selection: #c198ff;
+  --sn-purple-accent-focus-ring: #c4a2fa;
+
+  /* === Success (green) === */
+  --sn-green-accent: #2e8555;
+  --sn-green-accent-strong: #276c46;
+  --sn-green-accent-soft-bg: #e0f6ea;
+  --sn-green-accent-soft-border: #8ad0a3;
+
+  /* === Danger (red) === */
+  --sn-red-accent: #af1b3f;
+  --sn-red-accent-strong: #8c1533;
+  --sn-red-accent-soft-bg: #fbe3ea;
+  --sn-red-accent-soft-border: #f199ac;
+
+  /* === Warning (orange) === */
+  --sn-orange-accent: #eb8023;
+  --sn-orange-accent-strong: #c86812;
+  --sn-orange-accent-soft-bg: #ffe9cf;
+  --sn-orange-accent-soft-border: #f4b77e;
+
+  /* === Info (blue) === */
+  --sn-blue-accent: #5784ec;
+  --sn-blue-accent-strong: #3f62d8;
+  --sn-blue-accent-soft-bg: #e1ebff;
+  --sn-blue-accent-soft-border: #9cb5ff;
+
+  /* === Teal (support) === */
+  --sn-teal-accent: #32989a;
+  --sn-teal-accent-strong: #148488;
+  --sn-teal-accent-soft-bg: #e0f7f8;
+  --sn-teal-accent-soft-border: #90d4d6;
+
+  /* === Run action (fixed across themes) === */
+  --sn-run-accent: #2e8555;
+  --sn-run-accent-strong: #276c46;
+
+  /* === Yellow (hint) === */
+  --sn-yellow-accent: #f2c94c;
+  --sn-yellow-accent-strong: #d3a52f;
+  --sn-yellow-accent-soft-bg: #fff7d6;
+
+  /* === Gray === */
+  --sn-gray: #7e7e7e;
+  --sn-gray-hover: #6c6c6c;
+  --sn-gray-border: #bcbcbc;
+
+  /* === Utility colors === */
+  --sn-code-bg-border: #232c41;
+  --sn-code-bg: #0f172a;
+  --sn-code-text: #e6edf5;
+  --sn-text-on-accent: #ffffff;
+}
+
+[data-theme='dark'] {
+  /* === Neutrals === */
+  --sn-bg: #05060a;
+  --sn-surface: #0d0f16;
+  --sn-surface-raised: #151827;
+  --sn-surface-deep: #242a3d;
+  --sn-text: #e9ecf5;
+  --sn-text-muted: #a2a7c0;
+  --sn-border: #31354a;
+
+  /* === Primary / Brand (purple) === */
+  --sn-purple-accent: #b47aff;
+  --sn-purple-accent-strong: #a25bee;
+  --sn-purple-accent-soft-bg: #24163b;
+  --sn-purple-accent-soft-border: #d4a8ff;
+  --sn-purple-accent-selection: #3b275d;
+  --sn-purple-accent-focus-ring: #4b2f75;
+
+  /* === Success (green) === */
+  --sn-green-accent: #63d49a;
+  --sn-green-accent-strong: #46b87d;
+  --sn-green-accent-soft-bg: #10211b;
+  --sn-green-accent-soft-border: #63d49a;
+
+  /* === Danger (red) === */
+  --sn-red-accent: #ff6b8c;
+  --sn-red-accent-strong: #f24369;
+  --sn-red-accent-soft-bg: #2a1218;
+  --sn-red-accent-soft-border: #ff6b8c;
+
+  /* === Warning (orange) === */
+  --sn-orange-accent: #ffb454;
+  --sn-orange-accent-strong: #ff9a1f;
+  --sn-orange-accent-soft-bg: #2b1c0b;
+  --sn-orange-accent-soft-border: #ffb454;
+
+  /* === Info (blue) === */
+  --sn-blue-accent: #84a7ff;
+  --sn-blue-accent-strong: #5b80f0;
+  --sn-blue-accent-soft-bg: #121b33;
+  --sn-blue-accent-soft-border: #84a7ff;
+
+  /* === Teal (support) === */
+  --sn-teal-accent: #148488;
+  --sn-teal-accent-strong: #32989a;
+  --sn-teal-accent-soft-bg: #0e1f20;
+  --sn-teal-accent-soft-border: #4dd4d7;
+
+  /* === Yellow (hint) === */
+  --sn-yellow-accent: #e6c347;
+  --sn-yellow-accent-strong: #c4a030;
+  --sn-yellow-accent-soft-bg: #5f4f1c;
+
+  /* === Gray === */
+  --sn-gray: #7c8291;
+  --sn-gray-hover: #9499a8;
+  --sn-gray-border: #2d3243;
+
+  /* === Utility colors === */
+  --sn-code-bg-border: #232c41;
+  --sn-code-bg: #0f172a;
+  --sn-code-text: #e6edf5;
+  --sn-text-on-accent: #ffffff;
+}

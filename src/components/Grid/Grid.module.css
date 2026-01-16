@@ -1,0 +1,24 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-item-width, 280px), 1fr));
+}
+
+.gap-xs {
+  gap: var(--sn-space-xs);
+}
+
+.gap-sm {
+  gap: var(--sn-space-sm);
+}
+
+.gap-md {
+  gap: var(--sn-space-md);
+}
+
+.gap-lg {
+  gap: var(--sn-space-lg);
+}
+
+.gap-xl {
+  gap: var(--sn-space-xl);
+}

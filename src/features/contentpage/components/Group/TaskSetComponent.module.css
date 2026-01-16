@@ -1,0 +1,100 @@
+.taskCard {
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  padding: var(--sn-space-md);
+  box-shadow: var(--sn-shadow-lw);
+}
+
+.taskStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-lg);
+
+}
+
+.taskIntro {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sn-space-sm);
+}
+
+.taskItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sn-space-sm);
+  padding-left: var(--sn-space-md);
+}
+
+.taskItemSolo {
+  padding-left: 0;
+}
+
+.taskLabel {
+  min-width: 1.6rem;
+  font-weight: var(--sn-font-bold);
+  color: var(--sn-text);
+  display: inline-flex;
+  align-items: center;
+}
+
+.taskContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.taskItemSolo .taskContent {
+  margin-top: 3px;
+}
+
+.taskBadge {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--sn-font-bold);
+  background: var(--sn-surface-deep);
+  color: var(--sn-text);
+}
+
+.taskIntroText {
+  margin-top: 3px;
+}
+
+.taskActions {
+  padding-top: var(--sn-space-xs);
+}
+
+.checkButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sn-space-xs);
+  padding: var(--sn-space-xs) var(--sn-space-md);
+  background: var(--sn-gray);
+  color: var(--sn-text-on-accent);
+  border-radius: 999px;
+  border: 1px solid var(--sn-gray-border);
+  font-weight: var(--sn-font-bold);
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: var(--sn-shadow-lw);
+}
+
+.checkButton:hover {
+  background: var(--sn-gray-hover);
+  box-shadow: var(--sn-shadow-md);
+}
+
+.checkButton:active {
+  transform: translateY(1px);
+}
+
+.checkButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  box-shadow: none;
+}

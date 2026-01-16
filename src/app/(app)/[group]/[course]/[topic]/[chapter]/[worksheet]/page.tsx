@@ -1,28 +1,33 @@
-import { GeneratedPage } from "@components/GeneratedPage/GeneratedPage";
+import { WorksheetRenderer } from "@features/contentpage/renderers/WorksheetRenderer";
 import { getPage } from "@/server/data/getPage";
 import { getSession, assertCanAccessPage } from "@/server/auth/auth";
 import { getCourseId, getSubject } from "@/server/data/courses";
 
 type PageParams = {
-  params: {
-    groupKey: string;
-    subjectKey: string;
-    topicId: string;
-    chapterId: string;
-    worksheetId: string;
-  };
+  params: Promise<{
+    group: string;
+    course: string;
+    topic: string;
+    chapter: string;
+    worksheet: string;
+  }>;
 };
 
 export default async function WorksheetRoute({ params }: PageParams) {
-  const {groupKey, subjectKey, topicId, chapterId, worksheetId} = params
+  const {
+    group: groupKey,
+    course: subjectKey,
+    topic: topicId,
+    chapter: chapterId,
+    worksheet: worksheetId,
+  } = await params;
 
   const session = await getSession();
-  assertCanAccessPage(session, groupKey, subjectKey );
+  const courseId = getCourseId(groupKey, subjectKey);
+  assertCanAccessPage(session, groupKey, courseId);
 
-  const courseId = getCourseId(groupKey, subjectKey)
   const subject = getSubject(courseId)
   const page = await getPage({subject: subject.id, topicId, chapterId, worksheetId});
 
-  return <GeneratedPage title={page.title} content={page.content} />;
+  return <WorksheetRenderer page={page} worksheetSlug={`${courseId}-${topicId}-${chapterId}-${worksheetId}`} />;
 }
-

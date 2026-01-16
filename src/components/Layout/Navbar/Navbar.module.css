@@ -14,7 +14,7 @@
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 1rem;
+  padding: 0 var(--sn-space-md);
   max-width: 100%;
   margin: 0 auto;
 }
@@ -22,7 +22,7 @@
 .left {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--sn-space-sm);
   flex: 1;
   min-width: 0;
 }
@@ -58,7 +58,7 @@
 .brandNav {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--sn-space-sm);
   flex: 1;
   min-width: 0;
 }
@@ -66,7 +66,7 @@
 .desktopLinks {
   display: none;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--sn-space-xs);
   flex-wrap: wrap;
 }
 
@@ -87,15 +87,20 @@
 }
 
 .brand {
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: var(--sn-font-bold);
+  font-size: var(--sn-font-size-1-2);
   color: var(--sn-purple-accent);
   text-decoration: none;
   white-space: nowrap;
   transition: color 120ms ease;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--sn-space-xs);
+}
+
+.brandText {
+  display: inline-block;
+  transform: translateY(-3.2px);
 }
 
 .brand:hover {
@@ -105,18 +110,18 @@
 .separator {
   color: var(--sn-border);
   user-select: none;
-  font-size: 0.9rem;
+  font-size: var(--sn-font-size-1);
   flex-shrink: 0;
 }
 
 .link {
   text-decoration: none;
   color: var(--sn-text-muted);
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: var(--sn-font-size-1);
+  font-weight: var(--sn-font-medium);
   white-space: nowrap;
   transition: color 120ms ease;
-  padding: 0.25rem 0.5rem;
+  padding: var(--sn-space-xs) var(--sn-space-xs);
   border-radius: var(--sn-radius-xs);
 }
 
@@ -127,7 +132,7 @@
 
 .linkActive {
   color: var(--sn-purple-accent);
-  font-weight: 600;
+  font-weight: var(--sn-font-semibold);
   background: var(--sn-purple-accent-soft-bg);
 }
 
@@ -139,7 +144,7 @@
 .dropdownTrigger {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--sn-space-xs);
   cursor: pointer;
   background: transparent;
   border: none;
@@ -155,12 +160,12 @@
 
 .dropdownMenu {
   position: absolute;
-  top: calc(100% + 0.25rem);
+  top: calc(100% + var(--sn-space-xs));
   left: 0;
   background: var(--sn-surface);
   border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-sm);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--sn-shadow-md);
   min-width: 200px;
   z-index: 1000;
   overflow: hidden;
@@ -197,6 +202,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -204,8 +210,8 @@
 }
 
 .dropdownItem {
-  display: block;
-  padding: 0.375rem 0.5rem;
+  display: flex;
+  padding: var(--sn-space-xs) var(--sn-space-xs);
   color: var(--sn-text-muted);
   text-decoration: none;
   transition: all 0.15s ease;
@@ -215,10 +221,13 @@
   width: 100%;
   text-align: left;
   cursor: pointer;
-  font-size: 0.9rem;
-  display: flex;
+  font-size: var(--sn-font-size-1);
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--sn-space-xs);
+}
+
+.courseDropdownItem {
+  font-weight: var(--sn-font-medium);
 }
 
 .dropdownItem:hover {
@@ -229,17 +238,17 @@
 .dropdownItemActive {
   color: var(--sn-purple-accent);
   background: var(--sn-purple-accent-soft-bg);
-  font-weight: 600;
+  font-weight: var(--sn-font-semibold);
 }
 
 .currentRoute {
   color: var(--sn-purple-accent);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--sn-font-size-1);
+  font-weight: var(--sn-font-semibold);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 0.25rem 0.5rem;
+  padding: var(--sn-space-xs) var(--sn-space-xs);
   border-radius: var(--sn-radius-xs);
   background: var(--sn-purple-accent-soft-bg);
   max-width: 100%;
@@ -248,7 +257,7 @@
 .right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--sn-space-sm);
   flex-shrink: 0;
 }
 
@@ -274,13 +283,13 @@
 .authButton {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  gap: var(--sn-space-xs);
+  padding: var(--sn-space-xs) var(--sn-space-md);
   border: 1px solid var(--sn-border);
   background: var(--sn-surface);
   color: var(--sn-text);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: var(--sn-font-size-1);
+  font-weight: var(--sn-font-semibold);
   border-radius: var(--sn-radius-sm);
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
@@ -294,13 +303,13 @@
 .profileButton {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  gap: var(--sn-space-xs);
+  padding: var(--sn-space-xs) var(--sn-space-md);
   border: 1px solid var(--sn-border);
   background: var(--sn-surface);
   color: var(--sn-text);
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: var(--sn-font-size-1);
+  font-weight: var(--sn-font-semibold);
   border-radius: var(--sn-radius-sm);
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
@@ -317,6 +326,7 @@
 }
 
 @media (min-width: 770px) {
+
   .profileButton span,
   .authButton span {
     display: inline;

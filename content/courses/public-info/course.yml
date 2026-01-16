@@ -1,0 +1,17 @@
+course:
+  group: public
+  subject: info
+
+worksheetFormat: web
+isPublic: true
+
+topics:
+  grundlagen-programmieren-ts:
+    - variablen-und-datentypen
+    - operatoren
+    - bedingungen
+    - schleifen
+    - funktionen
+    - arrays
+    - objekte
+    - referenzdatentypen

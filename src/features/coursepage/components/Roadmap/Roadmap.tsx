@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Check,
@@ -11,53 +11,26 @@ import {
   LockKeyholeOpen,
 } from "lucide-react";
 
-import type { RoadmapViewModel, Status } from "@domain/roadmap";
+import type { ProgressStatus, ProgressTopicDTO, ProgressChapterDTO } from "@domain/progressDTO";
 import styles from "./Roadmap.module.css";
 
-type RoadmapTrackerProps = {
-  roadmap: RoadmapViewModel;
+type RoadmapProps = {
+  roadmap: ProgressTopicDTO[];
   isAdmin?: boolean;
+  showIcons?: boolean;
 };
 
-const ACCENT_COLOR = "var(--sn-purple-accent)";
-const ACCENT_SOFT_BORDER_COLOR = "var(--sn-purple-accent-soft-border)";
-const MUTED_TEXT_COLOR = "var(--sn-text-muted)";
-const SURFACE_COLOR = "var(--sn-surface)";
-const BULLET_SIZE_PX = 32;
+export default function Roadmap({
+  roadmap,
+  isAdmin = false,
+  showIcons: showIconsProp,
+}: RoadmapProps) {
+  const showIcons = showIconsProp ?? roadmap.length > 1;
 
-export default function Roadmap({ roadmap, isAdmin = false }: RoadmapTrackerProps) {
-  const lastIndex = roadmap.length - 1;
-
-  const currentIndex = useMemo(
-    () => roadmap.findIndex((topic) => topic.status === "current"),
-    [roadmap]
-  );
-
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const bulletRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  const [segments, setSegments] = useState<null | {
-    finishedTop: number;
-    finishedHeight: number;
-    plannedTop: number;
-    plannedHeight: number;
-  }>(null);
-
-  const [expandedTopics, setExpandedTopics] = useState<Set<number>>(
-    () =>
-      new Set(
-        roadmap
-          .map((topic, index) => (topic.isExpanded ? index : null))
-          .filter((index): index is number => index !== null)
-      )
-  );
-
-  useEffect(() => {
-    if (expandedTopics.size > 0) return;
-    if (currentIndex >= 0) {
-      setExpandedTopics(new Set([currentIndex]));
-    }
-  }, [currentIndex, expandedTopics.size]);
+  const [expandedTopics, setExpandedTopics] = useState<Set<number>>(() => {
+    const initial = roadmap.findIndex((topic) => topic.status === "current");
+    return initial >= 0 ? new Set([initial]) : new Set();
+  });
 
   const toggleTopic = (index: number) => {
     setExpandedTopics((prev) => {
@@ -71,319 +44,176 @@ export default function Roadmap({ roadmap, isAdmin = false }: RoadmapTrackerProp
     });
   };
 
-  const getCircleStyle = (status: Status): CSSProperties => {
-    const base: CSSProperties = {
-      borderRadius: "50%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0,
-      transition: "all 0.2s ease",
-      borderStyle: "solid",
-      width: BULLET_SIZE_PX,
-      height: BULLET_SIZE_PX,
-    };
-
-    if (status === "finished") {
-      return {
-        ...base,
-        backgroundColor: ACCENT_COLOR,
-        borderColor: ACCENT_COLOR,
-        borderWidth: 2,
-      };
-    }
-
-    if (status === "current") {
-      return {
-        ...base,
-        backgroundColor: SURFACE_COLOR,
-        borderColor: ACCENT_COLOR,
-        borderWidth: 4,
-      };
-    }
-
-    return {
-      ...base,
-      backgroundColor: SURFACE_COLOR,
-      borderColor: MUTED_TEXT_COLOR,
-      borderWidth: 2,
-    };
-  };
-
-  const getTopicColor = (status: Status): string => {
-    if (status === "finished") return ACCENT_SOFT_BORDER_COLOR;
-    if (status === "current") return ACCENT_COLOR;
-    return MUTED_TEXT_COLOR;
-  };
-
-  const getTopicFontWeight = (status: Status): number => {
-    if (status === "current") return 600;
-    return 400;
-  };
-
-  const getChapterStyle = (status: Status): CSSProperties => {
-    const base: CSSProperties = {
-      padding: "0.4rem var(--sn-space-md)",
-      textDecoration: "none",
-      display: "block",
-      borderRadius: "var(--sn-radius-md)",
-      fontSize: "var(--sn-font-size-h4)",
-      transition: "background-color 0.2s ease",
-    };
-
-    if (status === "finished") {
-      return {
-        ...base,
-        color: ACCENT_SOFT_BORDER_COLOR,
-        fontWeight: 400,
-      };
-    }
-
-    if (status === "current") {
-      return {
-        ...base,
-        color: ACCENT_COLOR,
-        fontWeight: 600,
-      };
-    }
-
-    return {
-      ...base,
-      color: MUTED_TEXT_COLOR,
-      fontWeight: 400,
-    };
-  };
-
-  useEffect(() => {
-    const measure = () => {
-      const containerEl = containerRef.current;
-      if (!containerEl || roadmap.length === 0) {
-        setSegments(null);
-        return;
-      }
-
-      const containerRect = containerEl.getBoundingClientRect();
-
-      const centers = bulletRefs.current
-        .slice(0, roadmap.length)
-        .map((el) => {
-          if (!el) return null;
-          const rect = el.getBoundingClientRect();
-          return rect.top + rect.height / 2 - containerRect.top;
-        })
-        .filter((value): value is number => value !== null);
-
-      if (centers.length < 2) {
-        setSegments(null);
-        return;
-      }
-
-      const first = centers[0];
-      const last = centers[centers.length - 1];
-
-      let finishedEnd = first;
-      if (currentIndex >= 0 && currentIndex < centers.length) {
-        finishedEnd = centers[currentIndex];
-      }
-
-      const finishedHeight = Math.max(0, finishedEnd - first);
-      const plannedHeight = Math.max(0, last - finishedEnd);
-
-      setSegments({
-        finishedTop: first,
-        finishedHeight,
-        plannedTop: finishedEnd,
-        plannedHeight,
-      });
-    };
-
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [roadmap, currentIndex, expandedTopics]);
-
-  const bulletCenterX = BULLET_SIZE_PX / 2;
-
   return (
-    <div
-      ref={containerRef}
-      style={{
-        fontFamily: "var(--sn-font-body)",
-        position: "relative",
-      }}
-    >
-      {segments ? (
-        <>
-          {segments.finishedHeight > 0 ? (
-            <div
-              style={{
-                position: "absolute",
-                left: bulletCenterX,
-                top: segments.finishedTop,
-                width: 3,
-                height: segments.finishedHeight,
-                backgroundColor: ACCENT_COLOR,
-                transform: "translateX(-1.5px)",
-                zIndex: 0,
-              }}
-            />
-          ) : null}
-          {segments.plannedHeight > 0 ? (
-            <div
-              style={{
-                position: "absolute",
-                left: bulletCenterX,
-                top: segments.plannedTop,
-                width: 3,
-                height: segments.plannedHeight,
-                backgroundColor: MUTED_TEXT_COLOR,
-                transform: "translateX(-1.5px)",
-                zIndex: 0,
-              }}
-            />
-          ) : null}
-        </>
-      ) : null}
-
+    <div className={styles.container}>
       {roadmap.map((topic, index) => {
-        const isExpanded = expandedTopics.has(index);
-        const status = topic.status;
-        const panelId = `roadmap-topic-${index}-panel`;
-        const isLocked = status === "locked";
-        const isClickable = (isAdmin || !isLocked) && Boolean(topic.link);
+        const isLast = index === roadmap.length - 1;
+        // Segment color: finished topics get accent, current and below get muted
+        const segmentIsFinished = topic.status === "finished";
 
         return (
-          <div
-            key={topic.id}
-            style={{
-              marginBottom: index === lastIndex ? 0 : "var(--sn-space-md)",
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                gap: "12px",
-              }}
-            >
-              <div
-                ref={(el) => {
-                  bulletRefs.current[index] = el;
-                }}
-                style={{
-                  width: BULLET_SIZE_PX,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  zIndex: 1,
-                  position: "relative",
-                  top: "3px",
-                }}
-              >
-                <div style={getCircleStyle(status)}>
-                  {status === "finished" ? (
-                    <Check
-                      size={20}
-                      color="var(--sn-text-on-accent)"
-                      strokeWidth={4}
-                    />
-                  ) : null}
-                  {status === "current" ? (
-                    <Circle size={18} color={ACCENT_COLOR} fill={ACCENT_COLOR} />
-                  ) : null}
-                  {status === "planned" ? (
-                    <LockKeyholeOpen size={18} color={MUTED_TEXT_COLOR} strokeWidth={2} />
-                  ) : null}
-                  {status === "locked" ? (
-                    <LockKeyhole size={18} color={MUTED_TEXT_COLOR} strokeWidth={2} />
-                  ) : null}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  flex: 1,
-                  gap: "16px",
-                }}
-              >
-                {isClickable ? (
-                  <Link
-                    href={topic.link}
-                    className={styles.linkHoverBox}
-                    style={{
-                      flex: 1,
-                      textDecoration: "none",
-                      fontSize: "1.05rem",
-                      color: getTopicColor(status),
-                      fontWeight: getTopicFontWeight(status),
-                      lineHeight: 1.3,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {topic.label}
-                  </Link>
-                ) : (
-                  <span
-                    className={styles.linkHoverBox}
-                    style={{
-                      flex: 1,
-                      textDecoration: "none",
-                      fontSize: "1.05rem",
-                      color: getTopicColor(status),
-                      fontWeight: getTopicFontWeight(status),
-                      lineHeight: 1.3,
-                      cursor: "not-allowed",
-                    }}
-                  >
-                    {topic.label}
-                  </span>
-                )}
-
-                {topic.chapters.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => toggleTopic(index)}
-                    aria-expanded={isExpanded}
-                    aria-controls={panelId}
-                    className={styles.chevronHoverBox}
-                    style={{
-                      border: "none",
-                      cursor: "pointer",
-                      color: MUTED_TEXT_COLOR,
-                    }}
-                  >
-                    {isExpanded ? <ChevronDown size={24} /> : <ChevronRight size={24} />}
-                  </button>
-                ) : null}
-              </div>
-            </div>
-
-            {isExpanded ? (
-              <div style={{ paddingLeft: "44px" }}>
-                <div
-                  id={panelId}
-                  role="region"
-                  aria-label={`Kapitel zu ${topic.label}`}
-                >
-                  {topic.chapters.map((chapter) => (
-                    <Link
-                      key={chapter.id}
-                      href={chapter.link}
-                      className={styles.chapterHoverBox}
-                      style={getChapterStyle(chapter.status)}
-                    >
-                      {chapter.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
+          <RoadmapTopic
+            key={topic.topicId}
+            topic={topic}
+            index={index}
+            isLast={isLast}
+            isExpanded={expandedTopics.has(index)}
+            onToggle={() => toggleTopic(index)}
+            showIcons={showIcons}
+            showSegment={showIcons && !isLast}
+            segmentIsFinished={segmentIsFinished}
+            isAdmin={isAdmin}
+          />
         );
       })}
     </div>
   );
+}
+
+// --- Sub-components ---
+
+type RoadmapTopicProps = {
+  topic: ProgressTopicDTO;
+  index: number;
+  isLast: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
+  showIcons: boolean;
+  showSegment: boolean;
+  segmentIsFinished: boolean;
+  isAdmin: boolean;
+};
+
+function RoadmapTopic({
+  topic,
+  index,
+  isLast,
+  isExpanded,
+  onToggle,
+  showIcons,
+  showSegment,
+  segmentIsFinished,
+  isAdmin,
+}: RoadmapTopicProps) {
+  const { status, label, href, chapters } = topic;
+  const panelId = `roadmap-topic-${index}-panel`;
+  const isLocked = status === "locked";
+  const isClickable = (isAdmin || !isLocked) && Boolean(href);
+
+  const statusClass = styles[`topic${capitalize(status)}`] || "";
+
+  return (
+    <div className={`${styles.topicItem} ${isLast ? "" : styles.topicItemSpaced}`}>
+      {/* Segment line - extends full height of this topic item */}
+      {showSegment && (
+        <div
+          className={`${styles.segment} ${
+            segmentIsFinished ? styles.segmentFinished : styles.segmentPlanned
+          }`}
+        />
+      )}
+
+      <div className={styles.topicRow} style={{ gap: showIcons ? "12px" : 0 }}>
+        {showIcons && (
+          <div className={styles.bulletWrapper}>
+            <RoadmapBullet status={status} />
+          </div>
+        )}
+
+        <div className={styles.topicContent}>
+          {isClickable ? (
+            <Link href={href} className={`${styles.topicLabel} ${statusClass}`}>
+              {label}
+            </Link>
+          ) : (
+            <span className={`${styles.topicLabel} ${statusClass}`}>
+              {label}
+            </span>
+          )}
+
+          {chapters.length > 0 && (
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-expanded={isExpanded}
+              aria-controls={panelId}
+              className={styles.chevronButton}
+            >
+              {isExpanded ? <ChevronDown size={24} /> : <ChevronRight size={24} />}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {chapters.length > 0 && (
+        <div
+          className={`${styles.chaptersContent} ${isExpanded ? styles.chaptersContentExpanded : ""}`}
+          style={{ paddingLeft: showIcons ? "42px" : 0 }}
+        >
+          <div id={panelId} role="region" aria-label={`Chapters for ${label}`}>
+            {chapters.map((chapter) => (
+              <RoadmapChapter key={chapter.chapterId} chapter={chapter} isAdmin={isAdmin} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type RoadmapBulletProps = {
+  status: ProgressStatus;
+};
+
+function RoadmapBullet({ status }: RoadmapBulletProps) {
+  const bulletClass = styles[`bullet${capitalize(status)}`] || styles.bulletPlanned;
+
+  return (
+    <div className={`${styles.bullet} ${bulletClass}`}>
+      {status === "finished" && (
+        <Check size={20} className={styles.bulletIconFinished} strokeWidth={4} />
+      )}
+      {status === "current" && (
+        <Circle size={20} className={styles.bulletIconCurrent} />
+      )}
+      {status === "planned" && (
+        <LockKeyholeOpen size={20} className={styles.bulletIconMuted} strokeWidth={2} />
+      )}
+      {status === "locked" && (
+        <LockKeyhole size={20} className={styles.bulletIconMuted} strokeWidth={2} />
+      )}
+    </div>
+  );
+}
+
+type RoadmapChapterProps = {
+  chapter: ProgressChapterDTO;
+  isAdmin: boolean;
+};
+
+function RoadmapChapter({ chapter, isAdmin }: RoadmapChapterProps) {
+  const { status, label, href } = chapter;
+  const isLocked = status === "locked";
+  const isClickable = (isAdmin || !isLocked) && Boolean(href);
+
+  const statusClass = styles[`chapter${capitalize(status)}`] || "";
+
+  if (isClickable) {
+    return (
+      <Link href={href} className={`${styles.chapterLabel} ${statusClass}`}>
+        {label}
+      </Link>
+    );
+  }
+
+  return (
+    <span className={`${styles.chapterLabel} ${statusClass}`}>
+      {label}
+    </span>
+  );
+}
+
+// Helper
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

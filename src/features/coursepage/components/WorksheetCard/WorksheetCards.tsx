@@ -1,6 +1,6 @@
-import WorksheetCard from "@features/worksheet/components/WorksheetCard/WorksheetCard";
+import WorksheetCard from "./WorksheetCard";
+import type { WorksheetRef } from "@domain/courseContent";
 import styles from "./WorksheetCards.module.css";
-import { WorksheetRef } from "@/shared/schema/course";
 
 type WorksheetCardsProps = {
   worksheets: WorksheetRef[];

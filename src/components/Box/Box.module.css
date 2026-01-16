@@ -1,0 +1,24 @@
+.box {
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-lg);
+  background: var(--sn-surface);
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sn-shadow-md);
+  border-color: var(--sn-purple-accent-soft-border);
+}
+
+.padding-sm {
+  padding: var(--sn-space-sm);
+}
+
+.padding-md {
+  padding: var(--sn-space-md);
+}
+
+.padding-lg {
+  padding: var(--sn-space-lg);
+}

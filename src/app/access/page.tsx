@@ -1,13 +1,14 @@
 import AccessSectionClient from "@/features/access/AccessSection";
-import { isRegistrationOpen } from "@/server/auth/registrationWindow";
 import { getCourseId } from "@/server/data/courses";
 import { getCourseDTO } from "@/server/data/getCourseDTO";
+import { getSession, getUserAccessCode } from "@/server/auth/auth";
+import { isRegistrationOpen } from "@/server/database/registrationStore";
 
 type AccessPageProps = {
-  searchParams?: {
+  searchParams?: Promise<{
     groupKey?: string | string[];
     subjectKey?: string | string[];
-  };
+  }>;
 };
 
 function getSearchParam(value?: string | string[]) {
@@ -15,10 +16,17 @@ function getSearchParam(value?: string | string[]) {
   return Array.isArray(value) ? value[0] ?? null : value;
 }
 
-export default function AccessPage({ searchParams }: AccessPageProps) {
-  const groupKey = getSearchParam(searchParams?.groupKey);
-  const subjectKey = getSearchParam(searchParams?.subjectKey);
-    const isCourseJoin = Boolean(groupKey && subjectKey);
+export default async function AccessPage({ searchParams }: AccessPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const groupKey = getSearchParam(resolvedSearchParams?.groupKey);
+  const subjectKey = getSearchParam(resolvedSearchParams?.subjectKey);
+  const isCourseJoin = Boolean(groupKey && subjectKey);
+
+  // Get current user's access code if logged in
+  const session = await getSession();
+  const currentUserAccessCode = session?.user
+    ? await getUserAccessCode(session.user.id)
+    : null;
 
   let courseId: string | null = null;
   let courseName = "this course";
@@ -31,7 +39,7 @@ export default function AccessPage({ searchParams }: AccessPageProps) {
     courseId = resolvedCourseId;
     courseName = course.label;
     courseRoute = course.slug;
-    registrationOpen = isRegistrationOpen(courseId);
+    registrationOpen = await isRegistrationOpen(courseId);
   }
 
   return (
@@ -42,6 +50,7 @@ export default function AccessPage({ searchParams }: AccessPageProps) {
       courseRoute={courseRoute}
       courseName={courseName}
       isRegistrationOpen={registrationOpen}
+      currentUserAccessCode={currentUserAccessCode}
     />
   );
 }

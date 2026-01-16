@@ -23,7 +23,7 @@
 
 .title {
   margin: 0 0 var(--sn-section-title-gap, 0.5rem);
-  font-size: var(--sn-section-title-size, 1.6rem);
+  font-size: var(--sn-section-title-size, var(--sn-font-size-1-6));
   color: var(--sn-text);
 }
 

@@ -1,7 +1,9 @@
-import { Layout } from "@components/Layout/Layout";
 import type { ReactNode } from "react";
 
+type AppLayoutProps = {
+  children: ReactNode;
+};
 
-export default function AppLayout({ children }: { children: ReactNode }) {
-  return <Layout>{children}</Layout>;
+export default function AppLayout({ children }: AppLayoutProps) {
+  return <>{children}</>;
 }

@@ -1,4 +1,4 @@
-export const worksheetFormatEnum = ["web", "pdf"] as const;
+export const worksheetFormatEnum = ["web", "pdf", "pdfSolution"] as const;
 export type WorksheetFormat = typeof worksheetFormatEnum[number];
 
 export type Topic = {

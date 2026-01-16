@@ -1,5 +1,6 @@
 import { Mail } from "lucide-react";
 import HOMEPAGE_TEXT from "@features/homepage/homepage.de.json";
+import { Container } from "@components/Container";
 import styles from "@features/homepage/sections/Footer/Footer.module.css";
 
 export function Footer() {
@@ -9,7 +10,7 @@ export function Footer() {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.footerInner}>
+      <Container size="wide" className={styles.footerInner}>
         <div className={styles.footerGrid}>
           <div>
             <h3 className={styles.footerTitle}>StudyNode</h3>
@@ -32,7 +33,7 @@ export function Footer() {
           <span>{footer.tagline}</span>
           <span>{copyrightText}</span>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }

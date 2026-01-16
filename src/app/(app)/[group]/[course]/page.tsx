@@ -1,30 +1,32 @@
 
 import { getCourseId } from "@data/courses";
-import { getCourseRoadmap } from "@data/roadmap";
+import { getCourseDTO } from "@data/getCourseDTO";
+import { getProgressDTO } from "@data/getProgressDTO";
 import { CoursepagePage } from "@features/coursepage/Coursepage";
-import type { CoursepageModel } from "@domain/roadmap";
 
 type PageParams = {
-  params: {
-    groupKey: string;
-    subjectKey: string;
-  };
+  params: Promise<{
+    group: string;
+    course: string;
+  }>;
 };
 
 
 export default async function CourseRoute({ params }: PageParams) {
-  const { groupKey, subjectKey } = params;
-  const course = getCourseId(groupKey, subjectKey);
+  const { group: groupKey, course: subjectKey } = await params;
+  const courseId = getCourseId(groupKey, subjectKey);
+  const course = getCourseDTO(courseId);
+  const progress = await getProgressDTO(courseId);
 
-  const roadmap = getCourseRoadmap(courseId);
+  const currentTopic =
+    progress.topics.find((topic) => topic.topicId === progress.currentTopicId) ??
+    progress.topics.find((topic) => topic.status === "current");
 
-  const model: CoursepageModel = {
-    title: getCourseTitle(course),
-    label: getCourseLabel(course),
-    slug: course.slug,
-    group: groupKey,
-    current: null,
-    roadmap,
+  const model = {
+    title: course.label,
+    label: course.label,
+    current: currentTopic?.label ?? null,
+    roadmap: progress.topics,
   };
 
   return <CoursepagePage model={model} />;

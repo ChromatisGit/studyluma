@@ -1,0 +1,17 @@
+course:
+  group: tg
+  year: 1
+  variant: tgtm
+  subject: info
+
+worksheetFormat: web
+
+topics:
+  grundlagen-programmieren-ts:
+    - variablen-und-datentypen
+    - operatoren
+    - bedingungen
+    - schleifen
+    - funktionen
+    - arrays
+    - objekte

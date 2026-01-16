@@ -1,31 +1,221 @@
-.linkHoverBox {
-  padding: 0.5rem 0.5rem;
+/* === Container === */
+.container {
+  font-family: var(--sn-font-body);
+  position: relative;
+}
+
+/* === Segment Lines === */
+.segment {
+  position: absolute;
+  left: 15px;
+  top: 5px;
+  bottom: -5px;
+  width: 3px;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.segmentFinished {
+  background-color: var(--sn-purple-accent);
+}
+
+.segmentPlanned {
+  background-color: var(--sn-text-muted);
+}
+
+/* === Topic === */
+.topicItem {
+  position: relative;
+}
+
+.topicItemSpaced {
+  padding-bottom: var(--sn-space-lg);
+}
+
+.topicRow {
+  display: flex;
+  align-items: flex-start;
+}
+
+.topicContent {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 16px;
+}
+
+.topicLabel {
+  flex: 1;
+  padding: 0.5rem;
   border-radius: var(--sn-radius-md);
+  text-decoration: none;
+  font-size: var(--sn-font-size-1-05);
+  line-height: 1.3;
   transition: background-color 0.15s ease;
 }
 
-.linkHoverBox:hover {
+.topicLabel:hover {
   background-color: var(--sn-surface-raised);
 }
 
-/* Chevron hover area */
-.chevronHoverBox {
+/* Topic status variants */
+.topicFinished {
+  color: var(--sn-purple-accent-soft-border);
+  font-weight: 400;
+}
+
+.topicCurrent {
+  color: var(--sn-purple-accent);
+  font-weight: 600;
+}
+
+.topicPlanned {
+  color: var(--sn-text-muted);
+  font-weight: 400;
+}
+
+.topicLocked {
+  color: var(--sn-text-muted);
+  font-weight: 400;
+  cursor: default;
+}
+
+.topicLocked:hover {
+  background-color: transparent;
+}
+
+/* === Bullet === */
+.bulletWrapper {
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  position: relative;
+  top: 3px;
+}
+
+.bullet {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  border-style: solid;
+}
+
+.bulletFinished {
+  background-color: var(--sn-purple-accent);
+  border-color: var(--sn-purple-accent);
+  border-width: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.bulletCurrent {
+  background-color: var(--sn-surface);
+  border-color: var(--sn-purple-accent);
+  border-width: 4px;
+  width: 26px;
+  height: 26px;
+}
+
+.bulletPlanned {
+  background-color: var(--sn-surface);
+  border-color: var(--sn-text-muted);
+  border-width: 2px;
+  width: 30px;
+  height: 30px;
+}
+
+.bulletLocked {
+  background-color: var(--sn-surface);
+  border-color: var(--sn-text-muted);
+  border-width: 2px;
+  width: 30px;
+  height: 30px;
+}
+
+/* Bullet icons */
+.bulletIconFinished {
+  color: var(--sn-text-on-accent);
+}
+
+.bulletIconCurrent {
+  color: var(--sn-purple-accent);
+  fill: var(--sn-purple-accent);
+}
+
+.bulletIconMuted {
+  color: var(--sn-text-muted);
+}
+
+/* === Chevron Button === */
+.chevronButton {
   padding: 0.35rem;
   border-radius: var(--sn-radius-xs);
+  border: none;
+  background-color: var(--sn-surface);
+  color: var(--sn-text-muted);
+  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
-.chevronHoverBox:hover {
+.chevronButton:hover {
   background-color: var(--sn-surface-raised);
 }
 
-/* Chapters */
-.chapterHoverBox {
+/* === Chapters === */
+.chaptersContent {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease;
+}
+
+.chaptersContentExpanded {
+  grid-template-rows: 1fr;
+}
+
+.chaptersContent > div {
+  overflow: hidden;
+}
+
+.chapterLabel {
+  padding: 0.4rem var(--sn-space-lg);
+  text-decoration: none;
+  display: block;
   border-radius: var(--sn-radius-md);
-  padding: 0.3rem 0.5rem;
-  transition: background-color 0.15s ease;
+  font-size: var(--sn-font-size-1-05);
+  transition: background-color 0.2s ease;
 }
 
-.chapterHoverBox:hover {
+.chapterLabel:hover {
   background-color: var(--sn-surface-raised);
+}
+
+/* Chapter status variants */
+.chapterFinished {
+  color: var(--sn-purple-accent-soft-border);
+  font-weight: 400;
+}
+
+.chapterCurrent {
+  color: var(--sn-purple-accent);
+  font-weight: 600;
+}
+
+.chapterPlanned {
+  color: var(--sn-text-muted);
+  font-weight: 400;
+}
+
+.chapterLocked {
+  color: var(--sn-text-muted);
+  font-weight: 400;
+  cursor: default;
+}
+
+.chapterLocked:hover {
+  background-color: transparent;
 }

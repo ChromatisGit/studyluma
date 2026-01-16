@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2020",
     "lib": [
       "dom",
       "dom.iterable",
@@ -26,6 +26,9 @@
       "@/*": [
         "./src/*"
       ],
+      "@pipeline/*": [
+        "./pipeline/*"
+      ],
       "@app/*": [
         "./src/app/*"
       ],
@@ -35,8 +38,21 @@
       "@components/*": [
         "./src/components/*"
       ],
+      "@features/*": [
+        "./src/features/*"
+      ],
+      "@lib/*": [
+        "./src/client/lib/*"
+      ],
+      "@styles/*": [
+        "./src/client/styles/*"
+      ],
       "@domain/*": [
         "./src/domain/*"
+      ],
+      "@schema/*": [
+        "./src/domain/*",
+        "./src/server/schema/*"
       ],
       "@auth/*": [
         "./src/server/auth/*"
@@ -47,9 +63,6 @@
       "@data/*": [
         "./src/server/data/*"
       ],
-      "@viewModel/*": [
-        "./src/client/viewModel/*"
-      ],
       "@generated/*": [
         "./.generated/*"
       ],
@@ -58,9 +71,6 @@
       ],
       "@coursepage/*": [
         "./src/features/coursepage/*"
-      ],
-      "@library/*": [
-        "./src/features/library/*"
       ],
       "@practise/*": [
         "./src/features/practise/*"

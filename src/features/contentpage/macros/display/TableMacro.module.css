@@ -1,0 +1,26 @@
+.tableWrapper {
+  overflow-x: auto;
+  margin: var(--sn-space-md) 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sn-font-size-0-95);
+}
+
+.table th,
+.table td {
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  border: 1px solid var(--sn-border);
+  text-align: left;
+}
+
+.table th {
+  background: var(--sn-surface-raised);
+  font-weight: var(--sn-font-semibold);
+}
+
+.table tr:nth-child(even) {
+  background: var(--sn-surface);
+}

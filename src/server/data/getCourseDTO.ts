@@ -8,8 +8,8 @@ export function getCourseDTO(courseId: CourseId): CourseDTO {
     const label = course.courseVariant?.short
         ? `${course.subject.label} (${course.courseVariant.short})`
         : course.subject.label;
-    const description = course.courseVariant?.label ?? course.group.label;
-    const tags = [course.group.label, course.subject.label];
+    const description = course.group.label;
+    const tags = [course.subject.label];
 
     if (course.courseVariant?.label) {
         tags.push(course.courseVariant.label);
