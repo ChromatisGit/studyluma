@@ -4,8 +4,8 @@ import { join } from "path";
 import type { CourseId } from "../data/courses";
 
 type ProgressCursor = {
-  currentTopicId?: string;
-  currentChapterId?: string;
+  currentTopicId: string;
+  currentChapterId: string;
 };
 
 const PROGRESS_DIR = join(process.cwd(), ".data", "progress");

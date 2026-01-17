@@ -7,5 +7,5 @@ export type CourseDTO = {
     slug: string;
     icon?: string;
     color: string;
-    tags: string[]
+    tags: string[];
 }

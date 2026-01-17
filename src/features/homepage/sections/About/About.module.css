@@ -19,7 +19,6 @@
   margin-top: var(--sn-space-lg);
   padding: 1.25rem 1.4rem;
   border-radius: var(--sn-radius-md);
-  border: 1px dashed var(--sn-border);
   background: var(--sn-surface-raised);
   color: var(--sn-text-muted);
   text-align: left;

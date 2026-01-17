@@ -1,4 +1,4 @@
-import { NestedRecord, ensurePath } from "../../src/server/lib/nestedRecord";
+import { NestedRecord, ensurePath } from "../dataTransformer/nestedRecord";
 import { WorksheetFormat } from "@schema/course";
 import { CoursePlan } from "./schema/coursePlan";
 

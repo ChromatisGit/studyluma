@@ -18,13 +18,22 @@ type RoadmapProps = {
   roadmap: ProgressTopicDTO[];
   isAdmin?: boolean;
   showIcons?: boolean;
+  /** When provided, clicking chapters calls this instead of navigating */
+  onChapterSelect?: (topicId: string, chapterId: string) => void;
+  /** The currently selected chapter (for highlighting in selection mode) */
+  selectedTopicId?: string;
+  selectedChapterId?: string;
 };
 
 export default function Roadmap({
   roadmap,
   isAdmin = false,
   showIcons: showIconsProp,
+  onChapterSelect,
+  selectedTopicId,
+  selectedChapterId,
 }: RoadmapProps) {
+  const isSelectionMode = Boolean(onChapterSelect);
   const showIcons = showIconsProp ?? roadmap.length > 1;
 
   const [expandedTopics, setExpandedTopics] = useState<Set<number>>(() => {
@@ -63,6 +72,10 @@ export default function Roadmap({
             showSegment={showIcons && !isLast}
             segmentIsFinished={segmentIsFinished}
             isAdmin={isAdmin}
+            isSelectionMode={isSelectionMode}
+            onChapterSelect={onChapterSelect}
+            isSelectedTopic={selectedTopicId === topic.topicId}
+            selectedChapterId={selectedTopicId === topic.topicId ? selectedChapterId : undefined}
           />
         );
       })}
@@ -82,6 +95,10 @@ type RoadmapTopicProps = {
   showSegment: boolean;
   segmentIsFinished: boolean;
   isAdmin: boolean;
+  isSelectionMode: boolean;
+  onChapterSelect?: (topicId: string, chapterId: string) => void;
+  isSelectedTopic: boolean;
+  selectedChapterId?: string;
 };
 
 function RoadmapTopic({
@@ -94,6 +111,10 @@ function RoadmapTopic({
   showSegment,
   segmentIsFinished,
   isAdmin,
+  isSelectionMode,
+  onChapterSelect,
+  isSelectedTopic,
+  selectedChapterId,
 }: RoadmapTopicProps) {
   const { status, label, href, chapters } = topic;
   const panelId = `roadmap-topic-${index}-panel`;
@@ -152,7 +173,15 @@ function RoadmapTopic({
         >
           <div id={panelId} role="region" aria-label={`Chapters for ${label}`}>
             {chapters.map((chapter) => (
-              <RoadmapChapter key={chapter.chapterId} chapter={chapter} isAdmin={isAdmin} />
+              <RoadmapChapter
+                key={chapter.chapterId}
+                chapter={chapter}
+                topicId={topic.topicId}
+                isAdmin={isAdmin}
+                isSelectionMode={isSelectionMode}
+                onChapterSelect={onChapterSelect}
+                isSelected={isSelectedTopic && selectedChapterId === chapter.chapterId}
+              />
             ))}
           </div>
         </div>
@@ -174,7 +203,7 @@ function RoadmapBullet({ status }: RoadmapBulletProps) {
         <Check size={20} className={styles.bulletIconFinished} strokeWidth={4} />
       )}
       {status === "current" && (
-        <Circle size={20} className={styles.bulletIconCurrent} />
+        <Circle size={18} className={styles.bulletIconCurrent} />
       )}
       {status === "planned" && (
         <LockKeyholeOpen size={20} className={styles.bulletIconMuted} strokeWidth={2} />
@@ -188,15 +217,41 @@ function RoadmapBullet({ status }: RoadmapBulletProps) {
 
 type RoadmapChapterProps = {
   chapter: ProgressChapterDTO;
+  topicId: string;
   isAdmin: boolean;
+  isSelectionMode: boolean;
+  onChapterSelect?: (topicId: string, chapterId: string) => void;
+  isSelected: boolean;
 };
 
-function RoadmapChapter({ chapter, isAdmin }: RoadmapChapterProps) {
-  const { status, label, href } = chapter;
+function RoadmapChapter({
+  chapter,
+  topicId,
+  isAdmin,
+  isSelectionMode,
+  onChapterSelect,
+  isSelected,
+}: RoadmapChapterProps) {
+  const { status, label, href, chapterId } = chapter;
   const isLocked = status === "locked";
-  const isClickable = (isAdmin || !isLocked) && Boolean(href);
 
   const statusClass = styles[`chapter${capitalize(status)}`] || "";
+  const selectedClass = isSelected ? styles.chapterSelected : "";
+
+  // In selection mode, render as a button instead of a link
+  if (isSelectionMode) {
+    return (
+      <button
+        type="button"
+        onClick={() => onChapterSelect?.(topicId, chapterId)}
+        className={`${styles.chapterLabel} ${styles.chapterSelectable} ${statusClass} ${selectedClass}`.trim()}
+      >
+        {label}
+      </button>
+    );
+  }
+
+  const isClickable = (isAdmin || !isLocked) && Boolean(href);
 
   if (isClickable) {
     return (

@@ -42,7 +42,6 @@ export function FancyGrid<T>({
             display: "grid",
             gap: `${gap}px`,
             gridTemplateColumns: `repeat(${row.length}, minmax(0, 1fr))`,
-            maxWidth: items.length === 1 ? "50%" : undefined,
           }}
         >
           {row.map((item, columnIndex) => {

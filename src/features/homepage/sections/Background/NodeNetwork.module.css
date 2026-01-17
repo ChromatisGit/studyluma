@@ -4,13 +4,11 @@
   pointer-events: none;
   color: var(--sn-purple-accent-soft-border);
   opacity: 0.45;
-  filter: drop-shadow(0 10px 24px color-mix(in srgb, var(--sn-text) 8%, transparent));
 }
 
 :global([data-theme='dark']) .nodeNetwork {
   color: var(--sn-purple-accent);
   opacity: 0.55;
-  filter: drop-shadow(0 12px 28px color-mix(in srgb, var(--sn-text) 55%, transparent));
 }
 
 .nodeNetwork svg {

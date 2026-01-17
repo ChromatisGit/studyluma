@@ -1,15 +1,11 @@
 import "server-only";
 
 import type { SidebarCourseDTO } from "@/domain/sidebarDTO";
-import { isAdmin, type User } from "@/domain/userTypes";
-import { getCoursesByAccess, getPublicCourses } from "./courses";
+import { type User } from "@/domain/userTypes";
+import { getCoursesByAccess } from "./courses";
 import { getCourseDTO } from "./getCourseDTO";
 
 export function getNavbarCourses(user: User): SidebarCourseDTO[] {
-  if (isAdmin(user)) {
-    return [];
-  }
-
   const { accessible } = getCoursesByAccess(user);
 
   return accessible.map((id) => {
@@ -19,9 +15,9 @@ export function getNavbarCourses(user: User): SidebarCourseDTO[] {
 }
 
 export function getPublicNavbarCourses(): SidebarCourseDTO[] {
-  const publicCourseIds = getPublicCourses();
+  const { public: publicCourses } = getCoursesByAccess(null);
 
-  return publicCourseIds.map((id) => {
+  return publicCourses.map((id) => {
     const { label, slug } = getCourseDTO(id);
     return { id, label, href: slug };
   });

@@ -7,7 +7,7 @@ import { getNavbarCourses, getPublicNavbarCourses } from "./getNavbarCourses";
 import { getProgressDTO } from "./getProgressDTO";
 import { getUserAccessCode } from "../auth/auth";
 
-const EMPTY_PROGRESS = { topics: [] };
+const EMPTY_PROGRESS = { currentTopicId: "", currentChapterId: "", topics: [] };
 
 export async function getSidebarDTO({
   courseId,
@@ -22,7 +22,7 @@ export async function getSidebarDTO({
   // Get courses for navbar: authenticated users see their accessible courses,
   // unauthenticated users see public courses
   const courses =
-    user && !isAdmin(user) ? getNavbarCourses(user) : getPublicNavbarCourses();
+    user ? getNavbarCourses(user) : getPublicNavbarCourses();
 
   const progress = courseId ? await getProgressDTO(courseId) : EMPTY_PROGRESS;
 

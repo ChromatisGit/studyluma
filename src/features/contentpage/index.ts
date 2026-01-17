@@ -9,14 +9,6 @@ export { TaskSetComponent, type TaskSet } from './components/Group/TaskSetCompon
 export { CollapsibleSection } from './components/CollapsibleSection/CollapsibleSection';
 export { MarkdownRenderer } from './components/MarkdownRenderer/MarkdownRenderer';
 
-// Task components
-export { CodeTask } from './components/tasks/CodeTask/CodeTask';
-export { McqTask } from './components/tasks/McqTask/McqTask';
-export { GapTask } from './components/tasks/GapTask/GapTask';
-export { FreeResponseTask } from './components/tasks/FreeResponseTask/FreeResponseTask';
-export { TextTask } from './components/tasks/TextTask/TextTask';
-export { MathTask } from './components/tasks/MathTask/MathTask';
-
 // Code components (unified exports from CodeRunner)
 export { CodeEditor, CodeRunner, useTsRunner, TsWorkerProvider } from './components/CodeRunner';
 export type { CodeRunnerResult, TsWorkerDiagnostic } from './components/CodeRunner';
@@ -27,7 +19,7 @@ export { WorksheetStorageProvider, useWorksheetStorage } from './storage/Workshe
 export { useTaskPersistence } from './storage/useTaskPersistence';
 
 // Config
-export { getCategoryType, CATEGORY_HEADERS, type CategoryType } from './config/categoryConfig';
+export { getCategoryType, type CategoryType } from './config/categoryConfig';
 
 // Utils
 export { getMarkdown } from './utils/textUtils';

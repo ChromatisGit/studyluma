@@ -36,11 +36,11 @@
     "subtitle": "Wähle deinen Kurs aus, um auf alle Inhalte zuzugreifen.",
     "openActionLabel": "Kurs öffnen",
     "restrictedActionLabel": "Zugriff anfragen",
+    "publicCourses": "Öffentliche Kurse",
     "accessibleCourses": "Freigeschaltete Kurse",
     "restrictedCourses": "Weitere Kurse",
-    "accessibleCoursesAdmin": "Öffentliche Kurse",
-    "restrictedCoursesAdmin": "Weitere Kurse",
-    "hiddenCoursesAdmin": "Ungelistete Kurse"
+    "hiddenCourses": "Ungelistete Kurse",
+    "accessibleCoursesAdmin": "Alle gelisteten Kurse"
   },
   "footer": {
     "description": "Eine digitale Lernplattform für den Informatik- und Mathematikunterricht von Herr Holst.",

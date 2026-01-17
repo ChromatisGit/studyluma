@@ -217,11 +217,22 @@ export function calculateNodePosition(
   };
 }
 
-export function updateConnectionRandomness(
-  connection: Connection,
+export interface RandomnessState {
+  offset: number;
+  nextChange: number;
+}
+
+/**
+ * Pure function that returns updated randomness values.
+ * Caller is responsible for storing the result.
+ */
+export function getConnectionRandomness(
+  state: RandomnessState,
   elapsedTime: number
-): void {
-  if (elapsedTime <= connection.nextRandomChange) return;
+): RandomnessState {
+  if (elapsedTime <= state.nextChange) {
+    return state;
+  }
 
   const {
     RANDOM_OFFSET_RANGE,
@@ -229,27 +240,27 @@ export function updateConnectionRandomness(
     RECONNECTION_INTERVAL_MAX,
   } = CONNECTION_CONFIG;
 
-  connection.randomOffset = (Math.random() - 0.5) * RANDOM_OFFSET_RANGE;
-
-  connection.nextRandomChange =
-    elapsedTime +
-    randFloat(RECONNECTION_INTERVAL_MIN, RECONNECTION_INTERVAL_MAX);
+  return {
+    offset: (Math.random() - 0.5) * RANDOM_OFFSET_RANGE,
+    nextChange: elapsedTime + randFloat(RECONNECTION_INTERVAL_MIN, RECONNECTION_INTERVAL_MAX),
+  };
 }
 
-export function isConnectionActive(
-  connection: Connection,
+/**
+ * Check if connection is active given threshold, randomness offset, and positions.
+ * Pure function with no side effects.
+ */
+export function isConnectionActiveWithRandomness(
+  threshold: number,
+  randomOffset: number,
   startPos: Vec2,
   endPos: Vec2
 ): boolean {
-  const distance = calculateDistance(
-    startPos.x,
-    startPos.y,
-    endPos.x,
-    endPos.y
-  );
-
-  const effectiveThreshold = connection.threshold + connection.randomOffset;
-  return distance < effectiveThreshold;
+  const dx = endPos.x - startPos.x;
+  const dy = endPos.y - startPos.y;
+  const distanceSquared = dx * dx + dy * dy;
+  const effectiveThreshold = threshold + randomOffset;
+  return distanceSquared < effectiveThreshold * effectiveThreshold;
 }
 
 const randFloat = (min: number, max: number): number =>

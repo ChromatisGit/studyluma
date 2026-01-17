@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronRight, Shield } from "lucide-react";
 import type { CourseDTO } from "@/domain/courseDTO";
 import type { ProgressDTO } from "@/domain/progressDTO";
-import type { Topic } from "@/domain/courseContent";
 import type { CourseId } from "@/server/data/courses";
 import { ProgressControl } from "./ProgressControl";
 import { RegistrationControl } from "./RegistrationControl";
@@ -13,26 +12,32 @@ import styles from "./AdminCourseDetail.module.css";
 type AdminCourseDetailProps = {
   course: CourseDTO;
   progress: ProgressDTO;
-  topics: Topic[];
   courseId: CourseId;
 };
 
-export function AdminCourseDetail({ course, progress, topics, courseId }: AdminCourseDetailProps) {
+export function AdminCourseDetail({ course, progress, courseId }: AdminCourseDetailProps) {
   const courseUrl = `/${course.groupKey}/${course.subjectKey}`;
 
   return (
     <div className={styles.container}>
       {/* Breadcrumb */}
-      <div className={styles.breadcrumbs}>
-        <Link href="/admin" className={styles.breadcrumb}>
-          <ChevronLeft size={16} />
-          Admin Dashboard
-        </Link>
-        <span className={styles.separator}>|</span>
-        <Link href={courseUrl} className={styles.breadcrumbCourse}>
-          View Course Page
-        </Link>
-      </div>
+      <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <Link href="/admin" className={styles.breadcrumbHome}>
+              <Shield size={16} />
+            </Link>
+          </li>
+          <li className={styles.breadcrumbSeparator} aria-hidden="true">
+            <ChevronRight size={12} />
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <Link href={courseUrl} className={styles.breadcrumbLink}>
+              {course.label}
+            </Link>
+          </li>
+        </ol>
+      </nav>
 
       {/* Header */}
       <header className={styles.header}>
@@ -52,7 +57,7 @@ export function AdminCourseDetail({ course, progress, topics, courseId }: AdminC
             courseId={courseId}
             currentTopicId={progress.currentTopicId}
             currentChapterId={progress.currentChapterId}
-            topics={topics}
+            topics={progress.topics}
           />
         </section>
 

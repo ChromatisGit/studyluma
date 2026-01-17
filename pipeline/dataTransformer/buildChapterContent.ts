@@ -3,7 +3,7 @@ import { getFileNames, getFolderNames, writeJSONFile } from "../io";
 import { ContentIssueCollector, issueCatalog, type ContentIssue } from "../errorHandling";
 import { parsePage } from "../pageParser/parsePage";
 import { WorksheetFormat } from "@schema/course";
-import { NestedRecord, ensurePath } from "../../src/server/lib/nestedRecord";
+import { NestedRecord, ensurePath } from "./nestedRecord";
 import { fileNameToId } from "../pageParser/utils/fileNameToId";
 
 type WorksheetSummary = { worksheetId: string; label: string };

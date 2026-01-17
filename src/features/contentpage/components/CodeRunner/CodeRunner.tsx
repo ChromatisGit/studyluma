@@ -8,7 +8,7 @@ import { CodeEditor } from "@features/contentpage/components/CodeEditor/CodeEdit
 import type { TsWorkerDiagnostic } from "./useTsRunner";
 import styles from "./CodeRunner.module.css";
 
-export type CodeRunnerResult = "success" | "failure";
+export type CodeRunnerResult = "success" | "failure" | "compiled";
 
 type CodeRunnerProps = {
   code: string;
@@ -51,19 +51,24 @@ export function CodeRunner({
 
   const isSuccess = testResult === "success";
   const isFailure = testResult === "failure";
+  const isCompiled = testResult === "compiled";
 
   const resultClassName = clsx(
     styles.result,
     isSuccess && styles.resultSuccess,
-    isFailure && styles.resultFailure
+    isFailure && styles.resultFailure,
+    isCompiled && styles.resultCompiled
   );
 
   const resultLabel = (() => {
     if (isSuccess) {
-      return hasValidation ? strings.codeRunner.resultSuccess : strings.codeRunner.resultCompiled;
+      return strings.codeRunner.resultSuccess;
     }
     if (isFailure) {
       return hasValidation ? strings.codeRunner.resultFailure : strings.codeRunner.resultCompileError;
+    }
+    if (isCompiled) {
+      return strings.codeRunner.resultCompiled;
     }
     if (hasConsoleData) {
       return strings.codeRunner.consoleOutput;

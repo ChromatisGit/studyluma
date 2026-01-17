@@ -6,7 +6,7 @@ import {
 } from "./yamlCoursePlan";
 import { Course, WorksheetFormat } from "@schema/course";
 import { resolveLucideIcon } from "../validateLucideIcons";
-import { makeGroupKey, makeCourseId, makeCourseSlug, makeSubjectKey } from "../../../src/server/lib/makeIds";
+import { makeGroupKey, makeCourseId, makeCourseSlug, makeSubjectKey } from "../../dataTransformer/makeIds";
 
 export type CoursePlan = Omit<Course, "topics"> & {
   worksheetFormat: WorksheetFormat;
@@ -53,7 +53,7 @@ export function createCoursePlanSchema(definitions: GroupDefinitions, principles
       if (!resolvedIcon) {
         addIssue(ctx, ["course", "icon"], `Unknown icon "${rawIcon}".`);
       } else {
-        v.course.icon = resolvedIcon;
+        v.course.icon = resolvedIcon.kebabCase;
       }
     }
 

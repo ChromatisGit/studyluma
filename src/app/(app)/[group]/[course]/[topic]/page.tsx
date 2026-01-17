@@ -29,9 +29,11 @@ export default async function ChapterPage({ params }: PageParams) {
         <ul>
           {topic.chapters.map((chapter) => (
             <li key={chapter.chapterId}>
-              <Link href={chapter.href}>
-                {chapter.label}
-              </Link>
+              {chapter.status === "locked" ? (
+                chapter.label
+              ) : (
+                <Link href={chapter.href} style={{ color: "var(--sn-purple-accent)" }}>{chapter.label}</Link>
+              )}
             </li>
           ))}
         </ul>

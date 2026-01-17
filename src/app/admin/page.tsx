@@ -11,6 +11,7 @@ export default async function AdminDashboardPage() {
   const courseAccess = getCoursesByAccess(user);
   const allCourseIds = [
     ...courseAccess.accessible,
+    ...courseAccess.public,
     ...courseAccess.restricted,
     ...courseAccess.hidden,
   ];
@@ -25,7 +26,6 @@ export default async function AdminDashboardPage() {
     <AdminDashboard
       courses={courses}
       totalUsers={totalUsers}
-      accessibleCoursesCount={courseAccess.accessible.length}
     />
   );
 }

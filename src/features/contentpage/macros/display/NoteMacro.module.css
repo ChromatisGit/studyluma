@@ -1,15 +1,35 @@
 .note {
-  padding: var(--sn-space-md);
-  border-radius: var(--sn-radius-md);
-  background: var(--sn-purple-accent-soft-bg);
-  border: 1px solid var(--sn-purple-accent-soft-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  border-radius: var(--sn-radius-sm);
+  border: 1px solid var(--sn-border);
+  background: var(--sn-surface);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--sn-text-muted);
 }
 
 .label {
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-purple-accent);
-  margin-bottom: var(--sn-space-xs);
+  font-weight: var(--sn-font-bold);
   font-size: var(--sn-font-size-0-85);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: var(--sn-text);
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+
+.content > :last-child {
+  margin-bottom: 0;
 }

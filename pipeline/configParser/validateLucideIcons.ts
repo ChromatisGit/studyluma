@@ -8,8 +8,13 @@ type AnyRecord = Record<string, unknown>;
 type CourseConfig = { filePath: string; data: YamlCoursePlan };
 export type LucideIconExportName = keyof typeof LucideIcons;
 
-function normalizeLucideIconInput(input: string): string {
-  return input.trim().toLowerCase().replace(/[\s_-]+/g, "");
+function toKebabCase(input: string): string {
+  return input
+    .trim()
+    .replace(/[\s_]+/g, "-")
+    .replace(/([a-z])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
+    .toLowerCase();
 }
 
 function isIconExport(v: unknown): v is (...args: unknown[]) => unknown {
@@ -24,7 +29,7 @@ const LUCIDE_ICON_LOOKUP = (() => {
   for (const key of Object.keys(LucideIcons) as LucideIconExportName[]) {
     const value = (LucideIcons as AnyRecord)[key];
     if (!isIconExport(value)) continue;
-    map.set(normalizeLucideIconInput(key), key);
+    map.set(toKebabCase(key), key);
   }
 
   return map;
@@ -32,9 +37,13 @@ const LUCIDE_ICON_LOOKUP = (() => {
 
 export const lucideIconNames = [...new Set(LUCIDE_ICON_LOOKUP.values())].sort();
 
-export function resolveLucideIcon(input: string): string | null {
-  const normalized = normalizeLucideIconInput(input);
-  return LUCIDE_ICON_LOOKUP.get(normalized) ?? null;
+export function resolveLucideIcon(
+  input: string
+): { kebabCase: string; exportName: LucideIconExportName } | null {
+  const kebabCase = toKebabCase(input);
+  const exportName = LUCIDE_ICON_LOOKUP.get(kebabCase);
+  if (!exportName) return null;
+  return { kebabCase, exportName };
 }
 
 export function validateLucideIcons(
@@ -46,30 +55,31 @@ export function validateLucideIcons(
   for (const [subjectId, subject] of Object.entries(definitions.subjects)) {
     if (!subject.icon) continue;
     const resolved = resolveLucideIcon(subject.icon);
-    if (!resolved) {
-      issues.push({
-        ...issueCatalog.invalidIcon(subject.icon),
-        filePath: "content/definitions.yml",
-        path: ["subjects", subjectId, "icon"],
-      });
-    } else {
-      subject.icon = resolved;
+    if (resolved) {
+      subject.icon = resolved.kebabCase;
+      continue;
+
     }
+    issues.push({
+      ...issueCatalog.invalidIcon(subject.icon),
+      filePath: "content/definitions.yml",
+      path: ["subjects", subjectId, "icon"],
+    });
   }
 
   for (const course of courses) {
     const icon = course.data.course.icon;
     if (!icon) continue;
     const resolved = resolveLucideIcon(icon);
-    if (!resolved) {
-      issues.push({
-        ...issueCatalog.invalidIcon(icon),
-        filePath: course.filePath,
-        path: ["course", "icon"],
-      });
-    } else {
-      course.data.course.icon = resolved;
+    if (resolved) {
+      course.data.course.icon = resolved.kebabCase;
+      continue
     }
+    issues.push({
+      ...issueCatalog.invalidIcon(icon),
+      filePath: course.filePath,
+      path: ["course", "icon"],
+    });
   }
 
   return issues;

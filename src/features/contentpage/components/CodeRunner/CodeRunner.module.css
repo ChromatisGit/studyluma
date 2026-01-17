@@ -100,6 +100,12 @@
   color: var(--sn-red-accent-strong);
 }
 
+.resultCompiled {
+  border-color: var(--sn-yellow-accent);
+  background: var(--sn-yellow-accent-soft-bg);
+  color: var(--sn-yellow-accent-strong);
+}
+
 .resultLabel {
   font-weight: 700;
   margin-bottom: 0.35rem;

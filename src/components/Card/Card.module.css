@@ -8,6 +8,7 @@
   border-radius: var(--sn-radius-md);
   background: var(--sn-surface-raised);
   text-decoration: none;
+  max-width: 520px;
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 
   /* Color accent variables - overridden by color classes */
@@ -43,7 +44,7 @@
   flex-shrink: 0;
   border-radius: var(--sn-radius-sm);
   background: var(--card-accent-bg);
-  border: 1px solid var(--card-accent-border);
+  border: 1px solid var(--card-accent);
   color: var(--card-accent);
 }
 

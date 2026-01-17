@@ -43,12 +43,6 @@ export function coursePublic(courseId: CourseId) {
   return resolveCourse(courseId).isPublic;
 }
 
-export function getPublicCourses(): CourseId[] {
-  return courses
-    .filter((course) => course.isPublic && course.isListed)
-    .map((course) => course.id as CourseId);
-}
-
 export function getCourseGroupAndSubjectKey(courseId: CourseId) {
   const course = resolveCourse(courseId)
   return { groupKey: course.group.key, subjectKey: course.subject.key };
@@ -101,6 +95,7 @@ function getChapterData(topic: Topic | null, chapterId: string): Chapter | null 
 }
 
 type CourseAccessGroups = {
+  public: string[];
   accessible: string[];
   restricted: string[];
   hidden: string[];
@@ -115,6 +110,11 @@ export function getCoursesByAccess(user: User | null): CourseAccessGroups {
         return groups;
       }
 
+      if(course.isPublic) {
+        groups.public.push(course.id);
+        return groups;
+      }
+
       if (canUserAccessPage(user, course.group.key, course.id)) {
         groups.accessible.push(course.id);
         return groups;
@@ -123,6 +123,6 @@ export function getCoursesByAccess(user: User | null): CourseAccessGroups {
       groups.restricted.push(course.id);
       return groups;
     },
-    { accessible: [], restricted: [], hidden: [] }
+    { public: [], accessible: [], restricted: [], hidden: [] }
   );
 }

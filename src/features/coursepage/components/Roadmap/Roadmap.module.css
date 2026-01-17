@@ -108,17 +108,17 @@
 .bulletFinished {
   background-color: var(--sn-purple-accent);
   border-color: var(--sn-purple-accent);
-  border-width: 0;
-  width: 28px;
-  height: 28px;
+  border-width: 4px;
+  width: 30px;
+  height: 30px;
 }
 
 .bulletCurrent {
   background-color: var(--sn-surface);
   border-color: var(--sn-purple-accent);
   border-width: 4px;
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
 }
 
 .bulletPlanned {
@@ -218,4 +218,24 @@
 
 .chapterLocked:hover {
   background-color: transparent;
+}
+
+/* Selection mode styles */
+.chapterSelectable {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.chapterSelected {
+  background-color: var(--sn-purple-accent-soft);
+  color: var(--sn-purple-accent);
+  font-weight: 600;
+}
+
+.chapterSelected:hover {
+  background-color: var(--sn-purple-accent-soft);
 }

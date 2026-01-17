@@ -9,15 +9,10 @@ import { Stack } from "@components/Stack";
 import { CourseGroup } from "./CourseGroup";
 
 type CourseGroups = {
+  public: CourseDTO[];
   accessible: CourseDTO[];
   restricted: CourseDTO[];
   hidden: CourseDTO[];
-};
-
-const EMPTY_GROUPS: CourseGroups = {
-  accessible: [],
-  restricted: [],
-  hidden: [],
 };
 
 export async function CourseSection() {
@@ -26,35 +21,43 @@ export async function CourseSection() {
   const user = session?.user ?? null;
 
   const accessGroups = getCoursesByAccess(user);
-  const groups = accessGroups
-    ? {
-        accessible: accessGroups.accessible.map((courseId) => getCourseDTO(courseId)),
-        restricted: accessGroups.restricted.map((courseId) => getCourseDTO(courseId)),
-        hidden: accessGroups.hidden.map((courseId) => getCourseDTO(courseId)),
-      }
-    : EMPTY_GROUPS;
+
+  const groups: CourseGroups = {
+    public: accessGroups.public.map((courseId) => getCourseDTO(courseId)),
+    accessible: accessGroups.accessible.map((courseId) => getCourseDTO(courseId)),
+    restricted: accessGroups.restricted.map((courseId) => getCourseDTO(courseId)),
+    hidden: accessGroups.hidden.map((courseId) => getCourseDTO(courseId)),
+  }
   const admin = user ? isAdmin(user) : false;
 
   return (
     <HomeSection id="courses" title={courses.title} subtitle={courses.subtitle}>
       <Stack gap="xl">
+
         <CourseGroup
-          title={admin? courses.accessibleCoursesAdmin : courses.accessibleCourses}
+          title={admin ? courses.accessibleCoursesAdmin : courses.accessibleCourses}
           courses={groups.accessible}
           actionLabel={courses.openActionLabel}
           accessable={true}
         />
 
         <CourseGroup
-          title={admin? courses.restrictedCoursesAdmin : courses.restrictedCourses}
+          title={courses.publicCourses}
+          courses={groups.public}
+          actionLabel={courses.openActionLabel}
+          accessable={true}
+        />
+
+        <CourseGroup
+          title={courses.restrictedCourses}
           courses={groups.restricted}
-          actionLabel={admin? courses.openActionLabel : courses.restrictedActionLabel}
-          accessable={admin}
+          actionLabel={courses.restrictedActionLabel}
+          accessable={false}
         />
 
         {admin && (
           <CourseGroup
-            title={courses.hiddenCoursesAdmin}
+            title={courses.hiddenCourses}
             courses={groups.hidden}
             actionLabel={courses.openActionLabel}
             accessable={true}

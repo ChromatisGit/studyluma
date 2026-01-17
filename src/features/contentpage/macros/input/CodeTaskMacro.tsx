@@ -7,18 +7,34 @@ import { MarkdownRenderer } from "../../components/MarkdownRenderer/MarkdownRend
 import { CollapsibleSection } from "../../components/CollapsibleSection/CollapsibleSection";
 import { getMarkdown } from "../../utils/textUtils";
 import { useWorksheetStorage } from "../../storage/WorksheetStorageContext";
-import { CodeRunner } from "../../components/CodeRunner/CodeRunner";
+import { CodeRunner, type CodeRunnerResult } from "../../components/CodeRunner/CodeRunner";
 import { useTsRunner } from "../../components/CodeRunner/useTsRunner";
 import { Stack } from "@components/Stack";
 
 type Props = MacroComponentProps<CodeTaskMacroType>;
+
+function getTestResult(
+  lastPassed: boolean | null,
+  runtimeError: string | null,
+  hasValidation: boolean
+): CodeRunnerResult | null {
+  if (lastPassed === null) return null;
+
+  if (hasValidation) {
+    return lastPassed ? "success" : "failure";
+  }
+
+  // No validation: show "compiled" on success, "failure" on runtime error
+  if (runtimeError) return "failure";
+  return "compiled";
+}
 
 export function CodeTaskMacro({ macro, context }: Props) {
   const storage = useWorksheetStorage();
   const [code, setCode] = useState(macro.starter || "");
   const [isChecked, setIsChecked] = useState(false);
 
-  const { isLoading, diagnostics, consoleOutput, runtimeError, hadRuntime, runCode } =
+  const { isLoading, diagnostics, consoleOutput, runtimeError, hadRuntime, lastPassed, runCode } =
     useTsRunner();
 
   // Load persisted state
@@ -73,6 +89,8 @@ export function CodeTaskMacro({ macro, context }: Props) {
         runtimeError={runtimeError}
         consoleOutput={consoleOutput}
         hadRuntime={hadRuntime}
+        testResult={getTestResult(lastPassed, runtimeError, Boolean(macro.validation))}
+        hasValidation={Boolean(macro.validation)}
       />
 
       {(hint || (isChecked && solution)) && (

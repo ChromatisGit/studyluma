@@ -73,23 +73,28 @@ function getChapterStatus(
 }
 
 type ProgressCursor = {
-  currentTopicId?: string;
-  currentChapterId?: string;
+  currentTopicId: string;
+  currentChapterId: string;
 };
 
 async function getCurrentTopicAndChapter(courseId: string): Promise<ProgressCursor> {
   const { getProgressStore } = await import("../database/progressStore");
   const store = await getProgressStore();
   const cached = store.get(courseId);
-  if (cached) return cached;
 
+  // If we have a complete cached cursor, use it
+  if (cached) {
+    return cached;
+  }
+
+  // Otherwise, default to first topic and chapter
   const course = resolveCourse(courseId);
   const firstTopic = course.topics[0];
   const firstChapter = firstTopic?.chapters[0];
 
-  const cursor = {
-    currentTopicId: firstTopic?.topicId,
-    currentChapterId: firstChapter?.chapterId,
+  const cursor: ProgressCursor = {
+    currentTopicId: firstTopic?.topicId ?? "",
+    currentChapterId: firstChapter?.chapterId ?? "",
   };
 
   store.set(courseId, cursor);

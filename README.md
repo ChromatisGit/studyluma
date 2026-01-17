@@ -1,113 +1,103 @@
-# StudyNode
+# StudyNode – Meilenstein-Roadmap
 
-Digitale Unterrichtsplattform
+## Meilenstein 1: Docusaurus Public
 
----
+Ziele:
 
-## Installationsanleitung
-
-- Installiere [https://bun.com/](Bun) in der Powershell
-
-- Klone das Repository mit VS-Code und öffne das Projekt
-
-- Führe über das Terminal in VS-Code `bun install` aus
-
-- Um das Projekt lokal zu starten, schreibe ins Terminal `bun dev`
-
-- Der Webserver kann im Terminal gestoppt werden mit der Tastenkombination `Strg + C`
-
-
+* Ersten Prototyp erstellen (Proof of Concept)
+* Feedback in Informatik Didaktik erhalten
 
 ---
 
-## Inhalte erstellen
+## Meilenstein 2: Next.js Rewrite
 
-`base` enthält die grundlegenden Inhalte für ein Fach.
+Ziele:
 
-`courses` beschreibt die konkreten Inhalte, die aus Basis verwendet werden sollen und in welcher Reihenfolge. Dabei kann konfiguriert werden, welche konkreten Kapitel angezeigt werden und auch in welcher Reihenfolge diese angezeigt werden.
+* Ablösung der Docusaurus-Version
+* Entwicklung einer stabilen und vorzeigbaren Plattform auf Basis von Next.js
 
-### Ordnerstruktur
+Inhaltlicher Umfang:
 
-```
-
-content/
-├─ groups-and-subjects.yml           # Definiert Fächer, Kursarten und Varianten
-│
-├─ base/                             # Basisinhalte (kursunabhängig, wiederverwendbar)
-│  ├─ <subject>/                     # z. B. math, info
-│  │  └─ <topic>/                    # z. B. vektorgeometrie, trigonometrie
-│  │     ├─ chapters/
-│  │     │  └─ <chapter>/            # z. B. 00-geraden, 01-geraden-lagebeziehung
-│  │     │     ├─ slides/            # Folien (Marp)
-│  │     │     ├─ worksheets/        # Arbeitsblätter
-│  │     │     └─ overview.typ       # Zusammenfassung der Inhalte des Kapitels
-│  │     │
-│  │     ├─ images/                  # Abbildungen für Webseite & Materialien
-│  │     └─ chapters.typ             # Titel und Stoffverteilungsplan des Themenblocks
-│  │
-│  └─ slides/                        # Fachübergreifende Präsentationen
-│
-├─ courses/                          # Konkrete Kurse (sichtbar für Schüler)
-│  └─ <groupID>/                     # z. B. tg1-math-lk, bk1-info
-│     ├─ course.yml                  # Kurs- und Themenkonfiguration
-│     ├─ course-variations.yml       # Anpassungen gegenüber Base (z. B. alternative Arbeitsblätter)
-│     └─ files/                      # Kursbezogene Zusatzdateien
-│
-└─ templates/                        # Vorlagen zum Kopieren
-   ├─ base-topic/                    # Grundgerüst für Topic + Chapter
-   └─ course-plans/                  # course-plan.yml-Vorlagen für Kursvarianten
-
-```
+* Fertige und stabile öffentliche Next.js-Version
+* Trennung von Code- und Inhaltsrepository
+* Hostwechsel von Cloudflare zu Vercel
 
 ---
 
-## Begriffe
+## Meilenstein 3: Kollaboration und PDF
 
-| Begriff | Bedeutung |
-|----------|------------|
-| **Kapitel (chapter)** | Didaktisch abgeschlossene Einheit mit 1–6 Unterrichtsstunden. |
-| **Themenblock (topic)** | Übergeordnete thematische Einheit, meist entsprechend einer Bildungsplaneinheit und enthält ein oder mehrere Kapitel. |
-| **Roadmap** | Fortschrittsübersicht über alle Themenblöcke und Kapitel eines Kurses. Zeigt aktuelle, abgeschlossene und kommende Themen. Wird über die Datei `course-plan.yml` pro Kurs gesteuert. |
-| **Arbeitsblatt (worksheet)** | In `Typst` verfasste Übungsaufgaben. Arbeitsblätter werden abhängig vom Kurs automatisiert in PDF-Dateien oder interaktive Web-Seiten umgewandelt. |
-| **Checkpoint** | Verständnisfragen mit sofortiger Rückmeldung (Check for Understanding). Dient der Selbstkontrolle und Lernstandserhebung. |
-| **Aufgaben** | Pflichtaufgaben, die alle Schüler während des Unterrichts bearbeiten. Sie bildet das erwartete Mindestlernziel ab. |
-| **Challenge** | Vertiefungs- oder Transferaufgabe für schnelle oder leistungsstarke Schüler. Fördert Anwendung und Transfer. |
+**Hier bin ich**
 
-© 2025 Christian Holst
+Ziele:
 
+* Externe Mitarbeit an Inhalten ermöglichen
+* Unterrichtsmaterialien generieren, die in der Praxis einsetzbar sind
 
-## Typst-Dateien im Detail
+Inhaltlicher Umfang:
 
-### `chapters.typ`
-
-Enthält:
-
-* Titel des Themenblocks
-* Lernziele der einzelnen Kapitel
-
-
-### `overview.typ` (Kapitelübersicht)
-
-Beinhaltet:
-
-* Theoretische Erklärung
-* Beispiele
-
-### `worksheet.typ` (Arbeitsblatt)
-
-Beinhaltet:
-
-* Checkpoint
-* Aufgaben
-* Challenges
-
-Wird automatisch zur Web- oder PDF-Version gebaut.
+* Finalisierung des Typst-PDF-Formats zur Preview
+* Dokumentation der Installationsschritte
+* Anleitung zur Inhaltserstellung
+* Externer Test: Eine Kommilitonin erstellt einen Arbeitsbogen komplett mit StudyNode
 
 ---
 
-## YAML-Dateien
+## Meilenstein 4: Slides
 
-### `course.yaml`
+Ziele:
 
+* Durchführung des Unterrichts direkt aus StudyNode heraus ermöglichen
 
-### `definitions.yml`
+Inhaltlicher Umfang:
+
+* Slides für das Praktikum
+* Nutzung eigener Komponenten (Code, Notizen, Bilder)
+* Präsentationsmodus für Beamer und Vollbild
+* Bedienung über Tastatursteuerung
+
+---
+
+## Meilenstein 5: Accounts und Datenbank
+
+Ziele:
+
+* Personalisierte Nutzung und persistente Datenhaltung ermöglichen
+
+Inhaltlicher Umfang:
+
+* Einrichtung einer PostgreSQL-Datenbank
+* Account-System (Schüler/Lehrer)
+* Speicherung des Lernfortschritts
+* Verwaltung von Kursmitgliedschaften
+* Einbinden von Kursübergreifenden Prinzipien und Regeln
+
+---
+
+## Meilenstein 6+
+
+Mögliche Inhalte:
+
+* Practice Notes (Wiederholung mit zeitlicher Verteilung)
+
+* Selbstevaluation der Lernenden:
+
+  * Einschätzung des eigenen Kenntnisstands
+  * Identifikation von Schwierigkeiten
+  * Definition persönlicher Übungsziele
+
+* Vollwertige Mathematik-Module
+  * Möglichkeit Arbeitsblätter im PDF Format anzubieten
+
+* StudyNode Mailserver einrichten
+
+* Code Quality
+
+  * Zentrale Verwaltung aller UI-Textstrings
+
+  * Zentrale Macro Registry
+
+  * Performance Check
+
+* Einmalige von Base abweichende Kursinhalte hinzufügen (PDF mit besonderen Infos, AB von Vertretungsstunde)
+
+* Eingebautes Kahoot

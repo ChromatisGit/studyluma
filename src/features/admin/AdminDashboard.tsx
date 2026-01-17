@@ -14,10 +14,9 @@ import { AccentColor } from "@/domain/accentColors";
 type AdminDashboardProps = {
   courses: CourseDTO[];
   totalUsers: number;
-  accessibleCoursesCount: number;
 };
 
-export function AdminDashboard({ courses, totalUsers, accessibleCoursesCount }: AdminDashboardProps) {
+export function AdminDashboard({ courses, totalUsers }: AdminDashboardProps) {
   return (
     <Container size="wide" className={styles.container}>
       <Stack gap="xl">
@@ -35,11 +34,6 @@ export function AdminDashboard({ courses, totalUsers, accessibleCoursesCount }: 
           <Box padding="lg">
             <h3 className={styles.statLabel}>Total Students</h3>
             <p className={styles.statValue}>{totalUsers}</p>
-          </Box>
-
-          <Box padding="lg">
-            <h3 className={styles.statLabel}>Accessible Courses</h3>
-            <p className={styles.statValue}>{accessibleCoursesCount}</p>
           </Box>
         </Grid>
 

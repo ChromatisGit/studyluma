@@ -8,8 +8,8 @@ type SidebarTopicNavProps = {
   topics: ProgressTopicDTO[];
   currentTopic?: string;
   currentChapter?: string;
-  progressCurrentTopicId?: string;
-  progressCurrentChapterId?: string;
+  progressCurrentTopicId: string;
+  progressCurrentChapterId: string;
   onLinkClick: () => void;
 };
 

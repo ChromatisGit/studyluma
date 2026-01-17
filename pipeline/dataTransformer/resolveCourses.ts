@@ -1,4 +1,4 @@
-import { NestedRecord, ensurePath } from "../../src/server/lib/nestedRecord";
+import { NestedRecord, ensurePath } from "./nestedRecord";
 import { Course, Topic } from "@schema/course";
 import { TopicPath } from "../configParser/buildPagePaths";
 import { CoursePlan } from "../configParser/schema/coursePlan";

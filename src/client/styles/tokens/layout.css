@@ -20,6 +20,6 @@
 
 [data-theme='dark'] {
   /* === Shadows (dark mode) === */
-  --sn-shadow-lw: 0 4px 12px color-mix(in srgb, var(--sn-text) 16%, transparent);
-  --sn-shadow-md: 0 10px 30px color-mix(in srgb, var(--sn-text) 24%, transparent);
+  --sn-shadow-lw: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --sn-shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4);
 }

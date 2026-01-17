@@ -19,7 +19,7 @@ export type ProgressTopicDTO = {
 };
 
 export type ProgressDTO = {
-  currentTopicId?: string;
-  currentChapterId?: string;
+  currentTopicId: string;
+  currentChapterId: string;
   topics: ProgressTopicDTO[];
 };

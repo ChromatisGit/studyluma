@@ -24,6 +24,6 @@ export function getCourseDTO(courseId: CourseId): CourseDTO {
         slug: course.slug,
         icon: course.icon,
         color: course.color,
-        tags,
+        tags
     };
 }

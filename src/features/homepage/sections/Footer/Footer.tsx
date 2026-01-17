@@ -19,9 +19,9 @@ export function Footer() {
 
           <div>
             <h3 className={styles.footerTitle}>{footer.contactHeading}</h3>
-            <a href="mailto:holst@studynode.com" className={styles.footerLink} aria-label="Send email to holst@studynode.com">
+            <a href="mailto:christian.contactmail@gmail.com" className={styles.footerLink} aria-label="Send email to christian.contactmail@gmail.com">
               <Mail size={18} aria-hidden />
-              <span>holst@studynode.com</span>
+              <span>christian.contactmail@gmail.com</span>
             </a>
             <p className={`${styles.footerText} ${styles.footerPrompt}`}>
               {footer.contactPrompt}

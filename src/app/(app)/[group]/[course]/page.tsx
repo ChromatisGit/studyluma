@@ -18,9 +18,9 @@ export default async function CourseRoute({ params }: PageParams) {
   const course = getCourseDTO(courseId);
   const progress = await getProgressDTO(courseId);
 
-  const currentTopic =
-    progress.topics.find((topic) => topic.topicId === progress.currentTopicId) ??
-    progress.topics.find((topic) => topic.status === "current");
+  const currentTopic = progress.topics.find(
+    (topic) => topic.topicId === progress.currentTopicId
+  );
 
   const model = {
     title: course.label,

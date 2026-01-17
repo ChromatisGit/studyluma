@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTsWorkerContext } from './TsWorkerContext';
 
+let requestIdCounter = 0;
+
 export type DiagnosticCategory = 'error' | 'warning' | 'message' | 'suggestion';
 
 export type TsWorkerDiagnostic = {
@@ -58,7 +60,7 @@ export function useTsRunner() {
         return;
       }
 
-      const requestId = Date.now();
+      const requestId = ++requestIdCounter;
 
       setIsLoading(true);
 
@@ -113,14 +115,15 @@ export function useTsRunner() {
 
         if (runtime.error) {
           setRuntimeError(runtime.error);
-          setLastPassed(pendingValidate ? false : null);
+          setLastPassed(false);
           return;
         }
 
         if (pendingValidate) {
           setLastPassed(runtime.passed);
         } else {
-          setLastPassed(null);
+          // No validation - mark as passed (compiled successfully)
+          setLastPassed(true);
         }
       };
 
