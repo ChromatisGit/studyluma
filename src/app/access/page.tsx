@@ -1,8 +1,9 @@
-import AccessSectionClient from "@/features/access/AccessSection";
-import { getCourseId } from "@/server/data/courses";
-import { getCourseDTO } from "@/server/data/getCourseDTO";
-import { getSession, getUserAccessCode } from "@/server/auth/auth";
-import { isRegistrationOpen } from "@/server/database/registrationStore";
+import AccessSectionClient from "@features/access/AccessSection";
+import { getCourseId } from "@services/courseService";
+import { getCourseDTO } from "@services/getCourseDTO";
+import { getSession } from "@services/authService";
+import { isRegistrationOpen } from "@services/courseStateService";
+import { getUserAccessCode } from "@services/userService";
 
 type AccessPageProps = {
   searchParams?: Promise<{
@@ -54,3 +55,4 @@ export default async function AccessPage({ searchParams }: AccessPageProps) {
     />
   );
 }
+

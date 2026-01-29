@@ -1,8 +1,9 @@
-import { getSession, assertCanAccessPage } from "@/server/auth/auth";
-import { getCourseId } from "@/server/data/courses";
-import { getTopicDTO } from "@/server/data/getTopicDTO";
+import { getSession, assertCanAccessPage } from "@services/authService";
+import { getCourseId } from "@services/courseService";
+import { getTopicDTO } from "@services/getTopicDTO";
 import { PageHeader } from "@components/PageHeader/PageHeader";
-import Link from "next/link";
+import { AppLink } from "@components/AppLink";
+import styles from "./page.module.css";
 
 type PageParams = {
   params: Promise<{
@@ -32,7 +33,7 @@ export default async function ChapterPage({ params }: PageParams) {
               {chapter.status === "locked" ? (
                 chapter.label
               ) : (
-                <Link href={chapter.href} style={{ color: "var(--sn-purple-accent)" }}>{chapter.label}</Link>
+                <AppLink href={chapter.href} className={styles.chapterLink}>{chapter.label}</AppLink>
               )}
             </li>
           ))}
@@ -43,3 +44,4 @@ export default async function ChapterPage({ params }: PageParams) {
     </main>
   );
 }
+

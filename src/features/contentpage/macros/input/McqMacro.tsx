@@ -1,12 +1,13 @@
 "use client";
 
+import clsx from "clsx";
 import { useState, useEffect } from "react";
 import { Check, X } from "lucide-react";
-import type { McqMacro as McqMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { MarkdownRenderer } from "../../components/MarkdownRenderer/MarkdownRenderer";
-import { getMarkdown } from "../../utils/textUtils";
-import { useWorksheetStorage } from "../../storage/WorksheetStorageContext";
+import type { McqMacro as McqMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { getMarkdown } from "@features/contentpage/utils/textUtils";
+import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
 import styles from "./McqMacro.module.css";
 
 type Props = MacroComponentProps<McqMacroType>;
@@ -105,9 +106,9 @@ export function McqMacro({ macro, context }: Props) {
               type="button"
               onClick={() => handleSelect(optionText)}
               disabled={isChecked}
-              className={`${styles.option} ${styles[`option--${state}`]}`}
+              className={clsx(styles.option, styles[`option--${state}`])}
             >
-              <span className={`${styles.indicator} ${styles[`indicator--${indicatorState}`]} ${isSingleChoice ? styles.indicatorRadio : ""}`}>
+              <span className={clsx(styles.indicator, styles[`indicator--${indicatorState}`], isSingleChoice && styles.indicatorRadio)}>
                 {showIndicatorContent && (
                   isSingleChoice
                     ? <span className={styles.radioDot} />

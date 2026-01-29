@@ -1,8 +1,8 @@
-import { RawMacro } from "../parseMacro";
-import { deterministicShuffle } from "../../utils/simpleHash";
-import { defineMacro } from "../macroDefinition";
+import { RawMacro } from "@pipeline/pageParser/macros/parseMacro";
+import { deterministicShuffle } from "@pipeline/pageParser/utils/simpleHash";
+import { defineMacro } from "@pipeline/pageParser/macros/macroDefinition";
 import { Markdown } from "@schema/page";
-import { parseRawText } from "../parseRawText";
+import { parseRawText } from "@pipeline/pageParser/macros/parseRawText";
 
 export type McqMacro = {
     type: "mcq";

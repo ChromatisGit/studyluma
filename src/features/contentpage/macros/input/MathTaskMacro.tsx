@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { MathTaskMacro as MathTaskMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { MarkdownRenderer } from "../../components/MarkdownRenderer/MarkdownRenderer";
-import { CollapsibleSection } from "../../components/CollapsibleSection/CollapsibleSection";
-import { getMarkdown } from "../../utils/textUtils";
-import { useWorksheetStorage } from "../../storage/WorksheetStorageContext";
+import type { MathTaskMacro as MathTaskMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
+import { getMarkdown } from "@features/contentpage/utils/textUtils";
+import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
 import { Stack } from "@components/Stack";
 import styles from "./TextTaskMacro.module.css";
 

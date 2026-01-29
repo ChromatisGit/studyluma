@@ -1,4 +1,4 @@
-import type { Macro } from "@domain/macroTypes";
+import type { Macro } from "@schema/macroTypes";
 
 /**
  * Context passed to every macro component

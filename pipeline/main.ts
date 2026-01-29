@@ -1,24 +1,20 @@
 import { buildPagePaths } from "./configParser/buildPagePaths";
 import { loadConfigs } from "./configParser/loadConfigs";
 import { buildChapterContent } from "./dataTransformer/buildChapterContent";
+import { generateCourseSQLScript } from "./dataTransformer/generateCourseSQLScript";
 import { getTopicLabels, resolveCourses } from "./dataTransformer/resolveCourses";
 import { deleteGenerated, writeJSONFile } from "./io";
+import { ensureDevAdminUser } from "./devAdminUser";
 
-async function main() {
+export async function runPipeline() {
     await deleteGenerated();
     const coursePlans = await loadConfigs()
     const pagePaths = buildPagePaths(coursePlans)
     const { pageSummaries } = await buildChapterContent(pagePaths)
     const topicLabels = await getTopicLabels(pagePaths)
     const courses = resolveCourses(coursePlans, pageSummaries, topicLabels)
-    writeJSONFile("config/courses.json", courses)
+    await writeJSONFile("config/courses.json", courses)
+    await generateCourseSQLScript("courses.sql", courses)
+    await ensureDevAdminUser();
     console.log("[builder] SUCCESS")
-}
-
-try {
-    await main();
-} catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error("[builder] FAILED\n",message);
-    process.exitCode = 1;
 }

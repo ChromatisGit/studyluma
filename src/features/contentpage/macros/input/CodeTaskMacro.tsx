@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { CodeTaskMacro as CodeTaskMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { MarkdownRenderer } from "../../components/MarkdownRenderer/MarkdownRenderer";
-import { CollapsibleSection } from "../../components/CollapsibleSection/CollapsibleSection";
-import { getMarkdown } from "../../utils/textUtils";
-import { useWorksheetStorage } from "../../storage/WorksheetStorageContext";
-import { CodeRunner, type CodeRunnerResult } from "../../components/CodeRunner/CodeRunner";
-import { useTsRunner } from "../../components/CodeRunner/useTsRunner";
+import type { CodeTaskMacro as CodeTaskMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
+import { getMarkdown } from "@features/contentpage/utils/textUtils";
+import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
+import { CodeRunner, type CodeRunnerResult } from "@features/contentpage/components/CodeRunner/CodeRunner";
+import { useTsRunner } from "@features/contentpage/components/CodeRunner/useTsRunner";
 import { Stack } from "@components/Stack";
 
 type Props = MacroComponentProps<CodeTaskMacroType>;

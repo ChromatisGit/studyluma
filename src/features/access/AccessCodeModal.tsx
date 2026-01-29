@@ -7,6 +7,7 @@ import { Modal } from "@components/Modal";
 import { Button } from "@components/Button";
 import { IconBox } from "@components/IconBox";
 import styles from "./AccessCodeModal.module.css";
+import ACCESS_TEXT from "./access.de.json";
 
 type AccessCodeModalProps = {
   accessCode: string;
@@ -23,14 +24,14 @@ export function AccessCodeModal({ accessCode, isOpen, onConfirm }: AccessCodeMod
         <div className={styles.icon}>
           <IconBox icon={Key} color="purple" size="lg" />
         </div>
-        <h2 className={styles.title}>Save Your Access Code</h2>
+        <h2 className={styles.title}>{ACCESS_TEXT.modal.title}</h2>
         <p className={styles.description}>
-          You will need this code along with your PIN to log in again.
+          {ACCESS_TEXT.modal.description}
         </p>
       </div>
 
       <div className={styles.codeBox}>
-        <div className={styles.codeLabel}>Your Access Code</div>
+        <div className={styles.codeLabel}>{ACCESS_TEXT.modal.codeLabel}</div>
         <span className={styles.code}>{accessCode}</span>
       </div>
 
@@ -41,11 +42,11 @@ export function AccessCodeModal({ accessCode, isOpen, onConfirm }: AccessCodeMod
           checked={hasSaved}
           onChange={(e) => setHasSaved(e.target.checked)}
         />
-        <span className={styles.checkboxLabel}>I have saved my access code</span>
+        <span className={styles.checkboxLabel}>{ACCESS_TEXT.modal.checkboxLabel}</span>
       </label>
 
       <Button variant="primary" fullWidth disabled={!hasSaved} onClick={onConfirm}>
-        Continue
+        {ACCESS_TEXT.modal.continueButton}
       </Button>
     </Modal>
   );

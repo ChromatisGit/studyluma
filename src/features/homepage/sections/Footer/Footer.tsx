@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { Mail } from "lucide-react";
 import HOMEPAGE_TEXT from "@features/homepage/homepage.de.json";
 import { Container } from "@components/Container";
@@ -23,7 +24,7 @@ export function Footer() {
               <Mail size={18} aria-hidden />
               <span>christian.contactmail@gmail.com</span>
             </a>
-            <p className={`${styles.footerText} ${styles.footerPrompt}`}>
+            <p className={clsx(styles.footerText, styles.footerPrompt)}>
               {footer.contactPrompt}
             </p>
           </div>

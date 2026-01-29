@@ -1,7 +1,7 @@
 import { protectCodeBlocks } from "./codeBlockGuard";
 import { parseContent } from "./parseContent";
-import { readTypFile } from "../io";
-import { ContentIssueError, issueCatalog } from "../errorHandling";
+import { readTypFile } from "@pipeline/io";
+import { ContentIssueError, issueCatalog } from "@pipeline/errorHandling";
 import { Page } from "@schema/page";
 
 export async function parsePage(fileName: string, contentParsing = true): Promise<Page> {

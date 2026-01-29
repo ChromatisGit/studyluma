@@ -1,17 +1,19 @@
 "use client";
 
+import clsx from "clsx";
 import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { CourseId } from "@/server/data/courses";
+import type { CourseId } from "@services/courseService";
 import {
-  openRegistrationAction,
   closeRegistrationAction,
   getRegistrationStatusAction,
-} from "@/server/admin/registrationActions";
+  openRegistrationAction,
+} from "@actions/registrationActions";
 import { Button } from "@components/Button";
 import { Grid } from "@components/Grid";
 import styles from "./RegistrationControl.module.css";
+import ADMIN_TEXT from "./admin.de.json";
 
 type RegistrationControlProps = {
   courseId: CourseId;
@@ -31,6 +33,8 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
       if (result.ok) {
         setIsOpen(result.isOpen);
         setOpenUntil(result.openUntil);
+      } else {
+        toast.error(result.error);
       }
     });
   }, [courseId]);
@@ -74,8 +78,8 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
       }
 
       setIsOpen(true);
-      setOpenUntil(new Date(Date.now() + 15 * 60 * 1000).toISOString());
-      toast.success("Registration window opened (15 minutes)");
+      setOpenUntil(result.openUntil);
+      toast.success(ADMIN_TEXT.courseDetail.registration.openSuccessMessage);
       router.refresh();
     });
   };
@@ -91,7 +95,7 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
 
       setIsOpen(false);
       setOpenUntil(null);
-      toast.success("Registration window closed");
+      toast.success(ADMIN_TEXT.courseDetail.registration.closeSuccessMessage);
       router.refresh();
     });
   };
@@ -99,12 +103,12 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
   return (
     <div className={styles.container}>
       {/* Status Display */}
-      <div className={`${styles.statusCard} ${isOpen ? styles.statusOpen : styles.statusClosed}`}>
+      <div className={clsx(styles.statusCard, isOpen ? styles.statusOpen : styles.statusClosed)}>
         <div className={styles.statusHeader}>
           <div className={styles.statusIndicator}>
-            <span className={`${styles.statusDot} ${isOpen ? styles.dotOpen : styles.dotClosed}`} />
+            <span className={clsx(styles.statusDot, isOpen ? styles.dotOpen : styles.dotClosed)} />
             <span className={styles.statusLabel}>
-              {isOpen ? "Registration Open" : "Registration Closed"}
+              {isOpen ? ADMIN_TEXT.courseDetail.registration.statusOpen : ADMIN_TEXT.courseDetail.registration.statusClosed}
             </span>
           </div>
           {isOpen && timeRemaining && (
@@ -114,14 +118,14 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
 
         {isOpen && openUntil && (
           <p className={styles.statusText}>
-            Students can join this course without an access code until{" "}
+            {ADMIN_TEXT.courseDetail.registration.openMessage}{" "}
             {new Date(openUntil).toLocaleTimeString()}
           </p>
         )}
 
         {!isOpen && (
           <p className={styles.statusText}>
-            Students need an access code to join this course
+            {ADMIN_TEXT.courseDetail.registration.closedMessage}
           </p>
         )}
       </div>
@@ -133,7 +137,7 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
           disabled={isPending || isOpen}
           variant="primary"
         >
-          {isPending && !isOpen ? "Opening..." : "Open Registration (15 min)"}
+          {isPending && !isOpen ? ADMIN_TEXT.courseDetail.registration.opening : ADMIN_TEXT.courseDetail.registration.openButton}
         </Button>
 
         <Button
@@ -141,9 +145,10 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
           disabled={isPending || !isOpen}
           variant="secondary"
         >
-          {isPending && isOpen ? "Closing..." : "Close Registration"}
+          {isPending && isOpen ? ADMIN_TEXT.courseDetail.registration.closing : ADMIN_TEXT.courseDetail.registration.closeButton}
         </Button>
       </Grid>
     </div>
   );
 }
+

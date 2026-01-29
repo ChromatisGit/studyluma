@@ -1,7 +1,7 @@
 
-import { getCourseId } from "@data/courses";
-import { getCourseDTO } from "@data/getCourseDTO";
-import { getProgressDTO } from "@data/getProgressDTO";
+import { getCourseId } from "@services/courseService";
+import { getCourseDTO } from "@services/getCourseDTO";
+import { getProgressDTO } from "@services/getProgressDTO";
 import { CoursepagePage } from "@features/coursepage/Coursepage";
 
 type PageParams = {
@@ -31,3 +31,4 @@ export default async function CourseRoute({ params }: PageParams) {
 
   return <CoursepagePage model={model} />;
 }
+

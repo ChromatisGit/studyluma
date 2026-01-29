@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { TextTaskMacro as TextTaskMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { MarkdownRenderer } from "../../components/MarkdownRenderer/MarkdownRenderer";
-import { CollapsibleSection } from "../../components/CollapsibleSection/CollapsibleSection";
-import { getMarkdown } from "../../utils/textUtils";
-import { useWorksheetStorage } from "../../storage/WorksheetStorageContext";
+import type { TextTaskMacro as TextTaskMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
+import { getMarkdown } from "@features/contentpage/utils/textUtils";
+import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
 import { Stack } from "@components/Stack";
 import styles from "./TextTaskMacro.module.css";
+import CONTENTPAGE_TEXT from "../../contentpage.de.json";
 
 type Props = MacroComponentProps<TextTaskMacroType>;
 
@@ -67,7 +68,7 @@ export function TextTaskMacro({ macro, context }: Props) {
         onChange={(e) => setAnswer(e.target.value)}
         className={styles.textarea}
         rows={4}
-        placeholder="Enter your answer..."
+        placeholder={CONTENTPAGE_TEXT.freeResponseTask.placeholder}
       />
 
       {(hint || (isChecked && solution)) && (

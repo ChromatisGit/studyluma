@@ -1,0 +1,10 @@
+{
+  "worksheetCard": {
+    "web": "Online öffnen",
+    "pdf": "PDF herunterladen",
+    "pdfSolution": "Lösung herunterladen"
+  },
+  "roadmap": {
+    "chaptersAriaLabel": "Chapters for {label}"
+  }
+}

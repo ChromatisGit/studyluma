@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { WorksheetStorage } from './WorksheetStorage';
-import type { Section } from '@domain/page';
+import type { Section } from '@schema/page';
 
 const WorksheetStorageContext = createContext<WorksheetStorage | null>(null);
 

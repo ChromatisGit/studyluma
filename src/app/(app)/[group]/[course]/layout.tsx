@@ -3,14 +3,14 @@ import type { ReactNode } from "react";
 // Force dynamic rendering - layouts with session/auth must not be cached
 export const dynamic = "force-dynamic";
 
-import { Layout } from "@components/Layout/Layout";
+import { Layout } from "@ui/layout/Layout";
 import { CourseProviders } from "./CourseProviders";
-import { getSession } from "@/server/auth/auth";
-import { getCourseId } from "@/server/data/courses";
-import { getCourseDTO } from "@/server/data/getCourseDTO";
-import { getSidebarDTO } from "@/server/data/getSidebarDTO";
-import { isAdmin } from "@/domain/userTypes";
-import { signOutAction } from "@/server/auth/accessAction";
+import { getSession } from "@services/authService";
+import { getCourseId } from "@services/courseService";
+import { getCourseDTO } from "@services/getCourseDTO";
+import { getSidebarDTO } from "@services/getSidebarDTO";
+import { isAdmin } from "@schema/userTypes";
+import { logoutAction } from "@actions/logoutAction";
 
 type CourseLayoutProps = {
   children: ReactNode;
@@ -19,11 +19,6 @@ type CourseLayoutProps = {
     course: string;
   }>;
 };
-
-async function logoutAction() {
-  "use server";
-  await signOutAction();
-}
 
 export default async function CourseLayout({ children, params }: CourseLayoutProps) {
   const session = await getSession();
@@ -47,3 +42,4 @@ export default async function CourseLayout({ children, params }: CourseLayoutPro
     </Layout>
   );
 }
+

@@ -1,4 +1,4 @@
-import type { Section } from '@domain/page';
+import type { Section } from '@schema/page';
 
 type TaskResponseEntry = {
   value: string;

@@ -1,9 +1,9 @@
 "use client";
 
-import { Card } from "@/components/Card";
-import type { IconName } from "@/components/ConfigableIcon/ConfigableIcon";
-import { AccentColor } from "@/domain/accentColors";
-import type { CourseDTO } from "@/domain/courseDTO";
+import { Card } from "@components/Card";
+import type { IconName } from "@components/ConfigableIcon/ConfigableIcon";
+import { AccentColor } from "@schema/accentColors";
+import type { CourseDTO } from "@schema/courseDTO";
 import HOMEPAGE_TEXT from "@homepage/homepage.de.json";
 
 const coursesText = HOMEPAGE_TEXT.courses;

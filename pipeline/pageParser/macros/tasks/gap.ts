@@ -1,7 +1,7 @@
-import { restoreCodeBlocks } from "../../codeBlockGuard";
-import { RawMacro } from "../parseMacro";
-import { deterministicShuffle } from "../../utils/simpleHash";
-import { defineMacro } from "../macroDefinition";
+import { restoreCodeBlocks } from "@pipeline/pageParser/codeBlockGuard";
+import { RawMacro } from "@pipeline/pageParser/macros/parseMacro";
+import { deterministicShuffle } from "@pipeline/pageParser/utils/simpleHash";
+import { defineMacro } from "@pipeline/pageParser/macros/macroDefinition";
 
 export type GapMacro = {
     type: "gap",

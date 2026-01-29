@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+
+  outputFileTracingIncludes: {
+    "/*": [".generated/**/*"],
+  },
 };
 
 export default nextConfig;

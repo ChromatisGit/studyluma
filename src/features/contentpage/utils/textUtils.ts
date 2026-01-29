@@ -1,4 +1,4 @@
-import type { Markdown } from "@domain/page";
+import type { Markdown } from "@schema/page";
 
 /**
  * Extracts the raw text string from a Markdown object or returns the string as-is.

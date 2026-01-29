@@ -1,4 +1,4 @@
-import { RawText } from "@schema/page";
+import { RawText } from "@pipeline/types";
 import { removeIndent } from "./utils/removeIndent";
 
 export type ProtectedBlock = {

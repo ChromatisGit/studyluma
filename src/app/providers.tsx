@@ -3,10 +3,10 @@
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 
-import type { Session } from "@/domain/session";
-import { MockAuthProvider, useMockAuth } from "@/client/contexts/MockAuthContext";
-import { RouteProvider } from "@/client/contexts/RouteContext";
-import { ThemeProvider } from "@/client/contexts/ThemeContext";
+import type { Session } from "@schema/session";
+import { MockAuthProvider, useMockAuth } from "@ui/contexts/MockAuthContext";
+import { RouteProvider } from "@ui/contexts/RouteContext";
+import { ThemeProvider } from "@ui/contexts/ThemeContext";
 
 type ProvidersProps = {
   children: ReactNode;

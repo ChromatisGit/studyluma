@@ -1,12 +1,20 @@
-import { getSession, getAllUsersForStats } from "@/server/auth/auth";
-import { getCoursesByAccess } from "@/server/data/courses";
-import { getCourseDTO } from "@/server/data/getCourseDTO";
-import { AdminDashboard } from "@/features/admin/AdminDashboard";
+import { notFound } from "next/navigation";
+import { getSession } from "@services/authService";
+import { isAdmin } from "@schema/userTypes";
+import { getCoursesByAccess } from "@services/courseService";
+import { getCourseDTO } from "@services/getCourseDTO";
+import { AdminDashboard } from "@features/admin/AdminDashboard";
+import { getUserCount } from "@services/userService";
 
 export default async function AdminDashboardPage() {
   const session = await getSession();
-  // Layout already checks for admin auth, so we know session!.user exists and is admin
-  const user = session!.user;
+
+  // Explicit check even though layout also checks - defense in depth
+  if (!session || !isAdmin(session.user)) {
+    notFound();
+  }
+
+  const user = session.user;
 
   const courseAccess = getCoursesByAccess(user);
   const allCourseIds = [
@@ -18,9 +26,8 @@ export default async function AdminDashboardPage() {
 
   const courses = allCourseIds.map((id) => getCourseDTO(id));
 
-  // Count total users (excluding admins)
-  const allUsers = await getAllUsersForStats();
-  const totalUsers = allUsers.filter((u) => u.role === "user").length;
+  // Count total users
+  const totalUsers = await getUserCount();
 
   return (
     <AdminDashboard
@@ -29,3 +36,4 @@ export default async function AdminDashboardPage() {
     />
   );
 }
+

@@ -1,9 +1,9 @@
 "use client";
 
-import type { CodeRunnerMacro as CodeRunnerMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { CodeRunner } from "../../components/CodeRunner/CodeRunner";
-import { useTsRunner } from "../../components/CodeRunner/useTsRunner";
+import type { CodeRunnerMacro as CodeRunnerMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { CodeRunner } from "@features/contentpage/components/CodeRunner/CodeRunner";
+import { useTsRunner } from "@features/contentpage/components/CodeRunner/useTsRunner";
 
 type Props = MacroComponentProps<CodeRunnerMacroType>;
 

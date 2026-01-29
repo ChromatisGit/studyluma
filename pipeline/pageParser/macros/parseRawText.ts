@@ -1,5 +1,6 @@
-import { RawText, Subheader, Markdown } from "@schema/page";
-import { ProtectedBlock, restoreCodeBlocks } from "../codeBlockGuard";
+import { Subheader, Markdown, createMarkdown } from "@schema/page";
+import { RawText } from "@pipeline/types";
+import { ProtectedBlock, restoreCodeBlocks } from "@pipeline/pageParser/codeBlockGuard";
 
 const SUBHEADER_REGEX = /^==\s+(.+)$/gm;
 
@@ -53,5 +54,5 @@ export function parseRawText(
 ): Markdown {
     const converted = rawText.replace(/\*(.*?)\*/g, "**$1**");
     const restored = restoreCodeBlocks({ rawText: converted }, protectedBlocks).rawText;
-    return { markdown: restored };
+    return createMarkdown(restored);
 }

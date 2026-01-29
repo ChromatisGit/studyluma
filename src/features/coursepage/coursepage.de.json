@@ -8,9 +8,15 @@
     "heading": "Aktuelles Thema"
   },
   "worksheets": {
-    "title": "Aktuelle Aufgaben"
+    "title": "Aktuelle Aufgaben",
+    "actions": {
+      "web": "Online öffnen",
+      "pdf": "PDF herunterladen",
+      "pdfSolution": "Lösung herunterladen"
+    }
   },
   "roadmap": {
-    "heading": "Roadmap"
+    "heading": "Roadmap",
+    "chaptersAriaLabel": "Chapters for {label}"
   }
 }

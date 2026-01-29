@@ -1,5 +1,6 @@
-import type { PracticeTask } from "@data/practice";
+import type { PracticeTask } from "@services/practiceService";
 import styles from "./Practise.module.css";
+import PRACTISE_TEXT from "./practise.de.json";
 
 interface PractiseProps {
   courseId: string;
@@ -10,10 +11,10 @@ interface PractiseProps {
 export function Practise({ courseId, topicTitle, tasks }: PractiseProps) {
   return (
     <main className={styles.page}>
-      <h1>Practice session</h1>
-      <p>Course: {courseId}</p>
-      <p>Topic: {topicTitle}</p>
-      <p>Practice routes are stubbed with minimal tasks for now.</p>
+      <h1>{PRACTISE_TEXT.title}</h1>
+      <p>{PRACTISE_TEXT.course}: {courseId}</p>
+      <p>{PRACTISE_TEXT.topic}: {topicTitle}</p>
+      <p>{PRACTISE_TEXT.stubMessage}</p>
 
       {tasks.length > 0 ? (
         <ol className={styles.taskList}>
@@ -24,7 +25,7 @@ export function Practise({ courseId, topicTitle, tasks }: PractiseProps) {
           ))}
         </ol>
       ) : (
-        <p className={styles.emptyState}>No practice tasks are available yet.</p>
+        <p className={styles.emptyState}>{PRACTISE_TEXT.emptyState}</p>
       )}
     </main>
   );

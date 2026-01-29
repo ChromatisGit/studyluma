@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
-import type { ImageMacro as ImageMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
+import clsx from "clsx";
+import type { ImageMacro as ImageMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
 import styles from "./ImageMacro.module.css";
 
 type Props = MacroComponentProps<ImageMacroType>;
@@ -19,7 +20,7 @@ export function ImageMacro({ macro }: Props) {
       <img
         src={macro.source}
         alt=""
-        className={`${styles.image} ${sizeClass}`}
+        className={clsx(styles.image, sizeClass)}
       />
     </figure>
   );

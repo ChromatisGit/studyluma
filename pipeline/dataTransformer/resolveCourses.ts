@@ -1,10 +1,11 @@
 import { NestedRecord, ensurePath } from "./nestedRecord";
 import { Course, Topic } from "@schema/course";
-import { TopicPath } from "../configParser/buildPagePaths";
-import { CoursePlan } from "../configParser/schema/coursePlan";
-import { parsePage } from "../pageParser/parsePage";
+import { TopicPath } from "@pipeline/configParser/buildPagePaths";
+import { CoursePlan } from "@pipeline/configParser/schema/coursePlan";
+import { parsePage } from "@pipeline/pageParser/parsePage";
 import { PageSummaries } from "./buildChapterContent";
-import { ContentIssueCollector } from "../errorHandling";
+import { ContentIssueCollector } from "@pipeline/errorHandling";
+import { collectCourseIds } from "@pipeline/types";
 
 type WorksheetSummary = { worksheetId: string; label: string };
 type ChapterSummary = { label: string; worksheets: WorksheetSummary[] };
@@ -78,14 +79,4 @@ export async function getTopicLabels(pagePaths: TopicPath[]): Promise<TopicLabel
 
     collector.throwIfAny("Content issues found");
     return topicLabels;
-}
-
-function collectCourseIds(chapters: Record<string, { courseIds: string[] }>): string[] {
-    const ids = new Set<string>();
-    for (const chapter of Object.values(chapters)) {
-        for (const courseId of chapter.courseIds) {
-            ids.add(courseId);
-        }
-    }
-    return [...ids];
 }

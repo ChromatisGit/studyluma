@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { ChevronRight, Shield } from "lucide-react";
-import type { CourseDTO } from "@/domain/courseDTO";
-import type { ProgressDTO } from "@/domain/progressDTO";
-import type { CourseId } from "@/server/data/courses";
+import { AppLink } from "@components/AppLink";
+import type { CourseDTO } from "@schema/courseDTO";
+import type { ProgressDTO } from "@schema/progressDTO";
+import type { CourseId } from "@services/courseService";
 import { ProgressControl } from "./ProgressControl";
 import { RegistrationControl } from "./RegistrationControl";
 import styles from "./AdminCourseDetail.module.css";
+import ADMIN_TEXT from "./admin.de.json";
 
 type AdminCourseDetailProps = {
   course: CourseDTO;
@@ -24,17 +25,17 @@ export function AdminCourseDetail({ course, progress, courseId }: AdminCourseDet
       <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
         <ol className={styles.breadcrumbList}>
           <li className={styles.breadcrumbItem}>
-            <Link href="/admin" className={styles.breadcrumbHome}>
+            <AppLink href="/admin" className={styles.breadcrumbHome}>
               <Shield size={16} />
-            </Link>
+            </AppLink>
           </li>
           <li className={styles.breadcrumbSeparator} aria-hidden="true">
             <ChevronRight size={12} />
           </li>
           <li className={styles.breadcrumbItem}>
-            <Link href={courseUrl} className={styles.breadcrumbLink}>
+            <AppLink href={courseUrl} className={styles.breadcrumbLink}>
               {course.label}
-            </Link>
+            </AppLink>
           </li>
         </ol>
       </nav>
@@ -49,9 +50,9 @@ export function AdminCourseDetail({ course, progress, courseId }: AdminCourseDet
       <div className={styles.sections}>
         {/* Progress Control Section */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Chapter Progress Control</h2>
+          <h2 className={styles.sectionTitle}>{ADMIN_TEXT.courseDetail.progressControl.title}</h2>
           <p className={styles.sectionDescription}>
-            Set the current chapter for all students. Students can only see chapters up to the planned chapter.
+            {ADMIN_TEXT.courseDetail.progressControl.description}
           </p>
           <ProgressControl
             courseId={courseId}
@@ -63,24 +64,25 @@ export function AdminCourseDetail({ course, progress, courseId }: AdminCourseDet
 
         {/* Registration Window Section */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Registration Window</h2>
+          <h2 className={styles.sectionTitle}>{ADMIN_TEXT.courseDetail.registration.title}</h2>
           <p className={styles.sectionDescription}>
-            Control when students can join this course without an access code.
+            {ADMIN_TEXT.courseDetail.registration.description}
           </p>
           <RegistrationControl courseId={courseId} />
         </section>
 
         {/* Enrolled Students Section */}
         <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>Enrolled Students</h2>
+          <h2 className={styles.sectionTitle}>{ADMIN_TEXT.courseDetail.enrolledStudents.title}</h2>
           <p className={styles.sectionDescription}>
-            View all students enrolled in this course.
+            {ADMIN_TEXT.courseDetail.enrolledStudents.description}
           </p>
           <div className={styles.placeholder}>
-            <p>Student list coming soon</p>
+            <p>{ADMIN_TEXT.courseDetail.enrolledStudents.comingSoon}</p>
           </div>
         </section>
       </div>
     </div>
   );
 }
+

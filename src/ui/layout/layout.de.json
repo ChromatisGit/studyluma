@@ -1,0 +1,24 @@
+{
+  "navbar": {
+    "brand": "StudyNode",
+    "courses": "Courses",
+    "principles": "Principles",
+    "login": "Login",
+    "profileMenu": "Profile menu",
+    "profile": "Profile",
+    "adminPanel": "Admin Panel",
+    "logOut": "Log out",
+    "openSidebar": "Open sidebar",
+    "closeSidebar": "Close sidebar",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "sidebar": {
+    "homepage": "Homepage",
+    "courses": "Courses",
+    "principles": "Principles"
+  },
+  "breadcrumbs": {
+    "ariaLabel": "Breadcrumb"
+  }
+}

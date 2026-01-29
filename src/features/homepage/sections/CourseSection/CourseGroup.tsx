@@ -1,10 +1,10 @@
 "use client";
 
-import { FancyGrid } from "@/components/FancyGrid";
+import { FancyGrid } from "@components/FancyGrid";
 import { Stack } from "@components/Stack";
 import { CourseCard } from "./CourseCard";
 import styles from "@homepage/sections/CourseSection/CourseGroup.module.css";
-import type { CourseDTO } from "@/domain/courseDTO";
+import type { CourseDTO } from "@schema/courseDTO";
 
 type CourseGroupProps = {
     title: string;

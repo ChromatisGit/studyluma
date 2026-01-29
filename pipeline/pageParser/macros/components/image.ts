@@ -1,5 +1,5 @@
-import { RawMacro } from "../parseMacro";
-import { defineMacro } from "../macroDefinition";
+import { RawMacro } from "@pipeline/pageParser/macros/parseMacro";
+import { defineMacro } from "@pipeline/pageParser/macros/macroDefinition";
 
 export type ImageMacro = {
     type: "image",

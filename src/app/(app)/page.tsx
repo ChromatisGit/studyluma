@@ -1,26 +1,32 @@
-import { Layout } from "@components/Layout/Layout";
-import { getSession } from "@/server/auth/auth";
-import { getSidebarDTO } from "@/server/data/getSidebarDTO";
-import { isAdmin } from "@/domain/userTypes";
-import { signOutAction } from "@/server/auth/accessAction";
+import { Layout } from "@ui/layout/Layout";
+import { getSession } from "@services/authService";
+import { getSidebarDTO } from "@services/getSidebarDTO";
+import { getCoursesByAccess } from "@services/courseService";
+import { getCourseDTO } from "@services/getCourseDTO";
+import { isAdmin } from "@schema/userTypes";
+import { logoutAction } from "@actions/logoutAction";
 
-import { About } from "@/features/homepage/sections/About/About";
-import { NodeNetwork } from "@/features/homepage/sections/Background/NodeNetwork";
-import { CourseSection } from "@/features/homepage/sections/CourseSection/CourseSection";
-import { Footer } from "@/features/homepage/sections/Footer/Footer";
-import { Hero } from "@/features/homepage/sections/Hero/Hero";
+import { About } from "@features/homepage/sections/About/About";
+import { NodeNetwork } from "@features/homepage/sections/Background/NodeNetwork";
+import { CourseSection, type CourseGroups } from "@features/homepage/sections/CourseSection/CourseSection";
+import { Footer } from "@features/homepage/sections/Footer/Footer";
+import { Hero } from "@features/homepage/sections/Hero/Hero";
 import styles from "@features/homepage/Homepage.module.css";
-
-async function logoutAction() {
-  "use server";
-  await signOutAction();
-}
 
 export default async function HomePage() {
   const session = await getSession();
   const user = session?.user ?? null;
   const isUserAdmin = user ? isAdmin(user) : false;
   const sidebarData = await getSidebarDTO({ courseId: null, user });
+
+  // Fetch course data in app layer, pass to feature
+  const accessGroups = getCoursesByAccess(user);
+  const courseGroups: CourseGroups = {
+    public: accessGroups.public.map((courseId) => getCourseDTO(courseId)),
+    accessible: accessGroups.accessible.map((courseId) => getCourseDTO(courseId)),
+    restricted: accessGroups.restricted.map((courseId) => getCourseDTO(courseId)),
+    hidden: accessGroups.hidden.map((courseId) => getCourseDTO(courseId)),
+  };
 
   return (
     <Layout
@@ -37,7 +43,7 @@ export default async function HomePage() {
         </div>
 
         <Hero />
-        <CourseSection />
+        <CourseSection groups={courseGroups} isAdmin={isUserAdmin} />
         <About />
         <Footer />
       </main>

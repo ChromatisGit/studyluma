@@ -43,7 +43,9 @@ next-env.d.ts
 *.pdf
 .vscode
 .generated
+.generatedScripts
 
 # local data storage
 .data/
 .claude/settings.local.json
+nul

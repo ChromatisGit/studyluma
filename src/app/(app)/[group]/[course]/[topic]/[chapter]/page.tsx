@@ -1,8 +1,8 @@
 import { ContentPageRenderer } from "@features/contentpage/renderers/ContentPageRenderer";
-import { assertCanAccessPage, getSession } from "@/server/auth/auth";
-import { getCourseId, getSubject, getWorksheetRefs } from "@/server/data/courses";
-import { getPage } from "@/server/data/getPage";
-import { getProgressDTO } from "@/server/data/getProgressDTO";
+import { assertCanAccessPage, getSession } from "@services/authService";
+import { getCourseId, getSubject, getWorksheetRefs } from "@services/courseService";
+import { getPage } from "@services/pageService";
+import { getProgressDTO } from "@services/getProgressDTO";
 import { notFound } from "next/navigation";
 
 
@@ -43,3 +43,4 @@ export default async function ChapterPage({ params }: PageParams) {
     />
   );
 }
+

@@ -1,4 +1,3 @@
-import type { Markdown } from "@domain/page";
 import type { ReactNode } from "react";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
@@ -175,7 +174,11 @@ const processor = unified()
     },
   });
 
-export function MarkdownRenderer({ markdown }: Markdown): ReactNode {
+interface MarkdownRendererProps {
+  markdown: string;
+}
+
+export function MarkdownRenderer({ markdown }: MarkdownRendererProps): ReactNode {
   const rendered = processor.processSync(markdown).result as ReactNode;
   return <div className="sn-markdown">{rendered}</div>;
 }

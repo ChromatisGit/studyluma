@@ -119,7 +119,7 @@ export function CodeRunner({
           {resultLabel && <div className={styles.resultLabel}>{resultLabel}</div>}
           {hasConsoleData && (
             <pre
-              className={`${styles.consoleOutput} ${runtimeError ? styles.consoleError : ''}`}
+              className={clsx(styles.consoleOutput, runtimeError && styles.consoleError)}
             >
               {runtimeError || consoleOutput || strings.codeRunner.noOutput}
             </pre>

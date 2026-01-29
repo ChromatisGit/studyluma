@@ -1,6 +1,6 @@
-import { Grid } from "@/components/Grid";
-import { Box } from "@/components/Box";
-import { IconBox } from "@/components/IconBox";
+import { Grid } from "@components/Grid";
+import { Box } from "@components/Box";
+import { IconBox } from "@components/IconBox";
 import { HomeSection } from "@features/homepage/Homepage";
 import { aboutGoals } from "./aboutData";
 import HOMEPAGE_TEXT from "@features/homepage/homepage.de.json";

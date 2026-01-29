@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { useState } from 'react';
 import { BookOpen, ChevronDown, ChevronRight, Lightbulb } from 'lucide-react';
 import styles from './CollapsibleSection.module.css';
@@ -30,7 +31,7 @@ export function CollapsibleSection({ type, content, defaultOpen = false }: Colla
   const Icon = config.icon;
 
   return (
-    <div className={`${styles.collapsible} ${config.variant}`}>
+    <div className={clsx(styles.collapsible, config.variant)}>
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -48,7 +49,7 @@ export function CollapsibleSection({ type, content, defaultOpen = false }: Colla
       {isOpen && (
         <div className={styles.collapsibleContent}>
           {typeof content === 'string' ? (
-            <p className={`${sharedStyles.bodyText} ${sharedStyles.bodyTextNoMargin}`}>{content}</p>
+            <p className={clsx(sharedStyles.bodyText, sharedStyles.bodyTextNoMargin)}>{content}</p>
           ) : (
             content
           )}

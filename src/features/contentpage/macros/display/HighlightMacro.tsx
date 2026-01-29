@@ -1,7 +1,7 @@
-import type { HighlightMacro as HighlightMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { MarkdownRenderer } from "../../components/MarkdownRenderer/MarkdownRenderer";
-import { getMarkdown } from "../../utils/textUtils";
+import type { HighlightMacro as HighlightMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { getMarkdown } from "@features/contentpage/utils/textUtils";
 import { Lightbulb, AlertTriangle } from "lucide-react";
 import clsx from "clsx";
 import styles from "./HighlightMacro.module.css";

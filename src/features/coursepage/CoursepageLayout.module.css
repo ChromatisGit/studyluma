@@ -41,6 +41,12 @@
   color: var(--sn-purple-accent);
 }
 
+.worksheetsTitle {
+  margin: 0 0 0.5rem;
+  font-size: var(--sn-font-size-1-6);
+  color: var(--sn-text);
+}
+
 @media screen and (max-width: 768px) {
   .courseSection {
     --sn-section-padding: 0.5rem 0 2rem;

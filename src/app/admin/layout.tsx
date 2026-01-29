@@ -1,19 +1,14 @@
 import type { ReactNode } from "react";
-import { getSession } from "@/server/auth/auth";
-import { isAdmin } from "@/domain/userTypes";
+import { getSession } from "@services/authService";
+import { isAdmin } from "@schema/userTypes";
 import { notFound } from "next/navigation";
-import { Layout } from "@components/Layout/Layout";
-import { getSidebarDTO } from "@/server/data/getSidebarDTO";
-import { signOutAction } from "@/server/auth/accessAction";
+import { Layout } from "@ui/layout/Layout";
+import { getSidebarDTO } from "@services/getSidebarDTO";
+import { logoutAction } from "@actions/logoutAction";
 
 type AdminLayoutProps = {
   children: ReactNode;
 };
-
-async function logoutAction() {
-  "use server";
-  await signOutAction();
-}
 
 export default async function AdminLayout({ children }: AdminLayoutProps) {
   const session = await getSession();

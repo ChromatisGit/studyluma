@@ -1,7 +1,7 @@
-import { RawMacro } from "../parseMacro";
-import { defineMacro } from "../macroDefinition";
+import { RawMacro } from "@pipeline/pageParser/macros/parseMacro";
+import { defineMacro } from "@pipeline/pageParser/macros/macroDefinition";
 import { Markdown } from "@schema/page";
-import { parseRawText } from "../parseRawText";
+import { parseRawText } from "@pipeline/pageParser/macros/parseRawText";
 
 export type NoteMacro = {
     type: "note",

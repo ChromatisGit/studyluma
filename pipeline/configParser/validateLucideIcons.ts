@@ -1,6 +1,6 @@
 import * as LucideIcons from "lucide-react";
-import type { ContentIssue } from "../errorHandling";
-import { issueCatalog } from "../errorHandling";
+import type { ContentIssue } from "@pipeline/errorHandling";
+import { issueCatalog } from "@pipeline/errorHandling";
 import type { GroupDefinitions } from "./schema/definitions";
 import type { YamlCoursePlan } from "./schema/yamlCoursePlan";
 

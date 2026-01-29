@@ -2,8 +2,8 @@ import { GroupDefinitions, groupDefinitionsSchema } from "./schema/definitions";
 import { CoursePlan, createCoursePlanSchema } from "./schema/coursePlan";
 import { yamlCoursePlanSchema } from "./schema/yamlCoursePlan";
 import { validateLucideIcons } from "./validateLucideIcons";
-import { getFileNames, getFolderNames, parseYamlAndValidate } from "../io";
-import { ContentError, applyContextToIssues, issuesFromZodError } from "../errorHandling";
+import { getFileNames, getFolderNames, parseYamlAndValidate } from "@pipeline/io";
+import { ContentError, applyContextToIssues, issuesFromZodError } from "@pipeline/errorHandling";
 
 export type LoadedConfigs = {
   definitions: GroupDefinitions;

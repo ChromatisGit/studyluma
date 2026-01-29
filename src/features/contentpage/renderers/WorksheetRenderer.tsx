@@ -1,7 +1,8 @@
 "use client";
 
-import type { Page, Node } from "@domain/page";
-import type { Macro } from "@domain/macroTypes";
+import clsx from "clsx";
+import type { Page, Node } from "@schema/page";
+import type { Macro } from "@schema/macroTypes";
 import { CategorySection, type Category } from "@features/contentpage/components/CategorySection/CategorySection";
 import type { InfoBlock } from "@features/contentpage/components/InfoBlock/InfoBlock";
 import type { TaskSet } from "@features/contentpage/components/Group/TaskSetComponent";
@@ -125,7 +126,7 @@ export function WorksheetRenderer({ page, className, worksheetSlug }: WorksheetR
 
   return (
     <WorksheetStorageProvider worksheetSlug={worksheetSlug} pageContent={page.content}>
-      <div className={`${styles.worksheet} ${className ?? ""}`.trim()}>
+      <div className={clsx(styles.worksheet, className)}>
         {page.title && <PageHeader title={page.title} />}
         <div className={styles.categoryList}>
           {categories.map((category, index) => (

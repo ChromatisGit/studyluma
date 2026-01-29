@@ -1,5 +1,6 @@
 'use client';
 
+import clsx from 'clsx';
 import { useState } from 'react';
 import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
 import { renderMacro } from '@features/contentpage/macros/registry';
@@ -8,8 +9,8 @@ import type { MacroRenderContext } from '@features/contentpage/macros/types';
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
 import sharedStyles from '@features/contentpage/styles/shared.module.css';
 import styles from './TaskSetComponent.module.css';
-import type { Macro } from '@domain/macroTypes';
-import type { Markdown } from '@domain/page';
+import type { Macro } from '@schema/macroTypes';
+import type { Markdown } from '@schema/page';
 import { getMarkdown } from '@features/contentpage/utils/textUtils';
 
 export interface TaskSet {
@@ -52,7 +53,7 @@ export function TaskSetComponent({ taskSet, categoryType, taskNumber }: TaskSetC
         {!taskSet.intro && showNumbering && hasMultipleTasks && (
           <div className={styles.taskIntro}>
             <TaskNumberBadge number={currentTaskNumber} />
-            <div className={`${sharedStyles.bodyText} ${styles.taskIntroText}`} aria-hidden>
+            <div className={clsx(sharedStyles.bodyText, styles.taskIntroText)} aria-hidden>
               &nbsp;
             </div>
           </div>
@@ -79,7 +80,7 @@ export function TaskSetComponent({ taskSet, categoryType, taskNumber }: TaskSetC
           return (
             <div
               key={taskKey}
-              className={`${styles.taskItem} ${onlyTask ? styles.taskItemSolo : ''}`}
+              className={clsx(styles.taskItem, onlyTask && styles.taskItemSolo)}
             >
               {showNumbering && (
                 <>

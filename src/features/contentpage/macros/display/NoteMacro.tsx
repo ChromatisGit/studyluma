@@ -1,7 +1,7 @@
-import type { NoteMacro as NoteMacroType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { MarkdownRenderer } from "../../components/MarkdownRenderer/MarkdownRenderer";
-import { getMarkdown } from "../../utils/textUtils";
+import type { NoteMacro as NoteMacroType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { getMarkdown } from "@features/contentpage/utils/textUtils";
 import { Info } from "lucide-react";
 import styles from "./NoteMacro.module.css";
 import CONTENTPAGE_TEXT from "@features/contentpage/contentpage.de.json";

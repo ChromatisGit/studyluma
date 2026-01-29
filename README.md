@@ -21,6 +21,7 @@ Inhaltlicher Umfang:
 * Fertige und stabile öffentliche Next.js-Version
 * Trennung von Code- und Inhaltsrepository
 * Hostwechsel von Cloudflare zu Vercel
+* Datenbank einrichten
 
 ---
 
@@ -35,6 +36,7 @@ Ziele:
 
 Inhaltlicher Umfang:
 
+* Dev Modus ohne Datenbank
 * Finalisierung des Typst-PDF-Formats zur Preview
 * Dokumentation der Installationsschritte
 * Anleitung zur Inhaltserstellung
@@ -65,8 +67,6 @@ Ziele:
 
 Inhaltlicher Umfang:
 
-* Einrichtung einer PostgreSQL-Datenbank
-* Account-System (Schüler/Lehrer)
 * Speicherung des Lernfortschritts
 * Verwaltung von Kursmitgliedschaften
 * Einbinden von Kursübergreifenden Prinzipien und Regeln

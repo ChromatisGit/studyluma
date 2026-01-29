@@ -1,21 +1,28 @@
 "use client";
 
+import clsx from "clsx";
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
 import { Highlight } from "prism-react-renderer";
 import { codeTheme } from "@features/contentpage/components/MarkdownRenderer/codeTheme";
-import type { GapMacro as GapMacroType, GapField as GapFieldType } from "@domain/macroTypes";
-import type { MacroComponentProps } from "../types";
-import { useWorksheetStorage } from "../../storage/WorksheetStorageContext";
+import type { GapMacro as GapMacroType, GapField as GapFieldType } from "@schema/macroTypes";
+import type { MacroComponentProps } from "@features/contentpage/macros/types";
+import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
 import styles from "./GapMacro.module.css";
+import CONTENTPAGE_TEXT from "../../contentpage.de.json";
 
 type Props = MacroComponentProps<GapMacroType>;
 
 export function GapMacro({ macro, context }: Props) {
   const storage = useWorksheetStorage();
   const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [isChecked, setIsChecked] = useState(false);
+  const [checkedGaps, setCheckedGaps] = useState<Record<number, boolean>>({});
+
+  const gapCount = macro.parts.reduce(
+    (count, part) => (part.type === "text" ? count : count + 1),
+    0
+  );
 
   // Load persisted state
   useEffect(() => {
@@ -41,12 +48,16 @@ export function GapMacro({ macro, context }: Props) {
   // Respond to check trigger
   useEffect(() => {
     if (context.checkTrigger && context.checkTrigger > 0) {
-      setIsChecked(true);
+      const nextChecked: Record<number, boolean> = {};
+      for (let index = 0; index < gapCount; index += 1) {
+        nextChecked[index] = true;
+      }
+      setCheckedGaps(nextChecked);
     }
-  }, [context.checkTrigger]);
+  }, [context.checkTrigger, gapCount]);
 
   const handleChange = (gapIndex: number, value: string) => {
-    if (isChecked) return;
+    setCheckedGaps((prev) => ({ ...prev, [gapIndex]: false }));
     setAnswers((prev) => ({ ...prev, [gapIndex]: value }));
   };
 
@@ -147,13 +158,21 @@ export function GapMacro({ macro, context }: Props) {
         // Gap field
         const currentGapIndex = gapCounter++;
         const answer = answers[currentGapIndex] ?? "";
-        const valueToCompare = part.gap.mode === "text" ? answer.toLowerCase() : answer;
+        const valueToCompare =
+          part.gap.mode === "text"
+            ? isInCodeBlock
+              ? answer.trim()
+              : answer.toLowerCase().trim()
+            : answer;
         const correctOptions =
           part.gap.mode === "text"
-            ? part.gap.correct.map((option) => option.toLowerCase())
+            ? isInCodeBlock
+              ? part.gap.correct
+              : part.gap.correct.map((option) => option.toLowerCase())
             : part.gap.correct;
         const isCorrect = correctOptions.includes(valueToCompare);
 
+        const isGapChecked = checkedGaps[currentGapIndex] ?? false;
         const gapElement = (
           <GapField
             key={`gap-${partIndex}`}
@@ -161,7 +180,7 @@ export function GapMacro({ macro, context }: Props) {
             value={answer}
             onChange={(value) => handleChange(currentGapIndex, value)}
             isInCodeBlock={isInCodeBlock}
-            isChecked={isChecked}
+            isChecked={isGapChecked}
             isCorrect={isCorrect}
           />
         );
@@ -219,16 +238,15 @@ function GapField({ gap, value, onChange, isInCodeBlock = false, isChecked = fal
   if (gap.mode === "text") {
     return (
       <span
-        className={`${styles.gapField} ${isInCodeBlock ? styles.gapInCode : ""} ${stateClass}`}
+        className={clsx(styles.gapField, isInCodeBlock && styles.gapInCode, stateClass)}
         style={widthStyle}
       >
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          disabled={isChecked}
           className={styles.gapControl}
-          placeholder="..."
+          placeholder={CONTENTPAGE_TEXT.gapTask.textPlaceholder}
         />
       </span>
     );
@@ -237,14 +255,13 @@ function GapField({ gap, value, onChange, isInCodeBlock = false, isChecked = fal
   // MCQ mode - dropdown
   return (
     <span
-      className={`${styles.gapField} ${isInCodeBlock ? styles.gapInCode : ""} ${stateClass}`}
+      className={clsx(styles.gapField, isInCodeBlock && styles.gapInCode, stateClass)}
       style={widthStyle}
     >
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        disabled={isChecked}
-        className={`${styles.gapControl} ${styles.gapSelect}`}
+        className={clsx(styles.gapControl, styles.gapSelect)}
       >
         <option value="" disabled hidden />
         {options.map((option, index) => (

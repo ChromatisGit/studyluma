@@ -23,45 +23,50 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
       "@pipeline/*": [
         "./pipeline/*"
       ],
       "@app/*": [
         "./src/app/*"
       ],
-      "@client/*": [
-        "./src/client/*"
+      "@ui/*": [
+        "./src/ui/*"
       ],
       "@components/*": [
-        "./src/components/*"
+        "./src/ui/components/*"
       ],
       "@features/*": [
         "./src/features/*"
       ],
-      "@lib/*": [
-        "./src/client/lib/*"
-      ],
       "@styles/*": [
-        "./src/client/styles/*"
-      ],
-      "@domain/*": [
-        "./src/domain/*"
+        "./src/ui/styles/*"
       ],
       "@schema/*": [
-        "./src/domain/*",
-        "./src/server/schema/*"
+        "./src/schema/*"
       ],
-      "@auth/*": [
-        "./src/server/auth/*"
+      "@actions/*": [
+        "./src/server/actions/*"
       ],
-      "@builder/*": [
-        "./src/server/builder/*"
+      "@db/*": [
+        "./src/server/db/*"
       ],
-      "@data/*": [
-        "./src/server/data/*"
+      "@repo/*": [
+        "./src/server/repo/*"
+      ],
+      "@dev/*": [
+        "./src/server/dev/*"
+      ],
+      "@providers/*": [
+        "./src/server/providers/*"
+      ],
+      "@services/*": [
+        "./src/server/services/*"
+      ],
+      "@server-lib/*": [
+        "./src/server/lib/*"
+      ],
+      "@server/config/*": [
+        "./src/server/config/*"
       ],
       "@generated/*": [
         "./.generated/*"
@@ -77,9 +82,6 @@
       ],
       "@access/*": [
         "./src/features/access/*"
-      ],
-      "@worksheet/*": [
-        "./src/features/worksheet/*"
       ]
     }
   },

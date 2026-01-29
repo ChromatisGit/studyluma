@@ -10,9 +10,10 @@ import { Input } from "@components/Input";
 import { Stack } from "@components/Stack";
 import { IconBox } from "@components/IconBox";
 import styles from "./AccessSection.module.css";
-import { useMockAuth } from "@/client/contexts/MockAuthContext";
-import { continueAccessAction } from "@/server/auth/accessAction";
+import { useMockAuth } from "@ui/contexts/MockAuthContext";
+import { continueAccessAction } from "@actions/accessActions";
 import { AccessCodeModal } from "./AccessCodeModal";
+import ACCESS_TEXT from "./access.de.json";
 
 type AccessSectionProps = {
   isCourseJoin: boolean;
@@ -98,48 +99,48 @@ export default function AccessSection({
         <header className={styles.header}>
           <IconBox icon={BookOpen} color="purple" size="lg" />
           <h1 className={styles.title}>
-            {isCourseJoin ? `Join ${courseName}` : "Welcome to StudyNode"}
+            {isCourseJoin ? ACCESS_TEXT.section.joinTitle.replace("{courseName}", courseName) : ACCESS_TEXT.section.welcomeTitle}
           </h1>
           <p className={styles.subtitle}>
             {isCourseJoin
-              ? "Enter your credentials to join this course."
-              : "Enter your credentials to continue."}
+              ? ACCESS_TEXT.section.joinSubtitle
+              : ACCESS_TEXT.section.loginSubtitle}
           </p>
         </header>
 
         <form onSubmit={handleContinue}>
           <Stack gap="md">
             <Input
-              label="Access Code"
-              hint={isCourseJoin && !currentUserAccessCode ? "(Optional)" : undefined}
+              label={ACCESS_TEXT.section.accessCodeLabel}
+              hint={isCourseJoin && !currentUserAccessCode ? ACCESS_TEXT.section.accessCodeOptional : undefined}
               value={accessCode}
               onChange={(event) => setAccessCode(event.target.value)}
               placeholder={
                 isCourseJoin && !currentUserAccessCode
-                  ? "Enter access code if you have one"
-                  : "Enter your access code"
+                  ? ACCESS_TEXT.section.accessCodePlaceholderJoin
+                  : ACCESS_TEXT.section.accessCodePlaceholder
               }
               disabled={isPending || !!currentUserAccessCode}
               helperText={
                 isCourseJoin && !currentUserAccessCode
-                  ? "If registration is open, you can use only your PIN."
+                  ? ACCESS_TEXT.section.accessCodeHelper
                   : undefined
               }
             />
 
             <Input
-              label="PIN"
+              label={ACCESS_TEXT.section.pinLabel}
               type="password"
               value={pin}
               onChange={(event) => setPin(event.target.value)}
-              placeholder="Enter your PIN"
+              placeholder={ACCESS_TEXT.section.pinPlaceholder}
               disabled={isPending}
             />
 
             {error ? <div className={styles.message}>{error}</div> : null}
 
             <Button type="submit" variant="primary" fullWidth disabled={isPending}>
-              {isPending ? "Processing..." : "Continue"}
+              {isPending ? ACCESS_TEXT.section.processing : ACCESS_TEXT.section.continueButton}
             </Button>
 
             <Button
@@ -149,12 +150,12 @@ export default function AccessSection({
               onClick={() => router.push("/")}
               disabled={isPending}
             >
-              Back to home
+              {ACCESS_TEXT.section.backToHome}
             </Button>
           </Stack>
         </form>
 
-        <p className={styles.footer}>Need help? Contact your instructor.</p>
+        <p className={styles.footer}>{ACCESS_TEXT.section.helpText}</p>
       </div>
 
       <AccessCodeModal

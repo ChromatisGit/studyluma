@@ -1,10 +1,9 @@
 import { SectionShell } from "@components/SectionShell";
 import { PageHeader } from "@components/PageHeader/PageHeader";
-import type { ProgressTopicDTO, ProgressChapterDTO } from "@domain/progressDTO";
-import Roadmap from "./components/Roadmap/Roadmap";
-import { WorksheetCards } from "./components/WorksheetCard/WorksheetCards";
+import type { ProgressTopicDTO, ProgressChapterDTO } from "@schema/progressDTO";
+import { Roadmap } from "@components/Roadmap";
+import { WorksheetCards } from "@components/WorksheetCards";
 import styles from "./CoursepageLayout.module.css";
-import sectionStyles from "@styles/sectionShell.module.css";
 import COURSEPAGE_TEXT from "@coursepage/coursepage.de.json";
 
 function findCurrentChapter(roadmap: ProgressTopicDTO[]): ProgressChapterDTO | undefined {
@@ -46,7 +45,7 @@ export function CoursepagePage({ model }: CoursepagePageProps) {
           <h3 className={styles.currentTopicTitle}>{currentChapter.label}</h3>
           {currentChapter.worksheets && currentChapter.worksheets.length > 0 ? (
             <>
-              <h2 className={sectionStyles.title}>{COURSEPAGE_TEXT.worksheets.title}</h2>
+              <h2 className={styles.worksheetsTitle}>{COURSEPAGE_TEXT.worksheets.title}</h2>
               <WorksheetCards worksheets={currentChapter.worksheets} />
             </>
           ) : null}

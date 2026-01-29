@@ -1,7 +1,7 @@
 import { WorksheetRenderer } from "@features/contentpage/renderers/WorksheetRenderer";
-import { getPage } from "@/server/data/getPage";
-import { getSession, assertCanAccessPage } from "@/server/auth/auth";
-import { getCourseId, getSubject } from "@/server/data/courses";
+import { getPage } from "@services/pageService";
+import { getSession, assertCanAccessPage } from "@services/authService";
+import { getCourseId, getSubject } from "@services/courseService";
 
 type PageParams = {
   params: Promise<{
@@ -31,3 +31,4 @@ export default async function WorksheetRoute({ params }: PageParams) {
 
   return <WorksheetRenderer page={page} worksheetSlug={`${courseId}-${topicId}-${chapterId}-${worksheetId}`} />;
 }
+

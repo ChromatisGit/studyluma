@@ -1,7 +1,7 @@
-import { ensureCourseId } from "@/server/data/courses";
-import { getCourseDTO } from "@/server/data/getCourseDTO";
-import { getProgressDTO } from "@/server/data/getProgressDTO";
-import { AdminCourseDetail } from "@/features/admin/AdminCourseDetail";
+import { ensureCourseId } from "@services/courseService";
+import { getCourseDTO } from "@services/getCourseDTO";
+import { getProgressDTO } from "@services/getProgressDTO";
+import { AdminCourseDetail } from "@features/admin/AdminCourseDetail";
 
 type PageParams = {
   params: Promise<{
@@ -24,3 +24,4 @@ export default async function AdminCourseDetailPage({ params }: PageParams) {
     />
   );
 }
+

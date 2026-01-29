@@ -1,7 +1,7 @@
 "use client";
 
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
-import type { Markdown } from "@domain/page";
+import type { Markdown } from "@schema/page";
 
 import sharedStyles from "@features/contentpage/styles/shared.module.css";
 import styles from "./InfoBlock.module.css";

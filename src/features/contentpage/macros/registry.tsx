@@ -1,4 +1,4 @@
-import type { Macro } from "@domain/macroTypes";
+import type { Macro } from "@schema/macroTypes";
 import type { MacroRenderContext } from "./types";
 import type { ComponentType } from "react";
 

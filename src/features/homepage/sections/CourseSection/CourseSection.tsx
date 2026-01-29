@@ -1,41 +1,30 @@
-import { getSession } from "@/server/auth/auth";
 import HOMEPAGE_TEXT from "@homepage/homepage.de.json";
 import { HomeSection } from "@homepage/Homepage";
-import { getCoursesByAccess } from "@/server/data/courses";
-import { getCourseDTO } from "@/server/data/getCourseDTO";
-import type { CourseDTO } from "@/domain/courseDTO";
-import { isAdmin } from "@/domain/userTypes";
+import type { CourseDTO } from "@schema/courseDTO";
 import { Stack } from "@components/Stack";
 import { CourseGroup } from "./CourseGroup";
 
-type CourseGroups = {
+export type CourseGroups = {
   public: CourseDTO[];
   accessible: CourseDTO[];
   restricted: CourseDTO[];
   hidden: CourseDTO[];
 };
 
-export async function CourseSection() {
+type CourseSectionProps = {
+  groups: CourseGroups;
+  isAdmin: boolean;
+};
+
+export function CourseSection({ groups, isAdmin }: CourseSectionProps) {
   const { courses } = HOMEPAGE_TEXT;
-  const session = await getSession();
-  const user = session?.user ?? null;
-
-  const accessGroups = getCoursesByAccess(user);
-
-  const groups: CourseGroups = {
-    public: accessGroups.public.map((courseId) => getCourseDTO(courseId)),
-    accessible: accessGroups.accessible.map((courseId) => getCourseDTO(courseId)),
-    restricted: accessGroups.restricted.map((courseId) => getCourseDTO(courseId)),
-    hidden: accessGroups.hidden.map((courseId) => getCourseDTO(courseId)),
-  }
-  const admin = user ? isAdmin(user) : false;
 
   return (
     <HomeSection id="courses" title={courses.title} subtitle={courses.subtitle}>
       <Stack gap="xl">
 
         <CourseGroup
-          title={admin ? courses.accessibleCoursesAdmin : courses.accessibleCourses}
+          title={isAdmin ? courses.accessibleCoursesAdmin : courses.accessibleCourses}
           courses={groups.accessible}
           actionLabel={courses.openActionLabel}
           accessable={true}
@@ -55,7 +44,7 @@ export async function CourseSection() {
           accessable={false}
         />
 
-        {admin && (
+        {isAdmin && (
           <CourseGroup
             title={courses.hiddenCourses}
             courses={groups.hidden}
@@ -67,3 +56,4 @@ export async function CourseSection() {
     </HomeSection>
   );
 }
+
