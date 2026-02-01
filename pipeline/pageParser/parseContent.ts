@@ -4,7 +4,7 @@ import { parseGroupMacro, parseMacro } from "./macros/parseMacro"
 import { parseAndSplitRawText } from "./macros/parseRawText"
 import { splitMacroAndText } from "./macros/splitMacroAndText"
 
-export function parseContent(content: string, protectedBlocks: ProtectedBlock[]): Section[] {
+export function parseContent(content: string, protectedBlocks: ProtectedBlock[], filePath: string): Section[] {
     const sections: Section[] = []
 
     const headerRegex = /^= (.+)$/gm
@@ -28,10 +28,10 @@ export function parseContent(content: string, protectedBlocks: ProtectedBlock[])
             }
 
             if (node.type === "group") {
-                return [parseGroupMacro(node, protectedBlocks)]
+                return [parseGroupMacro(node, protectedBlocks, filePath)]
             }
 
-            return [parseMacro(node, protectedBlocks)]
+            return [parseMacro(node, protectedBlocks, filePath)]
         })
 
         sections.push({

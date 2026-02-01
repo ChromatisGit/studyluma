@@ -8,6 +8,7 @@ import { RawMacroBlock, RawNode, splitMacroAndText } from "./splitMacroAndText";
 
 export type RawMacro = {
     type: string,
+    filePath: string,
     protectedBlocks: ProtectedBlock[],
     params?: Params,
     inlineMacros?: InlineMacros
@@ -22,7 +23,7 @@ type MacroGroup = {
 
 type InlineMacros = Record<string, RawText>
 
-export function parseGroupMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[]): MacroGroup {
+export function parseGroupMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string): MacroGroup {
     if (!node.content) {
         throw new Error("#group needs content.")
     }
@@ -50,18 +51,18 @@ export function parseGroupMacro(node: RawMacroBlock, protectedBlocks: ProtectedB
     }
 
     macroGroup.macros = groupNodes.map((node) => {
-        return parseMacro(node, protectedBlocks)
+        return parseMacro(node, protectedBlocks, filePath)
     })
 
     return macroGroup
 }
 
-export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[]): Macro {
+export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string): Macro {
     if(node.type === "group") {
         throw new Error("#group cannot be used inside another macro")
     }
 
-    const macro: RawMacro = { type: node.type, protectedBlocks };
+    const macro: RawMacro = { type: node.type, filePath, protectedBlocks };
 
     if (node.content) {
         const { inlineMacros, content } = extractInlineMacros(node.content);

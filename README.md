@@ -67,6 +67,7 @@ Ziele:
 
 Inhaltlicher Umfang:
 
+* Service Layer in Postgres integrieren
 * Speicherung des Lernfortschritts
 * Verwaltung von Kursmitgliedschaften
 * Einbinden von Kursübergreifenden Prinzipien und Regeln
@@ -78,6 +79,8 @@ Inhaltlicher Umfang:
 Mögliche Inhalte:
 
 * Practice Notes (Wiederholung mit zeitlicher Verteilung)
+
+* Klausuren erstellen
 
 * Selbstevaluation der Lernenden:
 
@@ -91,8 +94,6 @@ Mögliche Inhalte:
 * StudyNode Mailserver einrichten
 
 * Code Quality
-
-  * Zentrale Verwaltung aller UI-Textstrings
 
   * Zentrale Macro Registry
 

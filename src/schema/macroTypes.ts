@@ -29,13 +29,10 @@ export type GapField = {
   options?: string[];
 };
 
-export type GapPart =
-  | { type: "text"; content: string }
-  | { type: "gap"; gap: GapField };
-
 export type GapMacro = {
   type: "gap";
-  parts: GapPart[];
+  content: Markdown;
+  gaps: GapField[];
 };
 
 export type MathTaskMacro = {
@@ -71,6 +68,8 @@ export type TableMacro = {
 export type ImageMacro = {
   type: "image";
   source: string;
+  width: number;
+  height: number;
   size: "S" | "M" | "L";
 };
 

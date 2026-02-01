@@ -3,11 +3,12 @@ import { loadConfigs } from "./configParser/loadConfigs";
 import { buildChapterContent } from "./dataTransformer/buildChapterContent";
 import { generateCourseSQLScript } from "./dataTransformer/generateCourseSQLScript";
 import { getTopicLabels, resolveCourses } from "./dataTransformer/resolveCourses";
-import { deleteGenerated, writeJSONFile } from "./io";
+import { cleanImageOutput, deleteGenerated, writeJSONFile } from "./io";
 import { ensureDevAdminUser } from "./devAdminUser";
 
 export async function runPipeline() {
     await deleteGenerated();
+    await cleanImageOutput();
     const coursePlans = await loadConfigs()
     const pagePaths = buildPagePaths(coursePlans)
     const { pageSummaries } = await buildChapterContent(pagePaths)

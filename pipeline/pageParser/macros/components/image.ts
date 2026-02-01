@@ -1,9 +1,14 @@
+import { readFileSync } from "fs";
 import { RawMacro } from "@pipeline/pageParser/macros/parseMacro";
 import { defineMacro } from "@pipeline/pageParser/macros/macroDefinition";
+import { resolveAndCopyContentImage } from "@pipeline/io";
+import { imageSize } from "image-size";
 
 export type ImageMacro = {
     type: "image",
     source: string,
+    width: number,
+    height: number,
     size: "S" | "M" | "L"
 }
 
@@ -20,9 +25,19 @@ function parser(node: RawMacro): ImageMacro {
         source: string;
     };
 
+    if (!params.source) {
+        throw new Error("#image requires a source parameter");
+    }
+
+    const { publicUrl, absolutePath } = resolveAndCopyContentImage(params.source, node.filePath);
+    const buffer = readFileSync(absolutePath);
+    const dimensions = imageSize(buffer);
+
     return {
         type: "image",
-        source: params.source,
+        source: publicUrl,
+        width: dimensions.width ?? 0,
+        height: dimensions.height ?? 0,
         size: "L"
     }
 }

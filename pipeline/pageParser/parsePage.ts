@@ -23,7 +23,7 @@ export async function parsePage(fileName: string, contentParsing = true): Promis
     const startIndex = titleMatch.index + titleMatch[0].length;
     const rawContent = protectedContent.slice(startIndex).trim();
 
-    const content = parseContent(rawContent, protectedBlocks)
+    const content = parseContent(rawContent, protectedBlocks, fileName)
 
     return {
         title,

@@ -2,25 +2,6 @@
   line-height: 2;
 }
 
-.text {
-  color: var(--sn-text);
-  white-space: pre-wrap;
-}
-
-/* Code block styling */
-.codeBlock {
-  background: var(--sn-code-bg);
-  border: 1px solid var(--sn-code-bg-border);
-  border-radius: var(--sn-radius-md);
-  padding: var(--sn-space-md);
-  margin: var(--sn-space-sm) 0;
-  font-family: var(--sn-font-mono);
-  font-size: var(--sn-font-size-0-95);
-  line-height: 1.6;
-  overflow-x: auto;
-  color: var(--sn-code-text);
-}
-
 /* Gap field wrapper */
 .gapField {
   position: relative;

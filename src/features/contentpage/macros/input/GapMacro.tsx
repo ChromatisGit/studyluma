@@ -1,14 +1,16 @@
 "use client";
 
 import clsx from "clsx";
-import { useState, useEffect } from "react";
-import type { ReactNode } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChevronDown } from "lucide-react";
-import { Highlight } from "prism-react-renderer";
-import { codeTheme } from "@features/contentpage/components/MarkdownRenderer/codeTheme";
 import type { GapMacro as GapMacroType, GapField as GapFieldType } from "@schema/macroTypes";
 import type { MacroComponentProps } from "@features/contentpage/macros/types";
 import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
+import { getMarkdown } from "@features/contentpage/utils/textUtils";
+import {
+  GapMarkdownRenderer,
+  GapRenderProvider,
+} from "@features/contentpage/components/MarkdownRenderer/GapMarkdownRenderer";
 import styles from "./GapMacro.module.css";
 import CONTENTPAGE_TEXT from "../../contentpage.de.json";
 
@@ -19,10 +21,7 @@ export function GapMacro({ macro, context }: Props) {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [checkedGaps, setCheckedGaps] = useState<Record<number, boolean>>({});
 
-  const gapCount = macro.parts.reduce(
-    (count, part) => (part.type === "text" ? count : count + 1),
-    0
-  );
+  const gapCount = macro.gaps.length;
 
   // Load persisted state
   useEffect(() => {
@@ -61,148 +60,50 @@ export function GapMacro({ macro, context }: Props) {
     setAnswers((prev) => ({ ...prev, [gapIndex]: value }));
   };
 
-  let gapCounter = 0;
+  const renderGap = useCallback(
+    (gapIndex: number, isInCodeBlock: boolean) => {
+      const gap = macro.gaps[gapIndex];
+      if (!gap) return null;
 
-  // Process parts to handle code blocks properly
-  const renderParts = () => {
-    const elements: ReactNode[] = [];
-    let isInCodeBlock = false;
-    let codeBlockContent: ReactNode[] = [];
-    let currentLineContent: ReactNode[] = [];
-    let lineKey = 0;
+      const answer = answers[gapIndex] ?? "";
+      const valueToCompare =
+        gap.mode === "text"
+          ? isInCodeBlock
+            ? answer.trim()
+            : answer.toLowerCase().trim()
+          : answer;
+      const correctOptions =
+        gap.mode === "text"
+          ? isInCodeBlock
+            ? gap.correct
+            : gap.correct.map((o) => o.toLowerCase())
+          : gap.correct;
+      const isCorrect = correctOptions.includes(valueToCompare);
+      const isGapChecked = checkedGaps[gapIndex] ?? false;
 
-    const flushLine = () => {
-      if (currentLineContent.length === 0) return;
-
-      const lineKeyVal = lineKey++;
-      const fragments = currentLineContent;
-      currentLineContent = [];
-
-      codeBlockContent.push(
-        <div key={`line-${lineKeyVal}`}>
-          {fragments.map((frag, fragIndex) => {
-            if (typeof frag === "string") {
-              return (
-                <Highlight
-                  key={fragIndex}
-                  theme={codeTheme}
-                  code={frag}
-                  language="tsx"
-                >
-                  {({ tokens, getTokenProps }) =>
-                    tokens[0]?.map((token, tokenIndex) => (
-                      <span
-                        key={tokenIndex}
-                        {...(getTokenProps({ token }) as React.HTMLAttributes<HTMLSpanElement>)}
-                      />
-                    ))
-                  }
-                </Highlight>
-              );
-            }
-            return <span key={fragIndex}>{frag}</span>;
-          })}
-        </div>
+      return (
+        <GapField
+          gap={gap}
+          value={answer}
+          onChange={(value) => handleChange(gapIndex, value)}
+          isInCodeBlock={isInCodeBlock}
+          isChecked={isGapChecked}
+          isCorrect={isCorrect}
+        />
       );
-    };
+    },
+    [macro.gaps, answers, checkedGaps]
+  );
 
-    const flushCodeBlock = () => {
-      if (codeBlockContent.length > 0) {
-        elements.push(
-          <pre key={`code-${elements.length}`} className={styles.codeBlock}>
-            {codeBlockContent}
-          </pre>
-        );
-        codeBlockContent = [];
-      }
-    };
+  const markdown = getMarkdown(macro.content) ?? "";
 
-    macro.parts.forEach((part, partIndex) => {
-      if (part.type === "text") {
-        const lines = part.content.split("\n");
-
-        lines.forEach((line, lineIndex) => {
-          // Check for code block markers
-          if (line.trim().startsWith("```")) {
-            if (isInCodeBlock) {
-              // End of code block
-              flushLine();
-              flushCodeBlock();
-              isInCodeBlock = false;
-            } else {
-              // Start of code block
-              isInCodeBlock = true;
-            }
-            return;
-          }
-
-          if (isInCodeBlock) {
-            // Inside code block - keep even empty lines so spacing is preserved
-            currentLineContent.push(line ? line : "\u00A0");
-            if (lineIndex < lines.length - 1) {
-              flushLine();
-            }
-          } else {
-            // Regular text
-            const text = lineIndex < lines.length - 1 ? line + "\n" : line;
-            if (text) {
-              elements.push(
-                <span key={`text-${partIndex}-${lineIndex}`} className={styles.text}>
-                  {text}
-                </span>
-              );
-            }
-          }
-        });
-      } else {
-        // Gap field
-        const currentGapIndex = gapCounter++;
-        const answer = answers[currentGapIndex] ?? "";
-        const valueToCompare =
-          part.gap.mode === "text"
-            ? isInCodeBlock
-              ? answer.trim()
-              : answer.toLowerCase().trim()
-            : answer;
-        const correctOptions =
-          part.gap.mode === "text"
-            ? isInCodeBlock
-              ? part.gap.correct
-              : part.gap.correct.map((option) => option.toLowerCase())
-            : part.gap.correct;
-        const isCorrect = correctOptions.includes(valueToCompare);
-
-        const isGapChecked = checkedGaps[currentGapIndex] ?? false;
-        const gapElement = (
-          <GapField
-            key={`gap-${partIndex}`}
-            gap={part.gap}
-            value={answer}
-            onChange={(value) => handleChange(currentGapIndex, value)}
-            isInCodeBlock={isInCodeBlock}
-            isChecked={isGapChecked}
-            isCorrect={isCorrect}
-          />
-        );
-
-        if (isInCodeBlock) {
-          currentLineContent.push(gapElement);
-        } else {
-          elements.push(gapElement);
-        }
-      }
-    });
-
-    // Flush any remaining content
-    if (isInCodeBlock) {
-      flushLine();
-      flushCodeBlock();
-    }
-
-    return elements;
-  };
-
-  return <div className={styles.gap}>{renderParts()}</div>;
+  return (
+    <GapRenderProvider renderGap={renderGap}>
+      <div className={styles.gap}>
+        <GapMarkdownRenderer markdown={markdown} />
+      </div>
+    </GapRenderProvider>
+  );
 }
 
 interface GapFieldProps {

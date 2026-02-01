@@ -5,6 +5,19 @@ export function parseParams(src: string): Params {
     let i = 0;
     const len = src.length;
 
+    i = skipSeparators(src, i);
+
+    // Handle a single positional argument (a quoted string with no key)
+    if (i < len && (src[i] === '"' || src[i] === "'")) {
+        const colon = src.indexOf(":", i);
+        const quote = src[i];
+        const closeQuote = src.indexOf(quote, i + 1);
+        if (colon === -1 || (closeQuote !== -1 && closeQuote < colon)) {
+            const { value } = readValue(src, i);
+            return { _positional: value };
+        }
+    }
+
     while (i < len) {
         i = skipSeparators(src, i);
         if (i >= len) break;

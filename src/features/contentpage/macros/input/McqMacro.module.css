@@ -14,7 +14,7 @@
 
 .optionGrid {
   display: grid;
-  grid-template-columns: repeat(var(--columns, 4), 1fr);
+  grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
   gap: var(--sn-space-sm);
 }
 
@@ -36,6 +36,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   font-size: var(--sn-font-size-1-05);
+  min-width: 0;
 }
 
 .option:hover:not(:disabled) {
@@ -144,6 +145,7 @@
 .optionText {
   flex: 1;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .optionText :global(.sn-markdown),

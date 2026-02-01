@@ -10,8 +10,16 @@ export function checkParamsAndSetDefaults<
 ): Defaults {
     if (node.params == null) return { ...defaults };
 
+    const obj = { ...node.params } as Params;
 
-    const obj = node.params as Params;
+    // Map a positional argument to the single expected key
+    if ("_positional" in obj) {
+        const defaultKeys = Object.keys(defaults);
+        if (defaultKeys.length === 1) {
+            obj[defaultKeys[0]] = obj._positional;
+        }
+        delete obj._positional;
+    }
 
     for (const key of Object.keys(obj)) {
         if (!(key in defaults)) {

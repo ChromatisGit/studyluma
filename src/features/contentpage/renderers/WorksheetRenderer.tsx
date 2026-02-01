@@ -1,15 +1,17 @@
 "use client";
 
 import clsx from "clsx";
-import type { Page, Node } from "@schema/page";
+import type { Page } from "@schema/page";
 import type { Macro } from "@schema/macroTypes";
-import { CategorySection, type Category } from "@features/contentpage/components/CategorySection/CategorySection";
-import type { InfoBlock } from "@features/contentpage/components/InfoBlock/InfoBlock";
-import type { TaskSet } from "@features/contentpage/components/Group/TaskSetComponent";
+import { CategorySection, type Category, type CategoryItem } from "@features/contentpage/components/CategorySection/CategorySection";
 import { getCategoryType } from "@features/contentpage/config/categoryConfig";
 import { WorksheetStorageProvider } from "@features/contentpage/storage/WorksheetStorageContext";
 import { PageHeader } from "@components/PageHeader/PageHeader";
 import styles from "./WorksheetRenderer.module.css";
+
+const DISPLAY_MACRO_TYPES: ReadonlySet<string> = new Set([
+  'note', 'highlight', 'codeRunner', 'table', 'image',
+]);
 
 interface WorksheetRendererProps {
   page: Page;
@@ -26,67 +28,30 @@ function convertPageToCategories(page: Page): Category[] {
 
   for (const section of page.content ?? []) {
     const categoryType = getCategoryType(section.header);
+    const items: CategoryItem[] = [];
+
+    for (const node of section.content ?? []) {
+      if ('markdown' in node) {
+        items.push({ kind: 'info', title: '', text: node.markdown });
+      } else if ('type' in node && node.type === 'group') {
+        items.push({ kind: 'taskSet', intro: node.intro, tasks: node.macros });
+      } else if ('type' in node && node.type === 'subheader') {
+        items.push({ kind: 'subheader', title: node.header.markdown });
+      } else if ('type' in node && DISPLAY_MACRO_TYPES.has(node.type)) {
+        items.push({ kind: 'displayMacro', macro: node as Macro });
+      } else if ('type' in node) {
+        items.push({ kind: 'taskSet', tasks: [node as Macro] });
+      }
+    }
 
     if (categoryType === 'info') {
-      // Info category: single card with title and text
-      const textContent = extractTextFromNodes(section.content);
-      categories.push({
-        kind: 'info',
-        title: section.header,
-        text: textContent,
-      });
+      categories.push({ kind: 'info', title: section.header, items });
     } else {
-      // Task category: contains InfoBlocks and TaskSets
-      const items: Array<InfoBlock | TaskSet> = [];
-
-      for (const node of section.content ?? []) {
-        // Convert nodes to either InfoBlock or TaskSet
-        if ('markdown' in node) {
-          // Plain text becomes an info block
-          items.push({
-            kind: 'info',
-            title: '',
-            text: node.markdown,
-          });
-        } else if ('type' in node && node.type === 'group') {
-          // Group becomes a TaskSet
-          items.push({
-            kind: 'taskSet',
-            intro: node.intro,
-            tasks: node.macros,
-          });
-        } else if ('type' in node) {
-          // Single macro becomes a TaskSet with one task
-          items.push({
-            kind: 'taskSet',
-            tasks: [node as Macro],
-          });
-        }
-      }
-
-      categories.push({
-        kind: categoryType,
-        items,
-      });
+      categories.push({ kind: categoryType, items });
     }
   }
 
   return categories;
-}
-
-/**
- * Extracts text content from nodes for info categories
- */
-function extractTextFromNodes(nodes: Node[]): string {
-  return nodes
-    .map(node => {
-      if ('markdown' in node) {
-        return node.markdown;
-      }
-      return '';
-    })
-    .filter(Boolean)
-    .join('\n\n');
 }
 
 /**

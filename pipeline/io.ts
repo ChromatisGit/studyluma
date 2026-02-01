@@ -1,6 +1,7 @@
 import { Glob } from "bun";
-import { existsSync } from "fs";
+import { copyFileSync, existsSync, mkdirSync } from "fs";
 import { rm } from "fs/promises";
+import { resolve, dirname } from "path";
 import type { ZodType } from "zod";
 import {
   ContentError,
@@ -86,6 +87,51 @@ export async function writeFile(fullPath: string, content: string): Promise<void
 
 export async function deleteGenerated() {
    return rm(EXPORT_PATH, { recursive: true, force: true });
+}
+
+const IMAGE_OUTPUT_DIR = joinPath(WEBSITE_ROOT, "public", "_content", "images");
+const PROJECT_ROOT = joinPath(WEBSITE_ROOT, "..");
+
+type ResolvedImage = { publicUrl: string; absolutePath: string };
+const imageCache = new Map<string, ResolvedImage>();
+
+export async function cleanImageOutput() {
+  imageCache.clear();
+  return rm(IMAGE_OUTPUT_DIR, { recursive: true, force: true });
+}
+
+export function resolveAndCopyContentImage(source: string, typFilePath: string): ResolvedImage {
+  const cacheKey = `${source}::${typFilePath}`;
+  const cached = imageCache.get(cacheKey);
+  if (cached) return cached;
+
+  const absolutePath = resolve(
+    source.startsWith("/")
+      ? joinPath(PROJECT_ROOT, source)
+      : joinPath(SOURCE_PATH, typFilePath, "..", source)
+  );
+
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Image not found: "${source}" (resolved to ${absolutePath})`);
+  }
+
+  const outputRelPath = source.startsWith("/")
+    ? source.slice(1)
+    : joinPath(typFilePath, "..", source);
+
+  const outputPath = resolve(joinPath(IMAGE_OUTPUT_DIR, outputRelPath));
+  const outputDir = dirname(outputPath);
+
+  mkdirSync(outputDir, { recursive: true });
+  copyFileSync(absolutePath, outputPath);
+
+  const result: ResolvedImage = {
+    publicUrl: `/_content/images/${normalizeSlashes(outputRelPath)}`,
+    absolutePath,
+  };
+
+  imageCache.set(cacheKey, result);
+  return result;
 }
 
 export async function parseYamlAndValidate<T>(

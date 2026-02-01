@@ -1,4 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
+import Image from "next/image";
 import clsx from "clsx";
 import type { ImageMacro as ImageMacroType } from "@schema/macroTypes";
 import type { MacroComponentProps } from "@features/contentpage/macros/types";
@@ -17,9 +17,11 @@ export function ImageMacro({ macro }: Props) {
 
   return (
     <figure className={styles.figure}>
-      <img
+      <Image
         src={macro.source}
         alt=""
+        width={macro.width}
+        height={macro.height}
         className={clsx(styles.image, sizeClass)}
       />
     </figure>

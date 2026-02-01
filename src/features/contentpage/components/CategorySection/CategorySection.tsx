@@ -5,7 +5,8 @@ import { Info, Flag, Target, Zap } from 'lucide-react';
 import { InfoBlock } from '@features/contentpage/components/InfoBlock/InfoBlock';
 import { TaskSetComponent } from '@features/contentpage/components/Group/TaskSetComponent';
 import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
-import type { Markdown } from '@schema/page';
+import { renderMacro } from '@features/contentpage/macros/registry';
+import type { Macro } from '@schema/macroTypes';
 
 import styles from './CategorySection.module.css';
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
@@ -13,15 +14,27 @@ import sharedStyles from '@features/contentpage/styles/shared.module.css';
 import type { InfoBlock as InfoBlockType } from '@features/contentpage/components/InfoBlock/InfoBlock';
 import type { TaskSet } from '@features/contentpage/components/Group/TaskSetComponent';
 
+export type DisplayMacroItem = {
+  kind: 'displayMacro';
+  macro: Macro;
+};
+
+export type SubheaderItem = {
+  kind: 'subheader';
+  title: string;
+};
+
+export type CategoryItem = InfoBlockType | TaskSet | DisplayMacroItem | SubheaderItem;
+
 export type Category =
   | {
       kind: "info";
       title: string;
-      text: Markdown | string;
+      items: CategoryItem[];
     }
   | {
       kind: "checkpoint" | "core" | "challenge";
-      items: Array<InfoBlockType | TaskSet>;
+      items: CategoryItem[];
     };
 
 interface CategorySectionProps {
@@ -72,9 +85,26 @@ export function CategorySection({ block, categoryIndex, taskNumbers }: CategoryS
 
       {block.kind === 'info' && (
         <div className={styles.infoCard}>
-          <div className={sharedStyles.bodyText}>
-            <MarkdownRenderer markdown={typeof block.text === 'string' ? block.text : block.text.markdown} />
-          </div>
+          {block.items.map((item, index) => {
+            if (item.kind === 'info') {
+              return (
+                <div key={index} className={sharedStyles.bodyText}>
+                  <MarkdownRenderer markdown={typeof item.text === 'string' ? item.text : item.text.markdown} />
+                </div>
+              );
+            }
+            if (item.kind === 'displayMacro') {
+              return renderMacro(item.macro, { persistState: false }, index);
+            }
+            if (item.kind === 'subheader') {
+              return (
+                <h3 key={index} className={styles.subheader}>
+                  <MarkdownRenderer markdown={item.title} />
+                </h3>
+              );
+            }
+            return null;
+          })}
         </div>
       )}
 
@@ -84,15 +114,27 @@ export function CategorySection({ block, categoryIndex, taskNumbers }: CategoryS
             if (item.kind === "info") {
               return <InfoBlock key={index} info={item} />;
             }
-
-            return (
-              <TaskSetComponent
-                key={index}
-                taskSet={item}
-                categoryType={block.kind}
-                taskNumber={taskNumbers[`${categoryIndex}-${index}`]}
-              />
-            );
+            if (item.kind === "taskSet") {
+              return (
+                <TaskSetComponent
+                  key={index}
+                  taskSet={item}
+                  categoryType={block.kind}
+                  taskNumber={taskNumbers[`${categoryIndex}-${index}`]}
+                />
+              );
+            }
+            if (item.kind === 'displayMacro') {
+              return renderMacro(item.macro, { persistState: false }, index);
+            }
+            if (item.kind === 'subheader') {
+              return (
+                <h3 key={index} className={styles.subheader}>
+                  <MarkdownRenderer markdown={item.title} />
+                </h3>
+              );
+            }
+            return null;
           })}
         </div>
       )}

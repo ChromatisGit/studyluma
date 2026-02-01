@@ -2,33 +2,33 @@ import { restoreCodeBlocks } from "@pipeline/pageParser/codeBlockGuard";
 import { RawMacro } from "@pipeline/pageParser/macros/parseMacro";
 import { deterministicShuffle } from "@pipeline/pageParser/utils/simpleHash";
 import { defineMacro } from "@pipeline/pageParser/macros/macroDefinition";
+import { createMarkdown } from "@schema/page";
 
 export type GapMacro = {
     type: "gap",
-    parts: GapPart[];
+    content: ReturnType<typeof createMarkdown>;
+    gaps: GapField[];
 }
 
+type GapMode = "text" | "mcq";
+
 type GapField = {
-    mode: "text" | "mcq";
+    mode: GapMode;
     correct: string[];
     options?: string[];
 };
-
-type GapPart =
-    | { type: "text"; content: string }
-    | { type: "gap"; gap: GapField };
 
 
 export const gapMacro = defineMacro({
     type: "gap",
     parser,
     params: {
-        empty: true
+        mode: "text"
     }
 });
 
 function parser(node: RawMacro): GapMacro {
-    const params = node.params as { empty: boolean };
+    const params = node.params as { mode: GapMode };
 
     if (!node.content) {
         throw new Error("#gap requires a [ ... ]")
@@ -36,60 +36,46 @@ function parser(node: RawMacro): GapMacro {
 
     const content = restoreCodeBlocks(node.content, node.protectedBlocks).rawText;
 
-    const matches = [...content.matchAll(GAP_PLACEHOLDER_REGEX)];
-    if (matches.length === 0) {
-        throw new Error("No gaps found in gap task.");
-    }
+    const gaps: GapField[] = [];
 
-    const parts: GapPart[] = [];
-    let lastIndex = 0;
+    // Replace (( ... )) gap placeholders with Unicode sentinels and collect gap field data
+    const withSentinels = content.replace(GAP_PLACEHOLDER_REGEX, (_match, inner: string) => {
+        const index = gaps.length;
 
-    for (const match of matches) {
-        if (match.index == null) {
-            throw new Error("Expected match.index to be defined");
-        }
-
-        const matchIndex = match.index;
-
-        if (matchIndex > lastIndex) {
-            const textPart = content.slice(lastIndex, matchIndex);
-            parts.push({ type: "text", content: textPart });
-        }
-
-        const rawEntries = match[1]
+        const rawEntries = inner
             .split("|")
             .map((s) => s.trim())
             .filter(Boolean);
 
         const baseOptions = rawEntries.length ? rawEntries : [""];
 
-        const correct = params.empty ? baseOptions.map(t => t.toLowerCase()) : [baseOptions[0]];
+        const correct = params.mode === "text" ? baseOptions.map(t => t.toLowerCase()) : [baseOptions[0]];
 
-        const options = params.empty
+        const options = params.mode === "text"
             ? baseOptions
-            : deterministicShuffle(baseOptions, match[1]);
+            : deterministicShuffle(baseOptions, inner);
 
-        parts.push({
-            type: "gap",
-            gap: {
-                mode: params.empty ? "text" : "mcq",
-                correct,
-                ...(params.empty ? {} : { options }),
-            },
+        gaps.push({
+            mode: params.mode,
+            correct,
+            ...(params.mode === "text" ? {} : { options }),
         });
 
-        lastIndex = matchIndex + match[0].length;
+        return `\uFFFE${index}\uFFFE`;
+    });
+
+    if (gaps.length === 0) {
+        throw new Error("No gaps found in gap task.");
     }
 
-    if (lastIndex < content.length) {
-        const trailing = content.slice(lastIndex);
-        parts.push({ type: "text", content: trailing });
-    }
+    // Convert Typst bold syntax (*text*) to Markdown bold (**text**)
+    const markdown = withSentinels.replace(/\*(.*?)\*/g, "**$1**");
 
     return {
         type: "gap",
-        parts,
+        content: createMarkdown(markdown),
+        gaps,
     };
 }
 
-const GAP_PLACEHOLDER_REGEX = /\{\{\s*([^}]+?)\s*\}\}/g;
+const GAP_PLACEHOLDER_REGEX = /\(\(\s*([^)]+?)\s*\)\)/g;

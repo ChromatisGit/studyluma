@@ -124,7 +124,7 @@ function buildTaskKey(task: Macro, index: number) {
     case 'mcq':
       return `mcq-${normalize(getMarkdown(task.question) ?? "") || index}`;
     case 'gap':
-      return `gap-${task.parts.length}-${index}`;
+      return `gap-${task.gaps.length}-${index}`;
     case 'textTask':
     case 'mathTask':
       return `${task.type}-${normalize(getMarkdown(task.instruction) ?? "") || index}`;

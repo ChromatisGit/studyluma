@@ -103,3 +103,9 @@
   flex-direction: column;
   gap: 1.25rem;
 }
+
+.subheader {
+  font-size: var(--sn-font-size-1-4);
+  font-weight: 600;
+  margin: 0;
+}
