@@ -1,26 +1,26 @@
 {
   "section": {
-    "joinTitle": "Join {courseName}",
-    "welcomeTitle": "Welcome to StudyNode",
-    "joinSubtitle": "Enter your credentials to join this course.",
-    "loginSubtitle": "Enter your credentials to continue.",
-    "accessCodeLabel": "Access Code",
+    "joinTitle": "{courseName} beitreten",
+    "welcomeTitle": "Willkommen bei StudyNode",
+    "joinSubtitle": "Gib deine Zugangsdaten ein, um diesem Kurs beizutreten.",
+    "loginSubtitle": "Gib deine Zugangsdaten ein, um fortzufahren.",
+    "accessCodeLabel": "Zugangscode",
     "accessCodeOptional": "(Optional)",
-    "accessCodePlaceholderJoin": "Enter access code if you have one",
-    "accessCodePlaceholder": "Enter your access code",
-    "accessCodeHelper": "If registration is open, you can use only your PIN.",
+    "accessCodePlaceholderJoin": "Zugangscode eingeben, falls vorhanden",
+    "accessCodePlaceholder": "Zugangscode eingeben",
+    "accessCodeHelper": "Wenn die Registrierung offen ist, kannst du dich auch nur mit deiner PIN anmelden.",
     "pinLabel": "PIN",
-    "pinPlaceholder": "Enter your PIN",
-    "continueButton": "Continue",
-    "processing": "Processing...",
-    "backToHome": "Back to home",
-    "helpText": "Need help? Contact your instructor."
+    "pinPlaceholder": "PIN eingeben",
+    "continueButton": "Weiter",
+    "processing": "Wird verarbeitet …",
+    "backToHome": "Zur Startseite",
+    "helpText": "Brauchst du Hilfe? Wende dich an deine Lehrkraft."
   },
   "modal": {
-    "title": "Save Your Access Code",
-    "description": "You will need this code along with your PIN to log in again.",
-    "codeLabel": "Your Access Code",
-    "checkboxLabel": "I have saved my access code",
-    "continueButton": "Continue"
+    "title": "Speichere deinen Zugangscode",
+    "description": "Du benötigst diesen Code zusammen mit deiner PIN, um dich erneut anzumelden.",
+    "codeLabel": "Dein Zugangscode",
+    "checkboxLabel": "Ich habe meinen Zugangscode gespeichert",
+    "continueButton": "Weiter"
   }
 }

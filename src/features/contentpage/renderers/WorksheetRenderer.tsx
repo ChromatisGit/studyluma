@@ -2,16 +2,14 @@
 
 import clsx from "clsx";
 import type { Page } from "@schema/page";
-import type { Macro } from "@schema/macroTypes";
+import { type Macro, DISPLAY_MACRO_TYPES } from "@macros/registry";
 import { CategorySection, type Category, type CategoryItem } from "@features/contentpage/components/CategorySection/CategorySection";
-import { getCategoryType } from "@features/contentpage/config/categoryConfig";
+import { getCategoryType } from "@features/contentpage/components/CategorySection/categoryConfig";
 import { WorksheetStorageProvider } from "@features/contentpage/storage/WorksheetStorageContext";
 import { PageHeader } from "@components/PageHeader/PageHeader";
 import styles from "./WorksheetRenderer.module.css";
 
-const DISPLAY_MACRO_TYPES: ReadonlySet<string> = new Set([
-  'note', 'highlight', 'codeRunner', 'table', 'image',
-]);
+const DISPLAY_MACRO_TYPE_SET: ReadonlySet<string> = new Set(DISPLAY_MACRO_TYPES);
 
 interface WorksheetRendererProps {
   page: Page;
@@ -37,7 +35,7 @@ function convertPageToCategories(page: Page): Category[] {
         items.push({ kind: 'taskSet', intro: node.intro, tasks: node.macros });
       } else if ('type' in node && node.type === 'subheader') {
         items.push({ kind: 'subheader', title: node.header.markdown });
-      } else if ('type' in node && DISPLAY_MACRO_TYPES.has(node.type)) {
+      } else if ('type' in node && DISPLAY_MACRO_TYPE_SET.has(node.type)) {
         items.push({ kind: 'displayMacro', macro: node as Macro });
       } else if ('type' in node) {
         items.push({ kind: 'taskSet', tasks: [node as Macro] });

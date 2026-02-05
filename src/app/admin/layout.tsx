@@ -4,7 +4,7 @@ import { isAdmin } from "@schema/userTypes";
 import { notFound } from "next/navigation";
 import { Layout } from "@ui/layout/Layout";
 import { getSidebarDTO } from "@services/getSidebarDTO";
-import { logoutAction } from "@actions/logoutAction";
+import { signOutAction } from "@actions/accessActions";
 
 type AdminLayoutProps = {
   children: ReactNode;
@@ -25,7 +25,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       sidebarData={sidebarData}
       isAdmin={true}
       activeCourseLabel={null}
-      logoutAction={logoutAction}
+      signOutAction={signOutAction}
     >
       {children}
     </Layout>

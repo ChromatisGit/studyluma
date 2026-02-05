@@ -28,6 +28,7 @@ export default defineConfig([
     { type: "app", pattern: "src/app/**" },
     { type: "features", pattern: "src/features/:feature/**" },
     { type: "ui", pattern: "src/ui/**" },
+    { type: "macros", pattern: "src/macros/**" },
     { type: "schema", pattern: "src/schema/**" },
 
     { type: "server-actions", pattern: "src/server/actions/**" },
@@ -57,7 +58,7 @@ export default defineConfig([
             // -------------------------
             {
               from: "app",
-              allow: ["app", "features", "ui", "schema", "server-actions", "server-services"],
+              allow: ["app", "features", "ui", "macros", "schema", "server-actions", "server-services"],
             },
 
             // -------------------------
@@ -65,7 +66,7 @@ export default defineConfig([
             // -------------------------
             {
               from: "features",
-              allow: ["ui", "schema"],
+              allow: ["ui", "macros", "schema"],
               disallow: ["app", "server", "server-actions"],
               disallow: [["features", { feature: "!${from.feature}" }]],
             },
@@ -80,11 +81,20 @@ export default defineConfig([
             },
 
             // -------------------------
+            // macros/
+            // -------------------------
+            {
+              from: "macros",
+              allow: ["macros", "features", "ui", "schema", "pipeline"],
+              disallow: ["app", "server", "server-actions"],
+            },
+
+            // -------------------------
             // schema/ (pure types)
             // -------------------------
             {
               from: "schema",
-              allow: ["schema"],
+              allow: ["schema", "macros"],
               disallow: ["app", "features", "ui", "server", "server-actions", "pipeline"],
             },
 
@@ -165,7 +175,7 @@ export default defineConfig([
             // -------------------------
             {
               from: "pipeline",
-              allow: ["pipeline", "schema"],
+              allow: ["pipeline", "macros", "schema"],
               disallow: ["app", "features", "ui", "server", "server-actions"],
             },
           ],

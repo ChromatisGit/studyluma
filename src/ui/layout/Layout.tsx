@@ -16,7 +16,7 @@ type LayoutProps = {
   sidebarData: SidebarDTO;
   isAdmin: boolean;
   activeCourseLabel?: string | null;
-  logoutAction: () => Promise<void>;
+  signOutAction: () => Promise<void>;
   fullWidth?: boolean;
 };
 
@@ -25,7 +25,7 @@ export function Layout({
   sidebarData,
   isAdmin,
   activeCourseLabel,
-  logoutAction,
+  signOutAction,
   fullWidth = false,
 }: LayoutProps) {
   const { hasTopicContext, topic } = useRouteContext();
@@ -76,7 +76,7 @@ export function Layout({
           data={sidebarData}
           isAdmin={isAdmin}
           activeCourseLabel={activeCourseLabel}
-          logoutAction={logoutAction}
+          signOutAction={signOutAction}
         />
 
         {sidebarExists && (
@@ -101,7 +101,7 @@ export function Layout({
         data={sidebarData}
         isAdmin={isAdmin}
         activeCourseLabel={activeCourseLabel}
-        logoutAction={logoutAction}
+        signOutAction={signOutAction}
       />
 
       <div className={styles.container}>

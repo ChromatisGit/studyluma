@@ -3,15 +3,12 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
-import { renderMacro } from '@features/contentpage/macros/registry';
-import type { MacroRenderContext } from '@features/contentpage/macros/types';
+import { type Macro, type MacroRenderContext, renderMacro, buildTaskKey } from '@macros/registry';
+import type { Markdown } from '@schema/page';
 
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
-import sharedStyles from '@features/contentpage/styles/shared.module.css';
+import sharedStyles from '@features/contentpage/contentpage.module.css';;
 import styles from './TaskSetComponent.module.css';
-import type { Macro } from '@schema/macroTypes';
-import type { Markdown } from '@schema/page';
-import { getMarkdown } from '@features/contentpage/utils/textUtils';
 
 export interface TaskSet {
   kind: "taskSet";
@@ -117,23 +114,7 @@ export function TaskSetComponent({ taskSet, categoryType, taskNumber }: TaskSetC
   );
 }
 
-function buildTaskKey(task: Macro, index: number) {
-  const normalize = (value: string) => value.replace(/\s+/g, ' ').trim().slice(0, 40);
-
-  switch (task.type) {
-    case 'mcq':
-      return `mcq-${normalize(getMarkdown(task.question) ?? "") || index}`;
-    case 'gap':
-      return `gap-${task.gaps.length}-${index}`;
-    case 'textTask':
-    case 'mathTask':
-      return `${task.type}-${normalize(getMarkdown(task.instruction) ?? "") || index}`;
-    case 'codeTask':
-      return `code-${normalize(getMarkdown(task.instruction) ?? "") || index}`;
-    default:
-      return `task-${index}`;
-  }
-}
+// buildTaskKey is provided by @macros/registry
 
 function TaskRenderer({ task, triggerCheck, taskKey, taskNumber }: {
   task: Macro;

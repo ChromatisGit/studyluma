@@ -5,12 +5,11 @@ import { Info, Flag, Target, Zap } from 'lucide-react';
 import { InfoBlock } from '@features/contentpage/components/InfoBlock/InfoBlock';
 import { TaskSetComponent } from '@features/contentpage/components/Group/TaskSetComponent';
 import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
-import { renderMacro } from '@features/contentpage/macros/registry';
-import type { Macro } from '@schema/macroTypes';
+import { type Macro, renderMacro } from '@macros/registry';
 
 import styles from './CategorySection.module.css';
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
-import sharedStyles from '@features/contentpage/styles/shared.module.css';
+import sharedStyles from '@features/contentpage/contentpage.module.css';
 import type { InfoBlock as InfoBlockType } from '@features/contentpage/components/InfoBlock/InfoBlock';
 import type { TaskSet } from '@features/contentpage/components/Group/TaskSetComponent';
 

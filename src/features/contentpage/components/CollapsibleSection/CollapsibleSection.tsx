@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { BookOpen, ChevronDown, ChevronRight, Lightbulb } from 'lucide-react';
 import styles from './CollapsibleSection.module.css';
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
-import sharedStyles from '@features/contentpage/styles/shared.module.css';
+import sharedStyles from '@features/contentpage/contentpage.module.css';;
 
 interface CollapsibleSectionProps {
   type: 'hint' | 'solution';

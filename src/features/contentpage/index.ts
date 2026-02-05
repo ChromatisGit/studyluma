@@ -10,7 +10,7 @@ export { CollapsibleSection } from './components/CollapsibleSection/CollapsibleS
 export { MarkdownRenderer } from './components/MarkdownRenderer/MarkdownRenderer';
 
 // Code components (unified exports from CodeRunner)
-export { CodeEditor, CodeRunner, useTsRunner, TsWorkerProvider } from './components/CodeRunner';
+export { CodeRunner, useTsRunner, TsWorkerProvider } from './components/CodeRunner';
 export type { CodeRunnerResult, TsWorkerDiagnostic } from './components/CodeRunner';
 
 // Storage
@@ -19,7 +19,4 @@ export { WorksheetStorageProvider, useWorksheetStorage } from './storage/Workshe
 export { useTaskPersistence } from './storage/useTaskPersistence';
 
 // Config
-export { getCategoryType, type CategoryType } from './config/categoryConfig';
-
-// Utils
-export { getMarkdown } from './utils/textUtils';
+export { getCategoryType, type CategoryType } from './components/CategorySection/categoryConfig';

@@ -121,3 +121,56 @@
 .consoleError {
   color: var(--sn-red-accent-strong);
 }
+
+.editorWindow {
+  position: relative;
+  font-family: var(--sn-font-mono);
+  background: var(--sn-code-bg);
+  color: var(--sn-code-text);
+  overflow: hidden;
+  padding: 0;
+}
+
+.editorWindowBackdrop {
+  position: absolute;
+  inset: 0;
+  padding: 0.85rem 1rem;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.highlightedCode {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  line-height: 1.5;
+  font-family: var(--sn-font-mono);
+  font-size: var(--sn-font-size-0-98);
+  color: var(--sn-code-text);
+  background: transparent;
+  white-space: pre-wrap;
+}
+
+.editorTextarea {
+  position: relative;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  color: transparent;
+  border: 0;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.5;
+  font-family: var(--sn-font-mono);
+  font-size: var(--sn-font-size-0-98);
+  outline: none;
+  caret-color: var(--sn-text-on-accent);
+}
+
+.editorTextarea::selection {
+  background: var(--sn-purple-accent-selection);
+}
+
+.editorTextareaReadOnly {
+  cursor: default;
+}

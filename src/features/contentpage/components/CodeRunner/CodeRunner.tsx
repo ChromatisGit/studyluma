@@ -1,10 +1,8 @@
-"use client";
-
 import clsx from "clsx";
 import { Play } from "lucide-react";
 
 import strings from "@components/components.de.json";
-import { CodeEditor } from "@features/contentpage/components/CodeEditor/CodeEditor";
+import { EditorWindow } from "@features/contentpage/components/CodeRunner/EditorWindow";
 import type { TsWorkerDiagnostic } from "./useTsRunner";
 import styles from "./CodeRunner.module.css";
 
@@ -92,7 +90,7 @@ export function CodeRunner({
           </button>
         </div>
 
-        <CodeEditor
+        <EditorWindow
           value={code}
           onChange={onChange}
           rows={rows}

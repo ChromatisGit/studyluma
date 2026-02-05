@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { AppLink } from "@components/AppLink";
-import { useMockAuth } from "@ui/contexts/MockAuthContext";
 import { useRouteContext } from "@ui/contexts/RouteContext";
 import { useTheme } from "@ui/contexts/ThemeContext";
 import type { SidebarDTO } from "@schema/sidebarDTO";
@@ -23,7 +22,7 @@ type NavbarProps = {
   data: SidebarDTO;
   isAdmin: boolean;
   activeCourseLabel?: string | null;
-  logoutAction: () => Promise<void>;
+  signOutAction: () => Promise<void>;
 };
 
 function getCurrentRouteName({
@@ -48,10 +47,9 @@ export function Navbar({
   data,
   isAdmin,
   activeCourseLabel,
-  logoutAction,
+  signOutAction,
 }: NavbarProps) {
   const router = useRouter();
-  const { signOut } = useMockAuth();
   const { theme, toggleTheme } = useTheme();
   const routeContext = useRouteContext();
   const isMobile = useIsMobile();
@@ -71,12 +69,11 @@ export function Navbar({
   const handleLogout = () => {
     void (async () => {
       try {
-        await logoutAction();
+        await signOutAction();
       } catch {
         toast.error("Unable to log out right now.");
         return;
       }
-      signOut();
       router.refresh(); // Force server to clear session state
       router.push("/");
       toast.success("Logged out successfully");

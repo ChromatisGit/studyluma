@@ -44,6 +44,9 @@
       "@schema/*": [
         "./src/schema/*"
       ],
+      "@macros/*": [
+        "./src/macros/*"
+      ],
       "@actions/*": [
         "./src/server/actions/*"
       ],

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "@styles/globals.css";
-import { getSession } from "@services/authService";
 import { Providers } from "./providers";
 
 const themeInitScript = `
@@ -25,15 +24,13 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const session = await getSession();
-
   return (
     <html lang="de" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body>
-        <Providers initialSession={session}>{children}</Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

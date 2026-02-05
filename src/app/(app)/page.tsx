@@ -4,7 +4,7 @@ import { getSidebarDTO } from "@services/getSidebarDTO";
 import { getCoursesByAccess } from "@services/courseService";
 import { getCourseDTO } from "@services/getCourseDTO";
 import { isAdmin } from "@schema/userTypes";
-import { logoutAction } from "@actions/logoutAction";
+import { signOutAction } from "@actions/accessActions";
 
 import { About } from "@features/homepage/sections/About/About";
 import { NodeNetwork } from "@features/homepage/sections/Background/NodeNetwork";
@@ -33,7 +33,7 @@ export default async function HomePage() {
       sidebarData={sidebarData}
       isAdmin={isUserAdmin}
       activeCourseLabel={null}
-      logoutAction={logoutAction}
+      signOutAction={signOutAction}
       fullWidth
     >
       <main className={styles.page}>

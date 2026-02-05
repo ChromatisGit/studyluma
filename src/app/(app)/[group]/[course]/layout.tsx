@@ -10,7 +10,7 @@ import { getCourseId } from "@services/courseService";
 import { getCourseDTO } from "@services/getCourseDTO";
 import { getSidebarDTO } from "@services/getSidebarDTO";
 import { isAdmin } from "@schema/userTypes";
-import { logoutAction } from "@actions/logoutAction";
+import { signOutAction } from "@actions/accessActions";
 
 type CourseLayoutProps = {
   children: ReactNode;
@@ -36,7 +36,7 @@ export default async function CourseLayout({ children, params }: CourseLayoutPro
       sidebarData={sidebarData}
       isAdmin={isUserAdmin}
       activeCourseLabel={activeCourseLabel}
-      logoutAction={logoutAction}
+      signOutAction={signOutAction}
     >
       <CourseProviders>{children}</CourseProviders>
     </Layout>

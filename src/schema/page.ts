@@ -1,4 +1,4 @@
-import type { Macro } from "./macroTypes";
+import type { Macro } from "@macros/registry";
 
 export type Page = {
     title: string,

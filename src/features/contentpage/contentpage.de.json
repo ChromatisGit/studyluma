@@ -14,18 +14,5 @@
   "sections": {
     "hint": "Hinweis anzeigen",
     "solution": "Musterlösung anzeigen"
-  },
-  "highlight": {
-    "hint": "Merke",
-    "warning": "Achtung"
-  },
-  "note": {
-    "label": "Hinweis"
-  },
-  "freeResponseTask": {
-    "placeholder": "Schreibe deine Antwort hier..."
-  },
-  "gapTask": {
-    "textPlaceholder": "…"
   }
 }

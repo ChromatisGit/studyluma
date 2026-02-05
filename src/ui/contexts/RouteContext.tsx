@@ -7,7 +7,6 @@ type CourseId = string;
 
 type RouteContextValue = {
   pathname: string;
-  isAuthenticated: boolean;
   routeParam1?: string;
   routeParam2?: string;
   topic?: string;
@@ -32,7 +31,7 @@ function buildCourseId(groupKey: string, subjectKey: string): CourseId {
   return `${groupKey}-${subjectKey}`;
 }
 
-function buildRouteContext(pathname: string, isAuthenticated: boolean): RouteContextValue {
+function buildRouteContext(pathname: string): RouteContextValue {
   const segments = pathname.split("/").filter(Boolean);
   const routeParam1 = segments[0];
   const routeParam2 = segments[1];
@@ -65,7 +64,6 @@ function buildRouteContext(pathname: string, isAuthenticated: boolean): RouteCon
 
   return {
     pathname,
-    isAuthenticated,
     routeParam1,
     routeParam2,
     topic,
@@ -84,16 +82,11 @@ function buildRouteContext(pathname: string, isAuthenticated: boolean): RouteCon
 
 export function RouteProvider({
   children,
-  isAuthenticated,
 }: {
   children: ReactNode;
-  isAuthenticated: boolean;
 }) {
   const pathname = usePathname() ?? "/";
-  const value = useMemo(
-    () => buildRouteContext(pathname, isAuthenticated),
-    [pathname, isAuthenticated]
-  );
+  const value = useMemo(() => buildRouteContext(pathname), [pathname]);
 
   return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;
 }

@@ -1,0 +1,18 @@
+{
+  "note": {
+    "label": "Hinweis"
+  },
+  "highlight": {
+    "hint": "Merke",
+    "warning": "Achtung"
+  },
+  "gap": {
+    "textPlaceholder": "…"
+  },
+  "textTask": {
+    "placeholder": "Schreibe deine Antwort hier..."
+  },
+  "mathTask": {
+    "placeholder": "Schreibe deine Antwort hier..."
+  }
+}

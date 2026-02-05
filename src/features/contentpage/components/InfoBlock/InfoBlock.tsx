@@ -3,7 +3,7 @@
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
 import type { Markdown } from "@schema/page";
 
-import sharedStyles from "@features/contentpage/styles/shared.module.css";
+import sharedStyles from '@features/contentpage/contentpage.module.css';
 import styles from "./InfoBlock.module.css";
 
 export interface InfoBlock {

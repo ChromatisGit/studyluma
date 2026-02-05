@@ -3,7 +3,6 @@
 import { clearSessionCookie, setSessionCookie } from "@server-lib/auth";
 import { getSession } from "@services/authService";
 import type { User } from "@schema/userTypes";
-import type { Session } from "@schema/session";
 import { isAdmin } from "@schema/userTypes";
 import { addCourseToUser, createUser, getUserById } from "@services/userService";
 import { getAuthenticatedUser } from "@services/authService";
@@ -22,11 +21,10 @@ export type ContinueAccessInput = {
   accessCode: string;
   pin: string;
   ctx: AccessContext;
-  currentUserId?: string | null;
 };
 
 export type ContinueAccessResult =
-  | { ok: true; redirectTo: string; session: Session; accessCode?: string }
+  | { ok: true; redirectTo: string; accessCode?: string }
   | { ok: false; error: string; redirectTo?: string };
 
 // -----------------------------
@@ -46,7 +44,7 @@ const registrationClosed = () => fail("Registration window not open.", "/");
 
 async function success(user: User, redirectTo: string, accessCode?: string): Promise<ContinueAccessResult> {
   await setSessionCookie(user.id);
-  return { ok: true, redirectTo, session: { user }, accessCode };
+  return { ok: true, redirectTo, accessCode };
 }
 
 function hasCourseAccess(user: User, groupKey: string, courseId: string): boolean {
@@ -74,7 +72,7 @@ async function ensureCourseAccess(user: User, groupKey: string, courseId: string
 export async function continueAccessAction(
   input: ContinueAccessInput
 ): Promise<ContinueAccessResult> {
-  const { accessCode, pin, ctx, currentUserId } = input;
+  const { accessCode, pin, ctx } = input;
 
   const hasCode = isNonEmpty(accessCode);
   const hasPin = isNonEmpty(pin);
@@ -111,8 +109,7 @@ export async function continueAccessAction(
 
   // quick pass: already logged in + already has access => go
   const session = await getSession();
-  const currentUser =
-    session?.user ?? (currentUserId ? await getUserById(currentUserId) : null);
+  const currentUser = session?.user ?? null;
 
   if (currentUser && hasCourseAccess(currentUser, groupKey, courseId)) {
     return success(currentUser, courseRoute);

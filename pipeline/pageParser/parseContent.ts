@@ -1,7 +1,7 @@
 import { Node, Section } from "@schema/page"
 import { ProtectedBlock } from "./codeBlockGuard"
 import { parseGroupMacro, parseMacro } from "./macros/parseMacro"
-import { parseAndSplitRawText } from "./macros/parseRawText"
+import { parseAndSplitRawText } from "@pipeline/pageParser/macros/parserUtils"
 import { splitMacroAndText } from "./macros/splitMacroAndText"
 
 export function parseContent(content: string, protectedBlocks: ProtectedBlock[], filePath: string): Section[] {

@@ -74,11 +74,32 @@ Inhaltlicher Umfang:
 
 ---
 
-## Meilenstein 6+
+## Meilenstein 6: Instanz und Plattform Splitting
+
+Ziele:
+
+* Plattform von eigener Instanz splitten, sodass andere Lehrer eigene Instanz hosten können
+
+Inhaltlicher Umfang:
+
+* Homepage Elemente trennen
+* site.yml hinzufügen als allgemeine Config
+* Anleitung wie eigene Instanz auf Vercel gehostet werden kann
+
+---
+
+## Meilenstein 7+
 
 Mögliche Inhalte:
 
-* Practice Notes (Wiederholung mit zeitlicher Verteilung)
+* Aufgabenmacros erweitern (Erklärungen für weitere Aufgabentypen, Bilder in Aufgaben, weitere Aufgabentypen)
+
+* Vollwertige Mathematik-Module
+  * Freie Antwortfelder für Tablet unterstützen (#inkTask)
+  * Mathe Felder um Ergebnis zu vergleichen
+  * Möglichkeit Arbeitsblätter im PDF Format anzubieten
+
+* Practice Nodes (Wiederholung mit zeitlicher Verteilung)
 
 * Klausuren erstellen
 
@@ -88,17 +109,15 @@ Mögliche Inhalte:
   * Identifikation von Schwierigkeiten
   * Definition persönlicher Übungsziele
 
-* Vollwertige Mathematik-Module
-  * Möglichkeit Arbeitsblätter im PDF Format anzubieten
-
 * StudyNode Mailserver einrichten
 
 * Code Quality
 
-  * Zentrale Macro Registry
-
+  * Unit Tests und weitere Tests erstellen
   * Performance Check
 
 * Einmalige von Base abweichende Kursinhalte hinzufügen (PDF mit besonderen Infos, AB von Vertretungsstunde)
 
 * Eingebautes Kahoot
+
+* Weboberfläche zum Designen von ABs (generiert Typst Syntax)

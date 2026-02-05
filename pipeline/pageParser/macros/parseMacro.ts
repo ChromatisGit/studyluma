@@ -1,9 +1,10 @@
-import { Markdown } from "@schema/page";
-import { RawText } from "@pipeline/types";
-import { ProtectedBlock } from "@pipeline/pageParser/codeBlockGuard";
-import { Macro, parseMacroType } from "./macroRegistry";
+import type { Markdown } from "@schema/page";
+import type { RawText } from "@pipeline/types";
+import type { ProtectedBlock } from "@pipeline/pageParser/codeBlockGuard";
+import type { Macro } from "@macros/registry";
+import { parseMacroType } from "./macroRegistry";
 import { Params, parseParams } from "./parseParams";
-import { parseRawText } from "./parseRawText";
+import { parseRawText } from "@pipeline/pageParser/macros/parserUtils";
 import { RawMacroBlock, RawNode, splitMacroAndText } from "./splitMacroAndText";
 
 export type RawMacro = {
@@ -124,6 +125,4 @@ function assertOnlyMacroBlocks(nodes: RawNode[]): asserts nodes is RawMacroBlock
         throw new Error("Text is only allowed before macros inside a macro")
     }
 }
-
-
 

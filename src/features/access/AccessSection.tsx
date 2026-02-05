@@ -10,7 +10,6 @@ import { Input } from "@components/Input";
 import { Stack } from "@components/Stack";
 import { IconBox } from "@components/IconBox";
 import styles from "./AccessSection.module.css";
-import { useMockAuth } from "@ui/contexts/MockAuthContext";
 import { continueAccessAction } from "@actions/accessActions";
 import { AccessCodeModal } from "./AccessCodeModal";
 import ACCESS_TEXT from "./access.de.json";
@@ -42,8 +41,6 @@ export default function AccessSection({
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   const router = useRouter();
-  const auth = useMockAuth();
-
   const handleContinue = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
@@ -59,7 +56,6 @@ export default function AccessSection({
           courseRoute,
           isRegistrationOpen,
         },
-        currentUserId: auth.user?.id ?? null,
       });
 
       if (!result.ok) {
@@ -71,8 +67,6 @@ export default function AccessSection({
         toast.error(result.error);
         return;
       }
-
-      auth.setSession(result.session);
 
       // If this is a new registration, show the access code modal before redirecting
       if (result.accessCode) {

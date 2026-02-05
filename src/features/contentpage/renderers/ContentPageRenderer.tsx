@@ -3,11 +3,9 @@
 import clsx from "clsx";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
 import { PageHeader } from "@components/PageHeader/PageHeader";
-import type { Macro } from "@schema/macroTypes";
 import type { Markdown, Node, Page } from "@schema/page";
-import { getMarkdown } from "@features/contentpage/utils/textUtils";
-import { renderMacro } from "@features/contentpage/macros/registry";
-import type { MacroRenderContext } from "@features/contentpage/macros/types";
+import { getMarkdown } from "@macros/markdownParser";
+import { type Macro, type MacroRenderContext, renderMacro } from "@macros/registry";
 import styles from "./ContentPageRenderer.module.css";
 import { WorksheetCards } from "@components/WorksheetCards";
 import { WorksheetRef } from "@schema/courseContent";
