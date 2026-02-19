@@ -1,40 +1,44 @@
 {
   "dashboard": {
-    "title": "Admin Dashboard",
-    "subtitle": "Manage courses, progress, and student access",
-    "totalCourses": "Total Courses",
-    "totalStudents": "Total Students",
-    "coursesSection": "Courses",
-    "coursesDescription": "Control chapter progress and registration for each course.",
-    "manageAction": "Manage"
+    "title": "Lehrer-Dashboard",
+    "subtitle": "Kurse verwalten und Unterrichtsfolien öffnen",
+    "totalCourses": "Gesamtanzahl Kurse",
+    "totalStudents": "Gesamtanzahl Schüler",
+    "coursesSection": "Kurse",
+    "coursesDescription": "Wähle einen Kurs aus, um die Teilnehmer zu verwalten und die Unterrichtsfolien für den Unterricht zu öffnen.",
+    "manageAction": "Kurs öffnen"
   },
   "courseDetail": {
+    "slideSelection": {
+      "title": "Unterrichtsfolien",
+      "description": "Öffne die Folien des aktuellen Kapitels."
+    },
     "progressControl": {
-      "title": "Chapter Progress Control",
-      "description": "Set the current chapter for all students. Students can only see chapters up to the planned chapter.",
-      "selectChapter": "Please select a chapter",
-      "successMessage": "Progress updated successfully",
-      "updating": "Updating...",
-      "updateButton": "Update Progress"
+      "title": "Kapitelsteuerung",
+      "description": "Lege fest, bis zu welchem Kapitel die Schüler Inhalte sehen können.",
+      "selectChapter": "Kapitel auswählen",
+      "successMessage": "Kapitel erfolgreich aktualisiert",
+      "updating": "Wird aktualisiert...",
+      "updateButton": "Kapitel freigeben"
     },
     "registration": {
-      "title": "Registration Window",
-      "description": "Control when students can join this course without an access code.",
-      "statusOpen": "Registration Open",
-      "statusClosed": "Registration Closed",
-      "openMessage": "Students can join this course without an access code until",
-      "closedMessage": "Students need an access code to join this course",
-      "openButton": "Open Registration (15 min)",
-      "closeButton": "Close Registration",
-      "opening": "Opening...",
-      "closing": "Closing...",
-      "openSuccessMessage": "Registration window opened (15 minutes)",
-      "closeSuccessMessage": "Registration window closed"
+      "title": "Kursanmeldung",
+      "description": "Bestimme, ob Schüler dem Kurs aktuell ohne Zugangscode beitreten können.",
+      "statusOpen": "Anmeldung geöffnet",
+      "statusClosed": "Anmeldung geschlossen",
+      "openMessage": "Schüler können diesem Kurs ohne Zugangscode beitreten bis",
+      "closedMessage": "Für diesen Kurs ist ein Zugangscode erforderlich",
+      "openButton": "Anmeldung öffnen (15 Min.)",
+      "closeButton": "Anmeldung schließen",
+      "opening": "Wird geöffnet...",
+      "closing": "Wird geschlossen...",
+      "openSuccessMessage": "Anmeldung für 15 Minuten geöffnet",
+      "closeSuccessMessage": "Anmeldung geschlossen"
     },
     "enrolledStudents": {
-      "title": "Enrolled Students",
-      "description": "View all students enrolled in this course.",
-      "comingSoon": "Student list coming soon"
+      "title": "Teilnehmer",
+      "description": "Übersicht aller Schüler, die in diesem Kurs eingeschrieben sind.",
+      "comingSoon": "Teilnehmerliste folgt"
     }
   }
 }

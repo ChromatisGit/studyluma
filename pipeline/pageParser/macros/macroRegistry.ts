@@ -16,15 +16,18 @@ import { parser as gapParser } from "@macros/gap/parser";
 import { parser as mcqParser } from "@macros/mcq/parser";
 import { parser as codeTaskParser } from "@macros/codeTask/parser";
 import { parser as textTaskParser } from "@macros/textTask/parser";
-import { parser as mathTaskParser } from "@macros/mathTask/parser";
+import { parser as pnParser } from "@macros/pn/parser";
 
 // Import Macro type from registry (types only, no runtime deps)
 import type { Macro } from "@macros/registry";
+import type { MacroGroup } from "@schema/page";
 import type { Params } from "./parseParams";
+import type { ContentType } from "./parserUtils";
 
 type ParserDef = {
-  parser: (node: RawMacro) => Macro;
+  parser: (node: RawMacro) => Macro | MacroGroup;
   params?: Params;
+  allowedIn?: ContentType[];
 };
 
 // Parser map - explicitly typed to allow different parser types
@@ -38,12 +41,16 @@ const parserMap: Map<string, ParserDef> = new Map([
   ["mcq", mcqParser],
   ["codeTask", codeTaskParser],
   ["textTask", textTaskParser],
-  ["mathTask", mathTaskParser],
+  ["pn", pnParser],
 ] as [string, ParserDef][]);
 
-export function parseMacroType(node: RawMacro): Macro {
+export function parseMacroType(node: RawMacro, contentType?: ContentType): Macro | MacroGroup {
   const parserDef = parserMap.get(node.type);
   if (!parserDef) throw new Error(`Unknown macro: ${node.type}`);
+
+  if (contentType && parserDef.allowedIn && !parserDef.allowedIn.includes(contentType)) {
+    throw new Error(`#${node.type} cannot be used in ${contentType} content`);
+  }
 
   // Merge default params with actual params
   const mergedParams = { ...parserDef.params, ...node.params };

@@ -9,11 +9,11 @@ export const CATEGORY_HEADERS = {
   challenge: ['challenges', 'challenge'],
 } as const;
 
-export type CategoryType = 'checkpoint' | 'core' | 'challenge' | 'info';
+export type CategoryType = 'checkpoint' | 'core' | 'challenge';
 
 /**
  * Determines the category type based on a section header.
- * Returns 'info' for any header that doesn't match known categories.
+ * Returns 'core' for any header that doesn't match known categories.
  *
  * @param header - The section header text
  * @returns The category type
@@ -33,5 +33,5 @@ export function getCategoryType(header: string): CategoryType {
     return 'challenge';
   }
 
-  return 'info';
+  return 'core';
 }

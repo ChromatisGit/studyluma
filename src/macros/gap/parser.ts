@@ -65,4 +65,4 @@ export const parser = defineMacro({
 
 export const gapParser = parser;
 
-const GAP_PLACEHOLDER_REGEX = /\(\(\s*([^)]+?)\s*\)\)/g;
+const GAP_PLACEHOLDER_REGEX = /\(\(\s*([^()]+?)\s*\)\)/g;

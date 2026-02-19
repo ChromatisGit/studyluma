@@ -17,13 +17,6 @@
   gap: 1rem;
 }
 
-.categoryInfo {
-  --accent: var(--sn-purple-accent);
-  --accent-strong: var(--sn-purple-accent-strong);
-  --accent-rail: var(--sn-purple-accent-strong);
-  --accent-banner: var(--sn-purple-accent-strong);
-}
-
 .categoryCheckpoint {
   --accent: var(--sn-teal-accent);
   --accent-strong: var(--sn-teal-accent-strong);
@@ -85,17 +78,6 @@
 .categoryBannerTitle {
   margin: 0;
   font-size: var(--sn-font-size-1-1);
-}
-
-.infoCard {
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
-  padding: 1.1rem 1.2rem;
-  box-shadow: var(--sn-shadow-lw);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
 }
 
 .sectionSpacing {

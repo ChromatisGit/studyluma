@@ -1,0 +1,118 @@
+.presenter {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--sn-bg);
+  color: var(--sn-text);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-md);
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  border-bottom: 1px solid var(--sn-border);
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 0.95rem;
+  font-weight: var(--sn-font-semibold);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.slidePreview {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.currentSlide {
+  flex: 1;
+  background: var(--sn-bg);
+  border-radius: var(--sn-radius-md);
+  border: 1px solid var(--sn-border);
+  overflow: hidden;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--sn-border);
+  overflow: hidden;
+}
+
+.nextPreview {
+  padding: var(--sn-space-md);
+  border-top: 1px solid var(--sn-border);
+}
+
+.nextLabel {
+  font-size: 0.85rem;
+  font-weight: var(--sn-font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sn-text-muted);
+  margin-bottom: var(--sn-space-xs);
+}
+
+.nextTitle {
+  font-size: 0.95rem;
+  color: var(--sn-text);
+}
+
+.thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  padding: var(--sn-space-sm);
+  border-top: 1px solid var(--sn-border);
+  flex: 1;
+}
+
+.thumb {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  padding: var(--sn-space-xs) var(--sn-space-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--sn-radius-sm);
+  color: var(--sn-text);
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.thumb:hover {
+  background: var(--sn-surface);
+}
+
+.thumbActive {
+  border-color: var(--sn-purple-accent);
+  background: var(--sn-purple-accent-soft-bg);
+}
+
+.thumbNumber {
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text-muted);
+  min-width: 1.5em;
+}
+
+.thumbTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

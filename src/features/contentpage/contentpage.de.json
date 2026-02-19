@@ -3,7 +3,6 @@
     "title": "Aufgaben"
   },
   "categories": {
-    "info": "Info",
     "checkpoint": "Checkpoint",
     "core": "Aufgaben",
     "challenge": "Challenges"
@@ -14,5 +13,38 @@
   "sections": {
     "hint": "Hinweis anzeigen",
     "solution": "Musterlösung anzeigen"
+  },
+  "navigation": {
+    "previous": "Zurück",
+    "next": "Weiter",
+    "lockedTasksReason": "Bearbeite und vergleiche zuerst alle Aufgaben.",
+    "lockedCheckpointReason": "Gib zuerst deine Selbsteinschätzung ab.",
+    "nextPageTooltip": "Weiter zu Seite"
+  },
+  "trafficLight": {
+    "question": "Wie gut kamst du mit den Aufgaben zurecht?",
+    "levels": {
+      "green": "Alles selbstständig gelöst bekommen.",
+      "yellow": "Nur teilweise gelöst oder noch unsicher.",
+      "red": "Kam gar nicht zurecht."
+    },
+    "causeQuestion": "Woran hat es gelegen? (mehrere Antworten möglich)",
+    "causes": {
+      "topic": "Ich habe das Thema noch nicht ganz verstanden.",
+      "task": "Ich habe eine oder mehrere Aufgaben nicht verstanden.",
+      "approach": "Ich wusste nicht, wie ich anfangen oder vorgehen soll.",
+      "execution": "Ich muss es noch mehr üben.",
+      "mistake": "Ich verstehe nicht, was ich falsch gemacht habe.",
+      "other": "Anderes"
+    },
+    "submitButton": "Abschicken"
+  },
+  "checkpointMonitor": {
+    "sectionTitle": "Checkpoint-Ergebnisse",
+    "distribution": "Einschätzung",
+    "causes": "Ursachen",
+    "participation": "Teilnahmeübersicht",
+    "submitted": "Abgegeben",
+    "open": "Offen"
   }
 }

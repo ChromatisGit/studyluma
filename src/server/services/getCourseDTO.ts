@@ -20,6 +20,7 @@ export function getCourseDTO(courseId: CourseId): CourseDTO {
         label,
         description,
         groupKey: course.group.key,
+        subjectId: course.subject.id,
         subjectKey: course.subject.key,
         slug: course.slug,
         icon: course.icon,

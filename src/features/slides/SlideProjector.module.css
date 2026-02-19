@@ -1,0 +1,28 @@
+.projector {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--sn-bg);
+  overflow: hidden;
+  font-size: 1.5rem;
+
+  /* Scale up font-size tokens so code blocks and macros also get bigger */
+  --sn-font-size-0-75: 1.1rem;
+  --sn-font-size-0-8: 1.2rem;
+  --sn-font-size-0-85: 1.25rem;
+  --sn-font-size-0-875: 1.3rem;
+  --sn-font-size-0-9: 1.35rem;
+  --sn-font-size-0-95: 1.4rem;
+  --sn-font-size-0-98: 1.45rem;
+  --sn-font-size-1: 1.5rem;
+  --sn-font-size-1-05: 1.55rem;
+  --sn-font-size-1-1: 1.65rem;
+  --sn-font-size-1-15: 1.7rem;
+}
+
+.blackout {
+  position: fixed;
+  inset: 0;
+  background: var(--sn-surface);
+  z-index: 9999;
+}

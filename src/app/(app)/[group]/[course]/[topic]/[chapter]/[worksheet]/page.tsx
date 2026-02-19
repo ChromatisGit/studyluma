@@ -2,6 +2,7 @@ import { WorksheetRenderer } from "@features/contentpage/renderers/WorksheetRend
 import { getPage } from "@services/pageService";
 import { getSession, assertCanAccessPage } from "@services/authService";
 import { getCourseId, getSubject } from "@services/courseService";
+import { getProgressDTO } from "@services/getProgressDTO";
 
 type PageParams = {
   params: Promise<{
@@ -29,6 +30,11 @@ export default async function WorksheetRoute({ params }: PageParams) {
   const subject = getSubject(courseId)
   const page = await getPage({subject: subject.id, topicId, chapterId, worksheetId});
 
-  return <WorksheetRenderer page={page} worksheetSlug={`${courseId}-${topicId}-${chapterId}-${worksheetId}`} />;
+  const progressDTO = await getProgressDTO(courseId);
+  const topic = progressDTO.topics.find(t => t.topicId === topicId);
+  const chapter = topic?.chapters.find(c => c.chapterId === chapterId);
+  const chapterStatus = chapter?.status ?? 'finished';
+
+  return <WorksheetRenderer page={page} worksheetSlug={`${courseId}-${topicId}-${chapterId}-${worksheetId}`} chapterStatus={chapterStatus} />;
 }
 

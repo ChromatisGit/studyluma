@@ -1,0 +1,31 @@
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs, 0.25rem);
+}
+
+.deckLink {
+  display: block;
+  padding: var(--sn-space-sm, 0.5rem) var(--sn-space-md, 1rem);
+  background: var(--sn-surface-raised);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md, 8px);
+  color: var(--sn-text);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: var(--sn-font-size-0-95);
+  transition: border-color 120ms ease;
+}
+
+.deckLink:hover {
+  border-color: var(--sn-purple-accent);
+}
+
+.empty {
+  margin: 0;
+  color: var(--sn-text-muted);
+  font-style: italic;
+}

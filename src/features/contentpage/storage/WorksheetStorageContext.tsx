@@ -5,6 +5,8 @@ import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { WorksheetStorage } from './WorksheetStorage';
 import type { Section } from '@schema/page';
+import { MacroStateProvider } from '@macros/state/MacroStateContext';
+import { createWorksheetAdapter } from '@macros/state/WorksheetStorageAdapter';
 
 const WorksheetStorageContext = createContext<WorksheetStorage | null>(null);
 
@@ -62,11 +64,19 @@ export function WorksheetStorageProvider({
   const storage = manualStorage !== undefined ? manualStorage : autoStorage;
   const worksheetInstanceKey = storage?.worksheetId ?? "worksheet";
 
-  return (
+  const content = (
     <WorksheetStorageContext.Provider value={storage} key={worksheetInstanceKey}>
       {children}
     </WorksheetStorageContext.Provider>
   );
+
+  // Also provide the unified MacroStateAdapter for macros using useMacroValue
+  if (storage) {
+    const adapter = createWorksheetAdapter(storage);
+    return <MacroStateProvider adapter={adapter}>{content}</MacroStateProvider>;
+  }
+
+  return content;
 }
 
 export function useWorksheetStorage(): WorksheetStorage | null {

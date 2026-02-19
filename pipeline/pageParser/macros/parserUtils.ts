@@ -6,11 +6,14 @@ import type { RawText } from "@pipeline/types";
 import type { ProtectedBlock } from "@pipeline/pageParser/codeBlockGuard";
 import { restoreCodeBlocks } from "@pipeline/pageParser/codeBlockGuard";
 
+export type ContentType = "contentpage" | "worksheet" | "slides";
+
 export type MacroDefinition<TType extends string, TReturn> = {
   type: TType;
   parser: (node: RawMacro) => TReturn;
   inline?: InlineMacroSchema;
   params?: Params;
+  allowedIn?: ContentType[];
 };
 
 export const defineMacro = <TType extends string, TReturn>(

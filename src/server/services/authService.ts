@@ -41,6 +41,14 @@ export function assertLoggedIn(
     }
 }
 
+export function assertAdminAccess(
+    session: Session | null
+): asserts session is Session {
+    if (!session || !isAdmin(session.user)) {
+        notFound();
+    }
+}
+
 export function assertCanAccessPage(
     session: Session | null,
     groupKey: string,

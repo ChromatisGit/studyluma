@@ -1,11 +1,12 @@
 "use client";
 
 import clsx from "clsx";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { ChevronDown } from "lucide-react";
 import type { GapMacro, GapField as GapFieldType } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
+import { useMacroValue } from "@macros/state/useMacroValue";
+import { useMacroCheck } from "@macros/state/useMacroCheck";
 import { getMarkdown } from "@macros/markdownParser";
 import {
   GapMarkdownRenderer,
@@ -17,51 +18,20 @@ import MACROS_TEXT from "@macros/macros.de.json";
 type Props = MacroComponentProps<GapMacro>;
 
 export default function GapRenderer({ macro, context }: Props) {
-  const storage = useWorksheetStorage();
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useMacroValue<Record<number, string>>(context.storageKey, {});
   const [checkedGaps, setCheckedGaps] = useState<Record<number, boolean>>({});
 
   const gapCount = macro.gaps.length;
 
-  // Load persisted state
-  useEffect(() => {
-    if (context.persistState && context.storageKey && storage) {
-      const saved = storage.readResponse(context.storageKey);
-      if (saved) {
-        try {
-          setAnswers(JSON.parse(saved));
-        } catch {
-          // Invalid saved data
-        }
-      }
+  const isAttempted = Object.values(answers).some((a) => a.length > 0);
+
+  useMacroCheck(context, isAttempted, () => {
+    const nextChecked: Record<number, boolean> = {};
+    for (let index = 0; index < gapCount; index += 1) {
+      nextChecked[index] = true;
     }
-  }, [context.persistState, context.storageKey, storage]);
-
-  // Save state when it changes
-  useEffect(() => {
-    if (context.persistState && context.storageKey && storage && Object.keys(answers).length > 0) {
-      storage.saveResponse(context.storageKey, JSON.stringify(answers));
-    }
-  }, [context.persistState, context.storageKey, storage, answers]);
-
-  // Check if task was attempted (at least one gap filled)
-  const wasAttempted = Object.values(answers).some((a) => a.length > 0);
-
-  // Respond to check trigger - only if task was attempted
-  useEffect(() => {
-    if (context.checkTrigger && context.checkTrigger > 0 && wasAttempted) {
-      const nextChecked: Record<number, boolean> = {};
-      for (let index = 0; index < gapCount; index += 1) {
-        nextChecked[index] = true;
-      }
-      setCheckedGaps(nextChecked);
-    }
-  }, [context.checkTrigger, gapCount, wasAttempted]);
-
-  const handleChange = (gapIndex: number, value: string) => {
-    setCheckedGaps((prev) => ({ ...prev, [gapIndex]: false }));
-    setAnswers((prev) => ({ ...prev, [gapIndex]: value }));
-  };
+    setCheckedGaps(nextChecked);
+  });
 
   const renderGap = useCallback(
     (gapIndex: number, isInCodeBlock: boolean) => {
@@ -84,18 +54,23 @@ export default function GapRenderer({ macro, context }: Props) {
       const isCorrect = correctOptions.includes(valueToCompare);
       const isGapChecked = checkedGaps[gapIndex] ?? false;
 
+      const onChange = (value: string) => {
+        setCheckedGaps((prev) => ({ ...prev, [gapIndex]: false }));
+        setAnswers((prev) => ({ ...prev, [gapIndex]: value }));
+      };
+
       return (
         <GapField
           gap={gap}
           value={answer}
-          onChange={(value) => handleChange(gapIndex, value)}
+          onChange={onChange}
           isInCodeBlock={isInCodeBlock}
           isChecked={isGapChecked}
           isCorrect={isCorrect}
         />
       );
     },
-    [macro.gaps, answers, checkedGaps]
+    [macro.gaps, answers, checkedGaps, setAnswers]
   );
 
   const markdown = getMarkdown(macro.content) ?? "";

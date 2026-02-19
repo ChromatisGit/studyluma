@@ -1,83 +1,56 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { CodeTaskMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
 import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
 import { getMarkdown } from "@macros/markdownParser";
-import { useWorksheetStorage } from "@features/contentpage/storage/WorksheetStorageContext";
+import { useMacroValue } from "@macros/state/useMacroValue";
+import { useMacroCheck } from "@macros/state/useMacroCheck";
 import { CodeRunner, type CodeRunnerResult } from "@features/contentpage/components/CodeRunner/CodeRunner";
 import { useTsRunner } from "@features/contentpage/components/CodeRunner/useTsRunner";
 import { Stack } from "@components/Stack";
 
 type Props = MacroComponentProps<CodeTaskMacro>;
 
-function getTestResult(
-  lastPassed: boolean | null,
-  runtimeError: string | null,
-  hasValidation: boolean
-): CodeRunnerResult | null {
-  if (lastPassed === null) return null;
-
-  if (hasValidation) {
-    return lastPassed ? "success" : "failure";
-  }
-
-  // No validation: show "compiled" on success, "failure" on runtime error
-  if (runtimeError) return "failure";
-  return "compiled";
-}
-
 export default function CodeTaskRenderer({ macro, context }: Props) {
-  const storage = useWorksheetStorage();
-  const [code, setCode] = useState(macro.starter || "");
+  const [code, setCode] = useMacroValue<string>(context.storageKey, macro.starter || "");
   const [isChecked, setIsChecked] = useState(false);
+  const [isValidateRun, setIsValidateRun] = useState(false);
 
   const { isLoading, diagnostics, consoleOutput, runtimeError, hadRuntime, lastPassed, runCode } =
     useTsRunner();
 
-  // Track if task was attempted (code modified from starter)
-  const wasAttempted = code !== (macro.starter || "");
+  const isAttempted = code !== (macro.starter || "");
 
-  // Load persisted state
-  useEffect(() => {
-    if (context.persistState && context.storageKey && storage) {
-      const saved = storage.readResponse(context.storageKey);
-      if (saved) {
-        setCode(saved);
-      }
+  useMacroCheck(context, isAttempted, () => {
+    setIsChecked(true);
+    setIsValidateRun(true);
+    if (macro.validation) {
+      runCode({ code, validate: true, validation: macro.validation });
+    } else {
+      runCode({ code, validate: false });
     }
-  }, [context.persistState, context.storageKey, storage]);
-
-  // Save state when it changes
-  useEffect(() => {
-    if (context.persistState && context.storageKey && storage && code !== macro.starter) {
-      storage.saveResponse(context.storageKey, code);
-    }
-  }, [context.persistState, context.storageKey, storage, code, macro.starter]);
-
-  // Respond to check trigger - only if task was attempted
-  useEffect(() => {
-    if (context.checkTrigger && context.checkTrigger > 0 && wasAttempted) {
-      setIsChecked(true);
-      if (macro.validation) {
-        runCode({ code, validate: true, validation: macro.validation });
-      } else {
-        runCode({ code, validate: false });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context.checkTrigger]);
+  });
 
   const handleRun = () => {
+    setIsValidateRun(false);
     runCode({ code, validate: false });
   };
+
+  // Only show a pass/fail/compiled result when the run was triggered by validation.
+  // Manual runs just show raw console output with a neutral label.
+  const testResult: CodeRunnerResult | null = (() => {
+    if (!isValidateRun || lastPassed === null) return null;
+    if (macro.validation) return lastPassed ? "success" : "failure";
+    if (runtimeError) return "failure";
+    return "compiled";
+  })();
 
   const instruction = getMarkdown(macro.instruction);
   const hint = getMarkdown(macro.hint);
   const solution = getMarkdown(macro.solution);
-  const testResult = getTestResult(lastPassed, runtimeError, Boolean(macro.validation));
 
   return (
     <Stack gap="md">
@@ -98,7 +71,7 @@ export default function CodeTaskRenderer({ macro, context }: Props) {
       />
 
       {(() => {
-        const showSolution = isChecked && solution && testResult !== "failure";
+        const showSolution = isChecked && solution;
 
         if (!hint && !showSolution) return null;
 
@@ -110,7 +83,7 @@ export default function CodeTaskRenderer({ macro, context }: Props) {
             {showSolution && (
               <CollapsibleSection
                 type="solution"
-                defaultOpen={!macro.validation}
+                defaultOpen={testResult === "compiled"}
                 content={<MarkdownRenderer markdown={solution} />}
               />
             )}

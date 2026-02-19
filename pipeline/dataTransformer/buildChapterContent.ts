@@ -6,8 +6,12 @@ import { WorksheetFormat } from "@schema/course";
 import { NestedRecord, ensurePath } from "./nestedRecord";
 import { fileNameToId } from "@pipeline/pageParser/utils/fileNameToId";
 import { collectCourseIds } from "@pipeline/types";
+import type { Node, Page } from "@schema/page";
+import type { SlideDeck, Slide } from "@schema/slideTypes";
+import type { PresenterNoteMacro } from "@macros/pn/types";
 
 type WorksheetSummary = { worksheetId: string; label: string };
+type SlideSummary = { slideId: string; label: string };
 
 type SubjectId = string;
 type TopicId = string;
@@ -21,6 +25,7 @@ export type PageSummaries = NestedRecord<[SubjectId, TopicId, ChapterId], Chapte
 type ChapterSummary = {
     label: string;
     worksheets: WorksheetSummary[];
+    slides?: SlideSummary[];
 };
 
 export async function buildChapterContent(
@@ -114,7 +119,7 @@ async function processChapter(
     const overviewPath = `content/${chapterBase}/overview.typ`;
 
     try {
-        overviewPage = await parsePage(`${chapterBase}/overview.typ`);
+        overviewPage = await parsePage(`${chapterBase}/overview.typ`, true, "contentpage");
         if (!overviewPage.content || overviewPage.content.length === 0) {
             collector.addIssue(issueCatalog.emptyOverviewContent(), { ...ctx, filePath: overviewPath });
             overviewPage = null;
@@ -137,6 +142,17 @@ async function processChapter(
         ctx
     );
 
+    const slideSummaries = await processSlides(
+        {
+            subjectId,
+            topicId,
+            chapterId,
+            slidesDir: `${chapterBase}/slides`,
+        },
+        collector,
+        ctx
+    );
+
     if (!overviewPage) {
         return { chapterSummary: null, pdfConversionPaths };
     }
@@ -145,6 +161,7 @@ async function processChapter(
         chapterSummary: {
             label: overviewPage.title,
             worksheets: worksheetSummaries,
+            slides: slideSummaries.length > 0 ? slideSummaries : undefined,
         },
         pdfConversionPaths,
     };
@@ -191,7 +208,7 @@ async function processWorksheets(
         let worksheetPage: Awaited<ReturnType<typeof parsePage>>;
 
         try {
-            worksheetPage = await parsePage(sourcePath, hasWebWorksheets);
+            worksheetPage = await parsePage(sourcePath, hasWebWorksheets, "worksheet");
         } catch (err) {
             collector.add(err, { ...ctx, filePath: `content/${sourcePath}` });
             continue;
@@ -221,6 +238,86 @@ async function processWorksheets(
     }
 
     return { worksheetSummaries, pdfConversionPaths };
+}
+
+type ProcessSlidesInput = {
+    subjectId: string;
+    topicId: string;
+    chapterId: string;
+    slidesDir: string;
+};
+
+function pageToSlideDeck(page: Page): SlideDeck {
+    const slides: Slide[] = (page.content ?? []).map((section) => {
+        const content: Node[] = [];
+        const presenterNotes: Slide["presenterNotes"] = [];
+
+        for (const node of section.content) {
+            if ("type" in node && node.type === "pn") {
+                presenterNotes.push((node as PresenterNoteMacro).content);
+            } else {
+                content.push(node);
+            }
+        }
+
+        return {
+            header: section.header,
+            content,
+            presenterNotes,
+        };
+    });
+
+    return { title: page.title, slides };
+}
+
+async function processSlides(
+    input: ProcessSlidesInput,
+    collector: ContentIssueCollector,
+    ctx: {
+        subjectId: string;
+        topicId: string;
+        chapterId: string;
+        courseIds: string[];
+        basePath: string;
+    }
+): Promise<SlideSummary[]> {
+    const { subjectId, topicId, chapterId, slidesDir } = input;
+
+    let fileNames: string[] = [];
+    try {
+        fileNames = await getFileNames(slidesDir);
+    } catch {
+        return [];
+    }
+
+    const slideFileNames = fileNames.filter((f) => f.endsWith(".typ"));
+    const slideSummaries: SlideSummary[] = [];
+
+    for (const slideFileName of slideFileNames) {
+        const sourcePath = `${slidesDir}/${slideFileName}`;
+        let slidePage: Awaited<ReturnType<typeof parsePage>>;
+
+        try {
+            slidePage = await parsePage(sourcePath, true, "slides");
+        } catch (err) {
+            collector.add(err, { ...ctx, filePath: `content/${sourcePath}` });
+            continue;
+        }
+
+        if (!slidePage.content || slidePage.content.length === 0) {
+            collector.addIssue(issueCatalog.emptyOverviewContent(), { ...ctx, filePath: sourcePath });
+            continue;
+        }
+
+        const slideId = fileNameToId(slidePage.title);
+        const targetPath = `${subjectId}/${topicId}/${chapterId}/slides/${slideId}`;
+        const slideDeck = pageToSlideDeck(slidePage);
+
+        await writeJSONFile(targetPath, slideDeck);
+        slideSummaries.push({ slideId, label: slidePage.title });
+    }
+
+    return slideSummaries;
 }
 
 type FolderName = string;

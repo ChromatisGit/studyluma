@@ -3,8 +3,9 @@ import { parseContent } from "./parseContent";
 import { readTypFile } from "@pipeline/io";
 import { ContentIssueError, issueCatalog } from "@pipeline/errorHandling";
 import { Page } from "@schema/page";
+import type { ContentType } from "./macros/parserUtils";
 
-export async function parsePage(fileName: string, contentParsing = true): Promise<Page> {
+export async function parsePage(fileName: string, contentParsing = true, contentType?: ContentType): Promise<Page> {
     const fileContent = await readTypFile(fileName);
 
     const { protectedContent, protectedBlocks } = protectCodeBlocks(fileContent)
@@ -23,7 +24,7 @@ export async function parsePage(fileName: string, contentParsing = true): Promis
     const startIndex = titleMatch.index + titleMatch[0].length;
     const rawContent = protectedContent.slice(startIndex).trim();
 
-    const content = parseContent(rawContent, protectedBlocks, fileName)
+    const content = parseContent(rawContent, protectedBlocks, fileName, contentType)
 
     return {
         title,

@@ -1,0 +1,84 @@
+/* Slide frame — shared between projector and presenter */
+.slideFrame {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: var(--sn-space-lg);
+  overflow: hidden;
+}
+
+.headerBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-md);
+  padding: var(--sn-space-xs) var(--sn-space-lg);
+  background: var(--sn-purple-accent);
+  color: var(--sn-text-on-accent);
+  border-radius: var(--sn-radius-xl);
+  box-shadow: var(--sn-shadow-md);
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sn-space-xs);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--sn-radius-sm);
+}
+
+.headerTitle {
+  font-size: 1.15em;
+  font-weight: var(--sn-font-bold);
+  letter-spacing: 0.02em;
+  flex: 1;
+}
+
+.contentBox {
+  flex: 1;
+  margin-top: var(--sn-space-md);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-lg);
+  background: var(--sn-surface);
+  overflow: hidden;
+}
+
+.contentInner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sn-space-lg);
+  padding: var(--sn-space-lg) var(--sn-space-xl);
+  height: 100%;
+  font-size: 1em;
+  line-height: 1.7;
+}
+
+/* Content item styles */
+.textBlock {
+  line-height: 1.7;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-md);
+}
+
+.groupIntro {
+  margin-bottom: var(--sn-space-xs);
+}
+
+.groupTasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-md);
+}
+
+.subheader {
+  font-size: 1.15em;
+  font-weight: var(--sn-font-semibold);
+  margin-top: var(--sn-space-sm);
+}

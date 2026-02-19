@@ -1,0 +1,76 @@
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-xs);
+}
+
+.navButton {
+  padding: var(--sn-space-xs) var(--sn-space-sm);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-sm);
+  color: var(--sn-text);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.navButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.navButton:hover:not(:disabled) {
+  background: var(--sn-surface-raised);
+}
+
+.counter {
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+  min-width: 4em;
+  text-align: center;
+  color: var(--sn-text-muted);
+}
+
+.separator {
+  width: 1px;
+  height: 1.2rem;
+  background: var(--sn-border);
+  margin: 0 var(--sn-space-xs);
+}
+
+.actionButton {
+  padding: var(--sn-space-xs) var(--sn-space-sm);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-sm);
+  color: var(--sn-text);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: var(--sn-font-semibold);
+}
+
+.actionButton:hover {
+  background: var(--sn-surface-raised);
+}
+
+.actionButton.active {
+  background: var(--sn-purple-accent);
+  border-color: var(--sn-purple-accent);
+  color: var(--sn-text-on-accent);
+}
+
+.projectorButton {
+  padding: var(--sn-space-xs) var(--sn-space-md);
+  background: var(--sn-purple-accent);
+  border: 1px solid transparent;
+  border-radius: var(--sn-radius-sm);
+  color: var(--sn-text-on-accent);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: var(--sn-font-semibold);
+  margin-left: var(--sn-space-sm);
+}
+
+.projectorButton:hover {
+  opacity: 0.9;
+}

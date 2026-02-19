@@ -12,7 +12,15 @@
   margin: 0;
 }
 
+/* Row wrapping the grid + formative wrong indicator */
+.optionGridRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+}
+
 .optionGrid {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
   gap: var(--sn-space-sm);
@@ -24,6 +32,20 @@
   }
 }
 
+/* Formative mode: wrong indicator shown next to the grid */
+.wrongIndicator {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: default;
+}
+
+.wrongIcon {
+  width: var(--sn-font-size-1-75);
+  height: var(--sn-font-size-1-75);
+  color: var(--sn-red-accent);
+}
+
 .option {
   display: flex;
   align-items: center;
@@ -32,10 +54,10 @@
   border: 2px solid var(--sn-border);
   border-radius: var(--sn-radius-md);
   background: var(--sn-surface);
+  font-size: var(--sn-text-base);
   text-align: left;
   cursor: pointer;
   transition: all 0.15s ease;
-  font-size: var(--sn-font-size-1-05);
   min-width: 0;
 }
 
@@ -43,18 +65,11 @@
   border-color: var(--sn-purple-accent);
 }
 
-/* Show validation states on hover when checked */
-.option--correct:hover:disabled {
-  border-color: var(--sn-green-accent);
+.option:disabled {
+  cursor: default;
 }
 
-.option--wrong:hover:disabled {
-  border-color: var(--sn-red-accent);
-}
-
-.option--missed:hover:disabled {
-  border-color: var(--sn-green-accent);
-}
+/* ── Option state variants ── */
 
 .option--default {
   border-color: var(--sn-border);
@@ -76,13 +91,10 @@
   background: var(--sn-red-accent-soft-bg);
 }
 
+/* Missed = correct answer the user didn't select */
 .option--missed {
   border-color: var(--sn-green-accent);
   background: var(--sn-surface);
-}
-
-.option:disabled {
-  cursor: default;
 }
 
 /* Checkbox/Radio indicator */
@@ -115,16 +127,28 @@
   background: var(--sn-purple-accent);
 }
 
+.indicator--correct {
+  border-color: var(--sn-green-accent);
+  background: var(--sn-green-accent);
+}
+
+.indicator--wrong {
+  border-color: var(--sn-red-accent);
+  background: var(--sn-red-accent);
+}
+
+/* Missed: correct answer not selected — show empty green outline */
+.indicator--missed {
+  border-color: var(--sn-green-accent);
+  background: var(--sn-surface);
+}
+
 .checkbox {
   width: 12px;
   height: 12px;
   display: block;
   color: var(--sn-text-on-accent);
   stroke-width: 4;
-}
-
-.indicator--missed .checkbox {
-  color: var(--sn-green-accent);
 }
 
 .radioDot {
@@ -135,10 +159,6 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--sn-text-on-accent);
-}
-
-.indicator--missed .radioDot {
-  background: var(--sn-green-accent);
 }
 
 /* Option text */
@@ -153,33 +173,17 @@
   margin: 0;
 }
 
-/* Result icon on the right */
+/* Detailed mode: result icon at the far right of the option */
 .resultIcon {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  min-height: 20px;
+  width: var(--sn-space-md);
+  height: var(--sn-space-md);
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.resultIconSvg {
-  width: 20px;
-  height: 20px;
-  display: block;
-  stroke-width: 3;
-}
-
-.option--correct .resultIconSvg {
-  color: var(--sn-green-accent);
-}
-
-.option--wrong .resultIconSvg {
+.option--wrong .resultIcon {
   color: var(--sn-red-accent);
 }
 
-.option--missed .resultIconSvg {
+.option--missed .resultIcon {
   color: var(--sn-green-accent);
 }

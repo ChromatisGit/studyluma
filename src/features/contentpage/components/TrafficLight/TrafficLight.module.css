@@ -1,0 +1,173 @@
+.trafficLight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-md);
+  padding: var(--sn-space-lg);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  box-shadow: var(--sn-shadow-lw);
+}
+
+.question {
+  font-weight: var(--sn-font-bold);
+  color: var(--sn-text);
+  margin: 0;
+}
+
+.levelButtons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+.levelButton {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  padding: var(--sn-space-xs) var(--sn-space-md);
+  background: var(--sn-background);
+  border: 2px solid var(--sn-border);
+  border-radius: var(--sn-radius-sm);
+  cursor: pointer;
+  text-align: left;
+  font-size: var(--sn-text-base);
+  color: var(--sn-text);
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.levelButton:hover {
+  background: var(--sn-surface-raised);
+}
+
+.levelButtonSelected {
+  background: var(--sn-surface-raised);
+}
+
+.levelDot {
+  width: var(--sn-space-md);
+  height: var(--sn-space-md);
+  min-width: var(--sn-space-md);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.levelGreen .levelDot {
+  background: var(--sn-green-accent);
+}
+
+.levelYellow .levelDot {
+  background: var(--sn-yellow-accent);
+}
+
+.levelRed .levelDot {
+  background: var(--sn-red-accent);
+}
+
+.levelGreen.levelButtonSelected {
+  border-color: var(--sn-green-accent);
+}
+
+.levelYellow.levelButtonSelected {
+  border-color: var(--sn-yellow-accent-strong);
+}
+
+.levelRed.levelButtonSelected {
+  border-color: var(--sn-red-accent);
+}
+
+.causeSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
+  padding-top: var(--sn-space-xs);
+  border-top: 1px solid var(--sn-border);
+}
+
+.causeQuestion {
+  font-weight: var(--sn-font-bold);
+  color: var(--sn-text);
+  margin: 0;
+}
+
+.causeOptions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+.causeOption {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sn-space-sm);
+  cursor: pointer;
+}
+
+.causeRadioHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.causeCheckbox {
+  flex-shrink: 0;
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  border: 2px solid var(--sn-border);
+  border-radius: 3px;
+  background: var(--sn-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.causeCheckboxChecked {
+  border-color: var(--sn-purple-accent);
+  background: var(--sn-purple-accent);
+}
+
+.causeCheckboxIcon {
+  width: 14px;
+  height: 14px;
+  display: block;
+  color: var(--sn-text-on-accent);
+  stroke-width: 4;
+}
+
+.causeLabel {
+  color: var(--sn-text);
+  line-height: 1.4;
+}
+
+.submitButton {
+  align-self: flex-start;
+  padding: var(--sn-space-xs) var(--sn-space-lg);
+  background: var(--sn-purple-accent);
+  color: var(--sn-text-on-accent);
+  border: none;
+  border-radius: 999px;
+  font-weight: var(--sn-font-bold);
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+  box-shadow: var(--sn-shadow-lw);
+}
+
+.submitButton:hover:not(:disabled) {
+  background: var(--sn-purple-accent-strong);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}

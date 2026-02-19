@@ -25,7 +25,7 @@ import type { GapMacro } from "./gap/types";
 import type { McqMacro } from "./mcq/types";
 import type { CodeTaskMacro } from "./codeTask/types";
 import type { TextTaskMacro } from "./textTask/types";
-import type { MathTaskMacro } from "./mathTask/types";
+import type { PresenterNoteMacro } from "./pn/types";
 
 // ============================================================================
 // COMPONENT IMPORTS - Add new macro component imports here
@@ -40,7 +40,6 @@ import GapRenderer from "./gap/Renderer";
 import McqRenderer from "./mcq/Renderer";
 import CodeTaskRenderer from "./codeTask/Renderer";
 import TextTaskRenderer from "./textTask/Renderer";
-import MathTaskRenderer from "./mathTask/Renderer";
 
 // ============================================================================
 // MACRO TYPE (union of all macro types)
@@ -56,7 +55,7 @@ export type Macro =
   | McqMacro
   | CodeTaskMacro
   | TextTaskMacro
-  | MathTaskMacro;
+  | PresenterNoteMacro;
 
 export type MacroType = Macro["type"];
 
@@ -65,16 +64,15 @@ export type MacroType = Macro["type"];
 // ============================================================================
 
 const macros = {
-  note: { Component: NoteRenderer, category: "display" as const },
-  highlight: { Component: HighlightRenderer, category: "display" as const },
-  image: { Component: ImageRenderer, category: "display" as const },
-  table: { Component: TableRenderer, category: "display" as const },
-  codeRunner: { Component: CodeRunnerRenderer, category: "display" as const },
-  gap: { Component: GapRenderer, category: "input" as const },
-  mcq: { Component: McqRenderer, category: "input" as const },
-  codeTask: { Component: CodeTaskRenderer, category: "input" as const },
-  textTask: { Component: TextTaskRenderer, category: "input" as const },
-  mathTask: { Component: MathTaskRenderer, category: "input" as const },
+  note: { Component: NoteRenderer, category: "display" as const, state: "none" as const },
+  highlight: { Component: HighlightRenderer, category: "display" as const, state: "none" as const },
+  image: { Component: ImageRenderer, category: "display" as const, state: "none" as const },
+  table: { Component: TableRenderer, category: "display" as const, state: "none" as const },
+  codeRunner: { Component: CodeRunnerRenderer, category: "display" as const, state: "interactive" as const },
+  gap: { Component: GapRenderer, category: "input" as const, state: "interactive" as const },
+  mcq: { Component: McqRenderer, category: "input" as const, state: "interactive" as const },
+  codeTask: { Component: CodeTaskRenderer, category: "input" as const, state: "interactive" as const },
+  textTask: { Component: TextTaskRenderer, category: "input" as const, state: "interactive" as const },
 };
 
 type MacroName = keyof typeof macros;
@@ -95,6 +93,10 @@ export const INPUT_MACRO_TYPES = entries
 
 export const ALL_MACRO_TYPES = [...DISPLAY_MACRO_TYPES, ...INPUT_MACRO_TYPES];
 
+export const INTERACTIVE_MACRO_TYPES = entries
+  .filter(([, m]) => m.state === "interactive")
+  .map(([n]) => n);
+
 // ============================================================================
 // TYPE GUARDS
 // ============================================================================
@@ -102,8 +104,8 @@ export const ALL_MACRO_TYPES = [...DISPLAY_MACRO_TYPES, ...INPUT_MACRO_TYPES];
 const displaySet = new Set(DISPLAY_MACRO_TYPES);
 const inputSet = new Set(INPUT_MACRO_TYPES);
 
-export const isDisplayMacro = (m: Macro) => displaySet.has(m.type);
-export const isInputMacro = (m: Macro) => inputSet.has(m.type);
+export const isDisplayMacro = (m: Macro) => displaySet.has(m.type as MacroName);
+export const isInputMacro = (m: Macro) => inputSet.has(m.type as MacroName);
 
 // ============================================================================
 // TASK KEY BUILDER

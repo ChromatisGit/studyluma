@@ -1,7 +1,8 @@
-import { ensureCourseId } from "@services/courseService";
+import { ensureCourseId, getSubject } from "@services/courseService";
 import { getCourseDTO } from "@services/getCourseDTO";
 import { getProgressDTO } from "@services/getProgressDTO";
 import { AdminCourseDetail } from "@features/admin/AdminCourseDetail";
+import { listSlideDecks } from "@services/slideService";
 
 type PageParams = {
   params: Promise<{
@@ -16,11 +17,19 @@ export default async function AdminCourseDetailPage({ params }: PageParams) {
   const course = getCourseDTO(validCourseId);
   const progress = await getProgressDTO(validCourseId);
 
+    const subject = getSubject(courseId);
+    const slideIds = await listSlideDecks({
+      subject: subject.id,
+      topicId: progress.currentTopicId,
+      chapterId: progress.currentChapterId,
+    });
+
   return (
     <AdminCourseDetail
       course={course}
       progress={progress}
       courseId={validCourseId}
+      slideIds={slideIds}
     />
   );
 }

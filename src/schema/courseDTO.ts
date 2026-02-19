@@ -3,6 +3,7 @@ export type CourseDTO = {
     label: string;
     description: string;
     groupKey: string;
+    subjectId: string;
     subjectKey: string;
     slug: string;
     icon?: string;

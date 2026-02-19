@@ -1,4 +1,5 @@
 import type { Section } from '@schema/page';
+import type { CheckpointResponse } from '@schema/checkpointTypes';
 
 type TaskResponseEntry = {
   value: string;
@@ -11,6 +12,7 @@ type WorksheetRecord = {
   createdAt: number;
   lastAccessed: number;
   responses: Record<string, TaskResponseEntry>;
+  checkpoints: Record<number, CheckpointResponse>;
 };
 
 type StorageState = {
@@ -102,6 +104,20 @@ export class WorksheetStorage {
     WorksheetStorage.persist(state);
   }
 
+  readCheckpoint(sectionIndex: number): CheckpointResponse | null {
+    if (!WorksheetStorage.isAvailable()) return null;
+    const { state, record } = this.ensureRecord();
+    WorksheetStorage.persist(state);
+    return record.checkpoints[sectionIndex] ?? null;
+  }
+
+  saveCheckpoint(sectionIndex: number, response: CheckpointResponse): void {
+    if (!WorksheetStorage.isAvailable()) return;
+    const { state, record } = this.ensureRecord();
+    record.checkpoints[sectionIndex] = response;
+    WorksheetStorage.persist(state);
+  }
+
   clearAll(): void {
     if (!WorksheetStorage.isAvailable()) return;
     const state = WorksheetStorage.loadState();
@@ -135,6 +151,7 @@ export class WorksheetStorage {
       createdAt: timestamp,
       lastAccessed: timestamp,
       responses: {},
+      checkpoints: {},
     };
   }
 
@@ -151,6 +168,12 @@ export class WorksheetStorage {
     try {
       const parsed = JSON.parse(raw) as StorageState;
       if (parsed && parsed.version === 1 && parsed.worksheets) {
+        // Migrate existing records that lack checkpoints field
+        for (const record of Object.values(parsed.worksheets)) {
+          if (record && !record.checkpoints) {
+            record.checkpoints = {};
+          }
+        }
         return {
           version: 1,
           worksheets: parsed.worksheets,

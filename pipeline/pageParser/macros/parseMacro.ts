@@ -4,7 +4,7 @@ import type { ProtectedBlock } from "@pipeline/pageParser/codeBlockGuard";
 import type { Macro } from "@macros/registry";
 import { parseMacroType } from "./macroRegistry";
 import { Params, parseParams } from "./parseParams";
-import { parseRawText } from "@pipeline/pageParser/macros/parserUtils";
+import { parseRawText, type ContentType } from "@pipeline/pageParser/macros/parserUtils";
 import { RawMacroBlock, RawNode, splitMacroAndText } from "./splitMacroAndText";
 
 export type RawMacro = {
@@ -24,7 +24,7 @@ type MacroGroup = {
 
 type InlineMacros = Record<string, RawText>
 
-export function parseGroupMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string): MacroGroup {
+export function parseGroupMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string, contentType?: ContentType): MacroGroup {
     if (!node.content) {
         throw new Error("#group needs content.")
     }
@@ -51,14 +51,16 @@ export function parseGroupMacro(node: RawMacroBlock, protectedBlocks: ProtectedB
         throw new Error("#group needs at least 1 task macro")
     }
 
-    macroGroup.macros = groupNodes.map((node) => {
-        return parseMacro(node, protectedBlocks, filePath)
+    macroGroup.macros = groupNodes.flatMap((node) => {
+        const result = parseMacro(node, protectedBlocks, filePath, contentType)
+        if (result.type === "group") return result.macros
+        return [result]
     })
 
     return macroGroup
 }
 
-export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string): Macro {
+export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string, contentType?: ContentType): Macro | MacroGroup {
     if(node.type === "group") {
         throw new Error("#group cannot be used inside another macro")
     }
@@ -83,7 +85,7 @@ export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[
         }
     }
 
-    return parseMacroType(macro);
+    return parseMacroType(macro, contentType);
 }
 
 

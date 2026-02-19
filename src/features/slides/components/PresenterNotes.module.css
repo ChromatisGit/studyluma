@@ -1,0 +1,25 @@
+.notes {
+  padding: var(--sn-space-md);
+  border-top: 1px solid var(--sn-border);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: var(--sn-font-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sn-text-muted);
+  margin-bottom: var(--sn-space-sm);
+}
+
+.noteItem {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--sn-text);
+}
+
+.noteItem + .noteItem {
+  margin-top: var(--sn-space-sm);
+}

@@ -1,10 +1,10 @@
 import { Node, Section } from "@schema/page"
 import { ProtectedBlock } from "./codeBlockGuard"
 import { parseGroupMacro, parseMacro } from "./macros/parseMacro"
-import { parseAndSplitRawText } from "@pipeline/pageParser/macros/parserUtils"
+import { parseAndSplitRawText, type ContentType } from "@pipeline/pageParser/macros/parserUtils"
 import { splitMacroAndText } from "./macros/splitMacroAndText"
 
-export function parseContent(content: string, protectedBlocks: ProtectedBlock[], filePath: string): Section[] {
+export function parseContent(content: string, protectedBlocks: ProtectedBlock[], filePath: string, contentType?: ContentType): Section[] {
     const sections: Section[] = []
 
     const headerRegex = /^= (.+)$/gm
@@ -28,10 +28,10 @@ export function parseContent(content: string, protectedBlocks: ProtectedBlock[],
             }
 
             if (node.type === "group") {
-                return [parseGroupMacro(node, protectedBlocks, filePath)]
+                return [parseGroupMacro(node, protectedBlocks, filePath, contentType)]
             }
 
-            return [parseMacro(node, protectedBlocks, filePath)]
+            return [parseMacro(node, protectedBlocks, filePath, contentType)]
         })
 
         sections.push({

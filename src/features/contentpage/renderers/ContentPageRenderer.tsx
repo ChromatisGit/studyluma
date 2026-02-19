@@ -16,10 +16,7 @@ type ContentPageRendererProps = Page & {
   className?: string;
 };
 
-// Context for content page - no state persistence
-const contentContext: MacroRenderContext = {
-  persistState: false,
-};
+const contentContext: MacroRenderContext = {};
 
 function renderTextBlock(text: string, key?: string | number) {
   return (

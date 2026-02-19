@@ -9,14 +9,16 @@ import { ProgressControl } from "./ProgressControl";
 import { RegistrationControl } from "./RegistrationControl";
 import styles from "./AdminCourseDetail.module.css";
 import ADMIN_TEXT from "./admin.de.json";
+import { SlideSelection } from "@features/slides/SlideSelection";
 
 type AdminCourseDetailProps = {
   course: CourseDTO;
   progress: ProgressDTO;
   courseId: CourseId;
+  slideIds: string[];
 };
 
-export function AdminCourseDetail({ course, progress, courseId }: AdminCourseDetailProps) {
+export function AdminCourseDetail({ course, progress, courseId, slideIds }: AdminCourseDetailProps) {
   const courseUrl = `/${course.groupKey}/${course.subjectKey}`;
 
   return (
@@ -48,6 +50,23 @@ export function AdminCourseDetail({ course, progress, courseId }: AdminCourseDet
 
       {/* Sections */}
       <div className={styles.sections}>
+
+        {/* Slide Selection Section */}
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            {ADMIN_TEXT.courseDetail.slideSelection.title}
+          </h2>
+          <p className={styles.sectionDescription}>
+            {ADMIN_TEXT.courseDetail.slideSelection.description}
+          </p>
+          <SlideSelection
+            subjectId={course.subjectId}
+            topicId={progress.currentTopicId}
+            chapterId={progress.currentChapterId}
+            slideIds={slideIds}
+          />
+        </section>
+
         {/* Progress Control Section */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>{ADMIN_TEXT.courseDetail.progressControl.title}</h2>

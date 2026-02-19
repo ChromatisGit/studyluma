@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BookOpen, ChevronDown, ChevronRight, Lightbulb } from 'lucide-react';
 import styles from './CollapsibleSection.module.css';
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
@@ -15,6 +15,10 @@ interface CollapsibleSectionProps {
 
 export function CollapsibleSection({ type, content, defaultOpen = false }: CollapsibleSectionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    if (defaultOpen) setIsOpen(true);
+  }, [defaultOpen]);
 
   const config = type === 'hint'
     ? {
