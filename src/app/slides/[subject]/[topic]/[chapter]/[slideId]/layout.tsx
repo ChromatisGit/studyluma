@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { getSession, assertAdminAccess } from "@services/authService";
 import { Layout } from "@ui/layout/Layout";
 import { TsWorkerProvider } from "@features/contentpage";
-import { getSidebarDTO } from "@services/getSidebarDTO";
+import { getSidebarDTO } from "@services/courseService";
 import { signOutAction } from "@actions/accessActions";
 
 export const dynamic = "force-dynamic";

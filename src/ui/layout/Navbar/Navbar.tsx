@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { AppLink } from "@components/AppLink";
 import { useRouteContext } from "@ui/contexts/RouteContext";
 import { useTheme } from "@ui/contexts/ThemeContext";
-import type { SidebarDTO } from "@schema/sidebarDTO";
+import type { SidebarDTO } from "@schema/courseTypes";
 
 import { NavbarDesktopLinks } from "./NavbarDesktopLinks";
 import { NavbarProfileDropdown } from "./NavbarProfileDropdown";
@@ -54,7 +54,9 @@ export function Navbar({
   const routeContext = useRouteContext();
   const isMobile = useIsMobile();
 
-  const activeCourseId = routeContext.courseId ?? null;
+  const isAdminView = routeContext.isAdminView;
+  const adminCourseId = routeContext.adminCourseId ?? null;
+  const activeCourseId = isAdminView ? adminCourseId : (routeContext.courseId ?? null);
   const currentRouteName = getCurrentRouteName({
     isHome: routeContext.isHome,
     isPrinciples: routeContext.isPrinciples,
@@ -63,8 +65,24 @@ export function Navbar({
 
   const showHamburger = isMobile || routeContext.hasTopicContext;
 
-  // Admin panel link: go to course-specific admin if in a course, otherwise general admin
-  const adminPanelLink = activeCourseId ? `/admin/${activeCourseId}` : "/admin";
+  // Admin panel link logic:
+  // - In admin course view: go back to the course page
+  // - In admin overview: stay at /admin
+  // - In slide view (topic context): go to general /admin
+  // - In regular course view: go to course-specific admin
+  let adminPanelLink: string;
+  if (isAdminView) {
+    if (adminCourseId) {
+      const course = data.courses.find((c) => c.id === adminCourseId);
+      adminPanelLink = course ? course.href : "/admin";
+    } else {
+      adminPanelLink = "/admin";
+    }
+  } else if (routeContext.hasTopicContext) {
+    adminPanelLink = "/admin";
+  } else {
+    adminPanelLink = activeCourseId ? `/admin/${activeCourseId}` : "/admin";
+  }
 
   const handleLogout = () => {
     void (async () => {
@@ -74,7 +92,6 @@ export function Navbar({
         toast.error("Unable to log out right now.");
         return;
       }
-      router.refresh(); // Force server to clear session state
       router.push("/");
       toast.success("Logged out successfully");
     })();

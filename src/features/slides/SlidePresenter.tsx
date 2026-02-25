@@ -35,6 +35,7 @@ export function SlidePresenter({
 
   const { postMessage } = useSlideBroadcast({
     channelName,
+    role: "presenter",
     onMessage: (msg: SlideMessage) => {
       if (msg.type === "SYNC_REQUEST") {
         postMessage({

@@ -1,8 +1,9 @@
 import { Layout } from "@ui/layout/Layout";
 import { PageHeader } from "@components/PageHeader/PageHeader";
+import { notFound } from "next/navigation";
 import { getSession } from "@services/authService";
-import { getSidebarDTO } from "@services/getSidebarDTO";
-import { isAdmin } from "@schema/userTypes";
+import { getSidebarDTO } from "@services/courseService";
+import { isAdmin } from "@services/authService";
 import { signOutAction } from "@actions/accessActions";
 
 type PageParams = {
@@ -13,6 +14,7 @@ type PageParams = {
 
 export default async function GroupOverviewPage({ params }: PageParams) {
   const { group } = await params;
+  if (group.includes(".")) notFound();
 
   const session = await getSession();
   const user = session?.user ?? null;

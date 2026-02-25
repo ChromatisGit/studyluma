@@ -2,8 +2,16 @@
   "note": {
     "label": "Hinweis"
   },
-  "highlight": {
-    "hint": "Merke",
+  "card": {
+    "definition": "Definition",
+    "concept": "Konzept",
+    "example": "Beispiel",
+    "check": "Analyse",
+    "prompt": "Frage",
+    "task": "Aufgabe",
+    "highlight": "Merke",
+    "recap": "Zusammenfassung",
+    "remember": "Wichtig",
     "warning": "Achtung"
   },
   "gap": {

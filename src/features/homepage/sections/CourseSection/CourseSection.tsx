@@ -1,6 +1,6 @@
 import HOMEPAGE_TEXT from "@homepage/homepage.de.json";
 import { HomeSection } from "@homepage/Homepage";
-import type { CourseDTO } from "@schema/courseDTO";
+import type { CourseDTO } from "@schema/courseTypes";
 import { Stack } from "@components/Stack";
 import { CourseGroup } from "./CourseGroup";
 

@@ -4,7 +4,14 @@ import type { Node } from "@schema/page";
 import { type Macro, type MacroRenderContext, renderMacro } from "@macros/registry";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
+import type { LayoutName } from "@macros/layout/types";
 import styles from "./SlideRenderer.module.css";
+
+const LAYOUT_CLASS: Partial<Record<LayoutName, string>> = {
+  statement: styles.layoutStatement,
+  code: styles.layoutCode,
+  section: styles.layoutSection,
+};
 
 type SlideRendererProps = {
   header: string;
@@ -74,6 +81,18 @@ function renderSlideItem(
 }
 
 export function SlideRenderer({ header, content, context, slideIndex }: SlideRendererProps) {
+  const layoutNode = content.find(
+    (node): node is Macro & { type: "layout"; name: LayoutName } =>
+      "type" in node && node.type === "layout"
+  );
+  const layoutName: LayoutName = layoutNode?.name ?? "default";
+  const filteredContent = content.filter((node) => !("type" in node && node.type === "layout"));
+
+  const layoutClass = LAYOUT_CLASS[layoutName];
+  const contentInnerClass = layoutClass
+    ? `${styles.contentInner} ${layoutClass}`
+    : styles.contentInner;
+
   return (
     <div className={styles.slideFrame}>
       <div className={styles.headerBanner}>
@@ -87,8 +106,8 @@ export function SlideRenderer({ header, content, context, slideIndex }: SlideRen
         <h2 className={styles.headerTitle}>{header}</h2>
       </div>
       <div className={styles.contentBox}>
-        <div className={styles.contentInner}>
-          {content.map((item, i) => renderSlideItem(item, i, context, slideIndex))}
+        <div className={contentInnerClass}>
+          {filteredContent.map((item, i) => renderSlideItem(item, i, context, slideIndex))}
         </div>
       </div>
     </div>

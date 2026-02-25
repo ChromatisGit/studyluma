@@ -87,7 +87,11 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
             );
           }
           if (item.kind === 'displayMacro') {
-            return renderMacro(item.macro, {}, index);
+            return renderMacro(
+              item.macro,
+              { storageKey: `${item.macro.type}-${categoryIndex}-${index}` },
+              index,
+            );
           }
           if (item.kind === 'subheader') {
             return (

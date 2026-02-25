@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { useRouteContext } from "@ui/contexts/RouteContext";
-import type { SidebarDTO } from "@schema/sidebarDTO";
+import type { SidebarDTO } from "@schema/courseTypes";
 
 import styles from "./Layout.module.css";
 import { useIsMobile } from "@ui/lib/useMediaQuery";

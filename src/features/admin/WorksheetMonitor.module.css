@@ -1,0 +1,161 @@
+.monitor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-md);
+  padding: var(--sn-space-md);
+  background: var(--sn-bg);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-sm);
+  margin-top: var(--sn-space-xs);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sn-space-sm);
+}
+
+.sectionTitle {
+  font-size: 0.875rem;
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text);
+  margin: 0;
+}
+
+.presenceNote {
+  font-size: 0.75rem;
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+.noData {
+  font-size: 0.8125rem;
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+.refreshButton {
+  font-size: 0.75rem;
+  padding: var(--sn-space-xs) var(--sn-space-sm);
+  background: var(--sn-surface-raised);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-xs);
+  color: var(--sn-text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background: var(--sn-surface-deep);
+  border-color: var(--sn-purple-accent);
+}
+
+.refreshButton:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Presence bars */
+
+.presenceBars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.presenceRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+}
+
+.presenceLabel {
+  font-size: 0.8125rem;
+  color: var(--sn-text-muted);
+  width: 6rem;
+  flex-shrink: 0;
+}
+
+.barTrack {
+  flex: 1;
+  height: 1.25rem;
+  background: var(--sn-surface-raised);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-xxs);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: var(--sn-purple-accent-soft-bg);
+  border-right: 2px solid var(--sn-purple-accent);
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.presenceCount {
+  font-size: 0.8125rem;
+  color: var(--sn-text);
+  width: 5rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Traffic light */
+
+.trafficRow {
+  display: flex;
+  gap: var(--sn-space-lg);
+  font-size: 0.9375rem;
+  font-weight: var(--sn-font-medium);
+  padding: var(--sn-space-xs) 0;
+}
+
+.green { color: var(--sn-green-accent-strong); }
+.yellow { color: var(--sn-yellow-accent-strong); }
+.red { color: var(--sn-red-accent-strong); }
+
+/* Causes */
+
+.causes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: var(--sn-space-xs);
+  border-top: 1px solid var(--sn-border);
+}
+
+.causesTitle {
+  font-size: 0.75rem;
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text-muted);
+  margin: 0 0 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.causeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
+}
+
+.causeLabel {
+  color: var(--sn-text);
+}
+
+.causeCount {
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text-muted);
+  min-width: 1.5rem;
+  text-align: right;
+}

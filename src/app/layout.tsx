@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "@styles/globals.css";
 import { Providers } from "./providers";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const themeInitScript = `
 (function () {
@@ -21,6 +22,9 @@ const themeInitScript = `
 export const metadata: Metadata = {
   title: "StudyNode",
   description: "Lernplattform mit Next.js Komponenten",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
@@ -31,6 +35,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body>
         <Providers>{children}</Providers>
+        <SpeedInsights />
       </body>
     </html>
   );

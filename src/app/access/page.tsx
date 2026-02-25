@@ -1,9 +1,8 @@
 import AccessSectionClient from "@features/access/AccessSection";
 import { getCourseId } from "@services/courseService";
-import { getCourseDTO } from "@services/getCourseDTO";
+import { getCourseDTO, isRegistrationOpen } from "@services/courseService";
 import { getSession } from "@services/authService";
-import { isRegistrationOpen } from "@services/courseStateService";
-import { getUserAccessCode } from "@services/userService";
+import { getUserAccessCodeById } from "@services/userService";
 
 type AccessPageProps = {
   searchParams?: Promise<{
@@ -26,7 +25,7 @@ export default async function AccessPage({ searchParams }: AccessPageProps) {
   // Get current user's access code if logged in
   const session = await getSession();
   const currentUserAccessCode = session?.user
-    ? await getUserAccessCode(session.user.id)
+    ? await getUserAccessCodeById(session.user.id)
     : null;
 
   let courseId: string | null = null;
@@ -35,8 +34,8 @@ export default async function AccessPage({ searchParams }: AccessPageProps) {
   let registrationOpen = false;
 
   if (isCourseJoin && groupKey && subjectKey) {
-    const resolvedCourseId = getCourseId(groupKey, subjectKey);
-    const course = getCourseDTO(resolvedCourseId);
+    const resolvedCourseId = await getCourseId(groupKey, subjectKey);
+    const course = await getCourseDTO(resolvedCourseId);
     courseId = resolvedCourseId;
     courseName = course.label;
     courseRoute = course.slug;

@@ -1,0 +1,166 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-lg);
+}
+
+.empty {
+  margin: 0;
+  color: var(--sn-text-muted);
+  font-style: italic;
+  font-size: var(--sn-font-size-0-95);
+}
+
+/* Chapter */
+
+.chapter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
+}
+
+/* Worksheet list */
+
+.worksheetList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+/* Worksheet row */
+
+.worksheetRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  background: var(--sn-surface-raised);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  transition: border-color 120ms ease;
+}
+
+.worksheetMain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sn-space-md);
+}
+
+.worksheetInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.worksheetLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--sn-font-size-0-95);
+  font-weight: var(--sn-font-medium);
+  color: var(--sn-text);
+  text-decoration: none;
+  overflow: hidden;
+  transition: color 120ms ease;
+}
+
+.worksheetLabel:hover {
+  color: var(--sn-purple-accent);
+}
+
+.worksheetLabelIcon {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.worksheetLabel:hover .worksheetLabelIcon {
+  opacity: 1;
+}
+
+.worksheetFilename {
+  font-size: var(--sn-font-size-0-8);
+  color: var(--sn-text-muted);
+  font-family: var(--sn-font-mono);
+}
+
+.worksheetActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-xs);
+  flex-shrink: 0;
+}
+
+/* Toggle buttons */
+
+.toggleVisible,
+.toggleHidden {
+  font-size: var(--sn-font-size-0-85);
+  font-weight: var(--sn-font-medium);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--sn-radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  min-width: 5.5rem;
+  text-align: center;
+}
+
+.toggleVisible {
+  background: var(--sn-green-accent-soft-bg);
+  border-color: var(--sn-green-accent-soft-border);
+  color: var(--sn-green-accent-strong);
+}
+
+.toggleVisible:hover {
+  background: var(--sn-green-accent);
+  border-color: var(--sn-green-accent);
+  color: var(--sn-text-on-accent);
+}
+
+.toggleHidden {
+  background: var(--sn-surface);
+  border-color: var(--sn-border);
+  color: var(--sn-text-muted);
+}
+
+.toggleHidden:hover {
+  border-color: var(--sn-purple-accent);
+  color: var(--sn-text);
+}
+
+/* Monitor button */
+
+.monitorButton,
+.monitorButtonActive {
+  font-size: var(--sn-font-size-0-85);
+  font-weight: var(--sn-font-medium);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--sn-radius-sm);
+  cursor: pointer;
+  border: 1px solid var(--sn-border);
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.monitorButton {
+  background: var(--sn-surface);
+  color: var(--sn-text);
+}
+
+.monitorButton:hover {
+  border-color: var(--sn-purple-accent);
+}
+
+.monitorButtonActive {
+  background: var(--sn-purple-accent-soft-bg);
+  border-color: var(--sn-purple-accent-soft-border);
+  color: var(--sn-purple-accent-strong);
+}
+
+.monitorButtonActive:hover {
+  background: var(--sn-surface);
+  border-color: var(--sn-border);
+  color: var(--sn-text);
+}

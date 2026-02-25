@@ -1,9 +1,7 @@
 import { Layout } from "@ui/layout/Layout";
 import { getSession } from "@services/authService";
-import { getSidebarDTO } from "@services/getSidebarDTO";
-import { getCoursesByAccess } from "@services/courseService";
-import { getCourseDTO } from "@services/getCourseDTO";
-import { isAdmin } from "@schema/userTypes";
+import { getSidebarDTO, getCoursesByAccess, getCourseDTO } from "@services/courseService";
+import { isAdmin } from "@services/authService";
 import { signOutAction } from "@actions/accessActions";
 
 import { About } from "@features/homepage/sections/About/About";
@@ -20,12 +18,12 @@ export default async function HomePage() {
   const sidebarData = await getSidebarDTO({ courseId: null, user });
 
   // Fetch course data in app layer, pass to feature
-  const accessGroups = getCoursesByAccess(user);
+  const accessGroups = await getCoursesByAccess(user);
   const courseGroups: CourseGroups = {
-    public: accessGroups.public.map((courseId) => getCourseDTO(courseId)),
-    accessible: accessGroups.accessible.map((courseId) => getCourseDTO(courseId)),
-    restricted: accessGroups.restricted.map((courseId) => getCourseDTO(courseId)),
-    hidden: accessGroups.hidden.map((courseId) => getCourseDTO(courseId)),
+    public: await Promise.all(accessGroups.public.map((id) => getCourseDTO(id))),
+    accessible: await Promise.all(accessGroups.accessible.map((id) => getCourseDTO(id))),
+    restricted: await Promise.all(accessGroups.restricted.map((id) => getCourseDTO(id))),
+    hidden: await Promise.all(accessGroups.hidden.map((id) => getCourseDTO(id))),
   };
 
   return (

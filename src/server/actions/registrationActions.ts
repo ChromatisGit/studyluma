@@ -1,13 +1,12 @@
 "use server";
 
 import type { CourseId } from "@services/courseService";
-import { getSession } from "@services/authService";
-import { isAdmin } from "@schema/userTypes";
+import { getSession, isAdmin } from "@services/authService";
 import {
   closeRegistration,
   getRegistrationWindow,
   openRegistration,
-} from "@services/courseStateService";
+} from "@services/courseService";
 import { getClientIp } from "@server-lib/getClientIp";
 
 export type RegistrationStatusResult =

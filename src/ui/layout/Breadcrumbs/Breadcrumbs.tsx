@@ -5,7 +5,7 @@ import { ChevronRight, House } from "lucide-react";
 
 import { AppLink } from "@components/AppLink";
 import { useRouteContext } from "@ui/contexts/RouteContext";
-import type { SidebarDTO } from "@schema/sidebarDTO";
+import type { SidebarDTO } from "@schema/courseTypes";
 import styles from "./Breadcrumbs.module.css";
 import LAYOUT_TEXT from "../layout.de.json";
 

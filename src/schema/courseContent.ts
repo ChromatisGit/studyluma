@@ -21,4 +21,5 @@ export type WorksheetRef = {
     label: string;
     href: string;
     worksheetFormat: WorksheetFormat;
+    sourceFilename?: string;
 }

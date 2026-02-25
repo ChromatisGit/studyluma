@@ -7,7 +7,7 @@ import { PageSummaries } from "./buildChapterContent";
 import { ContentIssueCollector } from "@pipeline/errorHandling";
 import { collectCourseIds } from "@pipeline/types";
 
-type WorksheetSummary = { worksheetId: string; label: string };
+type WorksheetSummary = { worksheetId: string; label: string; sourceFilename: string };
 type ChapterSummary = { label: string; worksheets: WorksheetSummary[] };
 
 export function resolveCourses(coursePlans: CoursePlan[], pageSummaries: PageSummaries, topicLabels: TopicLabelMap): Course[] {

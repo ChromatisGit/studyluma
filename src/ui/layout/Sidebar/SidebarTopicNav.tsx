@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { AppLink } from "@components/AppLink";
-import type { ProgressTopicDTO } from "@schema/progressDTO";
+import type { ProgressTopicDTO } from "@schema/courseTypes";
 import styles from "./Sidebar.module.css";
 
 type SidebarTopicNavProps = {

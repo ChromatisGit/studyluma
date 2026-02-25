@@ -1,7 +1,7 @@
 
 import { getCourseId } from "@services/courseService";
-import { getCourseDTO } from "@services/getCourseDTO";
-import { getProgressDTO } from "@services/getProgressDTO";
+import { getCourseDTO, getProgressDTO } from "@services/courseService";
+import { getSession } from "@services/authService";
 import { CoursepagePage } from "@features/coursepage/Coursepage";
 
 type PageParams = {
@@ -14,9 +14,13 @@ type PageParams = {
 
 export default async function CourseRoute({ params }: PageParams) {
   const { group: groupKey, course: subjectKey } = await params;
-  const courseId = getCourseId(groupKey, subjectKey);
-  const course = getCourseDTO(courseId);
-  const progress = await getProgressDTO(courseId);
+  const session = await getSession();
+  const user = session?.user ?? null;
+  const courseId = await getCourseId(groupKey, subjectKey);
+  const [course, progress] = await Promise.all([
+    getCourseDTO(courseId),
+    getProgressDTO(courseId, user),
+  ]);
 
   const currentTopic = progress.topics.find(
     (topic) => topic.topicId === progress.currentTopicId

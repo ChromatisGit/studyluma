@@ -9,7 +9,7 @@ export function makeGroupKey({ group, year }: Pick<SubjectKeyParts, "group" | "y
   return `${group}${year !== undefined ? String(year) : ""}`;
 }
 
-export function makeSubjectKey({ subject, variant }: Pick<SubjectKeyParts, "subject" | "variant">) {
+function makeSubjectKey({ subject, variant }: Pick<SubjectKeyParts, "subject" | "variant">) {
   return `${subject}${variant ? `-${variant}` : ""}`;
 }
 

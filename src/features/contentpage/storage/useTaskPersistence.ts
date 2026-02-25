@@ -17,7 +17,7 @@ export function useTaskPersistence<T>(
 ) {
   const storage = useWorksheetStorage();
   const [value, setValue] = useState<T>(initialValue);
-  const [worksheetId, setWorksheetId] = useState<string | null>(null);
+  const prevStorageRef = useRef(storage);
   const fallbackRef = useRef(initialValue);
 
   useEffect(() => {
@@ -52,16 +52,13 @@ export function useTaskPersistence<T>(
 
   useEffect(() => {
     if (!storage) {
-      setWorksheetId(null);
+      prevStorageRef.current = null;
       setValue(fallbackRef.current);
       return;
     }
 
-    const currentId = storage.worksheetId;
-    if (!currentId) return;
-
-    const isNewWorksheet = worksheetId !== currentId;
-    setWorksheetId(currentId);
+    const isNewWorksheet = prevStorageRef.current !== storage;
+    prevStorageRef.current = storage;
 
     const raw = storage.readResponse(taskKey);
     if (raw) {
@@ -72,7 +69,7 @@ export function useTaskPersistence<T>(
     if (isNewWorksheet) {
       setValue(fallbackRef.current);
     }
-  }, [storage, taskKey, deserialize, worksheetId]);
+  }, [storage, taskKey, deserialize]);
 
   const updateValue = useCallback(
     (next: SetStateAction<T>) => {
@@ -90,6 +87,5 @@ export function useTaskPersistence<T>(
   return {
     value,
     setValue: updateValue,
-    worksheetId,
   };
 }

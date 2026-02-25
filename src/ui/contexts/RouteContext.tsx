@@ -20,6 +20,8 @@ type RouteContextValue = {
   isHome: boolean;
   isPrinciples: boolean;
   isGroupOverview: boolean;
+  isAdminView: boolean;
+  adminCourseId?: string;
 };
 
 const RouteContext = createContext<RouteContextValue | undefined>(undefined);
@@ -44,8 +46,11 @@ function buildRouteContext(pathname: string): RouteContextValue {
   const isGroupOverview =
     segments.length === 1 && !!routeParam1 && !RESERVED_ROOTS.has(routeParam1);
 
-  const groupKey = routeParam1;
-  const subjectKey = routeParam2 && !isPrinciples ? routeParam2 : undefined;
+  const isAdminView = routeParam1 === "admin";
+  const adminCourseId = isAdminView && routeParam2 ? routeParam2 : undefined;
+
+  const groupKey = isAdminView ? undefined : routeParam1;
+  const subjectKey = routeParam2 && !isPrinciples && !isAdminView ? routeParam2 : undefined;
   const courseId =
     groupKey && subjectKey ? buildCourseId(groupKey, subjectKey) : undefined;
 
@@ -77,6 +82,8 @@ function buildRouteContext(pathname: string): RouteContextValue {
     isHome,
     isPrinciples,
     isGroupOverview,
+    isAdminView,
+    adminCourseId,
   };
 }
 

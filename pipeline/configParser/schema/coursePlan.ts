@@ -6,7 +6,7 @@ import {
 } from "./yamlCoursePlan";
 import { Course, WorksheetFormat } from "@schema/course";
 import { resolveLucideIcon } from "@pipeline/configParser/validateLucideIcons";
-import { makeGroupKey, makeCourseId, makeCourseSlug, makeSubjectKey } from "@pipeline/dataTransformer/makeIds";
+import { makeGroupKey, makeCourseId, makeCourseSlug } from "@pipeline/dataTransformer/makeIds";
 
 export type CoursePlan = Omit<Course, "topics"> & {
   worksheetFormat: WorksheetFormat;
@@ -95,7 +95,6 @@ function toCoursePlan(definitions: GroupDefinitions) {
       subject: {
         id: v.course.subject,
         label: subjectDef.name,
-        key: makeSubjectKey(v.course)
       },
       courseVariant: variantId
         ? {

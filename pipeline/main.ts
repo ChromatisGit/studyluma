@@ -3,7 +3,7 @@ import { loadConfigs } from "./configParser/loadConfigs";
 import { buildChapterContent } from "./dataTransformer/buildChapterContent";
 import { generateCourseSQLScript } from "./dataTransformer/generateCourseSQLScript";
 import { getTopicLabels, resolveCourses } from "./dataTransformer/resolveCourses";
-import { cleanImageOutput, deleteGenerated, writeJSONFile } from "./io";
+import { cleanImageOutput, deleteGenerated } from "./io";
 import { ensureDevAdminUser } from "./devAdminUser";
 
 export async function runPipeline() {
@@ -14,7 +14,7 @@ export async function runPipeline() {
     const { pageSummaries } = await buildChapterContent(pagePaths)
     const topicLabels = await getTopicLabels(pagePaths)
     const courses = resolveCourses(coursePlans, pageSummaries, topicLabels)
-    await writeJSONFile("config/courses.json", courses)
+    // courses.json no longer generated — course config lives in Postgres (seeded via courses.sql)
     await generateCourseSQLScript("courses.sql", courses)
     await ensureDevAdminUser();
     console.log("[builder] SUCCESS")

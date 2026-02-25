@@ -8,9 +8,9 @@
     "accessCodeOptional": "(Optional)",
     "accessCodePlaceholderJoin": "Zugangscode eingeben, falls vorhanden",
     "accessCodePlaceholder": "Zugangscode eingeben",
-    "accessCodeHelper": "Wenn die Registrierung offen ist, kannst du dich auch nur mit deiner PIN anmelden.",
-    "pinLabel": "PIN",
-    "pinPlaceholder": "PIN eingeben",
+    "accessCodeHelper": "Wenn die Registrierung offen ist, kannst du dich mit einem Passwort registrieren, du erhälst dann ein Access Code.",
+    "pinLabel": "Passwort",
+    "pinPlaceholder": "Passwort eingeben",
     "continueButton": "Weiter",
     "processing": "Wird verarbeitet …",
     "backToHome": "Zur Startseite",
@@ -18,7 +18,7 @@
   },
   "modal": {
     "title": "Speichere deinen Zugangscode",
-    "description": "Du benötigst diesen Code zusammen mit deiner PIN, um dich erneut anzumelden.",
+    "description": "Du benötigst diesen Code zusammen mit deiner Passwort, um dich erneut anzumelden.",
     "codeLabel": "Dein Zugangscode",
     "checkboxLabel": "Ich habe meinen Zugangscode gespeichert",
     "continueButton": "Weiter"

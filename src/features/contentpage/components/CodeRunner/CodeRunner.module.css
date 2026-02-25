@@ -169,6 +169,7 @@
 
 .editorTextarea::selection {
   background: var(--sn-purple-accent-selection);
+  color: var(--sn-text-on-accent);
 }
 
 .editorTextareaReadOnly {

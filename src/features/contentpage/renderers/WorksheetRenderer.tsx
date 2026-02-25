@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import type { Page } from "@schema/page";
-import type { ProgressStatus } from "@schema/progressDTO";
+import type { ProgressStatus } from "@schema/courseTypes";
 import { type Macro, DISPLAY_MACRO_TYPES } from "@macros/registry";
 import { type Category, type CategoryItem } from "@features/contentpage/components/CategorySection/CategorySection";
 import { getCategoryType } from "@features/contentpage/components/CategorySection/categoryConfig";
@@ -18,6 +18,9 @@ interface WorksheetRendererProps {
   className?: string;
   worksheetSlug?: string;
   chapterStatus?: ProgressStatus;
+  userId?: string;
+  courseId?: string;
+  worksheetId?: string;
 }
 
 /**
@@ -84,18 +87,20 @@ function computeTaskNumbers(categories: Category[]): Record<string, number> {
  * When chapterStatus is 'current': forward navigation is gated on task/checkpoint completion.
  * Otherwise (default 'finished'): free navigation with no restrictions.
  */
-export function WorksheetRenderer({ page, className, worksheetSlug, chapterStatus = 'finished' }: WorksheetRendererProps) {
+export function WorksheetRenderer({ page, className, worksheetSlug, chapterStatus = 'finished', userId, courseId, worksheetId }: WorksheetRendererProps) {
   const categories = convertPageToCategories(page);
   const taskNumbers = computeTaskNumbers(categories);
 
   return (
-    <WorksheetStorageProvider worksheetSlug={worksheetSlug} pageContent={page.content}>
+    <WorksheetStorageProvider worksheetSlug={worksheetSlug} worksheetId={worksheetId} pageContent={page.content} userId={userId}>
       <div className={clsx(styles.worksheet, className)}>
         {page.title && <PageHeader title={page.title} />}
         <WorksheetNavigator
           categories={categories}
           chapterStatus={chapterStatus}
           taskNumbers={taskNumbers}
+          courseId={courseId}
+          worksheetId={worksheetId}
         />
       </div>
     </WorksheetStorageProvider>

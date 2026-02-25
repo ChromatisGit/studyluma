@@ -16,7 +16,7 @@ interface PageNavBarProps {
   lockedReason?: string;
 }
 
-export function PageNavBar({ onBack, onNext, canGoBack, canGoNext, currentIndex, totalSections, lockedReason }: PageNavBarProps) {
+export function PageNavBar({ onBack, onNext, canGoNext, currentIndex, totalSections, lockedReason }: PageNavBarProps) {
   const text = CONTENTPAGE_TEXT.navigation;
 
   const isFirstPage = currentIndex === 0;

@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { useRouteContext } from "@ui/contexts/RouteContext";
 import { useIsMobile } from "@ui/lib/useMediaQuery";
-import type { SidebarDTO } from "@schema/sidebarDTO";
+import type { SidebarDTO } from "@schema/courseTypes";
 
 import { SidebarMainNav } from "./SidebarMainNav";
 import { SidebarTopicNav } from "./SidebarTopicNav";
@@ -18,6 +18,8 @@ type SidebarProps = {
 export function Sidebar({ isOpen, onClose, data }: SidebarProps) {
   const {
     courseId,
+    adminCourseId,
+    isAdminView,
     topic,
     chapter,
     hasTopicContext,
@@ -50,7 +52,7 @@ export function Sidebar({ isOpen, onClose, data }: SidebarProps) {
           <SidebarMainNav
             isAuthenticated={data.isAuthenticated}
             courses={data.courses}
-            activeCourseId={courseId ?? null}
+            activeCourseId={isAdminView ? (adminCourseId ?? null) : (courseId ?? null)}
             groupKey={data.primaryGroupKey}
             isHome={isHome}
             isPrinciples={isPrinciples}

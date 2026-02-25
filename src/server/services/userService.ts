@@ -1,84 +1,118 @@
 import "server-only";
-import { insertAuditLog } from "@repo/auditRepo";
-import * as db from "@repo/userRepo";
-import { DefaultUser, User } from "@schema/userTypes";
+
+import { anonSQL, userSQL } from "@db/runSQL";
 import { hashPin } from "@server-lib/argon2";
 
-// Access code generation (moved from lib for proper layering)
-function generateAccessCode(): string {
-    return Math.floor(1000 + Math.random() * 9000).toString();
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export type UserDTO = {
+  id: string;
+  role: "admin" | "user";
+  groupKey: string | null;
+  courseIds: string[];
+};
+
+// ---------------------------------------------------------------------------
+// User creation
+// ---------------------------------------------------------------------------
+
+/**
+ * Creates a new student user.
+ * create_user_with_code is SECURITY DEFINER — generates a unique access code and
+ * inserts the user atomically in one SQL call.
+ */
+export async function createUser(
+  pin: string,
+  groupKey: string,
+  ip: string,
+): Promise<{ user: UserDTO; accessCode: string }> {
+  const userId = `u${Date.now().toString(36)}`;
+  const pinHash = await hashPin(pin);
+
+  const rows = await anonSQL<{ create_user_with_code: string }[]>`
+    SELECT create_user_with_code(${userId}, ${pinHash}, ${groupKey})
+  `;
+  const accessCode = rows[0]?.create_user_with_code;
+  if (!accessCode) throw new Error("Failed to create user account");
+
+  const user: UserDTO = { id: userId, role: "user", groupKey, courseIds: [] };
+
+  try {
+    await anonSQL`
+      INSERT INTO log_audit (user_id, event_type, ip_address, user_agent, metadata)
+      VALUES (${userId}, ${"createUser"}, ${ip ?? null}, ${null}, ${null})
+    `;
+  } catch (e) {
+    console.error("[Audit] Failed to log createUser:", e);
+  }
+
+  return { user, accessCode };
 }
 
-async function generateUniqueAccessCode(): Promise<string> {
-    let attempts = 30;
-    while (attempts--) {
-        const accessCode = generateAccessCode();
-        if (!(await accessCodeExists(accessCode))) {
-            return accessCode;
-        }
-    }
-    throw new Error("Couldn't generate unique AccessCode");
+// ---------------------------------------------------------------------------
+// Course enrollment (admin action)
+// ---------------------------------------------------------------------------
+
+export async function addCourseToUser(
+  user: UserDTO,
+  courseId: string,
+  ip: string,
+): Promise<void> {
+  // enroll_user_in_course is SECURITY DEFINER — bypasses RLS
+  await userSQL(user)`SELECT enroll_user_in_course(${user.id}, ${courseId})`;
+
+  try {
+    await anonSQL`
+      INSERT INTO log_audit (user_id, event_type, ip_address, user_agent, metadata)
+      VALUES (
+        ${user.id},
+        ${"addCourseToUser"},
+        ${ip ?? null},
+        ${null},
+        ${JSON.stringify({ courseId })}
+      )
+    `;
+  } catch (e) {
+    console.error("[Audit] Failed to log addCourseToUser:", e);
+  }
 }
 
-export async function createUser(pin: string, groupKey: string, ip: string): Promise<{user: User, accessCode: string}> {
-    const userId = `u${Date.now().toString(36)}`;
-    const accessCode = await generateUniqueAccessCode();
-    const user: DefaultUser = {
-        id: userId,
-        role: "user",
-        groupKey,
-        courseIds: [],
-    };
+// ---------------------------------------------------------------------------
+// User reads
+// ---------------------------------------------------------------------------
 
-    const hash = await hashPin(pin);
+/**
+ * Session bootstrap: reads user by ID via SECURITY DEFINER (bypasses RLS).
+ */
+export async function getUserById(userId: string): Promise<UserDTO | null> {
+  const rows = await anonSQL<{
+    id: string;
+    role: "admin" | "user";
+    group_key: string | null;
+    course_ids: string[];
+  }[]>`SELECT id, role, group_key, course_ids FROM get_session_user(${userId})`;
 
-    await db.insertUser({
-        user,
-        accessCode,
-        pinHash: hash,
-    });
-
-    try {
-        await insertAuditLog({
-            ip,
-            userId: user.id,
-            action: "createUser",
-        });
-    } catch (e) {
-        console.error("[Audit] Failed to log createUser:", e);
-    }
-
-    return { user, accessCode };
+  const row = rows[0];
+  if (!row) return null;
+  return { id: row.id, role: row.role, groupKey: row.group_key, courseIds: row.course_ids };
 }
 
-
-export async function addCourseToUser(userId: string, courseId: string, ip: string): Promise<void> {
-    await db.addCourseToUser(userId, courseId);
-
-    try {
-        await insertAuditLog({
-            ip,
-            userId,
-            action: "addCourseToUser",
-            courseId: courseId,
-        });
-    } catch (e) {
-        console.error("[Audit] Failed to log addCourseToUser:", e);
-    }
-}
-
-export async function getUserAccessCode(userId: string): Promise<string | null> {
-    return await db.getUserAccessCode(userId);
-}
-
-export async function accessCodeExists(accessCode: string): Promise<boolean> {
-    return Boolean(await db.getUserByAccessCode(accessCode));
-}
-
-export async function getUserById(userId: string): Promise<User | null> {
-    return await db.getUserById(userId);
+/**
+ * Returns the access code for a user (for sidebar display).
+ * get_user_access_code is SECURITY DEFINER — bypasses RLS.
+ */
+export async function getUserAccessCodeById(userId: string): Promise<string | null> {
+  const rows = await anonSQL<{ get_user_access_code: string | null }[]>`
+    SELECT get_user_access_code(${userId})
+  `;
+  return rows[0]?.get_user_access_code ?? null;
 }
 
 export async function getUserCount(): Promise<number> {
-    return await db.getUserCount();
+  const rows = await anonSQL<{ count: string }[]>`
+    SELECT COUNT(*) AS count FROM users WHERE role = 'user'
+  `;
+  return Number(rows[0]?.count ?? 0);
 }

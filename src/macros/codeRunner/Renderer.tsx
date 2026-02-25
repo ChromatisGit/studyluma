@@ -25,7 +25,7 @@ type Props = MacroComponentProps<CodeRunnerMacro>;
 export default function CodeRunnerRenderer({ macro, context }: Props) {
   const adapter = useMacroState();
   const [code, setCode] = useMacroValue<string>(context.storageKey, macro.code);
-  const isReadOnly = context.readOnly ?? true;
+  const isReadOnly = context.readOnly ?? false;
 
   const outputKey = context.storageKey ? `${context.storageKey}:output` : undefined;
   const [syncedOutput, setSyncedOutput] = useMacroValue<CodeRunnerOutput>(outputKey, EMPTY_OUTPUT);

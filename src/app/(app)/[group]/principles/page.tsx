@@ -1,7 +1,7 @@
 import { Layout } from "@ui/layout/Layout";
 import { getSession } from "@services/authService";
-import { getSidebarDTO } from "@services/getSidebarDTO";
-import { isAdmin } from "@schema/userTypes";
+import { getSidebarDTO } from "@services/courseService";
+import { isAdmin } from "@services/authService";
 import { signOutAction } from "@actions/accessActions";
 
 type PageParams = {

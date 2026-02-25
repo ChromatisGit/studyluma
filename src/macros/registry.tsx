@@ -17,7 +17,8 @@ import type { MacroRenderContext, MacroComponentProps } from "./componentTypes";
 // ============================================================================
 
 import type { NoteMacro } from "./note/types";
-import type { HighlightMacro } from "./highlight/types";
+import type { CardMacro } from "./card/types";
+import type { PairsMacro } from "./pairs/types";
 import type { ImageMacro } from "./image/types";
 import type { TableMacro } from "./table/types";
 import type { CodeRunnerMacro } from "./codeRunner/types";
@@ -26,13 +27,15 @@ import type { McqMacro } from "./mcq/types";
 import type { CodeTaskMacro } from "./codeTask/types";
 import type { TextTaskMacro } from "./textTask/types";
 import type { PresenterNoteMacro } from "./pn/types";
+import type { LayoutMacro } from "./layout/types";
 
 // ============================================================================
 // COMPONENT IMPORTS - Add new macro component imports here
 // ============================================================================
 
 import NoteRenderer from "./note/Renderer";
-import HighlightRenderer from "./highlight/Renderer";
+import CardRenderer from "./card/Renderer";
+import PairsRenderer from "./pairs/Renderer";
 import ImageRenderer from "./image/Renderer";
 import TableRenderer from "./table/Renderer";
 import CodeRunnerRenderer from "./codeRunner/Renderer";
@@ -40,6 +43,7 @@ import GapRenderer from "./gap/Renderer";
 import McqRenderer from "./mcq/Renderer";
 import CodeTaskRenderer from "./codeTask/Renderer";
 import TextTaskRenderer from "./textTask/Renderer";
+import LayoutRenderer from "./layout/Renderer";
 
 // ============================================================================
 // MACRO TYPE (union of all macro types)
@@ -47,7 +51,8 @@ import TextTaskRenderer from "./textTask/Renderer";
 
 export type Macro =
   | NoteMacro
-  | HighlightMacro
+  | CardMacro
+  | PairsMacro
   | ImageMacro
   | TableMacro
   | CodeRunnerMacro
@@ -55,7 +60,8 @@ export type Macro =
   | McqMacro
   | CodeTaskMacro
   | TextTaskMacro
-  | PresenterNoteMacro;
+  | PresenterNoteMacro
+  | LayoutMacro;
 
 export type MacroType = Macro["type"];
 
@@ -64,8 +70,10 @@ export type MacroType = Macro["type"];
 // ============================================================================
 
 const macros = {
+  layout: { Component: LayoutRenderer, category: "display" as const, state: "none" as const },
   note: { Component: NoteRenderer, category: "display" as const, state: "none" as const },
-  highlight: { Component: HighlightRenderer, category: "display" as const, state: "none" as const },
+  card: { Component: CardRenderer, category: "display" as const, state: "none" as const },
+  pairs: { Component: PairsRenderer, category: "display" as const, state: "none" as const },
   image: { Component: ImageRenderer, category: "display" as const, state: "none" as const },
   table: { Component: TableRenderer, category: "display" as const, state: "none" as const },
   codeRunner: { Component: CodeRunnerRenderer, category: "display" as const, state: "interactive" as const },
@@ -118,15 +126,20 @@ function extractText(v: unknown): string {
   return "";
 }
 
-function normalizeTaskKey(value: string): string {
-  return value.replace(/\s+/g, " ").trim().slice(0, 40);
+function hashTaskText(value: string): string {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  let hash = 5381;
+  for (let i = 0; i < normalized.length; i++) {
+    hash = (hash * 33) ^ normalized.charCodeAt(i);
+  }
+  return (hash >>> 0).toString(16);
 }
 
 export function buildTaskKey(macro: Macro, index: number): string {
   for (const field of ["instruction", "question", "content"]) {
     if (field in macro) {
-      const key = normalizeTaskKey(extractText((macro as Record<string, unknown>)[field]));
-      if (key) return key;
+      const text = extractText((macro as Record<string, unknown>)[field]).trim();
+      if (text) return hashTaskText(text);
     }
   }
   return `${macro.type}-${index}`;

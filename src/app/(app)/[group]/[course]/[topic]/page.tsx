@@ -1,6 +1,7 @@
 import { getSession, assertCanAccessPage } from "@services/authService";
-import { getCourseId } from "@services/courseService";
-import { getTopicDTO } from "@services/getTopicDTO";
+import { getCourseId, coursePublic } from "@services/courseService";
+import { getTopicDTO } from "@services/courseService";
+import type { ProgressChapterDTO } from "@schema/courseTypes";
 import { PageHeader } from "@components/PageHeader/PageHeader";
 import { AppLink } from "@components/AppLink";
 import styles from "./page.module.css";
@@ -17,10 +18,12 @@ export default async function ChapterPage({ params }: PageParams) {
   const { group: groupKey, course: subjectKey, topic: topicId } = await params;
 
   const session = await getSession();
-  const courseId = getCourseId(groupKey, subjectKey);
-  assertCanAccessPage(session, groupKey, courseId);
+  const user = session?.user ?? null;
+  const courseId = await getCourseId(groupKey, subjectKey);
+  const isPublic = await coursePublic(courseId);
+  assertCanAccessPage(session, groupKey, isPublic, courseId);
 
-  const topic = await getTopicDTO({ courseId, topicId });
+  const topic = await getTopicDTO({ courseId, topicId, user });
 
   return (
     <main>
@@ -28,7 +31,7 @@ export default async function ChapterPage({ params }: PageParams) {
 
       {topic.chapters.length > 0 ? (
         <ul>
-          {topic.chapters.map((chapter) => (
+          {topic.chapters.map((chapter: ProgressChapterDTO) => (
             <li key={chapter.chapterId}>
               {chapter.status === "locked" ? (
                 chapter.label

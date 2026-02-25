@@ -100,6 +100,144 @@
   font-size: var(--sn-font-size-0-95);
 }
 
+.chapterCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-lg);
+  box-shadow: var(--sn-shadow-lw);
+}
+
+/* Chapter picker header */
+
+.chapterCardHeader {
+  position: relative;
+}
+
+.chapterPickerButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
+.chapterPickerTitle {
+  margin: 0;
+  font-size: var(--sn-font-size-1-4);
+  font-weight: 700;
+  color: var(--sn-text);
+}
+
+.chevronClosed,
+.chevronOpen {
+  color: var(--sn-text-muted);
+  flex-shrink: 0;
+  transition: transform 150ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Chapter picker dropdown */
+
+.chapterPickerDropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 50;
+  min-width: 260px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-lg);
+  box-shadow: var(--sn-shadow-md, 0 8px 24px rgba(0,0,0,0.12));
+  padding: 0.5rem;
+}
+
+.dropdownTopic {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0;
+}
+
+.dropdownTopic + .dropdownTopic {
+  border-top: 1px solid var(--sn-border);
+}
+
+.dropdownTopicLabel {
+  font-size: var(--sn-font-size-0-75);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.6rem;
+}
+
+.dropdownChapter,
+.dropdownChapterActive {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--sn-radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: var(--sn-font-size-0-9);
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.dropdownChapter {
+  background: none;
+  color: var(--sn-text);
+}
+
+.dropdownChapter:hover {
+  background: var(--sn-surface-raised);
+}
+
+.dropdownChapterActive {
+  background: var(--sn-purple-accent-soft-bg);
+  color: var(--sn-purple-accent-strong);
+  font-weight: 600;
+}
+
+.dropdownChapterActive:hover {
+  background: var(--sn-purple-accent-soft-bg);
+}
+
+/* Card content */
+
+.cardDivider {
+  height: 1px;
+  background: var(--sn-border);
+  margin: 0 -1.5rem;
+}
+
+.cardSubsection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardSubsectionTitle {
+  margin: 0;
+  font-size: var(--sn-font-size-0-8);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .placeholder {
   padding: 1.5rem;
   background: var(--sn-surface-raised);

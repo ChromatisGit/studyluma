@@ -7,8 +7,10 @@
 import type { RawMacro } from "./parseMacro";
 
 // Import all parsers
+import { parser as layoutParser } from "@macros/layout/parser";
 import { parser as noteParser } from "@macros/note/parser";
-import { parser as highlightParser } from "@macros/highlight/parser";
+import { parser as cardParser } from "@macros/card/parser";
+import { parser as pairsParser } from "@macros/pairs/parser";
 import { parser as imageParser } from "@macros/image/parser";
 import { parser as tableParser } from "@macros/table/parser";
 import { parser as codeRunnerParser } from "@macros/codeRunner/parser";
@@ -32,8 +34,10 @@ type ParserDef = {
 
 // Parser map - explicitly typed to allow different parser types
 const parserMap: Map<string, ParserDef> = new Map([
+  ["layout", layoutParser],
   ["note", noteParser],
-  ["highlight", highlightParser],
+  ["card", cardParser],
+  ["pairs", pairsParser],
   ["image", imageParser],
   ["table", tableParser],
   ["codeRunner", codeRunnerParser],

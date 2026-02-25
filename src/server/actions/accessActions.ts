@@ -1,13 +1,12 @@
 "use server";
 
 import { clearSessionCookie, setSessionCookie } from "@server-lib/auth";
-import { getSession } from "@services/authService";
-import type { User } from "@schema/userTypes";
-import { isAdmin } from "@schema/userTypes";
+import { getSession, isAdmin } from "@services/authService";
 import { addCourseToUser, createUser, getUserById } from "@services/userService";
 import { getAuthenticatedUser } from "@services/authService";
-import { isRegistrationOpen } from "@services/courseStateService";
+import { isRegistrationOpen } from "@services/courseService";
 import { getClientIp } from "@server-lib/getClientIp";
+import type { UserDTO } from "@services/userService";
 
 export type AccessContext = {
   isCourseJoin: boolean;
@@ -42,26 +41,34 @@ const fail = (error: string, redirectTo?: string): ContinueAccessResult => ({
 const invalidCreds = () => fail("Invalid credentials.");
 const registrationClosed = () => fail("Registration window not open.", "/");
 
-async function success(user: User, redirectTo: string, accessCode?: string): Promise<ContinueAccessResult> {
+async function success(
+  user: UserDTO,
+  redirectTo: string,
+  accessCode?: string,
+): Promise<ContinueAccessResult> {
   await setSessionCookie(user.id);
   return { ok: true, redirectTo, accessCode };
 }
 
-function hasCourseAccess(user: User, groupKey: string, courseId: string): boolean {
+function hasCourseAccess(user: UserDTO, groupKey: string, courseId: string): boolean {
   if (isAdmin(user)) return true;
   if (user.role !== "user") return false;
   return user.groupKey === groupKey && user.courseIds.includes(courseId);
 }
 
-async function ensureCourseAccess(user: User, groupKey: string, courseId: string, ip: string): Promise<User | null> {
+async function ensureCourseAccess(
+  user: UserDTO,
+  groupKey: string,
+  courseId: string,
+  ip: string,
+): Promise<UserDTO | null> {
   if (hasCourseAccess(user, groupKey, courseId)) return user;
 
-  // enroll only normal users with matching groupKey
   if (isAdmin(user)) return user;
   if (user.role !== "user") return null;
   if (user.groupKey !== groupKey) return null;
 
-  await addCourseToUser(user.id, courseId, ip);
+  await addCourseToUser(user, courseId, ip);
   return getUserById(user.id);
 }
 
@@ -70,7 +77,7 @@ async function ensureCourseAccess(user: User, groupKey: string, courseId: string
 // -----------------------------
 
 export async function continueAccessAction(
-  input: ContinueAccessInput
+  input: ContinueAccessInput,
 ): Promise<ContinueAccessResult> {
   const { accessCode, pin, ctx } = input;
 
@@ -79,7 +86,6 @@ export async function continueAccessAction(
 
   if (!hasCode && !hasPin) return fail("Please enter your credentials.");
 
-  // resolve course ctx if needed
   const courseCtx =
     ctx.isCourseJoin && ctx.groupKey && ctx.courseId && ctx.courseRoute
       ? { groupKey: ctx.groupKey, courseId: ctx.courseId, courseRoute: ctx.courseRoute }
@@ -87,7 +93,6 @@ export async function continueAccessAction(
 
   if (ctx.isCourseJoin && !courseCtx) return fail("Invalid course link.");
 
-  // determine mode
   const mode: "normal" | "course-auth" | "course-pin" =
     !ctx.isCourseJoin ? "normal" : hasCode ? "course-auth" : "course-pin";
 
@@ -107,7 +112,6 @@ export async function continueAccessAction(
   const { groupKey, courseId, courseRoute } = courseCtx!;
   const registrationOpen = await isRegistrationOpen(courseId);
 
-  // quick pass: already logged in + already has access => go
   const session = await getSession();
   const currentUser = session?.user ?? null;
 

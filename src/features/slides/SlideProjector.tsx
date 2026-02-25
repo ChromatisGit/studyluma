@@ -23,9 +23,12 @@ export function SlideProjector({ deck, channelName }: SlideProjectorProps) {
   });
 
   const [synced, setSynced] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   const { postMessage } = useSlideBroadcast({
     channelName,
+    role: "projector",
+    onSessionExpired: useCallback(() => setSessionExpired(true), []),
     onMessage: useCallback((msg: SlideMessage) => {
       switch (msg.type) {
         case "STATE_UPDATE":
@@ -73,6 +76,14 @@ export function SlideProjector({ deck, channelName }: SlideProjectorProps) {
     <MacroStateProvider adapter={projectorAdapter}>
       <div className={styles.projector}>
         {state.blackout && <div className={styles.blackout} />}
+        {sessionExpired && (
+          <div className={styles.expired}>
+            <p>Präsentation beendet</p>
+            <button type="button" onClick={() => window.location.reload()}>
+              Neu laden
+            </button>
+          </div>
+        )}
         {currentSlide && (
           <SlideRenderer
             header={currentSlide.header}

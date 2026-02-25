@@ -15,20 +15,21 @@ export function useMacroCheck(
   onTrigger: () => void,
 ): void {
   const isAttemptedRef = useRef(isAttempted);
-  isAttemptedRef.current = isAttempted;
-
   const onTriggerRef = useRef(onTrigger);
-  onTriggerRef.current = onTrigger;
+
+  useEffect(() => { isAttemptedRef.current = isAttempted; });
+  useEffect(() => { onTriggerRef.current = onTrigger; });
+
+  const { storageKey, onAttemptedChange, checkTrigger } = context;
 
   useEffect(() => {
-    if (!context.storageKey) return;
-    context.onAttemptedChange?.(context.storageKey, isAttempted);
-  }, [context.storageKey, context.onAttemptedChange, isAttempted]);
+    if (!storageKey) return;
+    onAttemptedChange?.(storageKey, isAttempted);
+  }, [storageKey, onAttemptedChange, isAttempted]);
 
   useEffect(() => {
-    if (!context.checkTrigger || context.checkTrigger === 0) return;
+    if (!checkTrigger || checkTrigger === 0) return;
     if (!isAttemptedRef.current) return;
     onTriggerRef.current();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context.checkTrigger]);
+  }, [checkTrigger]);
 }

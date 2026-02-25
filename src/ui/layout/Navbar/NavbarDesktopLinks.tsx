@@ -1,7 +1,7 @@
 "use client";
 
 import { AppLink } from "@components/AppLink";
-import type { SidebarCourseDTO } from "@schema/sidebarDTO";
+import type { SidebarCourseDTO } from "@schema/courseTypes";
 
 import { NavbarCourseLinks } from "./NavbarCourseLinks";
 import styles from "./Navbar.module.css";

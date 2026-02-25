@@ -53,15 +53,6 @@
       "@db/*": [
         "./src/server/db/*"
       ],
-      "@repo/*": [
-        "./src/server/repo/*"
-      ],
-      "@dev/*": [
-        "./src/server/dev/*"
-      ],
-      "@providers/*": [
-        "./src/server/providers/*"
-      ],
       "@services/*": [
         "./src/server/services/*"
       ],
@@ -85,6 +76,9 @@
       ],
       "@access/*": [
         "./src/features/access/*"
+      ],
+      "@providers/*": [
+        "./src/server/providers/*"
       ]
     }
   },

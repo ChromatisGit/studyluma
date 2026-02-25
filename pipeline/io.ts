@@ -75,8 +75,8 @@ export async function writeJSONFile(path: string, content: unknown): Promise<voi
 }
 
 export async function writeSQLFile(path: string, content: string): Promise<void> {
-  const filePath = path.toLowerCase().endsWith(".sql") ? path : `${path}.sql`;
-  const fullPath = joinPath(".generatedScripts", filePath);
+  const filename = path.toLowerCase().endsWith(".sql") ? path : `${path}.sql`;
+  const fullPath = joinPath(WEBSITE_ROOT, "sql", ".generated", filename);
   await Bun.write(fullPath, content, { createPath: true });
 }
 
@@ -89,7 +89,7 @@ export async function deleteGenerated() {
    return rm(EXPORT_PATH, { recursive: true, force: true });
 }
 
-const IMAGE_OUTPUT_DIR = joinPath(WEBSITE_ROOT, "public", "_content", "images");
+const IMAGE_OUTPUT_DIR = joinPath(WEBSITE_ROOT, "public", ".generated", "images");
 const PROJECT_ROOT = joinPath(WEBSITE_ROOT, "..");
 
 type ResolvedImage = { publicUrl: string; absolutePath: string };
@@ -126,7 +126,7 @@ export function resolveAndCopyContentImage(source: string, typFilePath: string):
   copyFileSync(absolutePath, outputPath);
 
   const result: ResolvedImage = {
-    publicUrl: `/_content/images/${normalizeSlashes(outputRelPath)}`,
+    publicUrl: `/.generated/images/${normalizeSlashes(outputRelPath)}`,
     absolutePath,
   };
 

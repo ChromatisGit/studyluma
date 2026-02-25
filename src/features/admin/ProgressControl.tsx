@@ -3,8 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { ProgressTopicDTO } from "@schema/progressDTO";
-import type { CourseId } from "@services/courseService";
+import type { ProgressTopicDTO, CourseId } from "@schema/courseTypes";
 import { setProgressAction } from "@actions/progressActions";
 import { Button } from "@components/Button";
 import { Roadmap } from "@components/Roadmap";

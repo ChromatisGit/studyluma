@@ -18,8 +18,7 @@ export function CheckpointOverlay({ sectionIndex, onSubmitted }: CheckpointOverl
 
   useEffect(() => {
     if (!storage) return;
-    const existing = storage.readCheckpoint(sectionIndex);
-    if (existing) {
+    if (storage.hasCheckpoint(sectionIndex)) {
       setIsSubmitted(true);
       onSubmitted();
     } else {
@@ -33,7 +32,7 @@ export function CheckpointOverlay({ sectionIndex, onSubmitted }: CheckpointOverl
   if (isSubmitted !== false) return null;
 
   const handleSubmit = (response: CheckpointResponse) => {
-    storage?.saveCheckpoint(sectionIndex, response);
+    storage?.markCheckpointSubmitted(sectionIndex, response);
     setIsSubmitted(true);
     onSubmitted();
   };

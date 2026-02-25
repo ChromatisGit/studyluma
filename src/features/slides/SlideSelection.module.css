@@ -7,23 +7,67 @@
   gap: var(--sn-space-xs, 0.25rem);
 }
 
-.deckLink {
-  display: block;
+.deckItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   padding: var(--sn-space-sm, 0.5rem) var(--sn-space-md, 1rem);
   background: var(--sn-surface-raised);
   border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-md, 8px);
-  color: var(--sn-text);
-  text-decoration: none;
+}
+
+.deckName {
   font-weight: 500;
   font-size: var(--sn-font-size-0-95);
+  color: var(--sn-text);
+}
+
+.deckActions {
+  display: flex;
+  gap: var(--sn-space-xs, 0.25rem);
+  flex-shrink: 0;
+}
+
+.presenterLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--sn-radius-sm, 6px);
+  font-size: var(--sn-font-size-0-9);
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--sn-purple-accent);
+  color: #fff;
+  transition: opacity 120ms ease;
+}
+
+.presenterLink:hover {
+  opacity: 0.85;
+}
+
+.projectorLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--sn-radius-sm, 6px);
+  font-size: var(--sn-font-size-0-9);
+  font-weight: 500;
+  text-decoration: none;
+  background: var(--sn-surface);
+  color: var(--sn-text);
+  border: 1px solid var(--sn-border);
   transition: border-color 120ms ease;
 }
 
-.deckLink:hover {
+.projectorLink:hover {
   border-color: var(--sn-purple-accent);
 }
 
+.loading,
 .empty {
   margin: 0;
   color: var(--sn-text-muted);

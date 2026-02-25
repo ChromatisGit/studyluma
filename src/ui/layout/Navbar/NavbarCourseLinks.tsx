@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { ChevronDown } from "lucide-react";
 
 import { AppLink } from "@components/AppLink";
-import type { SidebarCourseDTO } from "@schema/sidebarDTO";
+import type { SidebarCourseDTO } from "@schema/courseTypes";
 import { NavbarDropdown } from "./NavbarDropdown";
 import styles from "./Navbar.module.css";
 import LAYOUT_TEXT from "../layout.de.json";

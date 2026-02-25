@@ -10,7 +10,7 @@ import type { Node, Page } from "@schema/page";
 import type { SlideDeck, Slide } from "@schema/slideTypes";
 import type { PresenterNoteMacro } from "@macros/pn/types";
 
-type WorksheetSummary = { worksheetId: string; label: string };
+type WorksheetSummary = { worksheetId: string; label: string; sourceFilename: string };
 type SlideSummary = { slideId: string; label: string };
 
 type SubjectId = string;
@@ -214,7 +214,8 @@ async function processWorksheets(
             continue;
         }
 
-        const worksheetId = fileNameToId(worksheetPage.title)
+        const worksheetId = fileNameToId(worksheetPage.title);
+        const sourceFilename = worksheetName.replace(/\.[^.]+$/, "");
         const targetPath = `${subjectId}/${topicId}/${chapterId}/worksheets/${worksheetId}`;
 
         if (hasWebWorksheets && worksheetPage) {
@@ -234,7 +235,7 @@ async function processWorksheets(
             });
         }
 
-        worksheetSummaries.push({ worksheetId, label: worksheetPage.title });
+        worksheetSummaries.push({ worksheetId, label: worksheetPage.title, sourceFilename });
     }
 
     return { worksheetSummaries, pdfConversionPaths };

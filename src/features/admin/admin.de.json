@@ -9,9 +9,11 @@
     "manageAction": "Kurs öffnen"
   },
   "courseDetail": {
-    "slideSelection": {
-      "title": "Unterrichtsfolien",
-      "description": "Öffne die Folien des aktuellen Kapitels."
+    "chapterContent": {
+      "title": "Kapitelinhalt",
+      "description": "Folien und Arbeitsblätter des ausgewählten Kapitels.",
+      "slidesLabel": "Folien",
+      "worksheetsLabel": "Arbeitsblätter"
     },
     "progressControl": {
       "title": "Kapitelsteuerung",
@@ -39,6 +41,32 @@
       "title": "Teilnehmer",
       "description": "Übersicht aller Schüler, die in diesem Kurs eingeschrieben sind.",
       "comingSoon": "Teilnehmerliste folgt"
+    },
+    "worksheetManagement": {
+      "title": "Arbeitsblatt-Verwaltung",
+      "description": "Arbeitsblätter freischalten oder verstecken und Schülerfortschritt live einsehen.",
+      "visible": "Sichtbar",
+      "hidden": "Versteckt",
+      "monitorButton": "Monitoring",
+      "closeMonitor": "Schließen",
+      "presenceTitle": "Wo sind die Schüler gerade?",
+      "presenceNote": "Nur Schüler aktiv in den letzten 90 Minuten",
+      "presenceSection": "Abschnitt",
+      "presenceStudents": "Schüler",
+      "checkpointTitle": "Checkpoint-Ergebnisse",
+      "checkpointCauses": "Ursachen",
+      "refreshButton": "Aktualisieren",
+      "loading": "Wird geladen...",
+      "noData": "Noch keine Daten vorhanden",
+      "noPresence": "Kein Schüler aktiv in den letzten 90 Minuten",
+      "causeLabels": {
+        "topic": "Thema noch unklar",
+        "task": "Aufgabenstellung unklar",
+        "approach": "Weiß nicht, wie anfangen",
+        "execution": "Umsetzung schwierig",
+        "mistake": "Fehler nicht verstanden",
+        "other": "Anderes"
+      }
     }
   }
 }

@@ -1,8 +1,8 @@
 import { WorksheetRenderer } from "@features/contentpage/renderers/WorksheetRenderer";
 import { getPage } from "@services/pageService";
 import { getSession, assertCanAccessPage } from "@services/authService";
-import { getCourseId, getSubject } from "@services/courseService";
-import { getProgressDTO } from "@services/getProgressDTO";
+import { getCourseId, getSubject, coursePublic } from "@services/courseService";
+import { getProgressDTO } from "@services/courseService";
 
 type PageParams = {
   params: Promise<{
@@ -24,17 +24,21 @@ export default async function WorksheetRoute({ params }: PageParams) {
   } = await params;
 
   const session = await getSession();
-  const courseId = getCourseId(groupKey, subjectKey);
-  assertCanAccessPage(session, groupKey, courseId);
+  const user = session?.user ?? null;
+  const courseId = await getCourseId(groupKey, subjectKey);
+  const isPublic = await coursePublic(courseId);
+  assertCanAccessPage(session, groupKey, isPublic, courseId);
 
-  const subject = getSubject(courseId)
+  const subject = await getSubject(courseId);
   const page = await getPage({subject: subject.id, topicId, chapterId, worksheetId});
 
-  const progressDTO = await getProgressDTO(courseId);
+  const progressDTO = await getProgressDTO(courseId, user);
   const topic = progressDTO.topics.find(t => t.topicId === topicId);
   const chapter = topic?.chapters.find(c => c.chapterId === chapterId);
   const chapterStatus = chapter?.status ?? 'finished';
 
-  return <WorksheetRenderer page={page} worksheetSlug={`${courseId}-${topicId}-${chapterId}-${worksheetId}`} chapterStatus={chapterStatus} />;
+  const userId = session?.user?.id;
+
+  return <WorksheetRenderer page={page} worksheetSlug={`${courseId}-${topicId}-${chapterId}-${worksheetId}`} chapterStatus={chapterStatus} userId={userId} courseId={courseId} worksheetId={worksheetId} />;
 }
 

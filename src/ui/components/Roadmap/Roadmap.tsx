@@ -12,7 +12,7 @@ import {
   LockKeyholeOpen,
 } from "lucide-react";
 
-import type { ProgressStatus, ProgressTopicDTO, ProgressChapterDTO } from "@schema/progressDTO";
+import type { ProgressStatus, ProgressTopicDTO, ProgressChapterDTO } from "@schema/courseTypes";
 import styles from "./Roadmap.module.css";
 import UI_TEXT from "@ui/ui.de.json";
 

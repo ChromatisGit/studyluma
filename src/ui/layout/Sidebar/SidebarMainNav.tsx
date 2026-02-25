@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { ChevronRight } from "lucide-react";
 
 import { AppLink } from "@components/AppLink";
-import type { SidebarCourseDTO } from "@schema/sidebarDTO";
+import type { SidebarCourseDTO } from "@schema/courseTypes";
 import styles from "./Sidebar.module.css";
 import LAYOUT_TEXT from "../layout.de.json";
 

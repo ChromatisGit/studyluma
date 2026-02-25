@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { getSession, assertAdminAccess } from "@services/authService";
 import { Layout } from "@ui/layout/Layout";
-import { getSidebarDTO } from "@services/getSidebarDTO";
+import { getSidebarDTO } from "@services/courseService";
 import { signOutAction } from "@actions/accessActions";
 
 type AdminLayoutProps = {

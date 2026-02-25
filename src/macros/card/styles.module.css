@@ -1,0 +1,82 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+  padding: var(--sn-space-md) var(--sn-space-lg);
+  border-radius: var(--sn-radius-md);
+  border: 1px solid var(--sn-border);
+  border-left: 4px solid var(--sn-border);
+  background: var(--sn-surface-raised);
+}
+
+/* Kind variants — left accent line + subtle tinted background */
+.task {
+  border: none;
+  border-left: 4px solid var(--sn-blue-accent);
+  background: color-mix(in srgb, var(--sn-blue-accent) 8%, var(--sn-surface));
+}
+
+.emphasis {
+  border: none;
+  border-left: 4px solid var(--sn-purple-accent);
+  background: color-mix(in srgb, var(--sn-purple-accent) 8%, var(--sn-surface));
+}
+
+.warning {
+  border: none;
+  border-left: 4px solid var(--sn-orange-accent);
+  background: color-mix(in srgb, var(--sn-orange-accent) 8%, var(--sn-surface));
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--sn-text-muted);
+  flex-shrink: 0;
+}
+
+.task .icon {
+  color: var(--sn-blue-accent);
+}
+
+.emphasis .icon {
+  color: var(--sn-purple-accent);
+}
+
+.warning .icon {
+  color: var(--sn-orange-accent);
+}
+
+.label {
+  font-weight: var(--sn-font-semibold);
+  font-size: var(--sn-font-size-0-8);
+  color: var(--sn-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.task .label {
+  color: var(--sn-blue-accent-strong);
+}
+
+.emphasis .label {
+  color: var(--sn-purple-accent-strong);
+}
+
+.warning .label {
+  color: var(--sn-orange-accent-strong);
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+
+.content > :last-child {
+  margin-bottom: 0;
+}

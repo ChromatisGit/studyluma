@@ -7,12 +7,11 @@ type TaskResponseEntry = {
 };
 
 type WorksheetRecord = {
-  worksheetId: string;
   signature: string;
   createdAt: number;
   lastAccessed: number;
   responses: Record<string, TaskResponseEntry>;
-  checkpoints: Record<number, CheckpointResponse>;
+  submittedSections: number[];
 };
 
 type StorageState = {
@@ -39,16 +38,16 @@ function hashString(value: string): string {
   return (hash >>> 0).toString(16);
 }
 
-function generateId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-  return `worksheet-${Math.random().toString(16).slice(2)}-${Date.now().toString(16)}`;
-}
-
 export class WorksheetStorage {
   private slug: string;
   private signature: string;
+
+  /** Called after each task response is saved to localStorage. Feeds into SyncManager. */
+  onSave?: (taskKey: string, value: string) => void;
+  /** Called after a checkpoint is submitted. Fires immediately to server. */
+  onCheckpointSave?: (sectionIndex: number, response: CheckpointResponse) => void;
+  /** Called by flush() — wired to SyncManager.flush() in context. */
+  onFlush?: () => Promise<void>;
 
   private constructor(slug: string, signature: string) {
     this.slug = slug;
@@ -73,13 +72,6 @@ export class WorksheetStorage {
     return instance;
   }
 
-  get worksheetId(): string | null {
-    if (!WorksheetStorage.isAvailable()) return null;
-    const { state, record } = this.ensureRecord();
-    WorksheetStorage.persist(state);
-    return record.worksheetId;
-  }
-
   readResponse(taskKey: string): string {
     if (!WorksheetStorage.isAvailable()) return '';
     const { state, record } = this.ensureRecord();
@@ -102,19 +94,61 @@ export class WorksheetStorage {
     }
 
     WorksheetStorage.persist(state);
+    this.onSave?.(taskKey, value);
   }
 
-  readCheckpoint(sectionIndex: number): CheckpointResponse | null {
-    if (!WorksheetStorage.isAvailable()) return null;
+  /** Returns true if the user has already submitted the checkpoint for this section. */
+  hasCheckpoint(sectionIndex: number): boolean {
+    if (!WorksheetStorage.isAvailable()) return false;
     const { state, record } = this.ensureRecord();
     WorksheetStorage.persist(state);
-    return record.checkpoints[sectionIndex] ?? null;
+    return record.submittedSections.includes(sectionIndex);
   }
 
-  saveCheckpoint(sectionIndex: number, response: CheckpointResponse): void {
+  /**
+   * Marks a section's checkpoint as submitted locally (stores only the index).
+   * Fires onCheckpointSave with the full response for immediate server sync.
+   */
+  markCheckpointSubmitted(sectionIndex: number, response: CheckpointResponse): void {
     if (!WorksheetStorage.isAvailable()) return;
     const { state, record } = this.ensureRecord();
-    record.checkpoints[sectionIndex] = response;
+    if (!record.submittedSections.includes(sectionIndex)) {
+      record.submittedSections.push(sectionIndex);
+    }
+    WorksheetStorage.persist(state);
+    this.onCheckpointSave?.(sectionIndex, response);
+  }
+
+  /**
+   * Triggers a flush of all pending dirty task responses to the DB.
+   * Wired to SyncManager.flush() by WorksheetStorageContext.
+   */
+  async flush(): Promise<void> {
+    await this.onFlush?.();
+  }
+
+  /**
+   * Merges data loaded from the DB into localStorage.
+   * DB task responses take precedence over existing localStorage values.
+   * submittedSections are unioned (any section submitted on any device is preserved).
+   * Does NOT trigger onSave / onCheckpointSave callbacks.
+   */
+  mergeDbData(responses: Record<string, string>, submittedSections: number[]): void {
+    if (!WorksheetStorage.isAvailable()) return;
+    const { state, record } = this.ensureRecord();
+
+    for (const [taskKey, value] of Object.entries(responses)) {
+      if (value) {
+        record.responses[taskKey] = { value, updatedAt: Date.now() };
+      }
+    }
+
+    for (const idx of submittedSections) {
+      if (!record.submittedSections.includes(idx)) {
+        record.submittedSections.push(idx);
+      }
+    }
+
     WorksheetStorage.persist(state);
   }
 
@@ -146,12 +180,11 @@ export class WorksheetStorage {
   private static createRecord(signature: string): WorksheetRecord {
     const timestamp = Date.now();
     return {
-      worksheetId: generateId(),
       signature,
       createdAt: timestamp,
       lastAccessed: timestamp,
       responses: {},
-      checkpoints: {},
+      submittedSections: [],
     };
   }
 
@@ -166,17 +199,29 @@ export class WorksheetStorage {
     }
 
     try {
-      const parsed = JSON.parse(raw) as StorageState;
-      if (parsed && parsed.version === 1 && parsed.worksheets) {
-        // Migrate existing records that lack checkpoints field
-        for (const record of Object.values(parsed.worksheets)) {
-          if (record && !record.checkpoints) {
-            record.checkpoints = {};
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if (parsed && parsed['version'] === 1 && parsed['worksheets'] && typeof parsed['worksheets'] === 'object') {
+        const worksheets = parsed['worksheets'] as Record<string, Record<string, unknown>>;
+        // Migrate existing records to new format
+        for (const record of Object.values(worksheets)) {
+          if (!record) continue;
+          // Remove old checkpoints field, replace with submittedSections
+          if ('checkpoints' in record && !('submittedSections' in record)) {
+            const checkpoints = record['checkpoints'] as Record<string, unknown>;
+            (record as WorksheetRecord).submittedSections = Object.keys(checkpoints).map(Number);
+            delete (record as Record<string, unknown>).checkpoints;
+          }
+          if (!('submittedSections' in record)) {
+            (record as WorksheetRecord).submittedSections = [];
+          }
+          // Remove old worksheetId field (no longer needed)
+          if ('worksheetId' in record) {
+            delete (record as Record<string, unknown>).worksheetId;
           }
         }
         return {
           version: 1,
-          worksheets: parsed.worksheets,
+          worksheets: worksheets as unknown as Record<string, WorksheetRecord>,
         };
       }
     } catch {

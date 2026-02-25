@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { CourseId } from "@services/courseService";
+import type { CourseId } from "@schema/courseTypes";
 import {
   closeRegistrationAction,
   getRegistrationStatusAction,

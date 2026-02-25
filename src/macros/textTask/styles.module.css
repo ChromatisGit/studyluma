@@ -4,6 +4,7 @@
   border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-md);
   background: var(--sn-surface);
+  color: var(--sn-text);
   font-family: inherit;
   font-size: var(--sn-font-size-0-95);
   line-height: 1.5;

@@ -7,9 +7,8 @@ import { Layout } from "@ui/layout/Layout";
 import { CourseProviders } from "./CourseProviders";
 import { getSession } from "@services/authService";
 import { getCourseId } from "@services/courseService";
-import { getCourseDTO } from "@services/getCourseDTO";
-import { getSidebarDTO } from "@services/getSidebarDTO";
-import { isAdmin } from "@schema/userTypes";
+import { getCourseDTO, getSidebarDTO } from "@services/courseService";
+import { isAdmin } from "@services/authService";
 import { signOutAction } from "@actions/accessActions";
 
 type CourseLayoutProps = {
@@ -26,10 +25,15 @@ export default async function CourseLayout({ children, params }: CourseLayoutPro
   const isUserAdmin = user ? isAdmin(user) : false;
 
   const { group: groupKey, course: subjectKey } = await params;
-  const courseId = getCourseId(groupKey, subjectKey);
-  const activeCourseLabel = getCourseDTO(courseId).label;
 
-  const sidebarData = await getSidebarDTO({ courseId, user });
+  const courseId = await getCourseId(groupKey, subjectKey);
+
+  const [courseDTO, sidebarData] = await Promise.all([
+    getCourseDTO(courseId),
+    getSidebarDTO({ courseId, user }),
+  ]);
+
+  const activeCourseLabel = courseDTO.label;
 
   return (
     <Layout

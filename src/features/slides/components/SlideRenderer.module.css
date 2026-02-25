@@ -48,12 +48,14 @@
 .contentInner {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: safe center;
   gap: var(--sn-space-lg);
-  padding: var(--sn-space-lg) var(--sn-space-xl);
+  padding: var(--sn-space-xl) var(--sn-space-xl);
   height: 100%;
-  font-size: 1em;
+  font-size: 1.08em;
   line-height: 1.7;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 /* Content item styles */
@@ -78,7 +80,39 @@
 }
 
 .subheader {
-  font-size: 1.15em;
+  font-size: 1.35em;
   font-weight: var(--sn-font-semibold);
   margin-top: var(--sn-space-sm);
+}
+
+/* Layout variants — applied alongside .contentInner */
+
+.layoutStatement {
+  justify-content: safe center;
+  align-items: center;
+  text-align: center;
+  font-size: 1.3em;
+}
+
+.layoutSection {
+  justify-content: safe center;
+  align-items: center;
+  text-align: center;
+  font-size: 1.6em;
+}
+
+.layoutCode {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--sn-space-lg);
+  align-items: start;
+  align-content: start;
+}
+
+.layoutCode > :first-child {
+  grid-column: 1;
+}
+
+.layoutCode > *:not(:first-child) {
+  grid-column: 2;
 }

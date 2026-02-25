@@ -1,0 +1,35 @@
+.pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--sn-space-md);
+  align-items: baseline;
+  padding: var(--sn-space-xs) 0;
+  border-bottom: 1px solid var(--sn-border);
+}
+
+.row:first-child {
+  border-top: 1px solid var(--sn-border);
+}
+
+.key {
+  color: var(--sn-text-muted);
+  white-space: nowrap;
+}
+
+.key > :first-child {
+  margin: 0;
+}
+
+.value > :first-child {
+  margin: 0;
+}
+
+.value > :last-child {
+  margin: 0;
+}
