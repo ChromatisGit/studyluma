@@ -1,0 +1,258 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-md);
+  width: 100%;
+}
+
+/* ── Timer ─────────────────────────────────────────── */
+
+.timerBar {
+  height: 4px;
+  background: var(--sn-border);
+  border-radius: var(--sn-radius-xxs);
+  overflow: hidden;
+}
+
+.timerFill {
+  height: 100%;
+  background: var(--sn-accent);
+  border-radius: var(--sn-radius-xxs);
+  /* 1s matches the tick interval — fills animate smoothly between seconds */
+  transition: width 1s linear, background 0.3s ease;
+}
+
+.timerUrgent {
+  background: var(--sn-error, #e53e3e);
+}
+
+.timerCount {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sn-text-secondary);
+  text-align: right;
+}
+
+.timerCountUrgent {
+  color: var(--sn-error, #e53e3e);
+}
+
+/* ── Question ───────────────────────────────────────── */
+
+.question {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--sn-text);
+  line-height: 1.55;
+}
+
+/* ── Options ────────────────────────────────────────── */
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+.option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  width: 100%;
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  background: var(--sn-surface);
+  border: 1.5px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s, background 0.15s;
+  min-height: 44px; /* touch target */
+}
+
+.option:hover:not(:disabled) {
+  border-color: var(--sn-accent);
+  background: var(--sn-surface-raised);
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+/* Reveal mode: options have bar behind them */
+.optionReveal {
+  cursor: default;
+}
+
+/* ── Option states ───────────────────────────────────── */
+
+.option--default {
+  border-color: var(--sn-border);
+}
+
+.option--selected {
+  border-color: var(--sn-accent);
+  background: color-mix(in srgb, var(--sn-accent) 8%, var(--sn-surface));
+}
+
+.option--correct {
+  border-color: var(--sn-success, #38a169);
+  background: color-mix(in srgb, var(--sn-success, #38a169) 8%, var(--sn-surface));
+}
+
+.option--incorrect {
+  border-color: var(--sn-error, #e53e3e);
+  background: color-mix(in srgb, var(--sn-error, #e53e3e) 6%, var(--sn-surface));
+}
+
+.option--neutral {
+  border-color: var(--sn-border);
+  background: var(--sn-surface);
+}
+
+/* ── Distribution bar (behind content, z-index: 0) ──── */
+
+.bar {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: color-mix(in srgb, var(--sn-text-secondary) 10%, transparent);
+  border-radius: var(--sn-radius-md);
+  z-index: 0;
+  transition: width 0.4s ease;
+  pointer-events: none;
+}
+
+.barCorrect {
+  background: color-mix(in srgb, var(--sn-success, #38a169) 18%, transparent);
+}
+
+/* ── Option indicator (letter badge) ───────────────── */
+
+.indicator {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--sn-radius-xs);
+  border: 1.5px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--sn-text-secondary);
+  transition: color 0.15s, background 0.15s;
+}
+
+.indicator--selected {
+  color: var(--sn-accent);
+  background: color-mix(in srgb, var(--sn-accent) 12%, transparent);
+}
+
+.indicator--correct {
+  color: var(--sn-success, #38a169);
+  background: color-mix(in srgb, var(--sn-success, #38a169) 12%, transparent);
+}
+
+.indicator--incorrect {
+  color: var(--sn-error, #e53e3e);
+  background: color-mix(in srgb, var(--sn-error, #e53e3e) 12%, transparent);
+}
+
+.indicator--neutral {
+  color: var(--sn-text-secondary);
+}
+
+.optionLetter {
+  line-height: 1;
+}
+
+/* ── Option text ────────────────────────────────────── */
+
+.optionText {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  font-size: 0.9375rem;
+  color: var(--sn-text);
+  line-height: 1.4;
+}
+
+/* ── Count badge (reveal phases) ───────────────────── */
+
+.countBadge {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--sn-text-secondary);
+  min-width: 1.5rem;
+  text-align: right;
+}
+
+/* ── Submit button ──────────────────────────────────── */
+
+.submitBtn {
+  padding: var(--sn-space-sm) var(--sn-space-lg);
+  background: var(--sn-surface-raised);
+  border: 1.5px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--sn-text-secondary);
+  cursor: not-allowed;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  width: 100%;
+  min-height: 44px;
+}
+
+.submitBtnReady {
+  background: var(--sn-accent);
+  border-color: var(--sn-accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.submitBtnReady:hover {
+  filter: brightness(1.08);
+}
+
+/* ── Waiting / submitted state ─────────────────────── */
+
+.waitingState {
+  text-align: center;
+  font-size: 0.9375rem;
+  color: var(--sn-text-secondary);
+  padding: var(--sn-space-sm) 0;
+}
+
+/* ── #why explanation ───────────────────────────────── */
+
+.why {
+  padding: var(--sn-space-md);
+  background: color-mix(in srgb, var(--sn-accent) 6%, var(--sn-surface));
+  border: 1px solid color-mix(in srgb, var(--sn-accent) 20%, var(--sn-border));
+  border-radius: var(--sn-radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+.whyLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sn-accent);
+}
+
+.whyText {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--sn-text);
+  line-height: 1.55;
+}

@@ -5,6 +5,7 @@ import type { SlideDeck, SlideMessage, SlideState } from "@schema/slideTypes";
 import type { MacroRenderContext } from "@macros/componentTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
 import { createProjectorAdapter } from "@macros/state/BroadcastAdapter";
+import { QuizProjectorOverlay } from "@features/quiz/QuizProjectorOverlay";
 import { useSlideBroadcast } from "./hooks/useSlideBroadcast";
 import { SlideRenderer } from "./components/SlideRenderer";
 import { LaserPointer } from "./components/LaserPointer";
@@ -92,6 +93,7 @@ export function SlideProjector({ deck, channelName }: SlideProjectorProps) {
             slideIndex={state.slideIndex}
           />
         )}
+        <QuizProjectorOverlay channelName={channelName} />
         <LaserPointer position={state.pointer} />
       </div>
     </MacroStateProvider>

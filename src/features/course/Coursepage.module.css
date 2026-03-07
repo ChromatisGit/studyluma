@@ -1,0 +1,113 @@
+.page {
+  padding-top: var(--sn-space-xl);
+  display: flex;
+  justify-content: center;
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--sn-content-width-narrow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xl);
+}
+
+/* === Sections === */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--sn-text-xl);
+  font-weight: var(--sn-font-bold);
+  color: var(--sn-text);
+}
+
+.continueCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sn-space-md);
+  padding: var(--sn-space-lg);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  box-shadow: var(--sn-shadow-lw);
+}
+
+.continueInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.topicName {
+  margin: 0;
+  font-size: var(--sn-text-md);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text);
+}
+
+.chapterName {
+  margin: 0;
+  font-size: var(--sn-text-sm);
+  color: var(--sn-text-muted);
+}
+
+/* === Worksheet list === */
+
+.worksheetList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+.worksheetItem {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  text-decoration: none;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+
+.worksheetItem:hover {
+  background: var(--sn-surface-raised);
+  border-color: var(--sn-purple-accent-soft-border);
+}
+
+.worksheetIcon {
+  flex-shrink: 0;
+  color: var(--sn-purple-accent);
+}
+
+.worksheetLabel {
+  flex: 1;
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-medium);
+  color: var(--sn-text);
+}
+
+.worksheetArrow {
+  flex-shrink: 0;
+  color: var(--sn-text-muted);
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding-top: var(--sn-space-lg);
+  }
+
+  .continueCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

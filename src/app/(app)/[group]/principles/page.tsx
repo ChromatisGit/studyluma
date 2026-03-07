@@ -22,7 +22,6 @@ export default async function GroupPrinciplesPage({ params }: PageParams) {
     <Layout
       sidebarData={sidebarData}
       isAdmin={isUserAdmin}
-      activeCourseLabel={null}
       signOutAction={signOutAction}
     >
       <main>

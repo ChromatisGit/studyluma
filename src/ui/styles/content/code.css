@@ -1,0 +1,12 @@
+.sn-code-block {
+  background: var(--sn-code-bg);
+  border: 1px solid var(--sn-code-bg-border);
+  border-radius: var(--sn-radius-xs);
+  padding: var(--sn-space-xs);
+  overflow-x: auto;
+  font-family: var(--sn-font-mono);
+  font-size: var(--sn-text-md);
+  margin: var(--sn-space-xs) 0;
+  line-height: 1.6;
+  color: var(--sn-code-text);
+}

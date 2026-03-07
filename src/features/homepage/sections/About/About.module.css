@@ -6,7 +6,7 @@
 }
 
 .goalTitle {
-  font-size: var(--sn-font-size-1-1);
+  font-size: var(--sn-text-md);
   margin: 0.35rem 0 0;
 }
 

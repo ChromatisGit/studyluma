@@ -1,0 +1,51 @@
+.sn-markdown {
+  color: var(--sn-text);
+  line-height: 1.6;
+}
+
+.sn-markdown > * + * {
+  margin-top: 0.5rem;
+}
+
+.sn-markdown p {
+  margin: 0;
+}
+
+.sn-markdown pre:not(.sn-code-block) {
+  margin: 0;
+}
+
+.sn-markdown ul,
+.sn-markdown ol {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.sn-markdown blockquote {
+  margin: 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--sn-border);
+  color: var(--sn-text-muted);
+}
+
+.sn-markdown code {
+  background: var(--sn-surface-raised);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--sn-radius-xs);
+  font-family: var(--sn-font-mono);
+}
+
+.sn-markdown a {
+  color: var(--sn-primary);
+  text-decoration: none;
+}
+
+.sn-markdown a:hover {
+  text-decoration: underline;
+}
+
+.sn-markdown hr {
+  border: none;
+  border-top: 1px solid var(--sn-border);
+  margin: 1rem 0;
+}

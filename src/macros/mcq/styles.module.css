@@ -41,8 +41,8 @@
 }
 
 .wrongIcon {
-  width: var(--sn-font-size-1-75);
-  height: var(--sn-font-size-1-75);
+  width: var(--sn-text-xl);
+  height: var(--sn-text-xl);
   color: var(--sn-red-accent);
 }
 

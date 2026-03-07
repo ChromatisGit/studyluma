@@ -28,17 +28,17 @@
 
 .size-sm {
   padding: 0.5rem 0.9rem;
-  font-size: var(--sn-font-size-0-875);
+  font-size: var(--sn-text-sm);
 }
 
 .size-md {
   padding: 0.65rem 1.15rem;
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
 }
 
 .size-lg {
   padding: 0.8rem 1.3rem;
-  font-size: var(--sn-font-size-1);
+  font-size: var(--sn-text-md);
 }
 
 /* === Variants === */

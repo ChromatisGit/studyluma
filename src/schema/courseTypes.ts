@@ -42,6 +42,7 @@ export type SidebarCourseDTO = {
   id: string;
   label: string;
   href: string;
+  icon?: string;
 };
 
 export type SidebarDTO = ProgressDTO & {
@@ -49,6 +50,10 @@ export type SidebarDTO = ProgressDTO & {
   isAuthenticated: boolean;
   primaryGroupKey?: string;
   accessCode?: string;
+  /** Display badge emoji for the user (e.g. "🎓"). Stub until DB field exists. */
+  badge?: string;
+  /** Total XP earned by the user. Stub until DB field exists. */
+  xp?: number;
 };
 
 export type CourseAccessGroups = {

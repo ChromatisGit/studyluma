@@ -16,6 +16,7 @@ import { parser as tableParser } from "@macros/table/parser";
 import { parser as codeRunnerParser } from "@macros/codeRunner/parser";
 import { parser as gapParser } from "@macros/gap/parser";
 import { parser as mcqParser } from "@macros/mcq/parser";
+import { parser as quizParser } from "@macros/quiz/parser";
 import { parser as codeTaskParser } from "@macros/codeTask/parser";
 import { parser as textTaskParser } from "@macros/textTask/parser";
 import { parser as pnParser } from "@macros/pn/parser";
@@ -43,6 +44,7 @@ const parserMap: Map<string, ParserDef> = new Map([
   ["codeRunner", codeRunnerParser],
   ["gap", gapParser],
   ["mcq", mcqParser],
+  ["quiz", quizParser],
   ["codeTask", codeTaskParser],
   ["textTask", textTaskParser],
   ["pn", pnParser],

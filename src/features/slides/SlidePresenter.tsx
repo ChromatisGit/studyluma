@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SlideDeck, SlideMessage } from "@schema/slideTypes";
 import type { MacroRenderContext } from "@macros/componentTypes";
+import type { QuizMacro } from "@macros/quiz/types";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
 import { createPresenterStore, type PresenterStore } from "@macros/state/BroadcastAdapter";
+import { QuizPresenterPanel } from "@features/quiz/QuizPresenterPanel";
 import { useSlideState } from "./hooks/useSlideState";
 import { useSlideBroadcast } from "./hooks/useSlideBroadcast";
 import { useSlideKeyboard } from "./hooks/useSlideKeyboard";
@@ -19,12 +21,30 @@ type SlidePresenterProps = {
   deck: SlideDeck;
   channelName: string;
   projectorPath: string;
+  courseId: string;
 };
+
+/** Collect all QuizMacro nodes from slide content (including inside MacroGroups). */
+function findQuizMacros(content: SlideDeck["slides"][number]["content"]): QuizMacro[] {
+  const result: QuizMacro[] = [];
+  for (const node of content) {
+    if ("type" in node && node.type === "quiz") {
+      result.push(node as QuizMacro);
+    } else if ("type" in node && node.type === "group") {
+      const group = node as { type: "group"; macros: { type: string }[] };
+      for (const macro of group.macros) {
+        if (macro.type === "quiz") result.push(macro as QuizMacro);
+      }
+    }
+  }
+  return result;
+}
 
 export function SlidePresenter({
   deck,
   channelName,
   projectorPath,
+  courseId,
 }: SlidePresenterProps) {
   const { state, next, prev, goTo, first, last, toggleBlackout } =
     useSlideState({ totalSlides: deck.slides.length });
@@ -95,6 +115,11 @@ export function SlidePresenter({
   const nextSlide = deck.slides[state.slideIndex + 1];
   const slideContext: MacroRenderContext = { readOnly: false };
 
+  const quizMacros = useMemo(
+    () => (currentSlide ? findQuizMacros(currentSlide.content) : []),
+    [currentSlide],
+  );
+
   return (
     <MacroStateProvider adapter={store.adapter}>
       <div className={styles.presenter}>
@@ -126,6 +151,14 @@ export function SlidePresenter({
           </main>
 
           <aside className={styles.sidebar}>
+            {quizMacros.length > 0 && (
+              <QuizPresenterPanel
+                quizMacros={quizMacros}
+                channelName={channelName}
+                courseId={courseId}
+              />
+            )}
+
             {currentSlide && (
               <PresenterNotes notes={currentSlide.presenterNotes} />
             )}

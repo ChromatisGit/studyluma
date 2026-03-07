@@ -45,7 +45,7 @@
 
 .collapsibleLabel {
   font-weight: var(--sn-font-bold);
-  font-size: var(--sn-font-size-0-8);
+  font-size: var(--sn-text-xs);
   color: var(--sn-text);
 }
 

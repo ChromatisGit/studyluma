@@ -10,14 +10,14 @@
 }
 
 .title {
-  font-size: var(--sn-font-size-3);
+  font-size: var(--sn-text-display);
   font-weight: var(--sn-font-bold);
   color: var(--sn-text);
   margin: 0 0 var(--sn-space-xs);
 }
 
 .description {
-  font-size: var(--sn-font-size-1);
+  font-size: var(--sn-text-md);
   color: var(--sn-text-muted);
   margin: 0;
 }
@@ -31,7 +31,7 @@
 }
 
 .codeLabel {
-  font-size: var(--sn-font-size-0);
+  font-size: var(--sn-text-xs);
   color: var(--sn-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -39,7 +39,7 @@
 }
 
 .code {
-  font-size: var(--sn-font-size-4);
+  font-size: var(--sn-text-display);
   font-weight: var(--sn-font-bold);
   font-family: var(--sn-font-mono);
   color: var(--sn-purple-accent);
@@ -62,7 +62,7 @@
 }
 
 .checkboxLabel {
-  font-size: var(--sn-font-size-1);
+  font-size: var(--sn-text-md);
   color: var(--sn-text);
   cursor: pointer;
   user-select: none;

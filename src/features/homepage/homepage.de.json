@@ -3,12 +3,16 @@
     "title": "Willkommen bei StudyNode",
     "lead": "Lernen neu gedacht - mit Sinn und Struktur",
     "primaryCta": {
-      "label": "Kurse entdecken",
-      "ariaLabel": "Zu den Kursen"
+      "label": "Anmelden",
+      "ariaLabel": "Bei StudyNode anmelden"
     },
     "secondaryCta": {
-      "label": "Mehr über StudyNode",
-      "ariaLabel": "Mehr über StudyNode"
+      "label": "Kurs beitreten",
+      "ariaLabel": "Einen Kurs beitreten"
+    },
+    "tertiaryCta": {
+      "label": "Was ist StudyNode?",
+      "ariaLabel": "Mehr über StudyNode erfahren"
     }
   },
   "about": {

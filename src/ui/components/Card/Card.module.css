@@ -62,7 +62,7 @@
 
 .title {
   margin: 0;
-  font-size: var(--sn-font-size-1-1);
+  font-size: var(--sn-text-md);
   font-weight: var(--sn-font-semibold);
   color: var(--sn-text);
   line-height: 1.3;
@@ -70,7 +70,7 @@
 
 .subtitle {
   margin: 0;
-  font-size: var(--sn-font-size-0-9);
+  font-size: var(--sn-text-sm);
   color: var(--sn-text-muted);
   line-height: 1.4;
 }
@@ -89,7 +89,7 @@
   border-radius: var(--sn-radius-xs);
   background: var(--card-accent-bg);
   color: var(--card-accent);
-  font-size: var(--sn-font-size-0-85);
+  font-size: var(--sn-text-sm);
   font-weight: var(--sn-font-semibold);
 }
 
@@ -102,7 +102,7 @@
   margin-top: auto;
   color: var(--card-accent);
   font-weight: var(--sn-font-bold);
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
 }
 
 /* === Color Variants === */

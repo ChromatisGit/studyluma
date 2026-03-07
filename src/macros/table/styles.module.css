@@ -6,7 +6,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
 }
 
 .table th,

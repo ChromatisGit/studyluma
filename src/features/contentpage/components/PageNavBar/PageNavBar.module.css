@@ -16,7 +16,7 @@
   border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-sm);
   font-weight: var(--sn-font-bold);
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
   cursor: pointer;
   transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
   box-shadow: var(--sn-shadow-lw);

@@ -1,20 +1,27 @@
 {
   "section": {
     "joinTitle": "{courseName} beitreten",
-    "welcomeTitle": "Willkommen bei StudyNode",
+    "welcomeTitle": "Willkommen zurück",
     "joinSubtitle": "Gib deine Zugangsdaten ein, um diesem Kurs beizutreten.",
-    "loginSubtitle": "Gib deine Zugangsdaten ein, um fortzufahren.",
+    "loginSubtitle": "Gib deinen Zugangscode und dein Passwort ein.",
+    "tabLogin": "Ich habe einen Zugangscode",
+    "tabRegister": "Neu hier",
     "accessCodeLabel": "Zugangscode",
-    "accessCodeOptional": "(Optional)",
-    "accessCodePlaceholderJoin": "Zugangscode eingeben, falls vorhanden",
     "accessCodePlaceholder": "Zugangscode eingeben",
-    "accessCodeHelper": "Wenn die Registrierung offen ist, kannst du dich mit einem Passwort registrieren, du erhälst dann ein Access Code.",
     "pinLabel": "Passwort",
     "pinPlaceholder": "Passwort eingeben",
     "continueButton": "Weiter",
     "processing": "Wird verarbeitet …",
     "backToHome": "Zur Startseite",
     "helpText": "Brauchst du Hilfe? Wende dich an deine Lehrkraft."
+  },
+  "picker": {
+    "unauthTitle": "Wähle deinen Kurs aus",
+    "authTitle": "Weiteren Kurs beitreten",
+    "joinButton": "Beitreten",
+    "backToHome": "← Zur Startseite",
+    "backToDashboard": "← Zurück",
+    "processing": "Wird verarbeitet …"
   },
   "modal": {
     "title": "Speichere deinen Zugangscode",

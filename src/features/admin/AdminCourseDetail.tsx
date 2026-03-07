@@ -142,7 +142,7 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
                 {ADMIN_TEXT.courseDetail.chapterContent.slidesLabel}
               </h3>
               <SlideSelection
-                subjectId={course.subjectId}
+                courseId={courseId}
                 topicId={viewTopicId}
                 chapterId={viewChapterId}
                 slideIds={viewSlideIds}

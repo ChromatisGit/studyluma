@@ -22,7 +22,7 @@
 
 .label {
   font-weight: var(--sn-font-bold);
-  font-size: var(--sn-font-size-0-85);
+  font-size: var(--sn-text-sm);
   color: var(--sn-text);
 }
 

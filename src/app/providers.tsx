@@ -12,7 +12,7 @@ type ProvidersProps = {
 
 export function Providers({ children }: ProvidersProps) {
   const toasterOffset = {
-    top: "calc(var(--sn-navbar-height) + var(--sn-space-sm))",
+    top: "var(--sn-space-sm)",
     right: "var(--sn-space-sm)",
     left: "var(--sn-space-sm)",
   };

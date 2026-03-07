@@ -1,10 +1,12 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { clearSessionCookie, setSessionCookie } from "@server-lib/auth";
-import { getSession, isAdmin } from "@services/authService";
+import { getSession, isAdmin, assertLoggedIn } from "@services/authService";
 import { addCourseToUser, createUser, getUserById } from "@services/userService";
 import { getAuthenticatedUser } from "@services/authService";
-import { isRegistrationOpen } from "@services/courseService";
+import { isRegistrationOpen, getCourseDTO } from "@services/courseService";
+import { getActiveQuizForUser } from "@services/quizService";
 import { getClientIp } from "@server-lib/getClientIp";
 import type { UserDTO } from "@services/userService";
 
@@ -14,6 +16,8 @@ export type AccessContext = {
   courseId: string | null;
   courseRoute: string | null;
   isRegistrationOpen: boolean;
+  /** Internal path to redirect to after login/registration (already sanitised by the server page). */
+  from: string | null;
 };
 
 export type ContinueAccessInput = {
@@ -105,7 +109,8 @@ export async function continueAccessAction(
     const user = await getAuthenticatedUser(accessCode, pin, ip);
     if (!user) return invalidCreds();
 
-    return success(user, "/");
+    const activeQuiz = await getActiveQuizForUser(user);
+    return success(user, activeQuiz ? "/quiz" : (ctx.from ?? "/home"));
   }
 
   // from here: course join mode
@@ -116,7 +121,7 @@ export async function continueAccessAction(
   const currentUser = session?.user ?? null;
 
   if (currentUser && hasCourseAccess(currentUser, groupKey, courseId)) {
-    return success(currentUser, courseRoute);
+    return success(currentUser, ctx.from ?? courseRoute);
   }
 
   // -------- course join with auth (code + pin) --------
@@ -133,7 +138,7 @@ export async function continueAccessAction(
     const updated = await ensureCourseAccess(user, groupKey, courseId, ip);
     if (!updated) return fail("Failed to enroll in course.", "/");
 
-    return success(updated, courseRoute);
+    return success(updated, ctx.from ?? courseRoute);
   }
 
   // -------- course join with pin only (create user) --------
@@ -144,7 +149,21 @@ export async function continueAccessAction(
   const updated = await ensureCourseAccess(newUser, groupKey, courseId, ip);
   if (!updated) return fail("Failed to enroll in course.", "/");
 
-  return success(updated, courseRoute, newAccessCode);
+  return success(updated, ctx.from ?? courseRoute, newAccessCode);
+}
+
+export async function joinCourseAction(courseId: string): Promise<void> {
+  const session = await getSession();
+  assertLoggedIn(session);
+
+  const open = await isRegistrationOpen(courseId);
+  if (!open) return; // silently bail — UI should only show open courses
+
+  const ip = await getClientIp();
+  await addCourseToUser(session.user, courseId, ip);
+
+  const course = await getCourseDTO(courseId);
+  redirect(`/${course.groupKey}/${course.slug}`);
 }
 
 export async function signOutAction(): Promise<void> {

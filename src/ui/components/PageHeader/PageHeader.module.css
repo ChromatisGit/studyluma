@@ -22,7 +22,7 @@
 
 .title {
   margin: 0;
-  font-size: var(--sn-font-size-2-2);
+  font-size: var(--sn-text-display);
   font-weight: var(--sn-font-bold);
   color: var(--sn-text);
   line-height: 1.2;
@@ -30,7 +30,7 @@
 
 .subtitle {
   margin: 0;
-  font-size: var(--sn-font-size-1);
+  font-size: var(--sn-text-md);
   color: var(--sn-text-muted);
 }
 

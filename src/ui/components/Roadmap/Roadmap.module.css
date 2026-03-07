@@ -49,7 +49,7 @@
   padding: 0.5rem;
   border-radius: var(--sn-radius-md);
   text-decoration: none;
-  font-size: var(--sn-font-size-1-05);
+  font-size: var(--sn-text-md);
   line-height: 1.3;
   transition: background-color 0.15s ease;
 }
@@ -186,7 +186,7 @@
   text-decoration: none;
   display: block;
   border-radius: var(--sn-radius-md);
-  font-size: var(--sn-font-size-1-05);
+  font-size: var(--sn-text-md);
   transition: background-color 0.2s ease;
 }
 

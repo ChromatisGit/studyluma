@@ -15,6 +15,9 @@ DROP TABLE IF EXISTS courses            CASCADE;
 DROP TABLE IF EXISTS auth_attempts      CASCADE;
 DROP TABLE IF EXISTS log_audit          CASCADE;
 DROP TABLE IF EXISTS slide_sessions     CASCADE;
+DROP TABLE IF EXISTS quiz_responses     CASCADE;
+DROP TABLE IF EXISTS quiz_participants  CASCADE;
+DROP TABLE IF EXISTS quiz_sessions      CASCADE;
 
 -- ============================================================
 -- 1) Lookup tables
@@ -208,7 +211,50 @@ CREATE TABLE IF NOT EXISTS slide_sessions (
 );
 
 -- ============================================================
--- 9) Write-only log tables (no RLS, log_ prefix convention)
+-- 9) Live quiz tables
+-- No RLS — admin-only access to session management enforced at
+-- application level. Student responses use userSQL (RLS context).
+-- ============================================================
+
+CREATE TABLE quiz_sessions (
+  session_id       TEXT         PRIMARY KEY,
+  channel_name     TEXT         NOT NULL,
+  course_id        TEXT         NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
+  phase            TEXT         NOT NULL DEFAULT 'waiting'
+                                  CHECK (phase IN (
+                                    'waiting',
+                                    'active',
+                                    'reveal_dist',
+                                    'reveal_correct',
+                                    'closed'
+                                  )),
+  questions        JSONB        NOT NULL,
+  current_index    INTEGER      NOT NULL DEFAULT 0,
+  timer_seconds    INTEGER,
+  timer_started_at TIMESTAMPTZ,
+  updated_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  created_at       TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE TABLE quiz_participants (
+  session_id  TEXT         NOT NULL REFERENCES quiz_sessions(session_id) ON DELETE CASCADE,
+  user_id     TEXT         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  joined_at   TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  PRIMARY KEY (session_id, user_id)
+);
+
+CREATE TABLE quiz_responses (
+  session_id      TEXT         NOT NULL REFERENCES quiz_sessions(session_id) ON DELETE CASCADE,
+  user_id         TEXT         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  question_index  INTEGER      NOT NULL,
+  selected        INTEGER[]    NOT NULL,
+  timed_out       BOOLEAN      NOT NULL DEFAULT false,
+  submitted_at    TIMESTAMPTZ  NOT NULL DEFAULT now(),
+  PRIMARY KEY (session_id, user_id, question_index)
+);
+
+-- ============================================================
+-- 10) Write-only log tables (no RLS, log_ prefix convention)
 -- ============================================================
 
 CREATE TABLE log_audit (
@@ -269,6 +315,16 @@ CREATE INDEX IF NOT EXISTS idx_auth_attempts_locked
 CREATE INDEX IF NOT EXISTS idx_log_audit_user      ON log_audit(user_id);
 CREATE INDEX IF NOT EXISTS idx_log_audit_event     ON log_audit(event_type);
 CREATE INDEX IF NOT EXISTS idx_log_audit_timestamp ON log_audit(created_at);
+
+-- Quiz: one active session per course at a time
+CREATE UNIQUE INDEX IF NOT EXISTS ux_quiz_one_active_per_course
+  ON quiz_sessions(course_id)
+  WHERE phase IN ('waiting', 'active', 'reveal_dist', 'reveal_correct');
+
+CREATE INDEX IF NOT EXISTS idx_quiz_sessions_course ON quiz_sessions(course_id);
+CREATE INDEX IF NOT EXISTS idx_quiz_sessions_channel ON quiz_sessions(channel_name);
+CREATE INDEX IF NOT EXISTS idx_quiz_participants_session ON quiz_participants(session_id);
+CREATE INDEX IF NOT EXISTS idx_quiz_responses_session ON quiz_responses(session_id, question_index);
 
 -- ============================================================
 -- 11) Row Level Security
@@ -434,6 +490,54 @@ CREATE POLICY checkpoint_responses_self_insert ON checkpoint_responses
 
 CREATE POLICY checkpoint_responses_self_update ON checkpoint_responses
   FOR UPDATE USING (user_id = current_setting('app.user_id', true));
+
+-- Quiz tables: RLS
+-- quiz_sessions: enrolled students read active sessions for their courses; admins read/write all
+-- quiz_participants: own row; admins all
+-- quiz_responses: own rows; admins all (for result aggregation)
+
+ALTER TABLE quiz_sessions    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quiz_participants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quiz_responses   ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS quiz_sessions_student_read ON quiz_sessions;
+DROP POLICY IF EXISTS quiz_sessions_admin_all    ON quiz_sessions;
+
+CREATE POLICY quiz_sessions_student_read ON quiz_sessions
+  FOR SELECT USING (
+    phase IN ('waiting', 'active', 'reveal_dist', 'reveal_correct')
+    AND EXISTS (
+      SELECT 1 FROM user_courses uc
+      WHERE uc.course_id = quiz_sessions.course_id
+        AND uc.user_id = current_setting('app.user_id', true)
+    )
+  );
+
+CREATE POLICY quiz_sessions_admin_all ON quiz_sessions
+  FOR ALL USING (current_setting('app.user_role', true) = 'admin');
+
+DROP POLICY IF EXISTS quiz_participants_self    ON quiz_participants;
+DROP POLICY IF EXISTS quiz_participants_admin   ON quiz_participants;
+
+CREATE POLICY quiz_participants_self ON quiz_participants
+  FOR ALL USING (user_id = current_setting('app.user_id', true))
+  WITH CHECK (user_id = current_setting('app.user_id', true));
+
+CREATE POLICY quiz_participants_admin ON quiz_participants
+  FOR ALL USING (current_setting('app.user_role', true) = 'admin');
+
+DROP POLICY IF EXISTS quiz_responses_self_read   ON quiz_responses;
+DROP POLICY IF EXISTS quiz_responses_self_insert ON quiz_responses;
+DROP POLICY IF EXISTS quiz_responses_admin_all   ON quiz_responses;
+
+CREATE POLICY quiz_responses_self_read ON quiz_responses
+  FOR SELECT USING (user_id = current_setting('app.user_id', true));
+
+CREATE POLICY quiz_responses_self_insert ON quiz_responses
+  FOR INSERT WITH CHECK (user_id = current_setting('app.user_id', true));
+
+CREATE POLICY quiz_responses_admin_all ON quiz_responses
+  FOR ALL USING (current_setting('app.user_role', true) = 'admin');
 
 -- Functions, views, and seed data are applied separately by db-init.ts.
 -- See website/scripts/db-init.ts for the complete execution order.

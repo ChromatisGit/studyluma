@@ -1,13 +1,16 @@
 /* StudyNode Global Styles */
 
-/* External dependencies */
-@import "katex/dist/katex.min.css";
-
-/* Design tokens */
+/* Layer 1: design tokens */
 @import "./tokens/index.css";
 
-/* Base styles */
-@import "./base.css";
+/* Layer 2: foundation */
+@import "./foundation/index.css";
 
-/* Utility classes */
-@import "./utilities.css";
+/* Layer 3: rich content */
+@import "./content/index.css";
+
+/* Layer 4: utilities */
+@import "./utilities/index.css";
+
+/* Layer 5: third-party integrations */
+@import "./integrations/index.css";

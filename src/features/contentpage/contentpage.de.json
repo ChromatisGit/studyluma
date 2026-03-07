@@ -19,7 +19,9 @@
     "next": "Weiter",
     "lockedTasksReason": "Bearbeite und vergleiche zuerst alle Aufgaben.",
     "lockedCheckpointReason": "Gib zuerst deine Selbsteinschätzung ab.",
-    "nextPageTooltip": "Weiter zu Seite"
+    "nextPageTooltip": "Weiter zu Seite",
+    "nextWorksheet": "Nächstes Arbeitsblatt",
+    "allWorksheets": "Alle Arbeitsblätter"
   },
   "trafficLight": {
     "question": "Wie gut kamst du mit den Aufgaben zurecht?",

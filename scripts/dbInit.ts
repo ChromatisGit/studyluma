@@ -91,7 +91,10 @@ async function main() {
     await applyFile(sql, path.join(SQL, "functions", "get_progress_dto.sql"));
     await applyFile(sql, path.join(SQL, "functions", "get_course_access_groups.sql"));
 
-    // 6. Course data
+    // 6. Quiz helper functions
+    await applyFile(sql, path.join(SQL, "functions", "try_advance_quiz_phase.sql"));
+
+    // 7. Course data
     console.log("[db-init] Applying courses.sql...");
     await sql.unsafe(content.trim());
 

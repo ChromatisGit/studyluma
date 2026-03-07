@@ -24,6 +24,7 @@ import type { TableMacro } from "./table/types";
 import type { CodeRunnerMacro } from "./codeRunner/types";
 import type { GapMacro } from "./gap/types";
 import type { McqMacro } from "./mcq/types";
+import type { QuizMacro } from "./quiz/types";
 import type { CodeTaskMacro } from "./codeTask/types";
 import type { TextTaskMacro } from "./textTask/types";
 import type { PresenterNoteMacro } from "./pn/types";
@@ -41,6 +42,7 @@ import TableRenderer from "./table/Renderer";
 import CodeRunnerRenderer from "./codeRunner/Renderer";
 import GapRenderer from "./gap/Renderer";
 import McqRenderer from "./mcq/Renderer";
+import QuizRenderer from "./quiz/Renderer";
 import CodeTaskRenderer from "./codeTask/Renderer";
 import TextTaskRenderer from "./textTask/Renderer";
 import LayoutRenderer from "./layout/Renderer";
@@ -61,7 +63,8 @@ export type Macro =
   | CodeTaskMacro
   | TextTaskMacro
   | PresenterNoteMacro
-  | LayoutMacro;
+  | LayoutMacro
+  | QuizMacro;
 
 export type MacroType = Macro["type"];
 
@@ -79,6 +82,7 @@ const macros = {
   codeRunner: { Component: CodeRunnerRenderer, category: "display" as const, state: "interactive" as const },
   gap: { Component: GapRenderer, category: "input" as const, state: "interactive" as const },
   mcq: { Component: McqRenderer, category: "input" as const, state: "interactive" as const },
+  quiz: { Component: QuizRenderer, category: "display" as const, state: "none" as const },
   codeTask: { Component: CodeTaskRenderer, category: "input" as const, state: "interactive" as const },
   textTask: { Component: TextTaskRenderer, category: "input" as const, state: "interactive" as const },
 };

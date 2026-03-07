@@ -23,7 +23,7 @@
   background: var(--gap-bg, var(--sn-surface));
   color: var(--gap-text);
   font-family: var(--sn-font-mono);
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
   outline: none;
   transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
   z-index: 2;

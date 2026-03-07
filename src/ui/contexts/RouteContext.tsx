@@ -26,7 +26,7 @@ type RouteContextValue = {
 
 const RouteContext = createContext<RouteContextValue | undefined>(undefined);
 
-const RESERVED_ROOTS = new Set(["access", "worksheet"]);
+const RESERVED_ROOTS = new Set(["access", "worksheet", "practice", "profile"]);
 const RESERVED_COURSE_SEGMENTS = new Set(["practice"]);
 
 function buildCourseId(groupKey: string, subjectKey: string): CourseId {
@@ -48,11 +48,15 @@ function buildRouteContext(pathname: string): RouteContextValue {
 
   const isAdminView = routeParam1 === "admin";
   const adminCourseId = isAdminView && routeParam2 ? routeParam2 : undefined;
+  const isSlideView = routeParam1 === "slides";
 
-  const groupKey = isAdminView ? undefined : routeParam1;
-  const subjectKey = routeParam2 && !isPrinciples && !isAdminView ? routeParam2 : undefined;
-  const courseId =
-    groupKey && subjectKey ? buildCourseId(groupKey, subjectKey) : undefined;
+  const groupKey = isAdminView || isSlideView ? undefined : routeParam1;
+  const subjectKey = routeParam2 && !isPrinciples && !isAdminView && !isSlideView ? routeParam2 : undefined;
+  const courseId = isSlideView
+    ? routeParam2
+    : groupKey && subjectKey
+      ? buildCourseId(groupKey, subjectKey)
+      : undefined;
 
   const isReservedTopicSegment = rawTopic ? RESERVED_COURSE_SEGMENTS.has(rawTopic) : false;
   const isReservedChapterSegment = rawChapter

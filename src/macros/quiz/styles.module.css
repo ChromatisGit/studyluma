@@ -1,0 +1,38 @@
+.quiz {
+  padding: var(--sn-space-lg);
+  background: var(--sn-surface);
+  border: 2px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-md);
+}
+
+.questionLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sn-text-secondary);
+}
+
+.question {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--sn-text);
+  line-height: 1.5;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+  padding-left: var(--sn-space-lg);
+  margin: 0;
+}
+
+.option {
+  color: var(--sn-text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}

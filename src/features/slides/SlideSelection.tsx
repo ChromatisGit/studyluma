@@ -5,14 +5,14 @@ import { Monitor, Presentation } from "lucide-react";
 import styles from "./SlideSelection.module.css";
 
 type SlideSelectionProps = {
-  subjectId: string;
+  courseId: string;
   topicId: string;
   chapterId: string;
   slideIds: string[];
   isLoading?: boolean;
 };
 
-export function SlideSelection({ subjectId, topicId, chapterId, slideIds, isLoading }: SlideSelectionProps) {
+export function SlideSelection({ courseId, topicId, chapterId, slideIds, isLoading }: SlideSelectionProps) {
   if (isLoading) {
     return <p className={styles.loading}>Folien werden geladen...</p>;
   }
@@ -23,7 +23,7 @@ export function SlideSelection({ subjectId, topicId, chapterId, slideIds, isLoad
     );
   }
 
-  const basePath = `/slides/${subjectId}/${topicId}/${chapterId}`;
+  const basePath = `/slides/${courseId}/${topicId}/${chapterId}`;
 
   return (
     <ul className={styles.list}>

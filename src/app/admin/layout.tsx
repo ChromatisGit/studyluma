@@ -19,7 +19,6 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     <Layout
       sidebarData={sidebarData}
       isAdmin={true}
-      activeCourseLabel={null}
       signOutAction={signOutAction}
     >
       {children}

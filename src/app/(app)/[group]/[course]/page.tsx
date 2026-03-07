@@ -2,7 +2,7 @@
 import { getCourseId } from "@services/courseService";
 import { getCourseDTO, getProgressDTO } from "@services/courseService";
 import { getSession } from "@services/authService";
-import { CoursepagePage } from "@features/coursepage/Coursepage";
+import { CoursepagePage } from "@features/course/Coursepage";
 
 type PageParams = {
   params: Promise<{
@@ -22,14 +22,10 @@ export default async function CourseRoute({ params }: PageParams) {
     getProgressDTO(courseId, user),
   ]);
 
-  const currentTopic = progress.topics.find(
-    (topic) => topic.topicId === progress.currentTopicId
-  );
-
   const model = {
-    title: course.label,
     label: course.label,
-    current: currentTopic?.label ?? null,
+    description: course.description,
+    courseId,
     roadmap: progress.topics,
   };
 

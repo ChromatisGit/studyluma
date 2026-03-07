@@ -55,7 +55,7 @@
 
 .label {
   font-weight: var(--sn-font-semibold);
-  font-size: var(--sn-font-size-0-8);
+  font-size: var(--sn-text-xs);
   color: var(--sn-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;

@@ -70,7 +70,7 @@
 .diagnosticsTitle {
   font-weight: 700;
   margin-bottom: 0.35rem;
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
 }
 
 .diagnosticList {
@@ -78,7 +78,7 @@
   padding-left: 1rem;
   display: grid;
   gap: 0.25rem;
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
 }
 
 .result {
@@ -145,7 +145,7 @@
   min-height: 100%;
   line-height: 1.5;
   font-family: var(--sn-font-mono);
-  font-size: var(--sn-font-size-0-98);
+  font-size: var(--sn-text-md);
   color: var(--sn-code-text);
   background: transparent;
   white-space: pre-wrap;
@@ -162,7 +162,7 @@
   overflow: hidden;
   line-height: 1.5;
   font-family: var(--sn-font-mono);
-  font-size: var(--sn-font-size-0-98);
+  font-size: var(--sn-text-md);
   outline: none;
   caret-color: var(--sn-text-on-accent);
 }

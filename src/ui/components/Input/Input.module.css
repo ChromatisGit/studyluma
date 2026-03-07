@@ -9,11 +9,11 @@
   gap: 0.4rem;
   font-weight: var(--sn-font-semibold);
   margin-bottom: 0.35rem;
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
 }
 
 .hint {
-  font-size: var(--sn-font-size-0-75);
+  font-size: var(--sn-text-xs);
   font-weight: var(--sn-font-medium);
   color: var(--sn-text-muted);
 }
@@ -25,7 +25,7 @@
   border: 1px solid var(--sn-border);
   background: var(--sn-surface);
   color: var(--sn-text);
-  font-size: var(--sn-font-size-0-95);
+  font-size: var(--sn-text-md);
   font-family: inherit;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
@@ -57,12 +57,12 @@
 
 .helper {
   margin: 0.35rem 0 0;
-  font-size: var(--sn-font-size-0-75);
+  font-size: var(--sn-text-xs);
   color: var(--sn-text-muted);
 }
 
 .error {
   margin: 0.35rem 0 0;
-  font-size: var(--sn-font-size-0-75);
+  font-size: var(--sn-text-xs);
   color: var(--sn-red-accent);
 }

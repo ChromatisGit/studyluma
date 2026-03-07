@@ -7,30 +7,10 @@
 }
 
 .networkLayer {
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-}
-
-.networkFade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 55%,
-    color-mix(in srgb, var(--sn-bg) 32%, transparent) 82%,
-    color-mix(in srgb, var(--sn-bg) 68%, transparent) 100%
-  );
-}
-
-:global([data-theme='dark']) .networkFade {
-  background: linear-gradient(
-    180deg,
-    transparent 58%,
-    color-mix(in srgb, var(--sn-bg) 42%, transparent) 84%,
-    color-mix(in srgb, var(--sn-bg) 78%, transparent) 100%
-  );
 }
 
 .homeSection {
@@ -39,7 +19,7 @@
   --sn-section-max-width: var(--sn-content-width-wide, 1120px);
   --sn-section-card-padding: 2rem;
   --sn-section-header-margin: 1.75rem;
-  --sn-section-title-size: var(--sn-font-size-1-9);
+  --sn-section-title-size: var(--sn-text-xl);
   --sn-section-title-gap: 0.5rem;
 }
 

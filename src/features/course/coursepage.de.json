@@ -1,0 +1,14 @@
+{
+  "intro": {
+    "titleSuffix": "Übersicht"
+  },
+  "currentTopic": {
+    "heading": "Aktuelles Thema"
+  },
+  "currentWorksheets": {
+    "heading": "Aktuelle Arbeitsblätter"
+  },
+  "roadmap": {
+    "heading": "Roadmap"
+  }
+}
