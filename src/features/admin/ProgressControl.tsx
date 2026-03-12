@@ -15,6 +15,7 @@ type ProgressControlProps = {
   currentTopicId: string;
   currentChapterId: string;
   topics: ProgressTopicDTO[];
+  onProgressUpdate?: (topicId: string, chapterId: string) => void;
 };
 
 export function ProgressControl({
@@ -22,6 +23,7 @@ export function ProgressControl({
   currentTopicId,
   currentChapterId,
   topics,
+  onProgressUpdate,
 }: ProgressControlProps) {
   const [selectedTopicId, setSelectedTopicId] = useState(currentTopicId);
   const [selectedChapterId, setSelectedChapterId] = useState(currentChapterId);
@@ -53,6 +55,7 @@ export function ProgressControl({
       }
 
       toast.success(ADMIN_TEXT.courseDetail.progressControl.successMessage);
+      onProgressUpdate?.(selectedTopicId, selectedChapterId);
       router.refresh();
     });
   };

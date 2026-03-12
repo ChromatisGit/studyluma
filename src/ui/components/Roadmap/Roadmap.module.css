@@ -54,10 +54,6 @@
   transition: background-color 0.15s ease;
 }
 
-.topicLabel:hover {
-  background-color: var(--sn-surface-raised);
-}
-
 /* Topic status variants */
 .topicFinished {
   color: var(--sn-purple-accent-soft-border);
@@ -77,11 +73,6 @@
 .topicLocked {
   color: var(--sn-text-muted);
   font-weight: 400;
-  cursor: default;
-}
-
-.topicLocked:hover {
-  background-color: transparent;
 }
 
 /* === Bullet === */
@@ -153,17 +144,25 @@
 
 /* === Chevron Button === */
 .chevronButton {
-  padding: 0.35rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   border-radius: var(--sn-radius-xs);
-  border: none;
-  background-color: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  background-color: var(--sn-surface-raised);
   color: var(--sn-text-muted);
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  outline: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
+
 .chevronButton:hover {
-  background-color: var(--sn-surface-raised);
+  background-color: var(--sn-surface-deep);
+  border-color: var(--sn-text-muted);
 }
 
 /* === Chapters === */

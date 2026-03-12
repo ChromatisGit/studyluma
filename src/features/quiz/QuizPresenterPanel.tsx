@@ -290,6 +290,17 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
       {phase === "closed" && (
         <p className={styles.closedNote}>Quiz beendet</p>
       )}
+
+      {phase !== "closed" && (
+        <button
+          type="button"
+          className={styles.secondaryBtn}
+          disabled={busy}
+          onClick={() => call(() => closeQuizAction(sessionId))}
+        >
+          Quiz beenden
+        </button>
+      )}
     </div>
   );
 }

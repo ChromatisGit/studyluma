@@ -17,6 +17,7 @@ export default function WorksheetCard({ label, href, worksheetFormat }: Workshee
       actionLabel={UI_TEXT.worksheetCard[worksheetFormat]}
       href={href}
       ctaButton
+      target="_blank"
     />
   );
 }

@@ -175,6 +175,10 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
             currentTopicId={progress.currentTopicId}
             currentChapterId={progress.currentChapterId}
             topics={progress.topics}
+            onProgressUpdate={(topicId, chapterId) => {
+              setViewTopicId(topicId);
+              setViewChapterId(chapterId);
+            }}
           />
         </section>
 

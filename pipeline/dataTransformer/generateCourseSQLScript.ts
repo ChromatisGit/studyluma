@@ -156,10 +156,14 @@ export async function generateCourseSQLScript(path: string, courses: Course[]): 
       `INSERT INTO courses (course_id, group_id, subject_id, variant_id, slug, icon, color, worksheet_format, is_listed, is_public) VALUES (${esc(course.id)}, ${esc(course.group.id)}, ${esc(course.subject.id)}, ${esc(variantId)}, ${esc(course.slug)}, ${esc(course.icon)}, ${esc(course.color)}, 'web', ${bool(course.isListed)}, ${bool(course.isPublic)}) ON CONFLICT (course_id) DO UPDATE SET group_id = EXCLUDED.group_id, subject_id = EXCLUDED.subject_id, variant_id = EXCLUDED.variant_id, slug = EXCLUDED.slug, icon = EXCLUDED.icon, color = EXCLUDED.color, is_listed = EXCLUDED.is_listed, is_public = EXCLUDED.is_public, updated_at = NOW();`,
     );
 
-    // Save which worksheets are currently visible before wiping junction tables
+    // Save current progress and visible worksheets before wiping junction tables
     lines.push(`DROP TABLE IF EXISTS _ws_visible;`);
     lines.push(
       `CREATE TEMP TABLE _ws_visible AS SELECT worksheet_id FROM course_worksheets WHERE course_id = ${esc(course.id)} AND is_hidden = false;`,
+    );
+    lines.push(`DROP TABLE IF EXISTS _current_progress;`);
+    lines.push(
+      `CREATE TEMP TABLE _current_progress AS SELECT cc.topic_id, cc.chapter_id FROM course_chapters cc WHERE cc.course_id = ${esc(course.id)} AND cc.status = 'current' LIMIT 1;`,
     );
 
     // Delete and reinsert junction tables to handle structural changes
@@ -167,19 +171,13 @@ export async function generateCourseSQLScript(path: string, courses: Course[]): 
     lines.push(`DELETE FROM course_topics WHERE course_id = ${esc(course.id)};`);
 
     for (const [topicIndex, topic] of course.topics.entries()) {
-      const topicStatus =
-        topicIndex === 0 ? "current" : topicIndex === 1 ? "planned" : "locked";
-
       lines.push(
-        `INSERT INTO course_topics (course_id, topic_id, display_order, status) VALUES (${esc(course.id)}, ${esc(topic.topicId)}, ${topicIndex}, ${esc(topicStatus)});`,
+        `INSERT INTO course_topics (course_id, topic_id, display_order, status) VALUES (${esc(course.id)}, ${esc(topic.topicId)}, ${topicIndex}, 'locked');`,
       );
 
       for (const [chapterIndex, chapter] of topic.chapters.entries()) {
-        const chapterStatus =
-          topicIndex === 0 && chapterIndex === 0 ? "current" : "locked";
-
         lines.push(
-          `INSERT INTO course_chapters (course_id, topic_id, chapter_id, display_order, status) VALUES (${esc(course.id)}, ${esc(topic.topicId)}, ${esc(chapter.chapterId)}, ${chapterIndex}, ${esc(chapterStatus)});`,
+          `INSERT INTO course_chapters (course_id, topic_id, chapter_id, display_order, status) VALUES (${esc(course.id)}, ${esc(topic.topicId)}, ${esc(chapter.chapterId)}, ${chapterIndex}, 'locked');`,
         );
 
         for (const [worksheetIndex, worksheet] of chapter.worksheets.entries()) {
@@ -195,6 +193,14 @@ export async function generateCourseSQLScript(path: string, courses: Course[]): 
       `UPDATE course_worksheets SET is_hidden = false WHERE course_id = ${esc(course.id)} AND worksheet_id IN (SELECT worksheet_id FROM _ws_visible);`,
     );
     lines.push(`DROP TABLE _ws_visible;`);
+
+    // Restore progress: use saved current chapter if it still exists, otherwise fall back to first chapter
+    lines.push(`DO $$ DECLARE v_topic_id TEXT; v_chapter_id TEXT; BEGIN`);
+    lines.push(`  SELECT cp.topic_id, cp.chapter_id INTO v_topic_id, v_chapter_id FROM _current_progress cp WHERE EXISTS (SELECT 1 FROM course_chapters cc WHERE cc.course_id = ${esc(course.id)} AND cc.topic_id = cp.topic_id AND cc.chapter_id = cp.chapter_id) LIMIT 1;`);
+    lines.push(`  IF v_topic_id IS NULL THEN SELECT cc.topic_id, cc.chapter_id INTO v_topic_id, v_chapter_id FROM course_chapters cc JOIN course_topics ct ON ct.course_id = cc.course_id AND ct.topic_id = cc.topic_id WHERE cc.course_id = ${esc(course.id)} ORDER BY ct.display_order, cc.display_order LIMIT 1; END IF;`);
+    lines.push(`  IF v_topic_id IS NOT NULL THEN PERFORM update_course_progress(${esc(course.id)}, v_topic_id, v_chapter_id); END IF;`);
+    lines.push(`END; $$;`);
+    lines.push(`DROP TABLE _current_progress;`);
     lines.push("");
   }
 

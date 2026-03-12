@@ -113,7 +113,8 @@ export async function continueAccessAction(
       getActiveQuizForUser(user),
       user.courseIds.length > 0 ? getCourseSlug(user.courseIds[0]) : Promise.resolve(null),
     ]);
-    return success(user, activeQuiz ? "/quiz" : (ctx.from ?? primaryCourseSlug ?? "/practice"));
+    const defaultRedirect = isAdmin(user) ? "/admin" : (primaryCourseSlug ?? "/");
+    return success(user, activeQuiz ? "/quiz" : (ctx.from ?? defaultRedirect));
   }
 
   // from here: course join mode
@@ -171,4 +172,5 @@ export async function joinCourseAction(courseId: string): Promise<void> {
 
 export async function signOutAction(): Promise<void> {
   await clearSessionCookie();
+  redirect("/");
 }

@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { Layout } from "@ui/layout/Layout";
 import { getSession, isAdmin } from "@services/authService";
 import { getSidebarDTO, getPublicNavbarCourses } from "@services/courseService";
@@ -17,13 +16,8 @@ export default async function RootPage() {
   const session = await getSession();
   const user = session?.user ?? null;
 
-  if (user) {
-    const sidebarData = await getSidebarDTO({ courseId: null, user });
-    redirect(sidebarData.courses[0]?.href ?? "/practice");
-  }
-
   const [sidebarData, publicCourses] = await Promise.all([
-    getSidebarDTO({ courseId: null, user: null }),
+    getSidebarDTO({ courseId: null, user }),
     getPublicNavbarCourses(),
   ]);
 

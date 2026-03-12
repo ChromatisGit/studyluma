@@ -57,14 +57,14 @@ function splitCells(line: string): string[] {
     const ch = line[i];
     if (ch === "\\") {
       const next = line[i + 1];
-      if (next === "," || next === "\\") {
+      if (next === ";" || next === "\\") {
         current += next;
         i += 2;
         continue;
       }
     }
 
-    if (ch === ",") {
+    if (ch === ";") {
       cells.push(current.trim());
       current = "";
       i += 1;

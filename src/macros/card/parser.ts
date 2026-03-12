@@ -13,6 +13,8 @@ const VALID_KINDS: CardKind[] = [
   "recap",
   "remember",
   "warning",
+  "answer",
+  "plain",
 ];
 
 function parsePairsRawText(rawText: string, protectedBlocks: Parameters<typeof parseRawText>[1]): PairItem[] {

@@ -67,12 +67,11 @@ export function QuizView({ mode, quiz, selectedIndex, onSelect, correctCount = 0
     return (
       <div className={styles.waitingWrap}>
         <div className={styles.waitingBody}>
-          <p className={styles.waitingLabel}>
-            Frage {quiz.currentIndex + 1} von {quiz.totalQuestions}
-          </p>
+          <p className={styles.waitingTitle}>Das Quiz startet gleich</p>
           <div className={styles.waitingPulse}>
             <span className={styles.pulseDot} />
           </div>
+          <p className={styles.waitingSubtitle}>Warte noch auf weitere Teilnehmer</p>
           {participants != null && participants > 0 && (
             <p className={styles.participantCount}>{participants} dabei</p>
           )}

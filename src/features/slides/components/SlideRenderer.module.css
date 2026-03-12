@@ -1,61 +1,56 @@
-/* Slide frame — shared between projector and presenter */
+/* Projector only — full-height frame with spacing from page border */
 .slideFrame {
   display: flex;
   flex-direction: column;
-  width: 100%;
   height: 100%;
   padding: var(--sn-space-lg);
-  overflow: hidden;
+  box-sizing: border-box;
+  --sn-slide-header-size: 1.5em;
 }
 
-.headerBanner {
+/* Presenter only — spacing around card (no left) */
+.slidePreview {
+  padding: var(--sn-space-lg) var(--sn-space-lg) var(--sn-space-lg) 0;
+}
+
+/* White card — sizes to content by default; projector adds .contentBoxFull */
+.contentBox {
   display: flex;
-  align-items: center;
-  gap: var(--sn-space-md);
-  padding: var(--sn-space-xs) var(--sn-space-lg);
-  background: var(--sn-purple-accent);
-  color: var(--sn-text-on-accent);
+  flex-direction: column;
+  border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-xl);
+  background: var(--sn-surface-raised);
   box-shadow: var(--sn-shadow-md);
+}
+
+/* Projector only — card fills the full frame height */
+.contentBoxFull {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Slide title — left purple accent stripe, inside the white card */
+.slideHeader {
+  margin: var(--sn-space-md) var(--sn-space-xl) var(--sn-space-sm);
+  padding: 4px 0 4px var(--sn-space-md);
+  border-left: 5px solid var(--sn-purple-accent);
   flex-shrink: 0;
 }
 
-.headerIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--sn-space-xs);
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: var(--sn-radius-sm);
-}
-
 .headerTitle {
-  font-size: 1.15em;
+  margin: 0;
+  font-size: var(--sn-slide-header-size, 1.05em);
   font-weight: var(--sn-font-bold);
-  letter-spacing: 0.02em;
-  flex: 1;
-}
-
-.contentBox {
-  flex: 1;
-  margin-top: var(--sn-space-md);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-lg);
-  background: var(--sn-surface);
-  overflow: hidden;
+  color: var(--sn-text);
 }
 
 .contentInner {
   display: flex;
   flex-direction: column;
-  justify-content: safe center;
   gap: var(--sn-space-lg);
-  padding: var(--sn-space-xl) var(--sn-space-xl);
-  height: 100%;
+  padding: 0 var(--sn-space-xl) var(--sn-space-xl);
   font-size: 1.08em;
   line-height: 1.7;
-  overflow-y: auto;
-  box-sizing: border-box;
 }
 
 /* Content item styles */

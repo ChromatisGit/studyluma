@@ -11,7 +11,9 @@ export type CardKind =
   | "highlight"
   | "recap"
   | "remember"
-  | "warning";
+  | "warning"
+  | "answer"
+  | "plain";
 
 export type CardMacro = {
   type: "card";

@@ -17,6 +17,7 @@ export type CardProps = {
   color?: AccentColor;
   className?: string;
   ctaButton?: boolean;
+  target?: string;
 };
 
 export function Card({
@@ -29,6 +30,7 @@ export function Card({
   color = "purple",
   className,
   ctaButton = false,
+  target,
 }: CardProps) {
   const colorClass = styles[`color-${color}`];
 
@@ -37,6 +39,7 @@ export function Card({
       href={href}
       className={clsx(styles.card, colorClass, className)}
       aria-label={actionLabel ? `${actionLabel}: ${title}` : title}
+      target={target}
     >
       <div className={styles.header}>
         {icon ? (

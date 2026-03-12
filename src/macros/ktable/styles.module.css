@@ -1,0 +1,30 @@
+.ktable {
+  display: grid;
+  gap: var(--sn-space-xs) var(--sn-space-md);
+  align-items: baseline;
+}
+
+.cell > :first-child {
+  margin: 0;
+}
+
+.cell > :last-child {
+  margin: 0;
+}
+
+.headerCell {
+  font-weight: 600;
+}
+
+.headerCell > :first-child {
+  margin: 0;
+}
+
+.keyCell {
+  color: var(--sn-text-muted);
+  white-space: nowrap;
+}
+
+.keyCell > :first-child {
+  margin: 0;
+}

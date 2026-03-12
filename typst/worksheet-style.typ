@@ -1,3 +1,5 @@
+#import "/typst/macros.typ": _parse-table
+
 #let colors = (
   page: rgb(249, 250, 251),
   card: rgb(255, 255, 255),
@@ -231,43 +233,8 @@
 }
 
 
-#let table(body) = {
-  // Collect rows/cells as content — supports math, equations, gaps, etc.
-  // Rows are separated by parbreak (blank line); cells by commas in text nodes.
-  let rows = ()
-  let current-row = ()
-  let current-cell = []
-  let row-has-content = false
-
-  for child in body.children {
-    if child.func() == parbreak {
-      current-row.push(current-cell)
-      current-cell = []
-      if row-has-content { rows.push(current-row) }
-      current-row = ()
-      row-has-content = false
-    } else if child.has("text") {
-      let parts = child.text.split(",")
-      for (i, part) in parts.enumerate() {
-        if i > 0 {
-          current-row.push(current-cell)
-          current-cell = []
-        }
-        let trimmed = part.trim()
-        if trimmed.len() > 0 {
-          current-cell += [#trimmed]
-          row-has-content = true
-        }
-      }
-    } else {
-      // equations, strong, em, gap elements, etc. — keep as content
-      current-cell += child
-      row-has-content = true
-    }
-  }
-  current-row.push(current-cell)
-  if row-has-content { rows.push(current-row) }
-
+#let table(body, header: true) = {
+  let rows = _parse-table(body)
   if rows.len() == 0 { return }
 
   let cols = rows.at(0).len()
@@ -276,7 +243,7 @@
   for (y, row) in rows.enumerate() {
     for (x, cell) in row.enumerate() {
       if x >= cols { break }
-      cells.push(if y == 0 { strong(cell) } else { cell })
+      cells.push(if header and y == 0 { strong(cell) } else { cell })
     }
     let diff = cols - calc.min(row.len(), cols)
     for _ in range(diff) { cells.push([]) }
@@ -289,7 +256,7 @@
       columns: (auto,) * cols,
       inset: 6pt,
       stroke: 0.6pt + colors.border,
-      fill: (x, y) => if y == 0 { colors.badge-bg } else { none },
+      fill: (x, y) => if header and y == 0 { colors.badge-bg } else { none },
       ..cells,
     ),
   )

@@ -1,0 +1,18 @@
+.callout {
+  width: 100%;
+  padding: var(--sn-space-sm) var(--sn-space-lg);
+  border-radius: var(--sn-radius-md);
+  background: color-mix(in srgb, var(--sn-purple-accent) 8%, var(--sn-surface));
+  text-align: center;
+  font-size: 1.05em;
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-purple-accent-strong);
+}
+
+.callout > :first-child {
+  margin-top: 0;
+}
+
+.callout > :last-child {
+  margin-bottom: 0;
+}

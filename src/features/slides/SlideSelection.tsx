@@ -31,11 +31,11 @@ export function SlideSelection({ courseId, topicId, chapterId, slideIds, isLoadi
         <li key={id} className={styles.deckItem}>
           <span className={styles.deckName}>{id}</span>
           <div className={styles.deckActions}>
-            <Link href={`${basePath}/${id}`} target="_blank" className={styles.presenterLink}>
+            <Link href={`${basePath}/${id}`} className={styles.presenterLink}>
               <Presentation size={15} />
               Präsentation
             </Link>
-            <Link href={`${basePath}/${id}/projector`} target="_blank" className={styles.projectorLink}>
+            <Link href={`${basePath}/${id}/projector`} className={styles.projectorLink}>
               <Monitor size={15} />
               Projektor
             </Link>

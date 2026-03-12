@@ -1,0 +1,26 @@
+.formula {
+  display: flex;
+  justify-content: center;
+  margin: var(--sn-space-sm) 0;
+}
+
+.box {
+  display: inline-block;
+  padding: var(--sn-space-sm) var(--sn-space-lg);
+  border-top: 2px solid var(--sn-purple-accent);
+  border-bottom: 2px solid var(--sn-purple-accent);
+  border-left: 1px solid var(--sn-border);
+  border-right: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  background: color-mix(in srgb, var(--sn-purple-accent) 6%, var(--sn-surface));
+  font-size: 1.1em;
+  text-align: center;
+}
+
+.box > :first-child {
+  margin-top: 0;
+}
+
+.box > :last-child {
+  margin-bottom: 0;
+}

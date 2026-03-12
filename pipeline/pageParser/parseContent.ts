@@ -1,6 +1,6 @@
 import { Node, Section } from "@schema/page"
-import { ProtectedBlock } from "./codeBlockGuard"
-import { parseGroupMacro, parseMacro } from "./macros/parseMacro"
+import { ProtectedBlock, restoreCodeBlocks } from "./codeBlockGuard"
+import { isLayoutMacro, parseLayoutMacro, parseMacro } from "./macros/parseMacro"
 import { parseAndSplitRawText, type ContentType } from "@pipeline/pageParser/macros/parserUtils"
 import { splitMacroAndText } from "./macros/splitMacroAndText"
 
@@ -12,7 +12,7 @@ export function parseContent(content: string, protectedBlocks: ProtectedBlock[],
 
     for (let i = 0; i < matches.length; i++) {
         const match = matches[i]
-        const header = match[1].trim()
+        const header = restoreCodeBlocks({ rawText: match[1].trim() }, protectedBlocks).rawText
 
         const start = match.index! + match[0].length
         const end =
@@ -27,8 +27,8 @@ export function parseContent(content: string, protectedBlocks: ProtectedBlock[],
                 return parseAndSplitRawText(node, protectedBlocks)
             }
 
-            if (node.type === "group") {
-                return [parseGroupMacro(node, protectedBlocks, filePath, contentType)]
+            if (isLayoutMacro(node.type)) {
+                return [parseLayoutMacro(node, protectedBlocks, filePath, contentType)]
             }
 
             return [parseMacro(node, protectedBlocks, filePath, contentType)]

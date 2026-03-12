@@ -11,21 +11,31 @@
 
 /* Kind variants — left accent line + subtle tinted background */
 .task {
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--sn-blue-accent) 35%, var(--sn-border));
   border-left: 4px solid var(--sn-blue-accent);
   background: color-mix(in srgb, var(--sn-blue-accent) 8%, var(--sn-surface));
 }
 
 .emphasis {
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--sn-purple-accent) 35%, var(--sn-border));
   border-left: 4px solid var(--sn-purple-accent);
   background: color-mix(in srgb, var(--sn-purple-accent) 8%, var(--sn-surface));
 }
 
 .warning {
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--sn-orange-accent) 35%, var(--sn-border));
   border-left: 4px solid var(--sn-orange-accent);
   background: color-mix(in srgb, var(--sn-orange-accent) 8%, var(--sn-surface));
+}
+
+.answer {
+  border: 1px solid color-mix(in srgb, var(--sn-green-accent) 35%, var(--sn-border));
+  border-left: 4px solid var(--sn-green-accent);
+  background: color-mix(in srgb, var(--sn-green-accent) 8%, var(--sn-surface));
+}
+
+.plain {
+  border-left-width: 1px;
 }
 
 .header {
@@ -71,6 +81,14 @@
 
 .warning .label {
   color: var(--sn-orange-accent-strong);
+}
+
+.answer .icon {
+  color: var(--sn-green-accent);
+}
+
+.answer .label {
+  color: var(--sn-green-accent-strong);
 }
 
 .content > :first-child {

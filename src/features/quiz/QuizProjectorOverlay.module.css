@@ -4,17 +4,13 @@
   inset: 0;
   z-index: 10;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   background: var(--sn-bg);
-  padding: 5%;
-}
+  padding: var(--sn-space-lg);
+  --sn-slide-header-size: 1.5em;
 
-/* Scale up all QuizView text for the projector by overriding CSS tokens */
-.card {
-  width: 100%;
-  max-width: 960px;
-
+  /* Scale quiz text for the projector */
   --sn-text-xs: 0.95rem;
   --sn-text-sm: 1.1rem;
   --sn-text-md: 1.35rem;
@@ -25,4 +21,8 @@
   --sn-space-md: 16px;
   --sn-space-lg: 24px;
   --sn-space-xl: 36px;
+}
+
+.cardWrap {
+  width: 100%;
 }

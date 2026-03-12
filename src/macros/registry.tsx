@@ -29,6 +29,12 @@ import type { CodeTaskMacro } from "./codeTask/types";
 import type { TextTaskMacro } from "./textTask/types";
 import type { PresenterNoteMacro } from "./pn/types";
 import type { LayoutMacro } from "./layout/types";
+import type { KTableMacro } from "./ktable/types";
+import type { FormulaMacro } from "./formula/types";
+import type { CalloutMacro } from "./callout/types";
+import type { StepsMacro } from "./steps/types";
+import type { SlideSplitMacro } from "./slideSplit/types";
+import type { SlideMainMacro } from "./slideMain/types";
 
 // ============================================================================
 // COMPONENT IMPORTS - Add new macro component imports here
@@ -46,6 +52,12 @@ import QuizRenderer from "./quiz/Renderer";
 import CodeTaskRenderer from "./codeTask/Renderer";
 import TextTaskRenderer from "./textTask/Renderer";
 import LayoutRenderer from "./layout/Renderer";
+import KTableRenderer from "./ktable/Renderer";
+import FormulaRenderer from "./formula/Renderer";
+import CalloutRenderer from "./callout/Renderer";
+import StepsRenderer from "./steps/Renderer";
+import SlideSplitRenderer from "./slideSplit/Renderer";
+import SlideMainRenderer from "./slideMain/Renderer";
 
 // ============================================================================
 // MACRO TYPE (union of all macro types)
@@ -55,6 +67,7 @@ export type Macro =
   | NoteMacro
   | CardMacro
   | PairsMacro
+  | KTableMacro
   | ImageMacro
   | TableMacro
   | CodeRunnerMacro
@@ -64,7 +77,12 @@ export type Macro =
   | TextTaskMacro
   | PresenterNoteMacro
   | LayoutMacro
-  | QuizMacro;
+  | QuizMacro
+  | FormulaMacro
+  | CalloutMacro
+  | StepsMacro
+  | SlideSplitMacro
+  | SlideMainMacro;
 
 export type MacroType = Macro["type"];
 
@@ -73,18 +91,24 @@ export type MacroType = Macro["type"];
 // ============================================================================
 
 const macros = {
-  layout: { Component: LayoutRenderer, category: "display" as const, state: "none" as const },
-  note: { Component: NoteRenderer, category: "display" as const, state: "none" as const },
-  card: { Component: CardRenderer, category: "display" as const, state: "none" as const },
-  pairs: { Component: PairsRenderer, category: "display" as const, state: "none" as const },
-  image: { Component: ImageRenderer, category: "display" as const, state: "none" as const },
-  table: { Component: TableRenderer, category: "display" as const, state: "none" as const },
+  layout:     { Component: LayoutRenderer,     category: "display" as const, state: "none" as const },
+  note:       { Component: NoteRenderer,       category: "display" as const, state: "none" as const },
+  card:       { Component: CardRenderer,       category: "display" as const, state: "none" as const },
+  pairs:      { Component: PairsRenderer,      category: "display" as const, state: "none" as const },
+  ktable:     { Component: KTableRenderer,     category: "display" as const, state: "none" as const },
+  image:      { Component: ImageRenderer,      category: "display" as const, state: "none" as const },
+  table:      { Component: TableRenderer,      category: "display" as const, state: "none" as const },
   codeRunner: { Component: CodeRunnerRenderer, category: "display" as const, state: "interactive" as const },
-  gap: { Component: GapRenderer, category: "input" as const, state: "interactive" as const },
-  mcq: { Component: McqRenderer, category: "input" as const, state: "interactive" as const },
-  quiz: { Component: QuizRenderer, category: "display" as const, state: "none" as const },
-  codeTask: { Component: CodeTaskRenderer, category: "input" as const, state: "interactive" as const },
-  textTask: { Component: TextTaskRenderer, category: "input" as const, state: "interactive" as const },
+  gap:        { Component: GapRenderer,        category: "input" as const,   state: "interactive" as const },
+  mcq:        { Component: McqRenderer,        category: "input" as const,   state: "interactive" as const },
+  quiz:       { Component: QuizRenderer,       category: "display" as const, state: "none" as const },
+  codeTask:   { Component: CodeTaskRenderer,   category: "input" as const,   state: "interactive" as const },
+  textTask:   { Component: TextTaskRenderer,   category: "input" as const,   state: "interactive" as const },
+  formula:    { Component: FormulaRenderer,    category: "display" as const, state: "none" as const },
+  callout:    { Component: CalloutRenderer,    category: "display" as const, state: "none" as const },
+  steps:      { Component: StepsRenderer,      category: "display" as const, state: "none" as const },
+  slideSplit: { Component: SlideSplitRenderer, category: "display" as const, state: "none" as const },
+  slideMain:  { Component: SlideMainRenderer,  category: "display" as const, state: "none" as const },
 };
 
 type MacroName = keyof typeof macros;

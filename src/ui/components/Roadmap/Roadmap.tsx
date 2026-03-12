@@ -118,10 +118,8 @@ function RoadmapTopic({
   isSelectedTopic,
   selectedChapterId,
 }: RoadmapTopicProps) {
-  const { status, label, href, chapters } = topic;
+  const { status, label, chapters } = topic;
   const panelId = `roadmap-topic-${index}-panel`;
-  const isLocked = status === "locked";
-  const isClickable = (isAdmin || !isLocked) && Boolean(href);
 
   const statusClass = styles[`topic${capitalize(status)}`] || "";
 
@@ -142,15 +140,9 @@ function RoadmapTopic({
         )}
 
         <div className={styles.topicContent}>
-          {isClickable ? (
-            <AppLink href={href} className={clsx(styles.topicLabel, statusClass)}>
-              {label}
-            </AppLink>
-          ) : (
-            <span className={clsx(styles.topicLabel, statusClass)}>
-              {label}
-            </span>
-          )}
+          <span className={clsx(styles.topicLabel, statusClass)}>
+            {label}
+          </span>
 
           {chapters.length > 0 && (
             <button

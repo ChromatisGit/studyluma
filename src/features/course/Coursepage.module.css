@@ -1,5 +1,6 @@
 .page {
   padding-top: var(--sn-space-xl);
+  padding-bottom: var(--sn-space-xl);
   display: flex;
   justify-content: center;
 }
@@ -60,9 +61,18 @@
 }
 
 
+.roadmapCard {
+  padding: var(--sn-space-lg);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  box-shadow: var(--sn-shadow-lw);
+}
+
 @media (max-width: 767px) {
   .page {
     padding-top: var(--sn-space-lg);
+    padding-bottom: var(--sn-space-lg);
   }
 
   .continueCard {

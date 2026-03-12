@@ -38,7 +38,8 @@ export function Sidebar({
   const [collapsed, setCollapsed] = useState(pathname === "/");
   const [isPending, startTransition] = useTransition();
   const { theme, toggleTheme } = useTheme();
-  const { topic, chapter, hasTopicContext } = useRouteContext();
+  const { topic, chapter, hasTopicContext, courseId, worksheet } = useRouteContext();
+  const openInNewTab = !!worksheet;
 
   const showTopicNav = hasTopicContext && sidebarData.topics.length > 0 && !collapsed;
 
@@ -128,6 +129,7 @@ export function Sidebar({
             progressCurrentTopicId={sidebarData.currentTopicId}
             progressCurrentChapterId={sidebarData.currentChapterId}
             onLinkClick={() => {}}
+            openInNewTab={openInNewTab}
           />
         </>
       ) : null}
@@ -136,7 +138,7 @@ export function Sidebar({
       <div className={styles.bottom}>
         {isAdmin && (
           <AppLink
-            href="/admin"
+            href={courseId ? `/admin/${courseId}` : "/admin"}
             className={clsx(styles.navItem, styles.bottomBtn)}
           >
             <ShieldCheck size={18} className={styles.icon} aria-hidden />

@@ -39,6 +39,10 @@ BEGIN
       USING ERRCODE = '22023';
   END IF;
 
+  UPDATE public.course_topics
+  SET status = 'locked'
+  WHERE course_id = p_course_id AND status = 'current';
+
   UPDATE public.course_topics ct
   SET status = CASE
     WHEN ct.display_order < v_topic_order THEN 'finished'
@@ -47,6 +51,10 @@ BEGIN
     ELSE 'locked'
   END
   WHERE ct.course_id = p_course_id;
+
+  UPDATE public.course_chapters
+  SET status = 'locked'
+  WHERE course_id = p_course_id AND status = 'current';
 
   UPDATE public.course_chapters cc
   SET status = CASE

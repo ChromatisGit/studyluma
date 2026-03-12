@@ -12,6 +12,7 @@ type SidebarTopicNavProps = {
   progressCurrentTopicId: string;
   progressCurrentChapterId: string;
   onLinkClick: () => void;
+  openInNewTab?: boolean;
 };
 
 export function SidebarTopicNav({
@@ -21,6 +22,7 @@ export function SidebarTopicNav({
   progressCurrentTopicId,
   progressCurrentChapterId,
   onLinkClick,
+  openInNewTab,
 }: SidebarTopicNavProps) {
   // Find the current topic from the list
   const topic = topics.find((t) => t.topicId === currentTopic);
@@ -68,6 +70,7 @@ export function SidebarTopicNav({
                       isRoadmapCurrent && styles.chapterLinkRoadmapCurrent
                     )}
                     onClick={onLinkClick}
+                    target={openInNewTab ? "_blank" : undefined}
                   >
                     {isRoadmapCurrent ? (
                       <span className={styles.roadmapMarker} aria-hidden="true" />

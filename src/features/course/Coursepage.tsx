@@ -71,7 +71,9 @@ export function CoursepagePage({ model }: CoursepagePageProps) {
         {roadmap.length > 0 && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{COURSE_TEXT.roadmap.heading}</h2>
-            <Roadmap roadmap={roadmap} />
+            <div className={styles.roadmapCard}>
+              <Roadmap roadmap={roadmap} />
+            </div>
           </section>
         )}
       </div>
