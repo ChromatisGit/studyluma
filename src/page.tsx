@@ -7,7 +7,7 @@ export default async function RootPage() {
   const session = await getSession();
 
   if (session) {
-    redirect("/home");
+    redirect("/");
   }
 
   const publicCourses = await getPublicNavbarCourses();

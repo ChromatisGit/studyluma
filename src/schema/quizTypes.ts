@@ -6,8 +6,9 @@
 export type QuizPhase =
   | "waiting"        // waiting for students to join
   | "active"         // question is live, students can submit
-  | "reveal_dist"    // timer ended / all answered; distribution shown (no correct highlighted)
-  | "reveal_correct" // correct answer + #why shown
+  | "reveal_dist"    // teacher reveals distribution (no correct highlighted)
+  | "reveal_correct" // correct answer shown
+  | "summary"        // end-of-quiz reflection; teacher dismisses to close
   | "closed";        // session archived
 
 /** A quiz question as stored in quiz_sessions.questions JSONB */
@@ -20,23 +21,26 @@ export type StoredQuestion = {
 
 /**
  * Active quiz state sent to students via the polling API.
- * Only fields safe to reveal to students at each phase.
+ * Fields are selectively populated per phase — see comments.
  */
 export type QuizStateDTO = {
   sessionId: string;
+  courseId: string;
   phase: Exclude<QuizPhase, "closed">;
   currentIndex: number;
   totalQuestions: number;
-  question: string;   // markdown
-  options: string[];  // markdown array
-  /** Only present in reveal_correct phase */
+  question: string;
+  options: string[];
+  /** Present during reveal_correct and summary */
   correctIndices?: number[];
-  /** Only present in reveal_correct phase */
-  why?: string;
-  /** Seconds per question, null = no timer */
-  timerSeconds: number | null;
-  /** ISO timestamp when the timer started for the current question */
-  timerStartedAt: string | null;
+  /** Present during waiting, reveal_dist, reveal_correct, summary */
+  participants?: number;
+  /** Present during reveal_dist, reveal_correct */
+  optionCounts?: number[];
+  /** Present during reveal_dist, reveal_correct */
+  answeredCount?: number;
+  /** Present only during summary phase */
+  questionSummaries?: QuizQuestionSummary[];
   updatedAt: string;
 };
 
@@ -46,34 +50,32 @@ export type QuizStateDTO = {
  */
 export type QuizResultsDTO = {
   sessionId: string;
+  courseId: string;
   phase: QuizPhase;
   currentIndex: number;
   totalQuestions: number;
   question: string;
   options: string[];
   correctIndices: number[];
-  why?: string;
   /** Number of students who have joined the session */
   participants: number;
   /** Number of responses submitted for the current question */
   answeredCount: number;
   /** Per-option submission count for the current question */
   optionCounts: number[];
-  timerSeconds: number | null;
-  timerStartedAt: string | null;
+  /** Present only during summary phase */
+  questionSummaries?: QuizQuestionSummary[];
   updatedAt: string;
 };
 
 /**
- * Per-question summary after session is closed.
- * Shown in the teacher's post-session review.
+ * Per-question summary after session closes or during summary phase.
  */
 export type QuizQuestionSummary = {
   questionIndex: number;
   question: string;
   options: string[];
   correctIndices: number[];
-  why?: string;
   participants: number;
   optionCounts: number[];
   /** Percentage of participants who selected all correct options (0–100) */

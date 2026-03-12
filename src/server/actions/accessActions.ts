@@ -5,7 +5,7 @@ import { clearSessionCookie, setSessionCookie } from "@server-lib/auth";
 import { getSession, isAdmin, assertLoggedIn } from "@services/authService";
 import { addCourseToUser, createUser, getUserById } from "@services/userService";
 import { getAuthenticatedUser } from "@services/authService";
-import { isRegistrationOpen, getCourseDTO } from "@services/courseService";
+import { isRegistrationOpen, getCourseDTO, getCourseSlug } from "@services/courseService";
 import { getActiveQuizForUser } from "@services/quizService";
 import { getClientIp } from "@server-lib/getClientIp";
 import type { UserDTO } from "@services/userService";
@@ -109,8 +109,11 @@ export async function continueAccessAction(
     const user = await getAuthenticatedUser(accessCode, pin, ip);
     if (!user) return invalidCreds();
 
-    const activeQuiz = await getActiveQuizForUser(user);
-    return success(user, activeQuiz ? "/quiz" : (ctx.from ?? "/home"));
+    const [activeQuiz, primaryCourseSlug] = await Promise.all([
+      getActiveQuizForUser(user),
+      user.courseIds.length > 0 ? getCourseSlug(user.courseIds[0]) : Promise.resolve(null),
+    ]);
+    return success(user, activeQuiz ? "/quiz" : (ctx.from ?? primaryCourseSlug ?? "/practice"));
   }
 
   // from here: course join mode
@@ -163,7 +166,7 @@ export async function joinCourseAction(courseId: string): Promise<void> {
   await addCourseToUser(session.user, courseId, ip);
 
   const course = await getCourseDTO(courseId);
-  redirect(`/${course.groupKey}/${course.slug}`);
+  redirect(course.slug);
 }
 
 export async function signOutAction(): Promise<void> {

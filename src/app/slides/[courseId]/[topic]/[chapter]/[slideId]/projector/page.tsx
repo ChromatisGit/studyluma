@@ -29,7 +29,5 @@ export default async function ProjectorPage({ params }: PageParams) {
     slideId,
   });
 
-  const channelName = `studynode-slides-${slideId}`;
-
-  return <SlideProjector deck={deck} channelName={channelName} />;
+  return <SlideProjector deck={deck} courseId={courseId} />;
 }

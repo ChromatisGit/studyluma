@@ -54,7 +54,7 @@ export default async function AccessPage({ searchParams }: AccessPageProps) {
       const courses = await Promise.all(allNonPublicIds.map((id) => getCourseDTO(id)));
       return <CoursePicker courses={courses} />;
     }
-    redirect("/home");
+    redirect("/");
   }
 
   // Course picker for unauthenticated users

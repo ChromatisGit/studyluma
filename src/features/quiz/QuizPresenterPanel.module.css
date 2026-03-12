@@ -55,6 +55,79 @@
   transition: width 0.3s ease;
 }
 
+/* ── Question preview (private to teacher) ───────── */
+
+.questionPreview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+  padding: var(--sn-space-sm);
+  background: var(--sn-surface);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-sm);
+}
+
+.previewLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+.previewQuestion {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--sn-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.previewOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.previewOption {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-xs);
+  font-size: 0.8125rem;
+  color: var(--sn-text-muted);
+}
+
+.previewOptionCorrect {
+  color: var(--sn-text);
+  font-weight: 600;
+}
+
+.previewLetter {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--sn-surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.previewOptionCorrect .previewLetter {
+  background: color-mix(in srgb, var(--sn-success, #38a169) 18%, var(--sn-surface));
+  color: var(--sn-success, #38a169);
+}
+
+.previewCheck {
+  color: var(--sn-success, #38a169);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
 /* ── Controls ────────────────────────────────────── */
 
 .controls {

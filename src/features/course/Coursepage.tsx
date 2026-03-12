@@ -1,7 +1,8 @@
-import { ArrowRight, FileText } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@components/Button";
 import { PageHeader } from "@components/PageHeader";
 import { Roadmap } from "@components/Roadmap";
+import { WorksheetCards } from "@components/WorksheetCards";
 import type { ProgressTopicDTO } from "@schema/courseTypes";
 import styles from "./Coursepage.module.css";
 import COURSE_TEXT from "./coursepage.de.json";
@@ -62,15 +63,7 @@ export function CoursepagePage({ model }: CoursepagePageProps) {
         {worksheets.length > 0 && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{COURSE_TEXT.currentWorksheets.heading}</h2>
-            <div className={styles.worksheetList}>
-              {worksheets.map((ws) => (
-                <a key={ws.worksheetId} href={ws.href} className={styles.worksheetItem}>
-                  <FileText size={16} className={styles.worksheetIcon} aria-hidden />
-                  <span className={styles.worksheetLabel}>{ws.label}</span>
-                  <ArrowRight size={14} className={styles.worksheetArrow} aria-hidden />
-                </a>
-              ))}
-            </div>
+            <WorksheetCards worksheets={worksheets} />
           </section>
         )}
 

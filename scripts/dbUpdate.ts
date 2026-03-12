@@ -6,7 +6,7 @@
  *
  * Run with: bun scripts/dbUpdate.ts
  *
- * Requires POSTGRES_URL environment variable.
+ * Requires POSTGRES_URL or DATABASE_URL environment variable.
  * Requires bun compile to have been run first.
  */
 
@@ -24,8 +24,8 @@ async function main() {
     process.exit(1);
   }
 
-  const url = process.env.POSTGRES_URL;
-  if (!url) throw new Error("Missing POSTGRES_URL");
+  const url = process.env.POSTGRES_URL ?? process.env.DATABASE_URL;
+  if (!url) throw new Error("Missing POSTGRES_URL or DATABASE_URL");
 
   const sql = postgres(url);
   await sql.unsafe(content);

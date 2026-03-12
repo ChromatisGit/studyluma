@@ -1,14 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { SlideDeck, SlideMessage } from "@schema/slideTypes";
+import type { SlideDeck } from "@schema/slideTypes";
 import type { MacroRenderContext } from "@macros/componentTypes";
+import type { MacroStateAdapter } from "@macros/state/MacroStateAdapter";
 import type { QuizMacro } from "@macros/quiz/types";
+import type { AdminStreamEvent, AdminSnapshot } from "@schema/streamTypes";
+import type { QuizResultsDTO } from "@schema/quizTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
-import { createPresenterStore, type PresenterStore } from "@macros/state/BroadcastAdapter";
 import { QuizPresenterPanel } from "@features/quiz/QuizPresenterPanel";
+import { broadcastSlideStateAction } from "@actions/slideActions";
 import { useSlideState } from "./hooks/useSlideState";
-import { useSlideBroadcast } from "./hooks/useSlideBroadcast";
+import { useSlideStream } from "./hooks/useSlideStream";
 import { useSlideKeyboard } from "./hooks/useSlideKeyboard";
 import { SlideRenderer } from "./components/SlideRenderer";
 import { SlideControls } from "./components/SlideControls";
@@ -19,12 +22,10 @@ import styles from "./SlidePresenter.module.css";
 
 type SlidePresenterProps = {
   deck: SlideDeck;
-  channelName: string;
-  projectorPath: string;
   courseId: string;
+  projectorPath: string;
 };
 
-/** Collect all QuizMacro nodes from slide content (including inside MacroGroups). */
 function findQuizMacros(content: SlideDeck["slides"][number]["content"]): QuizMacro[] {
   const result: QuizMacro[] = [];
   for (const node of content) {
@@ -40,49 +41,61 @@ function findQuizMacros(content: SlideDeck["slides"][number]["content"]): QuizMa
   return result;
 }
 
-export function SlidePresenter({
-  deck,
-  channelName,
-  projectorPath,
-  courseId,
-}: SlidePresenterProps) {
+export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenterProps) {
   const { state, next, prev, goTo, first, last, toggleBlackout } =
     useSlideState({ totalSlides: deck.slides.length });
 
   const [showGrid, setShowGrid] = useState(false);
   const projectorWindowRef = useRef<Window | null>(null);
-  const [store] = useState<PresenterStore>(createPresenterStore);
 
-  const { postMessage } = useSlideBroadcast({
-    channelName,
-    role: "presenter",
-    onMessage: (msg: SlideMessage) => {
-      if (msg.type === "SYNC_REQUEST") {
-        postMessage({
-          type: "SYNC_RESPONSE",
-          state: { ...state, interactiveState: store.getState() },
-        });
+  // Macro state lives in a ref (writes don't need re-renders)
+  const macroStateRef = useRef<Record<string, string>>({});
+  const stateRef = useRef(state);
+  useEffect(() => { stateRef.current = state; });
+
+  // Broadcast current state to DO (fire-and-forget)
+  const broadcast = useCallback(() => {
+    broadcastSlideStateAction(courseId, {
+      slideIndex: stateRef.current.slideIndex,
+      blackout: stateRef.current.blackout,
+      macroState: macroStateRef.current,
+    }).catch(() => {});
+  }, [courseId]);
+
+  // Broadcast on slide index / blackout changes
+  useEffect(() => {
+    broadcast();
+  }, [state.slideIndex, state.blackout, broadcast]);
+
+  // Writable macro adapter that broadcasts on every macro write
+  const macroAdapter = useMemo<MacroStateAdapter>(
+    () => ({
+      read: (key) => macroStateRef.current[key] ?? null,
+      write: (key, value) => {
+        macroStateRef.current = { ...macroStateRef.current, [key]: value };
+        broadcast();
+      },
+      isReadOnly: false,
+    }),
+    [broadcast],
+  );
+
+  // Quiz state received via WebSocket (pushed from DO after student submissions)
+  const [quizResults, setQuizResults] = useState<QuizResultsDTO | null>(null);
+  const onEvent = useCallback((event: AdminStreamEvent) => {
+    switch (event.type) {
+      case "INIT": {
+        const init = event as AdminSnapshot;
+        setQuizResults(init.quiz);
+        break;
       }
-    },
-  });
+      case "QUIZ_STATE":
+        setQuizResults(event.quiz as QuizResultsDTO | null);
+        break;
+    }
+  }, []);
 
-  // Wire up broadcast: when a macro writes, push interactive state to projector
-  useEffect(() => {
-    store.setBroadcast((interactiveState) => {
-      postMessage({
-        type: "STATE_UPDATE",
-        state: { ...state, interactiveState },
-      });
-    });
-  }, [store, postMessage, state]);
-
-  // Broadcast on slide/blackout state change
-  useEffect(() => {
-    postMessage({
-      type: "STATE_UPDATE",
-      state: { ...state, interactiveState: store.getState() },
-    });
-  }, [state, postMessage, store]);
+  useSlideStream({ courseId, onEvent });
 
   const openProjector = useCallback(() => {
     const w = window.open(projectorPath, "studynode-projector", "popup");
@@ -91,12 +104,7 @@ export function SlidePresenter({
 
   const handleBlackout = useCallback(() => {
     toggleBlackout();
-    postMessage({ type: "BLACKOUT", blackout: !state.blackout });
-  }, [toggleBlackout, postMessage, state.blackout]);
-
-  const handleFullscreen = useCallback(() => {
-    postMessage({ type: "FULLSCREEN_REQUEST" });
-  }, [postMessage]);
+  }, [toggleBlackout]);
 
   useSlideKeyboard({
     onNext: next,
@@ -104,11 +112,9 @@ export function SlidePresenter({
     onFirst: first,
     onLast: last,
     onBlackout: handleBlackout,
-    onFullscreen: handleFullscreen,
+    onFullscreen: () => {},
     onGrid: () => setShowGrid((v) => !v),
-    onLaser: () => {
-      /* laser pointer toggle — future */
-    },
+    onLaser: () => {},
   });
 
   const currentSlide = deck.slides[state.slideIndex];
@@ -121,7 +127,7 @@ export function SlidePresenter({
   );
 
   return (
-    <MacroStateProvider adapter={store.adapter}>
+    <MacroStateProvider adapter={macroAdapter}>
       <div className={styles.presenter}>
         <header className={styles.header}>
           <h1 className={styles.title}>{deck.title}</h1>
@@ -133,29 +139,29 @@ export function SlidePresenter({
             onNext={next}
             onPrev={prev}
             onBlackout={handleBlackout}
-            onFullscreen={handleFullscreen}
+            onFullscreen={() => {}}
             onOpenProjector={openProjector}
           />
         </header>
 
         <div className={styles.body}>
           <main className={styles.slidePreview}>
-              {currentSlide && (
-                <SlideRenderer
-                  header={currentSlide.header}
-                  content={currentSlide.content}
-                  context={slideContext}
-                  slideIndex={state.slideIndex}
-                />
-              )}
+            {currentSlide && (
+              <SlideRenderer
+                header={currentSlide.header}
+                content={currentSlide.content}
+                context={slideContext}
+                slideIndex={state.slideIndex}
+              />
+            )}
           </main>
 
           <aside className={styles.sidebar}>
             {quizMacros.length > 0 && (
               <QuizPresenterPanel
                 quizMacros={quizMacros}
-                channelName={channelName}
                 courseId={courseId}
+                quizResults={quizResults}
               />
             )}
 

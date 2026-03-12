@@ -1,0 +1,453 @@
+/* ── Shared layout atoms ──────────────────────────────────────────────────── */
+
+.questionMeta {
+  font-size: var(--sn-text-sm);
+  color: var(--sn-text-muted);
+  margin: 0 0 var(--sn-space-sm);
+}
+
+.questionText {
+  font-size: var(--sn-text-lg);
+  font-weight: var(--sn-font-medium);
+  color: var(--sn-text);
+  line-height: 1.5;
+  margin: 0 0 var(--sn-space-lg);
+}
+
+/* ── Waiting ──────────────────────────────────────────────────────────────── */
+
+.waitingWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.waitingBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sn-space-md);
+  text-align: center;
+}
+
+.waitingLabel {
+  font-size: var(--sn-text-sm);
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+.waitingPulse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pulseDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--sn-text-muted);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%       { opacity: 0.8; transform: scale(1.25); }
+}
+
+.participantCount {
+  font-size: var(--sn-text-sm);
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+/* ── Active ───────────────────────────────────────────────────────────────── */
+
+.activeWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Options */
+
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  width: 100%;
+  padding: var(--sn-space-md);
+  background: var(--sn-bg);
+  border: 2px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  text-align: left;
+  font-size: var(--sn-text-md);
+  color: var(--sn-text);
+  opacity: 0;
+  transform: translateY(6px);
+  animation: optionReveal 200ms ease-out forwards;
+  /* transitions only apply once data-ready=true */
+  transition: border-color 140ms ease, background 140ms ease, transform 80ms ease;
+}
+
+@keyframes optionReveal {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* While not yet interactive, no hover/pointer affordance */
+.option[data-ready="false"] {
+  cursor: default;
+  pointer-events: none;
+}
+
+.option[data-ready="true"] {
+  cursor: pointer;
+}
+
+.option[data-ready="true"]:hover:not(:disabled) {
+  border-color: var(--sn-purple-accent);
+}
+
+.option[data-ready="true"]:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+/* Projector: always non-interactive */
+.option:disabled {
+  cursor: default;
+}
+
+.optionSelected {
+  border-color: var(--sn-purple-accent);
+  background: color-mix(in srgb, var(--sn-purple-accent) 10%, var(--sn-surface));
+}
+
+.optionBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sn-surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-semibold);
+  flex-shrink: 0;
+}
+
+.optionText {
+  flex: 1;
+}
+
+.optionCheck {
+  font-size: var(--sn-text-sm);
+  color: var(--sn-purple-accent);
+  flex-shrink: 0;
+}
+
+/* Projector progress bar */
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  margin-top: var(--sn-space-lg);
+}
+
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--sn-surface-deep);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--sn-purple-accent);
+  transition: width 500ms ease;
+}
+
+.progressLabel {
+  font-size: var(--sn-text-sm);
+  color: var(--sn-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Reveal (dist + correct) ──────────────────────────────────────────────── */
+
+.revealWrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.barList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 32px 1fr 40px auto;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  border-radius: var(--sn-radius-md);
+  padding: var(--sn-space-xs) 0;
+}
+
+.barRowCorrect .barLabel { color: var(--sn-success, #38a169); }
+.barRowNeutral { opacity: 0.65; }
+
+.barLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.barLetter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sn-surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-semibold);
+}
+
+.checkIcon {
+  color: var(--sn-success, #38a169);
+}
+
+.barTrack {
+  position: relative;
+  height: 36px;
+  border-radius: var(--sn-radius-sm);
+  background: var(--sn-surface-raised);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.barFill {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--sn-radius-sm);
+  background: var(--sn-surface-deep);
+  transition: width 500ms ease-out;
+}
+
+.barFillCorrect {
+  background: color-mix(in srgb, var(--sn-success, #38a169) 25%, var(--sn-surface));
+}
+
+.barOptionText {
+  position: relative;
+  z-index: 1;
+  padding: 0 var(--sn-space-sm);
+  font-size: var(--sn-text-sm);
+  color: var(--sn-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barPct {
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Student's own selection indicator on the bar */
+
+.barPersonal {
+  display: flex;
+  align-items: center;
+}
+
+.personalCorrect { color: var(--sn-success, #38a169); }
+.personalWrong   { color: var(--sn-danger, #e53e3e); }
+
+.personalDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sn-purple-accent);
+  display: inline-block;
+}
+
+/* ── Summary ──────────────────────────────────────────────────────────────── */
+
+.summaryWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xl);
+}
+
+/* Student score */
+
+.summaryScore {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sn-space-sm);
+  text-align: center;
+  padding: var(--sn-space-xl) 0 var(--sn-space-lg);
+  border-bottom: 1px solid var(--sn-border);
+}
+
+.summaryFraction {
+  font-size: 3.5rem;
+  font-weight: var(--sn-font-bold, 700);
+  color: var(--sn-purple-accent);
+  margin: 0;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.summarySubLabel {
+  font-size: var(--sn-text-md);
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+.summaryMessage {
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-purple-accent);
+  background: color-mix(in srgb, var(--sn-purple-accent) 12%, var(--sn-surface));
+  border-radius: var(--sn-radius-sm);
+  padding: 4px 12px;
+  margin: 0;
+}
+
+/* Projector title */
+
+.summaryProjectorTitle {
+  font-size: var(--sn-text-lg);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text);
+  margin: 0;
+}
+
+/* Question list */
+
+.summaryList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-lg);
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-sm);
+}
+
+.summaryItemQuestion {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sn-space-sm);
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-medium);
+  color: var(--sn-text);
+  margin: 0;
+}
+
+.summaryItemIndex {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--sn-surface-raised);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--sn-text-xs);
+  font-weight: var(--sn-font-semibold);
+  flex-shrink: 0;
+}
+
+.summaryItemPct {
+  margin-left: auto;
+  font-size: var(--sn-text-xs);
+  color: var(--sn-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Mini bar chart */
+
+.summaryMiniBar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.miniBarRow {
+  display: grid;
+  grid-template-columns: 20px 1fr 36px;
+  align-items: center;
+  gap: var(--sn-space-xs);
+}
+
+.miniBarCorrect .miniBarLetter {
+  color: var(--sn-success, #38a169);
+  font-weight: var(--sn-font-semibold);
+}
+
+.miniBarLetter {
+  font-size: var(--sn-text-xs);
+  color: var(--sn-text-muted);
+  text-align: center;
+}
+
+.miniBarTrack {
+  position: relative;
+  height: 22px;
+  border-radius: var(--sn-radius-xxs, 2px);
+  background: var(--sn-surface-raised);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.miniBarFill {
+  position: absolute;
+  inset: 0;
+  background: var(--sn-surface-deep);
+  transition: width 500ms ease-out;
+}
+
+.miniBarFillCorrect {
+  background: color-mix(in srgb, var(--sn-success, #38a169) 22%, var(--sn-surface));
+}
+
+.miniBarText {
+  position: relative;
+  z-index: 1;
+  padding: 0 6px;
+  font-size: var(--sn-text-xs);
+  color: var(--sn-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.miniBarPct {
+  font-size: var(--sn-text-xs);
+  color: var(--sn-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

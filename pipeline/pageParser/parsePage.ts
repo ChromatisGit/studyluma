@@ -1,4 +1,4 @@
-import { protectCodeBlocks } from "./codeBlockGuard";
+import { protectCodeBlocks, restoreCodeBlocks } from "./codeBlockGuard";
 import { parseContent } from "./parseContent";
 import { readTypFile } from "@pipeline/io";
 import { ContentIssueError, issueCatalog } from "@pipeline/errorHandling";
@@ -15,7 +15,7 @@ export async function parsePage(fileName: string, contentParsing = true, content
     if (!titleMatch?.groups?.title) {
         throw new ContentIssueError(issueCatalog.missingTitle());
     }
-    const title = titleMatch.groups.title.trim();
+    const title = restoreCodeBlocks({ rawText: titleMatch.groups.title.trim() }, protectedBlocks).rawText;
 
     if (!contentParsing) {
         return { title }

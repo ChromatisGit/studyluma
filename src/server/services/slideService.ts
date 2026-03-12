@@ -1,51 +1,13 @@
 import "server-only";
 
 import type { SlideDeck } from "@schema/slideTypes";
+import type { LiveSlideState } from "@schema/streamTypes";
 import { notFound } from "next/navigation";
 import {
   getSlideDeck as getSlideDeckFromProvider,
   listSlideDecks as listFromProvider,
 } from "@providers/slideProvider";
 import { anonSQL } from "@db/runSQL";
-
-// ---------------------------------------------------------------------------
-// Slide session (cross-device projector state)
-// ---------------------------------------------------------------------------
-
-type SlideSessionRow = {
-  state: unknown;
-  updated_at: string;
-  last_heartbeat: string;
-};
-
-export async function getSlideSession(
-  channel: string,
-): Promise<SlideSessionRow | null> {
-  const [row] = await anonSQL<SlideSessionRow[]>`
-    SELECT state, updated_at, last_heartbeat
-    FROM slide_sessions
-    WHERE channel_name = ${channel}
-  `;
-  return row ?? null;
-}
-
-export async function upsertSlideSession(
-  channelName: string,
-  state: object,
-): Promise<void> {
-  await anonSQL`
-    INSERT INTO slide_sessions (channel_name, state, updated_at, last_heartbeat)
-      VALUES (${channelName}, ${state as never}, now(), now())
-    ON CONFLICT (channel_name) DO UPDATE
-      SET state          = EXCLUDED.state,
-          updated_at     = now(),
-          last_heartbeat = now()
-  `;
-}
-
-export async function heartbeatSlideSession(channelName: string): Promise<void> {
-  await anonSQL`UPDATE slide_sessions SET last_heartbeat = now() WHERE channel_name = ${channelName}`;
-}
 
 // ---------------------------------------------------------------------------
 // Slide decks (content)
@@ -68,4 +30,31 @@ export async function listSlideDecks(
   args: Omit<GetSlideDeckArgs, "slideId">
 ): Promise<string[]> {
   return listFromProvider(args);
+}
+
+// ---------------------------------------------------------------------------
+// Live slide state (DB-backed, polled by projector / presenter)
+// ---------------------------------------------------------------------------
+
+export async function upsertSlideState(courseId: string, state: LiveSlideState): Promise<void> {
+  await anonSQL`
+    INSERT INTO slide_state (course_id, slide_index, blackout, macro_state)
+    VALUES (${courseId}, ${state.slideIndex}, ${state.blackout}, ${state.macroState as never})
+    ON CONFLICT (course_id) DO UPDATE
+    SET slide_index = EXCLUDED.slide_index,
+        blackout    = EXCLUDED.blackout,
+        macro_state = EXCLUDED.macro_state,
+        updated_at  = now()
+  `;
+}
+
+export async function getSlideState(courseId: string): Promise<LiveSlideState> {
+  const [row] = await anonSQL<{ slide_index: number; blackout: boolean; macro_state: Record<string, string> }[]>`
+    SELECT slide_index, blackout, macro_state
+    FROM slide_state
+    WHERE course_id = ${courseId}
+  `;
+  return row
+    ? { slideIndex: row.slide_index, blackout: row.blackout, macroState: row.macro_state }
+    : { slideIndex: 0, blackout: false, macroState: {} };
 }

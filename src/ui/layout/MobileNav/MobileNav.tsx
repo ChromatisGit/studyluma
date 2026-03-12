@@ -1,40 +1,38 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Home, BookOpen, Brain, GraduationCap, User, ShieldCheck } from "lucide-react";
+import { BookOpen, GraduationCap, ArrowLeftRight, User, ShieldCheck } from "lucide-react";
 import clsx from "clsx";
 import { AppLink } from "@components/AppLink";
 import styles from "./MobileNav.module.css";
 
 type MobileNavProps = {
   isAuthenticated: boolean;
-  lastCourseHref: string | null;
+  primaryCourseHref: string | null;
   isAdmin: boolean;
+  enrolledCoursesCount: number;
 };
 
-export function MobileNav({ isAuthenticated, lastCourseHref, isAdmin }: MobileNavProps) {
+export function MobileNav({ isAuthenticated, primaryCourseHref, isAdmin, enrolledCoursesCount }: MobileNavProps) {
   const pathname = usePathname();
 
   if (!isAuthenticated) return null;
 
-  const courseHref = lastCourseHref ?? "/home";
+  const courseHref = primaryCourseHref ?? "/practice";
 
   const navItems = [
-    { href: "/home", icon: Home, label: "Home" },
     { href: "/practice", icon: BookOpen, label: "Practice" },
-    isAdmin
-      ? { href: "/admin", icon: ShieldCheck, label: "Admin" }
-      : { href: "/quiz", icon: Brain, label: "Quiz" },
-    { href: courseHref, icon: GraduationCap, label: "Course" },
-    { href: "/profile", icon: User, label: "Profile" },
+    { href: courseHref, icon: GraduationCap, label: "Kurs" },
+    ...(enrolledCoursesCount >= 2 ? [{ href: "/courses", icon: ArrowLeftRight, label: "Wechseln" }] : []),
+    ...(isAdmin ? [{ href: "/admin", icon: ShieldCheck, label: "Admin" }] : []),
+    { href: "/profile", icon: User, label: "Profil" },
   ];
 
   const isActive = (href: string) => {
-    if (href === "/home") return pathname === "/home";
     if (href === "/profile") return pathname === "/profile";
     if (href === "/practice") return pathname.startsWith("/practice");
-    if (href === "/quiz") return pathname.startsWith("/quiz");
     if (href === "/admin") return pathname.startsWith("/admin");
+    if (href === "/courses") return pathname === "/courses";
     return pathname.startsWith(href);
   };
 

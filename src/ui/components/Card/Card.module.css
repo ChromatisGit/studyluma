@@ -6,7 +6,7 @@
   padding: var(--sn-space-md);
   border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-md);
-  background: var(--sn-surface-raised);
+  background: var(--sn-surface);
   text-decoration: none;
   max-width: 520px;
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
@@ -103,6 +103,28 @@
   color: var(--card-accent);
   font-weight: var(--sn-font-bold);
   font-size: var(--sn-text-md);
+}
+
+.footerButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  width: 100%;
+  padding: var(--sn-space-xs) var(--sn-space-sm);
+  background: var(--card-accent-bg);
+  border: 1px solid var(--card-accent-border);
+  border-radius: var(--sn-radius-xs);
+  color: var(--card-accent);
+  font-weight: var(--sn-font-bold);
+  font-size: var(--sn-text-md);
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.card:hover .footerButton {
+  background: color-mix(in srgb, var(--card-accent) 18%, transparent);
+  border-color: var(--card-accent);
 }
 
 /* === Color Variants === */

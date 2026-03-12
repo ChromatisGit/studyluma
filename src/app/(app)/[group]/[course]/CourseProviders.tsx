@@ -8,5 +8,9 @@ type CourseProvidersProps = {
 };
 
 export function CourseProviders({ children }: CourseProvidersProps) {
-  return <TsWorkerProvider>{children}</TsWorkerProvider>;
+  return (
+    <TsWorkerProvider>
+      {children}
+    </TsWorkerProvider>
+  );
 }

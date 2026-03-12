@@ -13,7 +13,9 @@ type Props = MacroComponentProps<QuizMacro>;
  * Displays the question and options as static text — no interactive elements.
  * Students answer on their own devices via the quiz session UI.
  */
-export default function QuizRenderer({ macro }: Props) {
+export default function QuizRenderer({ macro, context }: Props) {
+  if (context.projector) return null;
+
   const question = getMarkdown(macro.question);
 
   return (

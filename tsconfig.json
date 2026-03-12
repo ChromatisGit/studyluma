@@ -71,8 +71,8 @@
       "@coursepage/*": [
         "./src/features/coursepage/*"
       ],
-      "@practise/*": [
-        "./src/features/practise/*"
+      "@practice/*": [
+        "./src/features/practice/*"
       ],
       "@access/*": [
         "./src/features/access/*"

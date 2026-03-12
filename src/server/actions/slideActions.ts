@@ -1,21 +1,23 @@
 "use server";
 
 import { getSession, isAdmin } from "@services/authService";
-import { upsertSlideSession, heartbeatSlideSession, listSlideDecks } from "@services/slideService";
+import { listSlideDecks, upsertSlideState } from "@services/slideService";
+import { publishToChannel } from "@server-lib/ablyServer";
+import type { SlideStateEvent } from "@schema/streamTypes";
 import { z } from "zod/v4";
 
-const CHANNEL_RE = /^[a-z0-9-]{1,64}$/;
-
-// pointer excluded — laser pointer is same-device only via BroadcastChannel
-// interactiveState: Record<string,string> mirrors current SlideState type
 const SlideStateSchema = z.object({
   slideIndex: z.number().int().min(0),
   blackout: z.boolean(),
-  interactiveState: z.record(z.string(), z.string()),
+  macroState: z.record(z.string(), z.string()),
 });
 
-export async function updateSlideStateAction(
-  channelName: string,
+/**
+ * Persists the current slide state to DB and publishes a SLIDE_STATE event
+ * to the Ably admin channel so the projector updates in realtime.
+ */
+export async function broadcastSlideStateAction(
+  courseId: string,
   rawState: unknown,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const session = await getSession();
@@ -23,26 +25,17 @@ export async function updateSlideStateAction(
     return { ok: false, error: "Unauthorized" };
   }
 
-  if (!CHANNEL_RE.test(channelName)) {
-    return { ok: false, error: "Invalid channel name" };
-  }
-
   const parsed = SlideStateSchema.safeParse(rawState);
   if (!parsed.success) {
     return { ok: false, error: "Invalid state" };
   }
 
-  await upsertSlideSession(channelName, parsed.data);
+  await upsertSlideState(courseId, parsed.data);
+
+  const event: SlideStateEvent = { type: "SLIDE_STATE", ...parsed.data };
+  await publishToChannel(`classroom:${courseId}:admin`, event);
 
   return { ok: true };
-}
-
-export async function heartbeatSlideSessionAction(channelName: string): Promise<void> {
-  const session = await getSession();
-  if (!session || !isAdmin(session.user)) return;
-  if (!CHANNEL_RE.test(channelName)) return;
-
-  await heartbeatSlideSession(channelName);
 }
 
 export async function listSlideDecksAction(

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@services/authService";
 import { getSidebarDTO } from "@services/courseService";
-import { PracticeHub } from "@features/practise/PracticeHub";
+import { PracticeHub } from "@features/practice/PracticeHub";
 
 export const dynamic = "force-dynamic";
 

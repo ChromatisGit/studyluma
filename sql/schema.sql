@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS courses            CASCADE;
 DROP TABLE IF EXISTS auth_attempts      CASCADE;
 DROP TABLE IF EXISTS log_audit          CASCADE;
 DROP TABLE IF EXISTS slide_sessions     CASCADE;
+DROP TABLE IF EXISTS slide_state        CASCADE;
 DROP TABLE IF EXISTS quiz_responses     CASCADE;
 DROP TABLE IF EXISTS quiz_participants  CASCADE;
 DROP TABLE IF EXISTS quiz_sessions      CASCADE;
@@ -199,26 +200,26 @@ CREATE SEQUENCE IF NOT EXISTS access_code_counter
   NO CYCLE;
 
 -- ============================================================
--- 8) Slide sessions (live cross-device presentation relay)
--- No RLS — admin-only access enforced at application level.
+-- 9) Live presentation state
+-- No RLS — admin-only; access enforced at the application layer.
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS slide_sessions (
-  channel_name    TEXT         PRIMARY KEY,
-  state           JSONB        NOT NULL,
-  updated_at      TIMESTAMPTZ  NOT NULL DEFAULT now(),
-  last_heartbeat  TIMESTAMPTZ  NOT NULL DEFAULT now()
+CREATE TABLE slide_state (
+  course_id   TEXT PRIMARY KEY REFERENCES courses(course_id) ON DELETE CASCADE,
+  slide_index INT NOT NULL DEFAULT 0,
+  blackout    BOOLEAN NOT NULL DEFAULT false,
+  macro_state JSONB NOT NULL DEFAULT '{}',
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- ============================================================
--- 9) Live quiz tables
+-- 10) Live quiz tables
 -- No RLS — admin-only access to session management enforced at
 -- application level. Student responses use userSQL (RLS context).
 -- ============================================================
 
 CREATE TABLE quiz_sessions (
   session_id       TEXT         PRIMARY KEY,
-  channel_name     TEXT         NOT NULL,
   course_id        TEXT         NOT NULL REFERENCES courses(course_id) ON DELETE CASCADE,
   phase            TEXT         NOT NULL DEFAULT 'waiting'
                                   CHECK (phase IN (
@@ -322,7 +323,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_quiz_one_active_per_course
   WHERE phase IN ('waiting', 'active', 'reveal_dist', 'reveal_correct');
 
 CREATE INDEX IF NOT EXISTS idx_quiz_sessions_course ON quiz_sessions(course_id);
-CREATE INDEX IF NOT EXISTS idx_quiz_sessions_channel ON quiz_sessions(channel_name);
 CREATE INDEX IF NOT EXISTS idx_quiz_participants_session ON quiz_participants(session_id);
 CREATE INDEX IF NOT EXISTS idx_quiz_responses_session ON quiz_responses(session_id, question_index);
 

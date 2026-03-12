@@ -24,13 +24,11 @@ export default async function PresenterPage({ params }: PageParams) {
 
   const deck = await getSlideDeck({ subject, topicId, chapterId, slideId });
 
-  const channelName = `studynode-slides-${slideId}`;
   const projectorPath = `/slides/${courseId}/${topicId}/${chapterId}/${slideId}/projector`;
 
   return (
     <SlidePresenter
       deck={deck}
-      channelName={channelName}
       projectorPath={projectorPath}
       courseId={courseId}
     />

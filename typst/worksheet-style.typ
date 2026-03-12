@@ -232,34 +232,53 @@
 
 
 #let table(body) = {
-  // Collect rows by splitting children on parbreak boundaries
+  // Collect rows/cells as content — supports math, equations, gaps, etc.
+  // Rows are separated by parbreak (blank line); cells by commas in text nodes.
   let rows = ()
-  let current-row = ""
+  let current-row = ()
+  let current-cell = []
+  let row-has-content = false
+
   for child in body.children {
     if child.func() == parbreak {
-      if current-row.trim() != "" { rows.push(current-row.trim()) }
-      current-row = ""
-    } else if child.func() == raw {
-      current-row += child.text
+      current-row.push(current-cell)
+      current-cell = []
+      if row-has-content { rows.push(current-row) }
+      current-row = ()
+      row-has-content = false
     } else if child.has("text") {
-      current-row += child.text
+      let parts = child.text.split(",")
+      for (i, part) in parts.enumerate() {
+        if i > 0 {
+          current-row.push(current-cell)
+          current-cell = []
+        }
+        let trimmed = part.trim()
+        if trimmed.len() > 0 {
+          current-cell += [#trimmed]
+          row-has-content = true
+        }
+      }
+    } else {
+      // equations, strong, em, gap elements, etc. — keep as content
+      current-cell += child
+      row-has-content = true
     }
   }
-  if current-row.trim() != "" { rows.push(current-row.trim()) }
+  current-row.push(current-cell)
+  if row-has-content { rows.push(current-row) }
 
   if rows.len() == 0 { return }
 
-  let split-row(row) = row.split(",").map(c => c.trim())
-  let cols = split-row(rows.at(0)).len()
+  let cols = rows.at(0).len()
 
   let cells = ()
   for (y, row) in rows.enumerate() {
-    let parts = split-row(row)
-    for (x, txt) in parts.enumerate() {
+    for (x, cell) in row.enumerate() {
       if x >= cols { break }
-      cells.push(if y == 0 { text(weight: "bold", txt) } else { txt })
+      cells.push(if y == 0 { strong(cell) } else { cell })
     }
-    let diff = cols - calc.min(parts.len(), cols)
+    let diff = cols - calc.min(row.len(), cols)
     for _ in range(diff) { cells.push([]) }
   }
 

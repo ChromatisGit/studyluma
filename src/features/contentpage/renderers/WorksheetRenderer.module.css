@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 2.25rem;
   padding-top: var(--sn-space-xl);
+  padding-bottom: var(--sn-space-2xl);
   max-width: var(--sn-content-width-narrow);
   margin: 0 auto;
   width: 100%;

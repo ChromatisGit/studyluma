@@ -16,6 +16,7 @@ export type CardProps = {
   href: string;
   color?: AccentColor;
   className?: string;
+  ctaButton?: boolean;
 };
 
 export function Card({
@@ -27,6 +28,7 @@ export function Card({
   href,
   color = "purple",
   className,
+  ctaButton = false,
 }: CardProps) {
   const colorClass = styles[`color-${color}`];
 
@@ -59,7 +61,7 @@ export function Card({
       ) : null}
 
       {actionLabel ? (
-        <div className={styles.footer}>
+        <div className={ctaButton ? styles.footerButton : styles.footer}>
           <span>{actionLabel}</span>
           <ArrowRight size={16} aria-hidden />
         </div>

@@ -3,10 +3,10 @@
 -- Run once after pg_cron is enabled: CREATE EXTENSION IF NOT EXISTS pg_cron;
 -- ============================================================
 
--- Delete slide sessions whose heartbeat has not been refreshed in 48 hours.
+-- Delete closed quiz sessions that have been inactive for 24 hours.
 -- Runs every hour.
 SELECT cron.schedule(
-  'cleanup-stale-slide-sessions',
+  'cleanup-stale-quiz-sessions',
   '0 * * * *',
-  $$DELETE FROM slide_sessions WHERE last_heartbeat < now() - INTERVAL '48 hours'$$
+  $$DELETE FROM quiz_sessions WHERE phase = 'closed' AND updated_at < now() - INTERVAL '24 hours'$$
 );

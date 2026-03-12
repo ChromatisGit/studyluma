@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { CheckCircle2, Circle, ClipboardList, Timer, Users } from "lucide-react";
-import { Button } from "@components/Button";
-import { pollActiveQuizAction, joinQuizAction, submitQuizResponseAction } from "@actions/quizActions";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ClipboardList } from "lucide-react";
+import { joinQuizAction, submitQuizResponseAction } from "@actions/quizActions";
 import type { QuizStateDTO } from "@schema/quizTypes";
+import type { StudentStreamEvent, StudentSnapshot } from "@schema/streamTypes";
+import { useQuizStream } from "./hooks/useQuizStream";
+import { QuizView } from "./QuizView";
 import styles from "./QuizPage.module.css";
 
 type QuizPageProps = {
@@ -12,54 +15,102 @@ type QuizPageProps = {
 };
 
 export function QuizPage({ initialState }: QuizPageProps) {
+  const router = useRouter();
   const [quiz, setQuiz] = useState<QuizStateDTO | null>(initialState);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const lastIndexRef = useRef<number | null>(initialState?.currentIndex ?? null);
+  const lastSessionRef = useRef<string | null>(initialState?.sessionId ?? null);
 
-  // Reset per-question state when the question index changes
+  // Score tracking
+  const [correctCount, setCorrectCount] = useState(0);
+  const correctCountRef = useRef(0);
+  const scoredQuestionRef = useRef(-1);
+
+  // End-of-quiz redirect
+  const wasActiveRef = useRef(!!initialState);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Reset per-question answer when the question index changes
   useEffect(() => {
     if (quiz && quiz.currentIndex !== lastIndexRef.current) {
       lastIndexRef.current = quiz.currentIndex;
       setSelectedAnswer(null);
-      setHasSubmitted(false);
     }
   }, [quiz]);
 
-  // Countdown timer
+  // Join on mount if a session is already active (student arrived mid-quiz)
   useEffect(() => {
-    if (!quiz?.timerSeconds || !quiz.timerStartedAt || quiz.phase !== "active") {
-      setTimeLeft(null);
-      return;
+    if (initialState?.sessionId) {
+      joinQuizAction(initialState.sessionId).catch(() => {});
     }
-    const end = new Date(quiz.timerStartedAt).getTime() + quiz.timerSeconds * 1000;
-    const tick = () => setTimeLeft(Math.max(0, Math.round((end - Date.now()) / 1000)));
-    tick();
-    const id = setInterval(tick, 500);
-    return () => clearInterval(id);
-  }, [quiz?.timerStartedAt, quiz?.timerSeconds, quiz?.phase]);
-
-  // Poll for state updates every 4 seconds
-  useEffect(() => {
-    const id = setInterval(async () => {
-      const result = await pollActiveQuizAction();
-      if (result.ok) setQuiz(result.data);
-    }, 4000);
-    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-join when a session becomes available
+  // Auto-join when a new session becomes available
   useEffect(() => {
-    if (quiz?.sessionId) {
-      joinQuizAction(quiz.sessionId);
+    if (quiz?.sessionId && quiz.sessionId !== lastSessionRef.current) {
+      lastSessionRef.current = quiz.sessionId;
+      joinQuizAction(quiz.sessionId).catch(() => {});
     }
   }, [quiz?.sessionId]);
 
-  const handleSubmit = async () => {
-    if (!quiz || selectedAnswer === null || hasSubmitted) return;
-    setHasSubmitted(true);
-    await submitQuizResponseAction(quiz.sessionId, quiz.currentIndex, [selectedAnswer], false);
+  // Accumulate score: increment once per question when correct answer is revealed
+  useEffect(() => {
+    if (
+      quiz?.phase === "reveal_correct" &&
+      quiz.correctIndices &&
+      quiz.currentIndex !== scoredQuestionRef.current
+    ) {
+      scoredQuestionRef.current = quiz.currentIndex;
+      if (selectedAnswer !== null && quiz.correctIndices.includes(selectedAnswer)) {
+        correctCountRef.current += 1;
+        setCorrectCount(correctCountRef.current);
+      }
+    }
+  }, [quiz?.phase, quiz?.currentIndex, quiz?.correctIndices, selectedAnswer]);
+
+  // Track whether a quiz was ever active
+  useEffect(() => {
+    if (quiz !== null) wasActiveRef.current = true;
+  }, [quiz]);
+
+  // When quiz closes, redirect to /plenum (future: teacher-controlled plenum state)
+  useEffect(() => {
+    if (quiz !== null || !wasActiveRef.current) return;
+    wasActiveRef.current = false;
+    redirectTimerRef.current = setTimeout(() => router.push("/"), 400);
+  }, [quiz, router]);
+
+  useEffect(() => {
+    return () => { if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current); };
+  }, []);
+
+  // WebSocket: receive live quiz state
+  const onEvent = useCallback((event: StudentStreamEvent) => {
+    switch (event.type) {
+      case "INIT": {
+        const init = event as StudentSnapshot;
+        setQuiz(init.quiz);
+        break;
+      }
+      case "QUIZ_STATE":
+        setQuiz((prev) => {
+          const next = event.quiz;
+          if (prev?.updatedAt && next?.updatedAt && next.updatedAt < prev.updatedAt) return prev;
+          return next;
+        });
+        break;
+      case "QUIZ_STARTED":
+        break;
+    }
+  }, []);
+
+  useQuizStream({ onEvent });
+
+  const handleSelect = async (i: number) => {
+    if (!quiz || quiz.phase !== "active") return;
+    setSelectedAnswer(i);
+    await submitQuizResponseAction(quiz.sessionId, quiz.currentIndex, [i]);
   };
 
   // ── No active quiz ──────────────────────────────────────────────────────
@@ -68,129 +119,44 @@ export function QuizPage({ initialState }: QuizPageProps) {
       <div className={styles.page}>
         <div className={styles.empty}>
           <ClipboardList size={56} className={styles.emptyIcon} aria-hidden />
-          <h1 className={styles.emptyTitle}>No quiz active</h1>
+          <h1 className={styles.emptyTitle}>Kein Quiz aktiv</h1>
           <p className={styles.emptyDesc}>
-            Your teacher will start a quiz — come back here when they announce it.
+            Dein Lehrer startet gleich ein Quiz — diese Seite aktualisiert sich automatisch.
           </p>
         </div>
       </div>
     );
   }
-
-  // ── Waiting ─────────────────────────────────────────────────────────────
-  if (quiz.phase === "waiting") {
-    return (
-      <div className={styles.page}>
-        <div className={styles.empty}>
-          <div className={styles.emptyIcon} aria-hidden>⏳</div>
-          <h1 className={styles.emptyTitle}>Quiz starting…</h1>
-          <p className={styles.emptyDesc}>Your teacher is about to launch the first question.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const progress = ((quiz.currentIndex + 1) / quiz.totalQuestions) * 100;
 
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
-        {/* Header */}
-        <div className={styles.header}>
-          <div className={styles.meta}>
-            <span className={styles.progress}>
-              <Users size={14} aria-hidden />
-              Question {quiz.currentIndex + 1} of {quiz.totalQuestions}
-            </span>
-            {timeLeft !== null && quiz.phase === "active" && (
-              <span className={timeLeft <= 10 ? styles.timerUrgent : styles.timer}>
-                <Timer size={14} aria-hidden />
-                {timeLeft}s
-              </span>
-            )}
-          </div>
-          <div className={styles.progressTrack}>
-            <div className={styles.progressFill} style={{ width: `${progress}%` }} />
-          </div>
+        {/* Question progress bar */}
+        <div className={styles.progressTrack}>
+          <div
+            className={styles.progressFill}
+            style={{ width: `${((quiz.currentIndex + 1) / quiz.totalQuestions) * 100}%` }}
+          />
         </div>
 
-        {/* Question */}
-        <div className={styles.questionCard}>
-          <p className={styles.question}>{quiz.question}</p>
+        {/* Shared quiz view */}
+        <QuizView
+          mode="student"
+          quiz={quiz}
+          selectedIndex={selectedAnswer}
+          onSelect={handleSelect}
+          correctCount={correctCount}
+        />
 
-          <div className={styles.options}>
-            {quiz.options.map((option, i) => {
-              const isSelected = selectedAnswer === i;
-              const isCorrect = quiz.correctIndices?.includes(i);
-              const isReveal =
-                quiz.phase === "reveal_correct" || quiz.phase === "reveal_dist";
-
-              let optionClass = styles.option;
-              if (isReveal && isCorrect) optionClass = `${styles.option} ${styles.optionCorrect}`;
-              else if (isReveal && isSelected && !isCorrect)
-                optionClass = `${styles.option} ${styles.optionWrong}`;
-              else if (isSelected) optionClass = `${styles.option} ${styles.optionSelected}`;
-
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  className={optionClass}
-                  onClick={() => {
-                    if (quiz.phase === "active" && !hasSubmitted) setSelectedAnswer(i);
-                  }}
-                  disabled={quiz.phase !== "active" || hasSubmitted}
-                  aria-pressed={isSelected}
-                >
-                  <span className={styles.optionLetter}>{String.fromCharCode(65 + i)}</span>
-                  <span className={styles.optionText}>{option}</span>
-                  {isReveal && isCorrect && (
-                    <CheckCircle2 size={18} className={styles.optionIcon} aria-hidden />
-                  )}
-                  {isReveal && isSelected && !isCorrect && (
-                    <Circle size={18} className={styles.optionIcon} aria-hidden />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Actions / status */}
-        {quiz.phase === "active" && (
-          <div className={styles.actions}>
-            {hasSubmitted ? (
-              <p className={styles.submitted}>Answer submitted — waiting for results…</p>
-            ) : (
-              <Button
-                variant="primary"
-                size="lg"
-                disabled={selectedAnswer === null}
-                onClick={handleSubmit}
-              >
-                Submit Answer
-              </Button>
-            )}
-          </div>
+        {/* Phase status hints */}
+        {quiz.phase === "active" && selectedAnswer !== null && (
+          <p className={styles.statusMsg}>Antwort gespeichert — du kannst sie noch ändern.</p>
         )}
-
         {quiz.phase === "reveal_dist" && (
-          <p className={styles.statusMsg}>Results incoming…</p>
+          <p className={styles.statusMsg}>Auswertung folgt…</p>
         )}
-
-        {quiz.phase === "reveal_correct" && quiz.why && (
-          <div className={styles.explanation}>
-            <p className={styles.explanationLabel}>Why?</p>
-            <p className={styles.explanationText}>{quiz.why}</p>
-          </div>
-        )}
-
-        {quiz.phase === "reveal_correct" && (
-          <p className={styles.statusMsg}>
-            {quiz.currentIndex + 1 < quiz.totalQuestions
-              ? "Next question coming up…"
-              : "Quiz complete — great job!"}
-          </p>
+        {quiz.phase === "reveal_correct" && quiz.currentIndex + 1 < quiz.totalQuestions && (
+          <p className={styles.statusMsg}>Nächste Frage kommt…</p>
         )}
       </div>
     </div>

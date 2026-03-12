@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { SidebarDTO } from "@schema/courseTypes";
 import { Sidebar } from "./Sidebar/Sidebar";
 import { MobileNav } from "./MobileNav/MobileNav";
+import { QuizStartBanner } from "@features/quiz/QuizStartBanner";
 import styles from "./Layout.module.css";
 
 type LayoutProps = {
@@ -19,10 +20,11 @@ export function Layout({
   children,
   fullWidth,
 }: LayoutProps) {
-  const lastCourseHref = sidebarData.courses[0]?.href ?? null;
+  const primaryCourseHref = sidebarData.courses[0]?.href ?? null;
 
   return (
     <div className={styles.layout}>
+      {!isAdmin && sidebarData.isAuthenticated && <QuizStartBanner />}
       <Sidebar
         sidebarData={sidebarData}
         isAdmin={isAdmin}
@@ -31,8 +33,9 @@ export function Layout({
       <main className={`${styles.main}${fullWidth ? ` ${styles.mainFullWidth}` : ""}`}>{children}</main>
       <MobileNav
         isAuthenticated={sidebarData.isAuthenticated}
-        lastCourseHref={lastCourseHref}
+        primaryCourseHref={primaryCourseHref}
         isAdmin={isAdmin}
+        enrolledCoursesCount={sidebarData.courses.length}
       />
     </div>
   );

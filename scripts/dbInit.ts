@@ -93,6 +93,7 @@ async function main() {
 
     // 6. Quiz helper functions
     await applyFile(sql, path.join(SQL, "functions", "try_advance_quiz_phase.sql"));
+    await applyFile(sql, path.join(SQL, "functions", "get_quiz_broadcast_data.sql"));
 
     // 7. Course data
     console.log("[db-init] Applying courses.sql...");

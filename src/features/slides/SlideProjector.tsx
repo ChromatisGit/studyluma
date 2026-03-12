@@ -1,88 +1,82 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
-import type { SlideDeck, SlideMessage, SlideState } from "@schema/slideTypes";
+import { useState, useCallback, useMemo } from "react";
+import type { SlideDeck } from "@schema/slideTypes";
+import type { AdminStreamEvent, LiveSlideState, AdminSnapshot } from "@schema/streamTypes";
 import type { MacroRenderContext } from "@macros/componentTypes";
+import type { QuizResultsDTO } from "@schema/quizTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
-import { createProjectorAdapter } from "@macros/state/BroadcastAdapter";
 import { QuizProjectorOverlay } from "@features/quiz/QuizProjectorOverlay";
-import { useSlideBroadcast } from "./hooks/useSlideBroadcast";
+import { useSlideStream } from "./hooks/useSlideStream";
 import { SlideRenderer } from "./components/SlideRenderer";
-import { LaserPointer } from "./components/LaserPointer";
 import styles from "./SlideProjector.module.css";
 
 type SlideProjectorProps = {
   deck: SlideDeck;
-  channelName: string;
+  courseId: string;
 };
 
-export function SlideProjector({ deck, channelName }: SlideProjectorProps) {
-  const [state, setState] = useState<SlideState>({
+function createReadOnlyAdapter(macroState: Record<string, string>) {
+  return {
+    read: (key: string) => macroState[key] ?? null,
+    write: () => { /* projector is read-only */ },
+    isReadOnly: true as const,
+  };
+}
+
+export function SlideProjector({ deck, courseId }: SlideProjectorProps) {
+  const [slideState, setSlideState] = useState<LiveSlideState>({
     slideIndex: 0,
     blackout: false,
-    interactiveState: {},
+    macroState: {},
   });
-
+  const [quizState, setQuizState] = useState<QuizResultsDTO | null>(null);
   const [synced, setSynced] = useState(false);
-  const [sessionExpired, setSessionExpired] = useState(false);
 
-  const { postMessage } = useSlideBroadcast({
-    channelName,
-    role: "projector",
-    onSessionExpired: useCallback(() => setSessionExpired(true), []),
-    onMessage: useCallback((msg: SlideMessage) => {
-      switch (msg.type) {
-        case "STATE_UPDATE":
-          setState(msg.state);
-          setSynced(true);
-          break;
-        case "SLIDE_CHANGE":
-          setState((prev) => ({ ...prev, slideIndex: msg.slideIndex }));
-          break;
-        case "BLACKOUT":
-          setState((prev) => ({ ...prev, blackout: msg.blackout }));
-          break;
-        case "SYNC_RESPONSE":
-          setState(msg.state);
-          setSynced(true);
-          break;
-        case "FULLSCREEN_REQUEST":
-          document.documentElement.requestFullscreen?.().catch(() => {});
-          break;
+  const onEvent = useCallback((event: AdminStreamEvent) => {
+    switch (event.type) {
+      case "INIT": {
+        const init = event as AdminSnapshot;
+        setSlideState({
+          slideIndex: init.slideIndex,
+          blackout: init.blackout,
+          macroState: init.macroState,
+        });
+        setQuizState(init.quiz);
+        setSynced(true);
+        break;
       }
-    }, []),
-  });
+      case "SLIDE_STATE":
+        setSlideState({
+          slideIndex: event.slideIndex,
+          blackout: event.blackout,
+          macroState: event.macroState,
+        });
+        break;
+      case "QUIZ_STATE":
+        setQuizState(event.quiz as QuizResultsDTO | null);
+        break;
+      // PRESENCE is admin-only; projector can ignore it
+    }
+  }, []);
 
-  // Request sync on mount, retry until synced
-  useEffect(() => {
-    if (synced) return;
+  useSlideStream({ courseId, onEvent });
 
-    postMessage({ type: "SYNC_REQUEST" });
-    const interval = setInterval(() => {
-      postMessage({ type: "SYNC_REQUEST" });
-    }, 500);
+  const currentSlide = deck.slides[slideState.slideIndex];
+  const slideContext: MacroRenderContext = { readOnly: true, projector: true };
 
-    return () => clearInterval(interval);
-  }, [synced, postMessage]);
-
-  const currentSlide = deck.slides[state.slideIndex];
-  const slideContext: MacroRenderContext = { readOnly: true };
-
-  const projectorAdapter = useMemo(
-    () => createProjectorAdapter(state.interactiveState),
-    [state.interactiveState]
+  const macroAdapter = useMemo(
+    () => createReadOnlyAdapter(slideState.macroState),
+    [slideState.macroState],
   );
 
   return (
-    <MacroStateProvider adapter={projectorAdapter}>
+    <MacroStateProvider adapter={macroAdapter}>
       <div className={styles.projector}>
-        {state.blackout && <div className={styles.blackout} />}
-        {sessionExpired && (
-          <div className={styles.expired}>
-            <p>Präsentation beendet</p>
-            <button type="button" onClick={() => window.location.reload()}>
-              Neu laden
-            </button>
+        {slideState.blackout && <div className={styles.blackout} />}
+        {!synced && (
+          <div className={styles.syncing}>
+            <p>Verbinde…</p>
           </div>
         )}
         {currentSlide && (
@@ -90,11 +84,10 @@ export function SlideProjector({ deck, channelName }: SlideProjectorProps) {
             header={currentSlide.header}
             content={currentSlide.content}
             context={slideContext}
-            slideIndex={state.slideIndex}
+            slideIndex={slideState.slideIndex}
           />
         )}
-        <QuizProjectorOverlay channelName={channelName} />
-        <LaserPointer position={state.pointer} />
+        <QuizProjectorOverlay quizState={quizState} />
       </div>
     </MacroStateProvider>
   );

@@ -43,6 +43,7 @@ export default function AccessSection({
   const [activeTab, setActiveTab] = useState<Tab>(showRegister ? "register" : "login");
   const [accessCode, setAccessCode] = useState(currentUserAccessCode ?? "");
   const [pin, setPin] = useState("");
+  const [pinConfirm, setPinConfirm] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [newAccessCode, setNewAccessCode] = useState<string | null>(null);
@@ -54,11 +55,17 @@ export default function AccessSection({
     setActiveTab(tab);
     setError("");
     setPin("");
+    setPinConfirm("");
   };
 
   const handleContinue = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+
+    if (activeTab === "register" && pin !== pinConfirm) {
+      setError(ACCESS_TEXT.section.pinMismatchError);
+      return;
+    }
 
     const submittedAccessCode = activeTab === "register" ? "" : accessCode;
 
@@ -156,7 +163,11 @@ export default function AccessSection({
             )}
 
             <Input
-              label={ACCESS_TEXT.section.pinLabel}
+              label={
+                activeTab === "register"
+                  ? ACCESS_TEXT.section.pinLabelChoose
+                  : ACCESS_TEXT.section.pinLabel
+              }
               type="password"
               value={pin}
               onChange={(event) => setPin(event.target.value)}
@@ -164,14 +175,27 @@ export default function AccessSection({
               disabled={isPending}
             />
 
+            {activeTab === "register" && (
+              <Input
+                label={ACCESS_TEXT.section.pinConfirmLabel}
+                type="password"
+                value={pinConfirm}
+                onChange={(event) => setPinConfirm(event.target.value)}
+                placeholder={ACCESS_TEXT.section.pinConfirmPlaceholder}
+                disabled={isPending}
+              />
+            )}
+
             {error ? <div className={styles.message}>{error}</div> : null}
 
             <Button type="submit" variant="primary" fullWidth disabled={isPending}>
               {isPending
                 ? ACCESS_TEXT.section.processing
                 : activeTab === "login"
-                  ? ACCESS_TEXT.section.tabLogin
-                  : ACCESS_TEXT.section.tabRegister}
+                  ? isCourseJoin
+                    ? ACCESS_TEXT.section.joinButton
+                    : ACCESS_TEXT.section.loginButton
+                  : ACCESS_TEXT.section.registerJoinButton}
             </Button>
 
             <Button

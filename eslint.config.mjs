@@ -9,6 +9,7 @@ export default defineConfig([
 
   globalIgnores([
     ".next/**",
+    ".open-next/**",
     "out/**",
     "build/**",
     "next-env.d.ts",
@@ -67,14 +68,14 @@ export default defineConfig([
         { type: "schema",           pattern: "src/schema/**" },
         { type: "types",            pattern: "src/types/**" },
 
-        { type: "server-actions",   pattern: "src/server/actions/**" },
-        { type: "server-services",  pattern: "src/server/services/**" },
-        { type: "server-db",        pattern: "src/server/db/**" },
-        { type: "server-providers", pattern: "src/server/providers/**" },
-        { type: "server-lib",       pattern: "src/server/lib/**" },
-        { type: "server-config",    pattern: "src/server/config/**" },
+        { type: "server-actions",         pattern: "src/server/actions/**" },
+        { type: "server-services",        pattern: "src/server/services/**" },
+        { type: "server-db",              pattern: "src/server/db/**" },
+        { type: "server-providers",       pattern: "src/server/providers/**" },
+        { type: "server-lib",             pattern: "src/server/lib/**" },
+        { type: "server-config",          pattern: "src/server/config/**" },
 
-        { type: "server",           pattern: "src/server/**" },
+        { type: "server",                 pattern: "src/server/**" },
 
         { type: "pipeline",         pattern: "pipeline/**" },
       ],
@@ -91,7 +92,7 @@ export default defineConfig([
             // -------------------------
             {
               from: "app",
-              allow: ["app", "features", "ui", "macros", "schema", "types", "server-actions", "server-services"],
+              allow: ["app", "features", "ui", "macros", "schema", "types", "server-actions", "server-services", "server-lib"],
             },
 
             // -------------------------

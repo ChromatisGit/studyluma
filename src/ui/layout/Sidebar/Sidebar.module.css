@@ -106,6 +106,10 @@
   gap: 2px;
 }
 
+.navFixed {
+  flex: 0 0 auto;
+}
+
 .navItem {
   display: flex;
   align-items: center;

@@ -26,6 +26,12 @@ export type MacroRenderContext = {
   readOnly?: boolean;
 
   /**
+   * When true, the macro is being rendered on the projector screen.
+   * Some macros (e.g. quiz) should hide themselves entirely on the projector.
+   */
+  projector?: boolean;
+
+  /**
    * Called when the macro's "attempted" state changes (i.e. whether the user
    * has entered any content). Used by TaskSetComponent to track section completion.
    */
@@ -33,7 +39,7 @@ export type MacroRenderContext = {
 
   /**
    * When true, show detailed per-option feedback after checking (correct/wrong/missed
-   * highlighted per option). Used by PractiseRenderer.
+   * highlighted per option). Used by PracticeRenderer.
    * When false (default), only indicate that something is wrong without revealing which options.
    */
   detailedFeedback?: boolean;
