@@ -1,10 +1,10 @@
 "use client";
 
-import type { Slide } from "@schema/slideTypes";
+type SlideListItem = { header: string };
 import styles from "./SlideOverviewGrid.module.css";
 
 type SlideOverviewGridProps = {
-  slides: Slide[];
+  slides: SlideListItem[];
   currentIndex: number;
   onSelect: (index: number) => void;
   onClose: () => void;

@@ -5,6 +5,7 @@ export type RawMacroBlock = {
   type: string;
   params?: string;
   content?: string;
+  content2?: string;  // Optional second content block: #macro[first][second]
 };
 
 export type RawNode = RawMacroBlock | RawText;
@@ -31,6 +32,15 @@ export function splitMacroAndText(content: string): RawNode[] {
           const macroBlock = readBalancedSquare(content, end);
           macro.content = macroBlock.content.trim();
           end = macroBlock.end;
+
+          // Check for an optional second content block (skip whitespace between ][)
+          let nextNonWs = end;
+          while (nextNonWs < content.length && /\s/.test(content[nextNonWs])) nextNonWs++;
+          if (content[nextNonWs] === "[") {
+            const macroBlock2 = readBalancedSquare(content, nextNonWs);
+            macro.content2 = macroBlock2.content.trim();
+            end = macroBlock2.end;
+          }
         }
 
         out.push(macro);

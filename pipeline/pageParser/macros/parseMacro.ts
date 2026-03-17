@@ -1,11 +1,7 @@
-import type { Markdown } from "@schema/page";
 import type { RawText } from "@pipeline/types";
 import type { ProtectedBlock } from "@pipeline/pageParser/codeBlockGuard";
 import type { Macro } from "@macros/registry";
 import type { MacroGroup } from "@schema/page";
-import type { SlideSplitMacro } from "@macros/slideSplit/types";
-import type { SlideMainMacro } from "@macros/slideMain/types";
-import type { StepsMacro } from "@macros/steps/types";
 import { parseMacroType } from "./macroRegistry";
 import { Params, parseParams } from "./parseParams";
 import { parseRawText, type ContentType } from "@pipeline/pageParser/macros/parserUtils";
@@ -34,9 +30,6 @@ type LayoutParser = (
 
 const layoutMacroRegistry = new Map<string, LayoutParser>([
     ["group",      parseGroupContent],
-    ["slideSplit", parseSlideSplitContent],
-    ["slideMain",  parseSlideMainContent],
-    ["steps",      parseStepsContent],
 ]);
 
 export function isLayoutMacro(type: string): boolean {
@@ -84,42 +77,10 @@ function parseGroupContent(node: RawMacroBlock, protectedBlocks: ProtectedBlock[
 
     macroGroup.macros = groupNodes.flatMap((node) => {
         const result = parseMacro(node, protectedBlocks, filePath, contentType)
-        if (result.type === "group") return result.macros
         return [result]
     })
 
     return macroGroup
-}
-
-function parseSlideSplitContent(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string, contentType?: ContentType): SlideSplitMacro {
-    const content = node.content ?? "";
-    const parts = content.split(/\n---\n/);
-    const [leftRaw = "", rightRaw = ""] = parts.map(s => s.trim());
-    return {
-        type: "slideSplit",
-        left:  parseMacroList(leftRaw, protectedBlocks, filePath, contentType),
-        right: parseMacroList(rightRaw, protectedBlocks, filePath, contentType),
-    };
-}
-
-function parseSlideMainContent(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string, contentType?: ContentType): SlideMainMacro {
-    const content = node.content ?? "";
-    const parts = content.split(/\n---\n/);
-    const [mainRaw = "", asideRaw = ""] = parts.map(s => s.trim());
-    return {
-        type: "slideMain",
-        main:  parseMacroList(mainRaw, protectedBlocks, filePath, contentType),
-        aside: parseMacroList(asideRaw, protectedBlocks, filePath, contentType),
-    };
-}
-
-function parseStepsContent(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string): StepsMacro {
-    const content = node.content ?? "";
-    const items = content.split(/\n\n+/).map(s => s.trim()).filter(Boolean);
-    return {
-        type: "steps",
-        items: items.map(item => parseRawText({ rawText: item }, protectedBlocks)),
-    };
 }
 
 

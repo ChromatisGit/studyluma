@@ -7,9 +7,12 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Layout } from "@ui/layout/Layout";
 import { CourseProviders } from "./CourseProviders";
+import { NewUserWelcomeModal } from "@features/access/NewUserWelcomeModal";
 import { getSession, isAdmin, canUserAccessPage } from "@services/authService";
 import { getCourseId, getSidebarDTO, coursePublic } from "@services/courseService";
+import { getActiveQuizForUser } from "@services/quizService";
 import { signOutAction } from "@actions/accessActions";
+import { getNewUserCodeCookie } from "@server-lib/auth";
 
 type CourseLayoutProps = {
   children: ReactNode;
@@ -32,10 +35,13 @@ export default async function CourseLayout({ children, params }: CourseLayoutPro
 
   const courseId = await getCourseId(groupKey, subjectKey);
 
-  const [sidebarData, isPublic] = await Promise.all([
+  const [sidebarData, isPublic, newUserCode] = await Promise.all([
     getSidebarDTO({ courseId, user }),
     coursePublic(courseId),
+    getNewUserCodeCookie(),
   ]);
+
+  const activeQuizExists = newUserCode && user ? !!(await getActiveQuizForUser(user)) : false;
 
   if (!session) {
     // Allow unauthenticated access only for public courses
@@ -52,7 +58,9 @@ export default async function CourseLayout({ children, params }: CourseLayoutPro
       sidebarData={sidebarData}
       isAdmin={user ? isAdmin(user) : false}
       signOutAction={signOutAction}
+      suppressQuizBanner={!!newUserCode}
     >
+      {newUserCode && <NewUserWelcomeModal accessCode={newUserCode} activeQuizExists={!!activeQuizExists} />}
       <CourseProviders>{children}</CourseProviders>
     </Layout>
   );

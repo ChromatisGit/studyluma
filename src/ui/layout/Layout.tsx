@@ -11,6 +11,7 @@ type LayoutProps = {
   signOutAction: () => Promise<void>;
   children: ReactNode;
   fullWidth?: boolean;
+  suppressQuizBanner?: boolean;
 };
 
 export function Layout({
@@ -19,12 +20,13 @@ export function Layout({
   signOutAction,
   children,
   fullWidth,
+  suppressQuizBanner,
 }: LayoutProps) {
   const primaryCourseHref = sidebarData.courses[0]?.href ?? null;
 
   return (
     <div className={styles.layout}>
-      {!isAdmin && sidebarData.isAuthenticated && <QuizStartBanner />}
+      {!isAdmin && sidebarData.isAuthenticated && !suppressQuizBanner && <QuizStartBanner />}
       <Sidebar
         sidebarData={sidebarData}
         isAdmin={isAdmin}

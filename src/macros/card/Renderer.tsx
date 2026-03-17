@@ -2,7 +2,6 @@ import type { CardMacro, CardKind } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
-import PairsRenderer from "../pairs/Renderer";
 import { Info, BookOpen, FlaskConical, Check, HelpCircle, CheckSquare, Star, RefreshCw, Bookmark, AlertTriangle, CheckCircle } from "lucide-react";
 import clsx from "clsx";
 import styles from "./styles.module.css";
@@ -40,11 +39,10 @@ const KIND_STYLE: Record<CardKind, string> = {
   plain: styles.plain,
 };
 
-export default function CardRenderer({ macro, context }: Props) {
+export default function CardRenderer({ macro }: Props) {
   const content = getMarkdown(macro.content);
   const Icon = ICONS[macro.kind];
   const label = MACROS_TEXT.card[macro.kind as keyof typeof MACROS_TEXT.card];
-  const hasPairs = macro.pairs && macro.pairs.length > 0;
   const hasText = content && content.trim().length > 0;
 
   return (
@@ -57,12 +55,6 @@ export default function CardRenderer({ macro, context }: Props) {
       )}
       <div className={styles.content}>
         {hasText && <MarkdownRenderer markdown={content} />}
-        {hasPairs && (
-          <PairsRenderer
-            macro={{ type: "pairs", items: macro.pairs! }}
-            context={context}
-          />
-        )}
       </div>
     </div>
   );

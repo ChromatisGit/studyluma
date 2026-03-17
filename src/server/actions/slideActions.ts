@@ -10,6 +10,7 @@ const SlideStateSchema = z.object({
   slideIndex: z.number().int().min(0),
   blackout: z.boolean(),
   macroState: z.record(z.string(), z.string()),
+  revealStep: z.number().int().min(0),
 });
 
 /**

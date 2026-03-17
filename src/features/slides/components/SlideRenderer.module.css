@@ -1,35 +1,71 @@
-/* Projector only — full-height frame with spacing from page border */
+/* Projector: full-height frame */
 .slideFrame {
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: var(--sn-space-lg);
   box-sizing: border-box;
-  --sn-slide-header-size: 1.5em;
 }
 
-/* Presenter only — spacing around card (no left) */
+/* Presenter: spacing around card */
 .slidePreview {
   padding: var(--sn-space-lg) var(--sn-space-lg) var(--sn-space-lg) 0;
 }
 
-/* White card — sizes to content by default; projector adds .contentBoxFull */
-.contentBox {
+/* White card */
+.card {
+  --slide-font-base: 1.3rem;
+  position: relative;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-xl);
-  background: var(--sn-surface-raised);
+  background: var(--sn-surface);
   box-shadow: var(--sn-shadow-md);
+  overflow: hidden;
+  transition: opacity 0.15s ease-out;
 }
 
-/* Projector only — card fills the full frame height */
+/* Projector: card fills full frame height */
+.cardFull {
+  flex: 1;
+  min-height: 0;
+  --slide-font-base: clamp(1.3rem, 2vw, 3rem);
+}
+
+/* Section slide uses full purple card — no inner content layout */
+.cardSection {
+  background: var(--sn-purple-accent);
+}
+
+/* Fade-in when slide changes */
+@keyframes slideIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.slideFrame .card,
+.slidePreview .card {
+  animation: slideIn 0.15s ease-out;
+}
+
+/* Legacy class names used by QuizProjectorOverlay — keep for compat */
+.contentBox {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-xl);
+  background: var(--sn-surface);
+  box-shadow: var(--sn-shadow-md);
+  overflow: hidden;
+}
+
 .contentBoxFull {
   flex: 1;
   min-height: 0;
 }
 
-/* Slide title — left purple accent stripe, inside the white card */
 .slideHeader {
   margin: var(--sn-space-md) var(--sn-space-xl) var(--sn-space-sm);
   padding: 4px 0 4px var(--sn-space-md);
@@ -39,7 +75,7 @@
 
 .headerTitle {
   margin: 0;
-  font-size: var(--sn-slide-header-size, 1.05em);
+  font-size: 1.05em;
   font-weight: var(--sn-font-bold);
   color: var(--sn-text);
 }
@@ -51,63 +87,6 @@
   padding: 0 var(--sn-space-xl) var(--sn-space-xl);
   font-size: 1.08em;
   line-height: 1.7;
-}
-
-/* Content item styles */
-.textBlock {
-  line-height: 1.7;
-}
-
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sn-space-md);
-}
-
-.groupIntro {
-  margin-bottom: var(--sn-space-xs);
-}
-
-.groupTasks {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sn-space-md);
-}
-
-.subheader {
-  font-size: 1.35em;
-  font-weight: var(--sn-font-semibold);
-  margin-top: var(--sn-space-sm);
-}
-
-/* Layout variants — applied alongside .contentInner */
-
-.layoutStatement {
-  justify-content: safe center;
-  align-items: center;
-  text-align: center;
-  font-size: 1.3em;
-}
-
-.layoutSection {
-  justify-content: safe center;
-  align-items: center;
-  text-align: center;
-  font-size: 1.6em;
-}
-
-.layoutCode {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: var(--sn-space-lg);
-  align-items: start;
-  align-content: start;
-}
-
-.layoutCode > :first-child {
-  grid-column: 1;
-}
-
-.layoutCode > *:not(:first-child) {
-  grid-column: 2;
+  flex: 1;
+  min-height: 0;
 }

@@ -9,6 +9,9 @@
   border-radius: var(--sn-radius-md);
   overflow: hidden;
   background: var(--sn-code-bg);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .codeHeader {
@@ -129,6 +132,7 @@
   color: var(--sn-code-text);
   overflow: hidden;
   padding: 0;
+  flex: 1;
 }
 
 .editorWindowBackdrop {
@@ -145,7 +149,7 @@
   min-height: 100%;
   line-height: 1.5;
   font-family: var(--sn-font-mono);
-  font-size: var(--sn-text-md);
+  font-size: var(--sn-text-sm);
   color: var(--sn-code-text);
   background: transparent;
   white-space: pre-wrap;
@@ -154,6 +158,7 @@
 .editorTextarea {
   position: relative;
   width: 100%;
+  height: 100%;
   padding: 0.85rem 1rem;
   background: transparent;
   color: transparent;
@@ -162,7 +167,7 @@
   overflow: hidden;
   line-height: 1.5;
   font-family: var(--sn-font-mono);
-  font-size: var(--sn-text-md);
+  font-size: var(--sn-text-sm);
   outline: none;
   caret-color: var(--sn-text-on-accent);
 }

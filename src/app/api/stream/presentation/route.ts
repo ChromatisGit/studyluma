@@ -33,6 +33,7 @@ export async function GET(request: Request): Promise<Response> {
     slideIndex: slideState.slideIndex,
     blackout: slideState.blackout,
     macroState: slideState.macroState,
+    revealStep: slideState.revealStep,
     quiz,
   };
 

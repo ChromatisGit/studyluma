@@ -11,7 +11,6 @@ import { Stack } from "@components/Stack";
 import { IconBox } from "@components/IconBox";
 import styles from "./AccessSection.module.css";
 import { continueAccessAction } from "@actions/accessActions";
-import { AccessCodeModal } from "./AccessCodeModal";
 import ACCESS_TEXT from "./access.de.json";
 
 type AccessSectionProps = {
@@ -46,8 +45,6 @@ export default function AccessSection({
   const [pinConfirm, setPinConfirm] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
-  const [newAccessCode, setNewAccessCode] = useState<string | null>(null);
-  const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -92,20 +89,8 @@ export default function AccessSection({
         return;
       }
 
-      if (result.accessCode) {
-        setNewAccessCode(result.accessCode);
-        setPendingRedirect(result.redirectTo);
-      } else {
-        window.location.href = result.redirectTo;
-      }
+      window.location.href = result.redirectTo;
     });
-  };
-
-  const handleModalConfirm = () => {
-    setNewAccessCode(null);
-    if (pendingRedirect) {
-      window.location.href = pendingRedirect;
-    }
   };
 
   const title = isCourseJoin
@@ -212,12 +197,6 @@ export default function AccessSection({
 
         <p className={styles.footer}>{ACCESS_TEXT.section.helpText}</p>
       </div>
-
-      <AccessCodeModal
-        accessCode={newAccessCode ?? ""}
-        isOpen={!!newAccessCode}
-        onConfirm={handleModalConfirm}
-      />
     </div>
   );
 }

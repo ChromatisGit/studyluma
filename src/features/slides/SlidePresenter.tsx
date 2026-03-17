@@ -1,14 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { SlideDeck } from "@schema/slideTypes";
-import type { MacroRenderContext } from "@macros/componentTypes";
+import type { TypedSlideDeck } from "@schema/slideTypes";
 import type { MacroStateAdapter } from "@macros/state/MacroStateAdapter";
-import type { QuizMacro } from "@macros/quiz/types";
 import type { AdminStreamEvent, AdminSnapshot } from "@schema/streamTypes";
 import type { QuizResultsDTO } from "@schema/quizTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
-import { QuizPresenterPanel } from "@features/quiz/QuizPresenterPanel";
 import { broadcastSlideStateAction } from "@actions/slideActions";
 import { useSlideState } from "./hooks/useSlideState";
 import { useSlideStream } from "./hooks/useSlideStream";
@@ -21,53 +18,36 @@ import { SlideOverviewGrid } from "./components/SlideOverviewGrid";
 import styles from "./SlidePresenter.module.css";
 
 type SlidePresenterProps = {
-  deck: SlideDeck;
+  deck: TypedSlideDeck;
   courseId: string;
   projectorPath: string;
 };
 
-function findQuizMacros(content: SlideDeck["slides"][number]["content"]): QuizMacro[] {
-  const result: QuizMacro[] = [];
-  for (const node of content) {
-    if ("type" in node && node.type === "quiz") {
-      result.push(node as QuizMacro);
-    } else if ("type" in node && node.type === "group") {
-      const group = node as { type: "group"; macros: { type: string }[] };
-      for (const macro of group.macros) {
-        if (macro.type === "quiz") result.push(macro as QuizMacro);
-      }
-    }
-  }
-  return result;
-}
-
 export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenterProps) {
+  const slides = deck.content;
   const { state, next, prev, goTo, first, last, toggleBlackout } =
-    useSlideState({ totalSlides: deck.slides.length });
+    useSlideState({ slides });
 
   const [showGrid, setShowGrid] = useState(false);
   const projectorWindowRef = useRef<Window | null>(null);
 
-  // Macro state lives in a ref (writes don't need re-renders)
   const macroStateRef = useRef<Record<string, string>>({});
   const stateRef = useRef(state);
   useEffect(() => { stateRef.current = state; });
 
-  // Broadcast current state to DO (fire-and-forget)
   const broadcast = useCallback(() => {
     broadcastSlideStateAction(courseId, {
       slideIndex: stateRef.current.slideIndex,
       blackout: stateRef.current.blackout,
       macroState: macroStateRef.current,
+      revealStep: stateRef.current.revealStep,
     }).catch(() => {});
   }, [courseId]);
 
-  // Broadcast on slide index / blackout changes
   useEffect(() => {
     broadcast();
-  }, [state.slideIndex, state.blackout, broadcast]);
+  }, [state.slideIndex, state.blackout, state.revealStep, broadcast]);
 
-  // Writable macro adapter that broadcasts on every macro write
   const macroAdapter = useMemo<MacroStateAdapter>(
     () => ({
       read: (key) => macroStateRef.current[key] ?? null,
@@ -80,8 +60,7 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
     [broadcast],
   );
 
-  // Quiz state received via WebSocket (pushed from DO after student submissions)
-  const [quizResults, setQuizResults] = useState<QuizResultsDTO | null>(null);
+  const [, setQuizResults] = useState<QuizResultsDTO | null>(null);
   const onEvent = useCallback((event: AdminStreamEvent) => {
     switch (event.type) {
       case "INIT": {
@@ -117,14 +96,8 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
     onLaser: () => {},
   });
 
-  const currentSlide = deck.slides[state.slideIndex];
-  const nextSlide = deck.slides[state.slideIndex + 1];
-  const slideContext: MacroRenderContext = { readOnly: false };
-
-  const quizMacros = useMemo(
-    () => (currentSlide ? findQuizMacros(currentSlide.content) : []),
-    [currentSlide],
-  );
+  const currentSlide = slides[state.slideIndex];
+  const nextSlide = slides[state.slideIndex + 1];
 
   return (
     <MacroStateProvider adapter={macroAdapter}>
@@ -134,7 +107,7 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
           <PresentationTimer />
           <SlideControls
             slideIndex={state.slideIndex}
-            totalSlides={deck.slides.length}
+            totalSlides={slides.length}
             blackout={state.blackout}
             onNext={next}
             onPrev={prev}
@@ -146,28 +119,11 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
 
         <div className={styles.body}>
           <main className={styles.slidePreview}>
-            {currentSlide && (
-              <SlideRenderer
-                header={currentSlide.header}
-                content={currentSlide.content}
-                context={slideContext}
-                slideIndex={state.slideIndex}
-              />
-            )}
+            {currentSlide && <SlideRenderer key={state.slideIndex} slide={currentSlide} revealStep={state.revealStep} />}
           </main>
 
           <aside className={styles.sidebar}>
-            {quizMacros.length > 0 && (
-              <QuizPresenterPanel
-                quizMacros={quizMacros}
-                courseId={courseId}
-                quizResults={quizResults}
-              />
-            )}
-
-            {currentSlide && (
-              <PresenterNotes notes={currentSlide.presenterNotes} />
-            )}
+            {currentSlide && <PresenterNotes notes={currentSlide.presenterNotes} />}
 
             {nextSlide && (
               <div className={styles.nextPreview}>
@@ -177,7 +133,7 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
             )}
 
             <div className={styles.thumbnails}>
-              {deck.slides.map((slide, i) => (
+              {slides.map((slide, i) => (
                 <button
                   key={i}
                   type="button"
@@ -194,7 +150,7 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
 
         {showGrid && (
           <SlideOverviewGrid
-            slides={deck.slides}
+            slides={slides}
             currentIndex={state.slideIndex}
             onSelect={goTo}
             onClose={() => setShowGrid(false)}

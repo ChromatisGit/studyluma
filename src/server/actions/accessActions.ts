@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { clearSessionCookie, setSessionCookie } from "@server-lib/auth";
+import { clearSessionCookie, setSessionCookie, setNewUserCodeCookie, clearNewUserCodeCookie } from "@server-lib/auth";
 import { getSession, isAdmin, assertLoggedIn } from "@services/authService";
 import { addCourseToUser, createUser, getUserById } from "@services/userService";
 import { getAuthenticatedUser } from "@services/authService";
@@ -153,7 +153,8 @@ export async function continueAccessAction(
   const updated = await ensureCourseAccess(newUser, groupKey, courseId, ip);
   if (!updated) return fail("Failed to enroll in course.", "/");
 
-  return success(updated, ctx.from ?? courseRoute, newAccessCode);
+  await setNewUserCodeCookie(newAccessCode);
+  return success(updated, ctx.from ?? courseRoute);
 }
 
 export async function joinCourseAction(courseId: string): Promise<void> {
@@ -168,6 +169,10 @@ export async function joinCourseAction(courseId: string): Promise<void> {
 
   const course = await getCourseDTO(courseId);
   redirect(course.slug);
+}
+
+export async function clearNewUserCodeAction(): Promise<void> {
+  await clearNewUserCodeCookie();
 }
 
 export async function signOutAction(): Promise<void> {

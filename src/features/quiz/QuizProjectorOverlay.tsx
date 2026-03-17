@@ -1,9 +1,9 @@
 "use client";
 
 import type { QuizResultsDTO, QuizStateDTO } from "@schema/quizTypes";
+import { SlideHeader } from "@features/slides/components/slides/SlideHeader";
 import { QuizView } from "./QuizView";
 import styles from "./QuizProjectorOverlay.module.css";
-import slideStyles from "@features/slides/components/SlideRenderer.module.css";
 
 type Props = {
   quizState: QuizResultsDTO | null;
@@ -34,12 +34,10 @@ export function QuizProjectorOverlay({ quizState }: Props) {
   if (!quizState || quizState.phase === "closed") return null;
 
   return (
-    <div className={styles.slide}>
-      <div className={`${styles.cardWrap} ${slideStyles.contentBox} ${slideStyles.contentBoxFull}`}>
-        <div className={slideStyles.slideHeader}>
-          <h2 className={slideStyles.headerTitle}>Quiz</h2>
-        </div>
-        <div className={slideStyles.contentInner}>
+    <div className={styles.overlay}>
+      <div className={styles.card}>
+        <SlideHeader title="Quiz" badge="Quiz" accent="teal" />
+        <div className={styles.content}>
           <QuizView mode="projector" quiz={resultsToViewState(quizState)} />
         </div>
       </div>

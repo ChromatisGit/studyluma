@@ -10,7 +10,6 @@ import type { RawMacro } from "./parseMacro";
 import { parser as layoutParser } from "@macros/layout/parser";
 import { parser as noteParser } from "@macros/note/parser";
 import { parser as cardParser } from "@macros/card/parser";
-import { parser as pairsParser } from "@macros/pairs/parser";
 import { parser as imageParser } from "@macros/image/parser";
 import { parser as tableParser } from "@macros/table/parser";
 import { parser as codeRunnerParser } from "@macros/codeRunner/parser";
@@ -20,7 +19,6 @@ import { parser as quizParser } from "@macros/quiz/parser";
 import { parser as codeTaskParser } from "@macros/codeTask/parser";
 import { parser as textTaskParser } from "@macros/textTask/parser";
 import { parser as pnParser } from "@macros/pn/parser";
-import { parser as ktableParser } from "@macros/ktable/parser";
 import { parser as formulaParser } from "@macros/formula/parser";
 import { parser as calloutParser } from "@macros/callout/parser";
 
@@ -41,7 +39,6 @@ const parserMap: Map<string, ParserDef> = new Map([
   ["layout", layoutParser],
   ["note", noteParser],
   ["card", cardParser],
-  ["pairs", pairsParser],
   ["image", imageParser],
   ["table", tableParser],
   ["codeRunner", codeRunnerParser],
@@ -51,7 +48,6 @@ const parserMap: Map<string, ParserDef> = new Map([
   ["codeTask", codeTaskParser],
   ["textTask", textTaskParser],
   ["pn", pnParser],
-  ["ktable", ktableParser],
   ["formula", formulaParser],
   ["callout", calloutParser],
 ] as [string, ParserDef][]);

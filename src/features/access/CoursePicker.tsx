@@ -25,7 +25,7 @@ export function CoursePicker({ courses }: CoursePickerProps) {
           <div className={pickerStyles.grid}>
             {courses.map((course) => {
               const [, urlGroup, urlSubject] = course.slug.split("/");
-              const href = `/access?groupKey=${urlGroup}&subjectKey=${urlSubject}&from=/home`;
+              const href = `/access?groupKey=${urlGroup}&subjectKey=${urlSubject}`;
               return (
                 <CourseCard
                   key={course.id}

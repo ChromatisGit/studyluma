@@ -11,6 +11,7 @@ export type LiveSlideState = {
   slideIndex: number;
   blackout: boolean;
   macroState: Record<string, string>;
+  revealStep: number;
 };
 
 // ── Initial snapshots (sent on WebSocket open) ───────────────────────────────
@@ -20,6 +21,7 @@ export type AdminSnapshot = {
   slideIndex: number;
   blackout: boolean;
   macroState: Record<string, string>;
+  revealStep: number;
   /** null if no active quiz */
   quiz: QuizResultsDTO | null;
 };
@@ -40,6 +42,7 @@ export type SlideStateEvent = {
   blackout: boolean;
   /** always full snapshot, never delta */
   macroState: Record<string, string>;
+  revealStep: number;
 };
 
 /** Sent to admin subscribers after any quiz DB mutation; null when quiz closes */

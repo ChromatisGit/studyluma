@@ -5,6 +5,7 @@ import type { InlineMacroSchema } from "@pipeline/pageParser/macros/validateInli
 import type { RawText } from "@pipeline/types";
 import type { ProtectedBlock } from "@pipeline/pageParser/codeBlockGuard";
 import { restoreCodeBlocks } from "@pipeline/pageParser/codeBlockGuard";
+import { translateTypstMathInMarkdown } from "@pipeline/pageParser/utils/typstMathToKatex";
 
 export type ContentType = "contentpage" | "worksheet" | "slides";
 
@@ -78,5 +79,6 @@ export function parseRawText(
 ): Markdown {
   const converted = rawText.replace(/\*(.*?)\*/g, "**$1**");
   const restored = restoreCodeBlocks({ rawText: converted }, protectedBlocks).rawText;
-  return createMarkdown(restored);
+  const translated = translateTypstMathInMarkdown(restored);
+  return createMarkdown(translated);
 }

@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { SlideDeck } from "@schema/slideTypes";
+import type { TypedSlideDeck } from "@schema/slideTypes";
 import type { LiveSlideState } from "@schema/streamTypes";
 import { notFound } from "next/navigation";
 import {
@@ -20,7 +20,7 @@ type GetSlideDeckArgs = {
   slideId: string;
 };
 
-export async function getSlideDeck(args: GetSlideDeckArgs): Promise<SlideDeck> {
+export async function getSlideDeck(args: GetSlideDeckArgs): Promise<TypedSlideDeck> {
   const deck = await getSlideDeckFromProvider(args);
   if (!deck) notFound();
   return deck;
@@ -55,6 +55,6 @@ export async function getSlideState(courseId: string): Promise<LiveSlideState> {
     WHERE course_id = ${courseId}
   `;
   return row
-    ? { slideIndex: row.slide_index, blackout: row.blackout, macroState: row.macro_state }
-    : { slideIndex: 0, blackout: false, macroState: {} };
+    ? { slideIndex: row.slide_index, blackout: row.blackout, macroState: row.macro_state, revealStep: 0 }
+    : { slideIndex: 0, blackout: false, macroState: {}, revealStep: 0 };
 }

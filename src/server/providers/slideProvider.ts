@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { SlideDeck } from "@schema/slideTypes";
+import type { TypedSlideDeck } from "@schema/slideTypes";
 import { readFile, readdir } from "fs/promises";
 import { join } from "path";
 import { tryCatch } from "@server-lib/errorHandler";
@@ -12,7 +12,7 @@ type GetSlideDeckArgs = {
   slideId: string;
 };
 
-export async function getSlideDeck(args: GetSlideDeckArgs): Promise<SlideDeck | null> {
+export async function getSlideDeck(args: GetSlideDeckArgs): Promise<TypedSlideDeck | null> {
   const { subject, topicId, chapterId, slideId } = args;
   const sourcePath = `.generated/${subject}/${topicId}/${chapterId}/slides/${slideId}.json`;
 
@@ -21,7 +21,7 @@ export async function getSlideDeck(args: GetSlideDeckArgs): Promise<SlideDeck | 
 
   if (!fileContent) return null;
 
-  return JSON.parse(fileContent) as SlideDeck;
+  return JSON.parse(fileContent) as TypedSlideDeck;
 }
 
 type ListSlideDecksArgs = {

@@ -1,14 +1,13 @@
-/* Full-screen quiz slide — covers the slide when a quiz is active */
-.slide {
+/* Full-screen overlay — covers the slide when a quiz is active */
+.overlay {
   position: absolute;
   inset: 0;
   z-index: 10;
   display: flex;
   align-items: stretch;
-  justify-content: center;
   background: var(--sn-bg);
   padding: var(--sn-space-lg);
-  --sn-slide-header-size: 1.5em;
+  box-sizing: border-box;
 
   /* Scale quiz text for the projector */
   --sn-text-xs: 0.95rem;
@@ -23,6 +22,24 @@
   --sn-space-xl: 36px;
 }
 
-.cardWrap {
+/* Card matching slide visual identity */
+.card {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-xl);
+  background: var(--sn-surface);
+  box-shadow: var(--sn-shadow-md);
+  overflow: hidden;
+}
+
+/* Content area below the SlideHeader */
+.content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 0 var(--sn-space-xl) var(--sn-space-xl);
+  overflow-y: auto;
 }

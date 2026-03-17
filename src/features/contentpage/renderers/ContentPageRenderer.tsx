@@ -47,7 +47,7 @@ function renderContentItem(item: Node, index: number) {
       <div key={index} className={styles.group}>
         {item.intro ? renderTextBlock(getMarkdown(item.intro) ?? "") : null}
         <div className={styles.groupTasks}>
-          {item.macros.map((macro, macroIndex) =>
+          {item.macros.map((macro: Macro, macroIndex: number) =>
             renderMacro(macro, contentContext, macroIndex)
           )}
         </div>

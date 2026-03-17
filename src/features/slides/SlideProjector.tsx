@@ -1,34 +1,35 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import type { SlideDeck } from "@schema/slideTypes";
+import type { TypedSlideDeck } from "@schema/slideTypes";
 import type { AdminStreamEvent, LiveSlideState, AdminSnapshot } from "@schema/streamTypes";
-import type { MacroRenderContext } from "@macros/componentTypes";
 import type { QuizResultsDTO } from "@schema/quizTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
 import { QuizProjectorOverlay } from "@features/quiz/QuizProjectorOverlay";
-import { useSlideStream } from "./hooks/useSlideStream";
 import { SlideRenderer } from "./components/SlideRenderer";
+import { useSlideStream } from "./hooks/useSlideStream";
 import styles from "./SlideProjector.module.css";
 
 type SlideProjectorProps = {
-  deck: SlideDeck;
+  deck: TypedSlideDeck;
   courseId: string;
 };
 
 function createReadOnlyAdapter(macroState: Record<string, string>) {
   return {
     read: (key: string) => macroState[key] ?? null,
-    write: () => { /* projector is read-only */ },
+    write: () => {},
     isReadOnly: true as const,
   };
 }
 
 export function SlideProjector({ deck, courseId }: SlideProjectorProps) {
+  const slides = deck.content;
   const [slideState, setSlideState] = useState<LiveSlideState>({
     slideIndex: 0,
     blackout: false,
     macroState: {},
+    revealStep: 0,
   });
   const [quizState, setQuizState] = useState<QuizResultsDTO | null>(null);
   const [synced, setSynced] = useState(false);
@@ -41,6 +42,7 @@ export function SlideProjector({ deck, courseId }: SlideProjectorProps) {
           slideIndex: init.slideIndex,
           blackout: init.blackout,
           macroState: init.macroState,
+          revealStep: init.revealStep ?? 0,
         });
         setQuizState(init.quiz);
         setSynced(true);
@@ -51,20 +53,18 @@ export function SlideProjector({ deck, courseId }: SlideProjectorProps) {
           slideIndex: event.slideIndex,
           blackout: event.blackout,
           macroState: event.macroState,
+          revealStep: event.revealStep ?? 0,
         });
         break;
       case "QUIZ_STATE":
         setQuizState(event.quiz as QuizResultsDTO | null);
         break;
-      // PRESENCE is admin-only; projector can ignore it
     }
   }, []);
 
   useSlideStream({ courseId, onEvent });
 
-  const currentSlide = deck.slides[slideState.slideIndex];
-  const slideContext: MacroRenderContext = { readOnly: true, projector: true };
-
+  const currentSlide = slides[slideState.slideIndex];
   const macroAdapter = useMemo(
     () => createReadOnlyAdapter(slideState.macroState),
     [slideState.macroState],
@@ -76,17 +76,10 @@ export function SlideProjector({ deck, courseId }: SlideProjectorProps) {
         {slideState.blackout && <div className={styles.blackout} />}
         {!synced && (
           <div className={styles.syncing}>
-            <p>Verbinde…</p>
+            <p>Verbinde...</p>
           </div>
         )}
-        {currentSlide && (
-          <SlideRenderer
-            header={currentSlide.header}
-            content={currentSlide.content}
-            context={slideContext}
-            slideIndex={slideState.slideIndex}
-          />
-        )}
+        {currentSlide && <SlideRenderer key={slideState.slideIndex} slide={currentSlide} projector revealStep={slideState.revealStep} />}
         <QuizProjectorOverlay quizState={quizState} />
       </div>
     </MacroStateProvider>

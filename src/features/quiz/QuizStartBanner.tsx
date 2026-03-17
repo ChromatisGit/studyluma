@@ -47,12 +47,13 @@ export function QuizStartBanner() {
     switch (event.type) {
       case "INIT": {
         const init = event as StudentSnapshot;
-        if (init.quiz && init.quiz.phase !== "waiting") {
+        if (init.quiz) {
           startCountdown();
         }
         break;
       }
       case "QUIZ_STARTED": {
+        console.log("[banner] QUIZ_STARTED");
         startCountdown();
         break;
       }
