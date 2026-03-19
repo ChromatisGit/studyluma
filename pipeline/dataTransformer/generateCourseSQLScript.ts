@@ -159,7 +159,7 @@ export async function generateCourseSQLScript(path: string, courses: Course[]): 
     // Save current progress and visible worksheets before wiping junction tables
     lines.push(`DROP TABLE IF EXISTS _ws_visible;`);
     lines.push(
-      `CREATE TEMP TABLE _ws_visible AS SELECT worksheet_id FROM course_worksheets WHERE course_id = ${esc(course.id)} AND is_hidden = false;`,
+      `CREATE TEMP TABLE _ws_visible AS SELECT worksheet_id, is_solution_hidden FROM course_worksheets WHERE course_id = ${esc(course.id)} AND is_hidden = false;`,
     );
     lines.push(`DROP TABLE IF EXISTS _current_progress;`);
     lines.push(
@@ -188,9 +188,9 @@ export async function generateCourseSQLScript(path: string, courses: Course[]): 
       }
     }
 
-    // Restore is_hidden = false for worksheets that were previously visible
+    // Restore is_hidden = false and is_solution_hidden for worksheets that were previously visible
     lines.push(
-      `UPDATE course_worksheets SET is_hidden = false WHERE course_id = ${esc(course.id)} AND worksheet_id IN (SELECT worksheet_id FROM _ws_visible);`,
+      `UPDATE course_worksheets SET is_hidden = false, is_solution_hidden = v.is_solution_hidden FROM _ws_visible v WHERE course_worksheets.course_id = ${esc(course.id)} AND course_worksheets.worksheet_id = v.worksheet_id;`,
     );
     lines.push(`DROP TABLE _ws_visible;`);
 

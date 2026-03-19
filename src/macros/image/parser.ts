@@ -8,14 +8,16 @@ export const parser = defineMacro({
   type: "image",
   parser: (node): ImageMacro => {
     const params = node.params as {
-      source: string;
+      file?: string;
+      _positional?: string;
     };
 
-    if (!params.source) {
-      throw new Error("#image requires a source parameter");
+    const filePath = params.file ?? params._positional;
+    if (!filePath) {
+      throw new Error("#image requires a file parameter");
     }
 
-    const { publicUrl, absolutePath } = resolveAndCopyContentImage(params.source, node.filePath);
+    const { publicUrl, absolutePath } = resolveAndCopyContentImage(filePath, node.filePath);
     const buffer = readFileSync(absolutePath);
     const dimensions = imageSize(buffer);
 
@@ -28,7 +30,7 @@ export const parser = defineMacro({
     };
   },
   params: {
-    source: "",
+    file: "",
   },
 });
 

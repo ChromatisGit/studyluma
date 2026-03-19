@@ -19,7 +19,7 @@ type TopicId = string;
 type ChapterId = string;
 
 
-type PdfConversionPath = { source: string; target: string };
+type PdfConversionPath = { source: string; target: string; isSolution: boolean };
 
 export type PageSummaries = NestedRecord<[SubjectId, TopicId, ChapterId], ChapterSummary>;
 
@@ -191,6 +191,7 @@ async function processWorksheets(
 
     const hasWebWorksheets = formats.includes("web");
     const hasPdfWorksheets = formats.includes("pdf");
+    const hasPdfSolutionWorksheets = formats.includes("pdfSolution");
 
     let fileNames: string[] = [];
     try {
@@ -229,11 +230,12 @@ async function processWorksheets(
 
         }
 
-        if (hasPdfWorksheets) {
-            pdfConversionPaths.push({
-                source: sourcePath,
-                target: targetPath,
-            });
+        if (hasPdfWorksheets || hasPdfSolutionWorksheets) {
+            pdfConversionPaths.push({ source: sourcePath, target: targetPath, isSolution: false });
+        }
+
+        if (hasPdfSolutionWorksheets) {
+            pdfConversionPaths.push({ source: sourcePath, target: targetPath, isSolution: true });
         }
 
         worksheetSummaries.push({ worksheetId, label: worksheetPage.title, sourceFilename });

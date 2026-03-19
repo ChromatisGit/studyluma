@@ -84,23 +84,6 @@ function parseGroupContent(node: RawMacroBlock, protectedBlocks: ProtectedBlock[
 }
 
 
-// ─── Internal Helper ──────────────────────────────────────────────────────────
-
-function parseMacroList(content: string, protectedBlocks: ProtectedBlock[], filePath: string, contentType?: ContentType): Macro[] {
-    const nodes = splitMacroAndText(content);
-    return nodes.flatMap((node): Macro[] => {
-        if ("rawText" in node) return [];  // ignore stray text between macros
-        if (isLayoutMacro(node.type)) {
-            const result = parseLayoutMacro(node, protectedBlocks, filePath, contentType);
-            if (result.type === "group") return (result as MacroGroup).macros;
-            return [result as Macro];
-        }
-        const result = parseMacro(node, protectedBlocks, filePath, contentType);
-        return [result];
-    });
-}
-
-
 // ─── Standard Macro Parser ────────────────────────────────────────────────────
 
 export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string, contentType?: ContentType): Macro {

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 import type { CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
-import { toggleWorksheetVisibilityAction } from "@actions/adminActions";
+import { toggleWorksheetVisibilityAction, toggleWorksheetSolutionVisibilityAction } from "@actions/adminActions";
 import { WorksheetMonitor } from "./WorksheetMonitor";
 import styles from "./WorksheetManagement.module.css";
 import ADMIN_TEXT from "./admin.de.json";
@@ -29,6 +29,7 @@ interface WorksheetRowProps {
 
 function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggleMonitor }: WorksheetRowProps) {
   const [optimisticHidden, setOptimisticHidden] = useOptimistic(worksheet.isHidden);
+  const [optimisticSolutionHidden, setOptimisticSolutionHidden] = useOptimistic(worksheet.isSolutionHidden);
   const [, startTransition] = useTransition();
 
   const handleToggle = () => {
@@ -39,6 +40,15 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
     });
   };
 
+  const handleSolutionToggle = () => {
+    const newHidden = !optimisticSolutionHidden;
+    startTransition(async () => {
+      setOptimisticSolutionHidden(newHidden);
+      await toggleWorksheetSolutionVisibilityAction(courseId, worksheet.worksheetId, newHidden);
+    });
+  };
+
+  const isPdfCourse = worksheet.worksheetFormat === "pdfSolution";
   const worksheetHref = `${courseSlug}/${worksheet.topicId}/${worksheet.chapterId}/${worksheet.worksheetId}`;
 
   return (
@@ -52,6 +62,15 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
           <span className={styles.worksheetFilename}>{worksheet.sourceFilename}</span>
         </div>
         <div className={styles.worksheetActions}>
+          {isPdfCourse && (
+            <button
+              className={optimisticSolutionHidden ? styles.solutionHidden : styles.solutionVisible}
+              onClick={handleSolutionToggle}
+              title={optimisticSolutionHidden ? TEXT.solutionHidden : TEXT.solutionVisible}
+            >
+              {optimisticSolutionHidden ? TEXT.solutionHidden : TEXT.solutionVisible}
+            </button>
+          )}
           <button
             className={optimisticHidden ? styles.toggleHidden : styles.toggleVisible}
             onClick={handleToggle}

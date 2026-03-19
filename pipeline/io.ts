@@ -90,6 +90,7 @@ export async function deleteGenerated() {
 }
 
 const IMAGE_OUTPUT_DIR = joinPath(WEBSITE_ROOT, "public", ".generated", "images");
+const PDF_OUTPUT_DIR = joinPath(WEBSITE_ROOT, "public", ".generated", "pdf");
 const PROJECT_ROOT = joinPath(WEBSITE_ROOT, "..");
 
 type ResolvedImage = { publicUrl: string; absolutePath: string };
@@ -98,6 +99,39 @@ const imageCache = new Map<string, ResolvedImage>();
 export async function cleanImageOutput() {
   imageCache.clear();
   return rm(IMAGE_OUTPUT_DIR, { recursive: true, force: true });
+}
+
+export async function cleanPdfOutput() {
+  return rm(PDF_OUTPUT_DIR, { recursive: true, force: true });
+}
+
+export async function compilePdfToPublic(
+  sourceRelPath: string,
+  outputRelPath: string,
+  showSolutions: boolean
+): Promise<void> {
+  const absoluteSource = joinPath(SOURCE_PATH, sourceRelPath);
+  const suffix = showSolutions ? "-solution" : "";
+  const absoluteOutput = joinPath(PDF_OUTPUT_DIR, `${outputRelPath}${suffix}.pdf`);
+
+  mkdirSync(dirname(resolve(absoluteOutput)), { recursive: true });
+
+  const proc = Bun.spawn(
+    [
+      "typst", "compile",
+      "--root", PROJECT_ROOT,
+      "--input", `show-solutions=${showSolutions}`,
+      absoluteSource,
+      absoluteOutput,
+    ],
+    { stdout: "inherit", stderr: "pipe" }
+  );
+
+  const exitCode = await proc.exited;
+  if (exitCode !== 0) {
+    const stderr = await new Response(proc.stderr).text();
+    throw new Error(`typst compile failed for ${sourceRelPath}:\n${stderr}`);
+  }
 }
 
 export function resolveAndCopyContentImage(source: string, typFilePath: string): ResolvedImage {

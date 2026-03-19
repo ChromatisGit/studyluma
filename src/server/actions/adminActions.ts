@@ -3,6 +3,7 @@
 import { getSession, isAdmin } from "@services/authService";
 import {
   toggleWorksheetVisibilityService,
+  toggleWorksheetSolutionVisibilityService,
   type CourseId,
 } from "@services/courseService";
 import { getWorksheetMonitorService, type WorksheetMonitorData } from "@services/worksheetService";
@@ -31,6 +32,30 @@ export async function toggleWorksheetVisibilityAction(
   } catch (error) {
     console.error("[Admin] Failed to toggle worksheet visibility:", error);
     return { ok: false, error: "Failed to update worksheet visibility." };
+  }
+}
+
+/**
+ * Toggle the is_solution_hidden flag for a worksheet in a course.
+ * Admin only.
+ */
+export async function toggleWorksheetSolutionVisibilityAction(
+  courseId: CourseId,
+  worksheetId: string,
+  isSolutionHidden: boolean,
+): Promise<AdminActionResult> {
+  const session = await getSession();
+  if (!session || !isAdmin(session.user)) {
+    return { ok: false, error: "Unauthorized. Admin access required." };
+  }
+
+  try {
+    await toggleWorksheetSolutionVisibilityService(session.user, courseId, worksheetId, isSolutionHidden);
+    revalidatePath(`/admin/${courseId}`);
+    return { ok: true };
+  } catch (error) {
+    console.error("[Admin] Failed to toggle worksheet solution visibility:", error);
+    return { ok: false, error: "Failed to update worksheet solution visibility." };
   }
 }
 

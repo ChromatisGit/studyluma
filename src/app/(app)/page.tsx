@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { Layout } from "@ui/layout/Layout";
 import { getSession, isAdmin } from "@services/authService";
 import { getSidebarDTO, getPublicNavbarCourses } from "@services/courseService";
@@ -12,7 +13,11 @@ import styles from "@features/homepage/Homepage.module.css";
 
 export const dynamic = "force-dynamic";
 
-export default async function RootPage() {
+export default async function RootPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ home?: string }>;
+}) {
   const session = await getSession();
   const user = session?.user ?? null;
 
@@ -20,6 +25,11 @@ export default async function RootPage() {
     getSidebarDTO({ courseId: null, user }),
     getPublicNavbarCourses(),
   ]);
+
+  const params = await searchParams;
+  if (user && !params.home && sidebarData.courses.length > 0) {
+    redirect(sidebarData.courses[0].href);
+  }
 
   return (
     <Layout

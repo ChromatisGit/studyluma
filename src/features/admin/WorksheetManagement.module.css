@@ -131,6 +131,44 @@
   color: var(--sn-text);
 }
 
+/* Solution toggle buttons */
+
+.solutionVisible,
+.solutionHidden {
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-medium);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--sn-radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  min-width: 7.5rem;
+  text-align: center;
+}
+
+.solutionVisible {
+  background: var(--sn-yellow-accent-soft-bg);
+  border-color: var(--sn-yellow-accent);
+  color: var(--sn-yellow-accent-strong);
+}
+
+.solutionVisible:hover {
+  background: var(--sn-yellow-accent);
+  border-color: var(--sn-yellow-accent);
+  color: var(--sn-text);
+}
+
+.solutionHidden {
+  background: var(--sn-surface);
+  border-color: var(--sn-border);
+  color: var(--sn-text-muted);
+}
+
+.solutionHidden:hover {
+  border-color: var(--sn-yellow-accent);
+  color: var(--sn-text);
+}
+
 /* Monitor button */
 
 .monitorButton,

@@ -41,7 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 *.pdf
+!public/.generated/pdf/**
 .vscode
-.generated
+/.generated
 sql/.generated
-public/.generated
+public/.generated/images

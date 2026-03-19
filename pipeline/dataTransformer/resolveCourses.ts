@@ -28,11 +28,17 @@ export function resolveCourses(coursePlans: CoursePlan[], pageSummaries: PageSum
                         label,
                         href: `${slug}/${topicId}/${chapterId}`,
                         worksheets: worksheets.map((worksheet) => {
-
+                            const pdfBase = `/.generated/pdf/${subject.id}/${topicId}/${chapterId}/worksheets/${worksheet.worksheetId}`;
+                            const href =
+                                worksheetFormat === "pdf"
+                                    ? `${pdfBase}.pdf`
+                                    : worksheetFormat === "pdfSolution"
+                                    ? `${pdfBase}-solution.pdf`
+                                    : `/${slug}/${topicId}/${chapterId}/${worksheet.worksheetId}`;
                             return {
                                 ...worksheet,
                                 worksheetFormat,
-                                href: `${slug}/${topicId}/${chapterId}/${worksheet.worksheetId}`
+                                href,
                             }
                         })
                     }

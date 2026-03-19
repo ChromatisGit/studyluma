@@ -157,9 +157,11 @@ export async function getWorksheetRefs({
     worksheet_id: string;
     label: string;
     href: string;
+    solution_href: string | null;
     worksheet_format: string;
+    is_solution_hidden: boolean;
   }[]>`
-    SELECT worksheet_id, label, href, worksheet_format
+    SELECT worksheet_id, label, href, solution_href, worksheet_format, is_solution_hidden
     FROM v_worksheets_by_chapter
     WHERE course_id  = ${courseId}
       AND topic_id   = ${topicId}
@@ -168,12 +170,15 @@ export async function getWorksheetRefs({
     ORDER BY display_order
   `;
   if (rows.length === 0) return null;
-  return rows.map((r) => ({
-    worksheetId: r.worksheet_id,
-    label: r.label,
-    href: r.href,
-    worksheetFormat: r.worksheet_format as WorksheetFormat,
-  }));
+  const result: WorksheetRef[] = [];
+  for (const r of rows) {
+    const format = r.worksheet_format === "pdfSolution" ? "pdf" : r.worksheet_format as WorksheetFormat;
+    result.push({ worksheetId: r.worksheet_id, label: r.label, href: r.href, worksheetFormat: format });
+    if (r.worksheet_format === "pdfSolution" && !r.is_solution_hidden && r.solution_href) {
+      result.push({ worksheetId: r.worksheet_id + "-solution", label: r.label, href: r.solution_href, worksheetFormat: "pdfSolution" });
+    }
+  }
+  return result;
 }
 
 // ==========================================================================
@@ -396,7 +401,9 @@ export type AdminWorksheetRef = {
   worksheetId: string;
   label: string;
   sourceFilename: string;
+  worksheetFormat: string;
   isHidden: boolean;
+  isSolutionHidden: boolean;
   displayOrder: number;
 };
 
@@ -414,11 +421,14 @@ export async function getAdminWorksheetList(
     worksheet_id: string;
     label: string;
     source_filename: string;
+    worksheet_format: string;
     is_hidden: boolean;
+    is_solution_hidden: boolean;
     display_order: number;
   }[]>`
     SELECT cw.topic_id, cw.chapter_id, cw.worksheet_id,
-           w.label, w.source_filename, cw.is_hidden, cw.display_order
+           w.label, w.source_filename, w.worksheet_format,
+           cw.is_hidden, cw.is_solution_hidden, cw.display_order
     FROM course_worksheets cw
     JOIN worksheets w ON w.worksheet_id = cw.worksheet_id
     WHERE cw.course_id = ${courseId}
@@ -430,7 +440,9 @@ export async function getAdminWorksheetList(
     worksheetId: r.worksheet_id,
     label: r.label,
     sourceFilename: r.source_filename,
+    worksheetFormat: r.worksheet_format,
     isHidden: r.is_hidden,
+    isSolutionHidden: r.is_solution_hidden,
     displayOrder: r.display_order,
   }));
 }
@@ -447,6 +459,22 @@ export async function toggleWorksheetVisibilityService(
   await userSQL(user)`
     UPDATE course_worksheets
     SET is_hidden = ${isHidden}
+    WHERE course_id = ${courseId} AND worksheet_id = ${worksheetId}
+  `;
+}
+
+/**
+ * Toggle the is_solution_hidden flag for a single worksheet in a course.
+ */
+export async function toggleWorksheetSolutionVisibilityService(
+  user: UserDTO,
+  courseId: CourseId,
+  worksheetId: string,
+  isSolutionHidden: boolean,
+): Promise<void> {
+  await userSQL(user)`
+    UPDATE course_worksheets
+    SET is_solution_hidden = ${isSolutionHidden}
     WHERE course_id = ${courseId} AND worksheet_id = ${worksheetId}
   `;
 }

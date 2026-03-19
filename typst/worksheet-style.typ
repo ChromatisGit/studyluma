@@ -1,4 +1,10 @@
 #import "/typst/macros.typ": _parse-table
+#let _std-image = image
+#let image(file: "") = _std-image(file, width: 100%, fit: "contain")
+
+// The `show-solutions` input is passed via `typst compile --input show-solutions=true`
+// when compiling solution PDFs (pdfSolution format).
+#let _show-solutions = sys.inputs.at("show-solutions", default: "false") == "true"
 
 #let colors = (
   page: rgb(249, 250, 251),
@@ -30,7 +36,6 @@
 
 #let _started = state("started", false)
 #let _category-color = state("cat-color", rgb(107, 114, 128))
-#let _category-kind = state("cat-kind", "info")
 #let _in-group = state("in-group", false)
 #let _task-counter = counter("task-num")
 #let _subtask-counter = counter("subtask-num")
@@ -101,14 +106,12 @@
       title.body.text,
       default: colors.category.Info,
     )
+    // Page break before every section except the first
+    context { if _started.get() { pagebreak() } }
     _started.update(true)
     _category-color.update(fill-color)
-    // Determine category kind for numbering decisions
-    let name = title.body.text
-    let kind = if lower(name) == "checkpoint" { "checkpoint" } else if (
-      lower(name) == "aufgaben" or lower(name) == "tasks"
-    ) { "core" } else if lower(name) == "challenges" or lower(name) == "challenge" { "challenge" } else { "info" }
-    _category-kind.update(kind)
+    // Reset task counter for each section
+    _task-counter.update(1)
 
 
     block(
@@ -187,18 +190,12 @@
     inset: (top: padding.sm, left: padding.sm, rest: padding.md),
 
     context {
-      let kind = _category-kind.get()
-      let show-number = kind == "core" or kind == "challenge"
-      if show-number {
-        _task-counter.step()
-        grid(
-          columns: (18pt, 1fr),
-          gutter: padding.md,
-          badge(_task-counter.display("1")), pad(top: 6pt, body),
-        )
-      } else {
-        body
-      }
+      grid(
+        columns: (18pt, 1fr),
+        gutter: padding.md,
+        badge(_task-counter.display("1")), pad(top: 6pt, body),
+      )
+      _task-counter.step()
     },
   )
 }
@@ -279,6 +276,29 @@
   task(body)
 }
 
+// Caro grid (graph paper) for calculation workspace — PDF only, not rendered in WebView.
+#let caroGrid(rows: 6) = layout(size => {
+  let cell = 5mm
+  let cols = calc.floor(size.width / cell)
+  grid(
+    columns: (cell,) * cols,
+    rows: (cell,) * rows,
+    stroke: 0.3pt + colors.border,
+    ..([],) * (cols * rows),
+  )
+})
+
+// Like textTask but with graph-paper calculation space instead of lines.
+#let calcTask(rows: 8, body) = {
+  task({
+    body
+    if not _show-solutions {
+      v(8pt)
+      caroGrid(rows: rows)
+    }
+  })
+}
+
 #let codeTask(body) = {
   task({
     body
@@ -355,10 +375,28 @@
         column-gutter: 8pt,
         row-gutter: 8pt,
         ..items.map(item => {
+          let is-correct = _show-solutions and repr(item.body).contains("[x]")
+
           let indicator = if single {
-            circle(radius: 5pt, stroke: 0.8pt + colors.text)
+            if is-correct {
+              circle(radius: 5pt, fill: colors.text, stroke: 0.8pt + colors.text)[
+                #set align(center + horizon)
+                #set text(size: 8pt, fill: white, weight: "bold")
+                ×
+              ]
+            } else {
+              circle(radius: 5pt, stroke: 0.8pt + colors.text)
+            }
           } else {
-            rect(width: 10pt, height: 10pt, stroke: 0.8pt + colors.text, radius: 2pt)
+            if is-correct {
+              rect(width: 10pt, height: 10pt, fill: colors.text, stroke: 0.8pt + colors.text, radius: 2pt)[
+                #set align(center + horizon)
+                #set text(size: 8pt, fill: white, weight: "bold")
+                ×
+              ]
+            } else {
+              rect(width: 10pt, height: 10pt, stroke: 0.8pt + colors.text, radius: 2pt)
+            }
           }
 
           box(
@@ -391,7 +429,27 @@
 
 #let hint(body) = []
 
-#let solution(body) = []
+#let solution(body) = {
+  if _show-solutions {
+    context {
+      let accent = _category-color.get()
+      block(
+        width: 100%,
+        radius: radius,
+        stroke: 0.8pt + accent,
+        fill: colors.option-bg,
+        inset: padding.md,
+        breakable: true,
+        {
+          set text(size: 10pt)
+          text(weight: "semibold", fill: accent, [Lösung])
+          v(4pt)
+          body
+        },
+      )
+    }
+  }
+}
 
 #let validation(body) = []
 

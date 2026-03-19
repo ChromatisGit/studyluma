@@ -3,11 +3,11 @@
     "joinTitle": "{courseName} beitreten",
     "welcomeTitle": "Willkommen zurück",
     "joinSubtitle": "Gib deine Zugangsdaten ein, um diesem Kurs beizutreten.",
-    "loginSubtitle": "Gib deinen Zugangscode und dein Passwort ein.",
-    "tabLogin": "Ich habe einen Zugangscode",
+    "loginSubtitle": "Gib deinen Benutzername und dein Passwort ein.",
+    "tabLogin": "Ich habe einen Benutzername",
     "tabRegister": "Neu hier",
-    "accessCodeLabel": "Zugangscode",
-    "accessCodePlaceholder": "Zugangscode eingeben",
+    "accessCodeLabel": "Benutzername",
+    "accessCodePlaceholder": "Benutzername eingeben",
     "pinLabel": "Passwort",
     "pinPlaceholder": "Passwort eingeben",
     "pinLabelChoose": "Passwort wählen",
@@ -31,10 +31,10 @@
     "processing": "Wird verarbeitet …"
   },
   "modal": {
-    "title": "Speichere deinen Zugangscode",
+    "title": "Speichere deinen Benutzername",
     "description": "Du benötigst diesen Code zusammen mit deiner Passwort, um dich erneut anzumelden.",
-    "codeLabel": "Dein Zugangscode",
-    "checkboxLabel": "Ich habe meinen Zugangscode gespeichert",
+    "codeLabel": "Dein Benutzername",
+    "checkboxLabel": "Ich habe meinen Benutzername gespeichert",
     "continueButton": "Weiter"
   }
 }

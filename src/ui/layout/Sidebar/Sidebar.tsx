@@ -69,7 +69,7 @@ export function Sidebar({
       <div className={styles.sidebarInner}>
       {/* Brand */}
       <div className={styles.header}>
-        <AppLink href="/" className={styles.brand}>
+        <AppLink href="/?home=1" className={styles.brand}>
           <div className={styles.brandIcon}>
             <GraduationCap size={18} />
           </div>
