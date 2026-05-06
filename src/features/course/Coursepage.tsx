@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@components/Button";
+import { Container } from "@components/Container";
 import { PageHeader } from "@components/PageHeader";
 import { Roadmap } from "@components/Roadmap";
 import { WorksheetCards } from "@components/WorksheetCards";
@@ -32,7 +33,7 @@ export function CoursepagePage({ model }: CoursepagePageProps) {
 
   return (
     <div className={styles.page}>
-      <div className={styles.inner}>
+      <Container size="narrow" gutters={false} className={styles.inner}>
         <PageHeader
           title={`${label} ${COURSE_TEXT.intro.titleSuffix}`}
           subtitle={description}
@@ -76,7 +77,7 @@ export function CoursepagePage({ model }: CoursepagePageProps) {
             </div>
           </section>
         )}
-      </div>
+      </Container>
     </div>
   );
 }

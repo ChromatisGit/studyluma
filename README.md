@@ -27,8 +27,6 @@ Inhaltlicher Umfang:
 
 ## Meilenstein 3: Kollaboration und PDF
 
-**Hier bin ich**
-
 Ziele:
 
 * Externe Mitarbeit an Inhalten ermöglichen

@@ -2,6 +2,7 @@
 
 import clsx from "clsx";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { Container } from "@components/Container";
 import { PageHeader } from "@components/PageHeader/PageHeader";
 import type { Markdown, Node, Page } from "@schema/page";
 import { getMarkdown } from "@macros/markdownParser";
@@ -77,7 +78,7 @@ export function ContentPageRenderer({ title, content, worksheets, className }: C
   const hasContent = content && content.length > 0;
 
   return (
-    <div className={clsx(styles.content, className)}>
+    <Container size="narrow" gutters={false} className={clsx(styles.content, className)}>
       {title && <PageHeader title={title} />}
       {hasContent && (
         <div className={styles.sections}>
@@ -100,6 +101,6 @@ export function ContentPageRenderer({ title, content, worksheets, className }: C
           ))}
         </div>
       )}
-    </div>
+    </Container>
   );
 }

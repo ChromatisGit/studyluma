@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import type { Page } from "@schema/page";
 import type { ProgressStatus } from "@schema/courseTypes";
+import { Container } from "@components/Container";
 import { type Macro, DISPLAY_MACRO_TYPES } from "@macros/registry";
 import { type Category, type CategoryItem } from "@features/contentpage/components/CategorySection/CategorySection";
 import { getCategoryType } from "@features/contentpage/components/CategorySection/categoryConfig";
@@ -93,7 +94,7 @@ export function WorksheetRenderer({ page, className, worksheetSlug, chapterStatu
 
   return (
     <WorksheetStorageProvider worksheetSlug={worksheetSlug} worksheetId={worksheetId} pageContent={page.content} userId={userId}>
-      <div className={clsx(styles.worksheet, className)}>
+      <Container size="narrow" gutters={false} className={clsx(styles.worksheet, className)}>
         {page.title && <PageHeader title={page.title} />}
         <WorksheetNavigator
           categories={categories}
@@ -102,7 +103,7 @@ export function WorksheetRenderer({ page, className, worksheetSlug, chapterStatu
           courseId={courseId}
           worksheetId={worksheetId}
         />
-      </div>
+      </Container>
     </WorksheetStorageProvider>
   );
 }

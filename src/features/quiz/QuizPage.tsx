@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ClipboardList } from "lucide-react";
+import { Container } from "@components/Container";
 import { joinQuizAction, submitQuizResponseAction } from "@actions/quizActions";
 import type { QuizStateDTO } from "@schema/quizTypes";
 import type { StudentStreamEvent, StudentSnapshot } from "@schema/streamTypes";
@@ -130,7 +131,7 @@ export function QuizPage({ initialState }: QuizPageProps) {
 
   return (
     <div className={styles.page}>
-      <div className={styles.inner}>
+      <Container size="narrow" gutters={false} className={styles.inner}>
         {/* Question progress bar */}
         <div className={styles.progressTrack}>
           <div
@@ -158,7 +159,7 @@ export function QuizPage({ initialState }: QuizPageProps) {
         {quiz.phase === "reveal_correct" && quiz.currentIndex + 1 < quiz.totalQuestions && (
           <p className={styles.statusMsg}>Nächste Frage kommt…</p>
         )}
-      </div>
+      </Container>
     </div>
   );
 }

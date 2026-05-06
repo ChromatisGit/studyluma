@@ -1,13 +1,9 @@
 .page {
   padding-top: var(--sn-space-xl);
   padding-bottom: var(--sn-space-xl);
-  display: flex;
-  justify-content: center;
 }
 
 .inner {
-  width: 100%;
-  max-width: var(--sn-content-width-narrow);
   display: flex;
   flex-direction: column;
   gap: var(--sn-space-xl);

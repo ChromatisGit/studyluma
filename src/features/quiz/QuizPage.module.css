@@ -1,14 +1,12 @@
 .page {
   min-height: 100%;
-  padding: var(--sn-space-xl) var(--sn-page-padding);
+  padding-top: var(--sn-space-xl);
+  padding-bottom: var(--sn-space-xl);
   display: flex;
   align-items: flex-start;
-  justify-content: center;
 }
 
 .inner {
-  width: 100%;
-  max-width: var(--sn-content-width-narrow);
   display: flex;
   flex-direction: column;
   gap: var(--sn-space-lg);
