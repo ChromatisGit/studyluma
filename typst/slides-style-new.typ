@@ -314,13 +314,17 @@
 
 // ─── Inline Macros ────────────────────────────────────────────────────────────
 
-// #focus[...] — renders a focus box using the current slide's accent color.
-// In taskSlide: stores content in state (rendered full-width before the body grid).
-#let focus(body) = context {
-  if _slide-type.get() == "task" {
-    _focus-content.update(body)
-  } else {
-    _focus-box(body, _slide-accent.get())
+// #focus[...] — always captures content to state.
+// Each slide renders it full-width above the body/split via _render-focus().
+#let focus(body) = {
+  _focus-content.update(body)
+}
+
+// Render focus full-width centered above the main content area.
+#let _render-focus() = context {
+  let f = _focus-content.get()
+  if f != none {
+    align(center, _focus-box(f, _slide-accent.get()))
   }
 }
 
@@ -469,7 +473,10 @@
   _slide-accent.update(colors.orange)
   _result-accent.update(colors.green)
   _result-content.update(none)
+  _focus-content.update(none)
   context { _header("Einstieg", colors.orange, _slide-title.get()) }
+  if body != none { place(hide(body)) }
+  _render-focus()
   _with-material(
     { if body != none { _styled-body(body, colors.orange) } },
     mat,
@@ -490,7 +497,10 @@
   _slide-accent.update(colors.purple)
   _result-accent.update(colors.green)
   _result-content.update(none)
+  _focus-content.update(none)
   context { _header("Konzept", colors.purple, _slide-title.get()) }
+  if body != none { place(hide(body)) }
+  _render-focus()
   _with-material(
     { if body != none { _styled-body(body, colors.purple) } },
     mat,
@@ -521,9 +531,15 @@
   _result-accent.update(colors.purple)
   _result-content.update(none)
   _columns-state.update(())
+  _focus-content.update(none)
   context { _header("Vergleich", colors.blue, _slide-title.get()) }
 
-  // Render body — triggers #focus, #col, #result, #pn calls (focus centered)
+  // Capture pass: trigger #focus/#col/#result state updates invisibly
+  if body != none { place(hide(body)) }
+  _render-focus()
+  // Reset columns so the visual pass doesn't double-append
+  _columns-state.update(())
+  // Visual pass: body without focus box (focus already rendered above)
   if body != none { align(center, _styled-body(body, colors.blue)) }
 
   context {
@@ -608,7 +624,10 @@
   _slide-accent.update(colors.muted)
   _result-accent.update(colors.green)
   _result-content.update(none)
+  _focus-content.update(none)
   context { _header("Beispiel", colors.muted, _slide-title.get()) }
+  if body != none { place(hide(body)) }
+  _render-focus()
   _with-material(
     { if body != none { _styled-body(body, colors.muted) } },
     mat,
@@ -629,7 +648,10 @@
   _slide-accent.update(colors.blue)
   _result-accent.update(colors.green)
   _result-content.update(none)
+  _focus-content.update(none)
   context { _header("Frage", colors.blue, _slide-title.get()) }
+  if body != none { place(hide(body)) }
+  _render-focus()
   _with-material(
     { if body != none { _styled-body(body, colors.blue) } },
     mat,
