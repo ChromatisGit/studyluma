@@ -100,7 +100,7 @@ export default function PasswordBruteForce() {
             <span className={styles.resultValue}>{formatBigInt(estimate.combinations)}</span>
           </div>
           <div className={`${styles.resultItem}`}>
-            <span className={styles.resultLabel}>Geschätzte Knackzeit (Ø)</span>
+            <span className={styles.resultLabel}>Geschätzte Brute-Force-Dauer (Ø)</span>
             <span className={`${styles.resultValue} ${styles.highlight}`}>
               {formatDuration(estimate.averageSeconds)}
             </span>
