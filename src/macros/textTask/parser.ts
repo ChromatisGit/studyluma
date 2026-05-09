@@ -11,13 +11,13 @@ export const parser = defineMacro({
     return {
       type: "textTask",
       instruction: parseRawText(node.content, node.protectedBlocks),
-      hint: parseRawText(node.inlineMacros!.hint, node.protectedBlocks),
-      solution: parseRawText(node.inlineMacros!.solution, node.protectedBlocks),
+      hint: node.inlineMacros?.hint !== undefined ? parseRawText(node.inlineMacros.hint, node.protectedBlocks) : undefined,
+      solution: node.inlineMacros?.solution !== undefined ? parseRawText(node.inlineMacros.solution, node.protectedBlocks) : undefined,
     };
   },
   inline: {
-    hint: "required",
-    solution: "required",
+    hint: "optional",
+    solution: "optional",
   },
 });
 
