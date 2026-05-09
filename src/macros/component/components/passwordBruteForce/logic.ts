@@ -14,6 +14,8 @@ export type BruteForceEstimate = {
 };
 
 const GUESSES_PER_SECOND = 1_000_000_000n;
+const SCIENTIFIC_NOTATION_THRESHOLD = 1_000_000n;
+const HEAT_DEATH_THRESHOLD_YEARS = 10n ** 100n;
 
 export function estimateBruteForceTime(password: string): BruteForceEstimate {
   const usedCharsets: UsedCharsets = {
@@ -53,13 +55,22 @@ export function formatDuration(seconds: bigint): string {
   if (seconds < hour) return `${seconds / minute} Minuten`;
   if (seconds < day) return `${seconds / hour} Stunden`;
   if (seconds < year) return `${seconds / day} Tage`;
-  return `${seconds / year} Jahre`;
+
+  const years = seconds / year;
+  if (years > HEAT_DEATH_THRESHOLD_YEARS) return "laenger als der Hitzetod des Universums";
+  if (years >= SCIENTIFIC_NOTATION_THRESHOLD) return `${formatScientificBigInt(years)} Jahre`;
+  return `${years} Jahre`;
 }
 
 export function formatBigInt(value: bigint): string {
   const text = value.toString();
   if (text.length <= 12) return text;
+  return formatScientificBigInt(value);
+}
+
+function formatScientificBigInt(value: bigint): string {
+  const text = value.toString();
   const leadingDigits = text.slice(0, 3);
   const exponent = text.length - 1;
-  return `${leadingDigits[0]},${leadingDigits.slice(1)} · 10^${exponent}`;
+  return `${leadingDigits[0]},${leadingDigits.slice(1)} * 10^${exponent}`;
 }

@@ -113,6 +113,13 @@
   font-size: var(--sn-text-md);
 }
 
+.assumption {
+  margin: calc(-1 * var(--sn-space-xs)) 0 0;
+  font-size: var(--sn-text-xs);
+  color: var(--sn-text-muted);
+  line-height: 1.4;
+}
+
 .empty {
   font-size: var(--sn-text-sm);
   color: var(--sn-text-muted);

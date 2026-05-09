@@ -181,7 +181,7 @@
   ]
 }
 
-#let card(accent: none, body) = {
+#let _task-card(body) = {
   block(
     width: 100%,
     radius: radius,
@@ -200,10 +200,62 @@
   )
 }
 
+#let _card-labels = (
+  definition: "Definition",
+  concept: "Konzept",
+  example: "Beispiel",
+  check: "Analyse",
+  prompt: "Frage",
+  task: "Aufgabe",
+  highlight: "Merke",
+  recap: "Zusammenfassung",
+  remember: "Wichtig",
+  warning: "Achtung",
+)
+
+#let _card-accents = (
+  definition: rgb(107, 114, 128),
+  concept: rgb(107, 114, 128),
+  example: rgb(107, 114, 128),
+  check: rgb(107, 114, 128),
+  prompt: rgb(87, 132, 236),
+  task: rgb(87, 132, 236),
+  highlight: rgb(107, 47, 160),
+  recap: rgb(107, 47, 160),
+  remember: rgb(107, 47, 160),
+  warning: rgb(235, 128, 35),
+  plain: rgb(229, 231, 235),
+)
+
+#let card(kind: none, body) = {
+  if kind == none {
+    _task-card(body)
+  } else {
+    let card-accent = _card-accents.at(kind, default: colors.border)
+    let card-label = _card-labels.at(kind, default: none)
+
+    block(
+      width: 100%,
+      radius: radius,
+      stroke: (left: 3pt + card-accent, rest: 1pt + colors.border),
+      fill: colors.card,
+      inset: padding.md,
+      breakable: true,
+      {
+        if card-label != none {
+          text(weight: "semibold", size: 10pt, fill: card-accent, card-label)
+          v(4pt)
+        }
+        body
+      },
+    )
+  }
+}
+
 #let group(body) = {
   _in-group.update(true)
   _subtask-counter.update(1)
-  card(body)
+  _task-card(body)
   _in-group.update(false)
 }
 
@@ -225,7 +277,7 @@
     )
   } else {
     // Standalone: own card with badge
-    card(body)
+    _task-card(body)
   }
 }
 

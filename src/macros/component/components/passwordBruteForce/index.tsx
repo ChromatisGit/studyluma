@@ -37,8 +37,8 @@ export default function PasswordBruteForce() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.inputRow}>
-        <label className={styles.label} htmlFor="bf-password-input">
-          Passwort eingeben
+        <label className={styles.label}>
+          Passwort testen (keine echten Passwörter eingeben)
         </label>
         <input
           id="bf-password-input"
@@ -46,7 +46,7 @@ export default function PasswordBruteForce() {
           type="text"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="z. B. sommer2024!"
+          placeholder="z. B. 123456"
           autoComplete="off"
           spellCheck={false}
         />
@@ -86,26 +86,32 @@ export default function PasswordBruteForce() {
       <hr className={styles.divider} />
 
       {hasInput ? (
-        <div className={styles.results}>
-          <div className={styles.resultItem}>
-            <span className={styles.resultLabel}>Länge</span>
-            <span className={styles.resultValue}>{estimate.passwordLength} Zeichen</span>
+        <>
+          <div className={styles.results}>
+            <div className={styles.resultItem}>
+              <span className={styles.resultLabel}>Länge</span>
+              <span className={styles.resultValue}>{estimate.passwordLength} Zeichen</span>
+            </div>
+            <div className={styles.resultItem}>
+              <span className={styles.resultLabel}>Zeichensatzgröße</span>
+              <span className={styles.resultValue}>{estimate.charsetSize}</span>
+            </div>
+            <div className={styles.resultItem}>
+              <span className={styles.resultLabel}>Kombinationen</span>
+              <span className={styles.resultValue}>{formatBigInt(estimate.combinations)}</span>
+            </div>
+            <div className={styles.resultItem}>
+              <span className={styles.resultLabel}>Geschätzte Brute-Force-Dauer (Ø)</span>
+              <span className={`${styles.resultValue} ${styles.highlight}`}>
+                {formatDuration(estimate.averageSeconds)}
+              </span>
+            </div>
           </div>
-          <div className={styles.resultItem}>
-            <span className={styles.resultLabel}>Zeichensatzgröße</span>
-            <span className={styles.resultValue}>{estimate.charsetSize}</span>
-          </div>
-          <div className={styles.resultItem}>
-            <span className={styles.resultLabel}>Kombinationen</span>
-            <span className={styles.resultValue}>{formatBigInt(estimate.combinations)}</span>
-          </div>
-          <div className={`${styles.resultItem}`}>
-            <span className={styles.resultLabel}>Geschätzte Brute-Force-Dauer (Ø)</span>
-            <span className={`${styles.resultValue} ${styles.highlight}`}>
-              {formatDuration(estimate.averageSeconds)}
-            </span>
-          </div>
-        </div>
+          <p className={styles.assumption}>
+            Modellannahme: reiner Offline-Brute-Force-Angriff mit 10^9 Versuchen/s; im Durchschnitt
+            liegt der Treffer nach etwa der Hälfte aller Kombinationen.
+          </p>
+        </>
       ) : (
         <p className={styles.empty}>Passwort eingeben um die Schätzung zu sehen</p>
       )}
