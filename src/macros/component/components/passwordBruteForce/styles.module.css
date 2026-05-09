@@ -1,0 +1,121 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-md);
+  padding: var(--sn-space-md);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-md);
+  background: var(--sn-surface);
+}
+
+.inputRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sn-space-xs);
+}
+
+.label {
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text);
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem var(--sn-space-sm);
+  font-size: var(--sn-text-md);
+  font-family: var(--sn-font-mono);
+  color: var(--sn-text);
+  background: var(--sn-bg);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-xs);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.input:focus {
+  border-color: var(--sn-purple-accent);
+}
+
+.charsets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sn-space-xs);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  font-size: var(--sn-text-xs);
+  font-weight: var(--sn-font-medium);
+  border-radius: var(--sn-radius-xxs);
+  border: 1px solid var(--sn-border);
+  background: var(--sn-bg);
+  color: var(--sn-text-muted);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.tag.active {
+  background: var(--tag-soft-bg);
+  border-color: var(--tag-soft-border);
+  color: var(--tag-accent);
+}
+
+.tagDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.tag.active .tagDot {
+  opacity: 1;
+}
+
+.divider {
+  height: 1px;
+  background: var(--sn-border);
+  border: none;
+  margin: 0;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sn-space-xs) var(--sn-space-md);
+}
+
+.resultItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.resultLabel {
+  font-size: var(--sn-text-xs);
+  color: var(--sn-text-muted);
+  font-weight: var(--sn-font-medium);
+}
+
+.resultValue {
+  font-size: var(--sn-text-sm);
+  font-weight: var(--sn-font-semibold);
+  color: var(--sn-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.resultValue.highlight {
+  color: var(--sn-purple-accent);
+  font-size: var(--sn-text-md);
+}
+
+.empty {
+  font-size: var(--sn-text-sm);
+  color: var(--sn-text-muted);
+  text-align: center;
+  padding: var(--sn-space-xs) 0;
+}

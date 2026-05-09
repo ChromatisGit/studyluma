@@ -1,0 +1,7 @@
+.unknown {
+  padding: var(--sn-space-sm) var(--sn-space-md);
+  border: 1px dashed var(--sn-border);
+  border-radius: var(--sn-radius-sm);
+  color: var(--sn-text-muted);
+  font-size: var(--sn-text-sm);
+}

@@ -454,3 +454,6 @@
 #let validation(body) = []
 
 #let pb = colbreak()
+
+// Interactive web components — rendered only in the browser, not in PDF.
+#let component(name) = []

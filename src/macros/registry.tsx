@@ -30,6 +30,7 @@ import type { PresenterNoteMacro } from "./pn/types";
 import type { LayoutMacro } from "./layout/types";
 import type { FormulaMacro } from "./formula/types";
 import type { CalloutMacro } from "./callout/types";
+import type { ComponentMacro } from "./component/types";
 // ============================================================================
 // COMPONENT IMPORTS - Add new macro component imports here
 // ============================================================================
@@ -47,6 +48,7 @@ import TextTaskRenderer from "./textTask/Renderer";
 import LayoutRenderer from "./layout/Renderer";
 import FormulaRenderer from "./formula/Renderer";
 import CalloutRenderer from "./callout/Renderer";
+import ComponentRenderer from "./component/Renderer";
 
 // ============================================================================
 // MACRO TYPE (union of all macro types)
@@ -66,7 +68,8 @@ export type Macro =
   | LayoutMacro
   | QuizMacro
   | FormulaMacro
-  | CalloutMacro;
+  | CalloutMacro
+  | ComponentMacro;
 
 export type MacroType = Macro["type"];
 
@@ -88,6 +91,7 @@ const macros = {
   textTask:   { Component: TextTaskRenderer,   category: "input" as const,   state: "interactive" as const },
   formula:    { Component: FormulaRenderer,    category: "display" as const, state: "none" as const },
   callout:    { Component: CalloutRenderer,    category: "display" as const, state: "none" as const },
+  component:  { Component: ComponentRenderer,  category: "display" as const, state: "interactive" as const },
 };
 
 type MacroName = keyof typeof macros;
