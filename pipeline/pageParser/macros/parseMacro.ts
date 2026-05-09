@@ -76,8 +76,9 @@ function parseGroupContent(node: RawMacroBlock, protectedBlocks: ProtectedBlock[
     }
 
     macroGroup.macros = groupNodes.flatMap((node) => {
-        const result = parseMacro(node, protectedBlocks, filePath, contentType)
-        return [result]
+        const result = parseMacroType(buildRawMacro(node, protectedBlocks, filePath), contentType)
+        if (result.type === "group") return result.macros as Macro[]
+        return [result as Macro]
     })
 
     return macroGroup
@@ -91,6 +92,13 @@ export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[
         throw new Error(`#${node.type} cannot be used inside another macro`)
     }
 
+    return parseMacroType(buildRawMacro(node, protectedBlocks, filePath), contentType) as Macro;
+}
+
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function buildRawMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[], filePath: string): RawMacro {
     const macro: RawMacro = { type: node.type, filePath, protectedBlocks };
 
     if (node.content) {
@@ -111,11 +119,8 @@ export function parseMacro(node: RawMacroBlock, protectedBlocks: ProtectedBlock[
         }
     }
 
-    return parseMacroType(macro, contentType) as Macro;
+    return macro;
 }
-
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function extractInlineMacros(src: string): { inlineMacros: InlineMacros, content: RawText } {
     const inlineNodes = splitMacroAndText(src)

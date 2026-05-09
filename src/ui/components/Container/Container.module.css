@@ -6,6 +6,11 @@
   padding-right: var(--sn-page-padding);
 }
 
+.noGutters {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .narrow {
   max-width: var(--sn-content-width-narrow);
 }

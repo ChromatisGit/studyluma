@@ -2,6 +2,7 @@
 
 import { Play, Clock, Target, Zap } from "lucide-react";
 import { Button } from "@components/Button";
+import { Container } from "@components/Container";
 import { PageHeader } from "@ui/components/PageHeader/PageHeader";
 import type { SidebarCourseDTO } from "@schema/courseTypes";
 import styles from "./PracticeHub.module.css";
@@ -30,7 +31,7 @@ export function PracticeHub({ courses, xp, badge: _badge }: PracticeHubProps) {
 
   return (
     <div className={styles.page}>
-      <div className={styles.inner}>
+      <Container size="narrow" gutters={false} className={styles.inner}>
         <PageHeader
           title="Work in Progress"
           subtitle="Dieses Feature wird gerade noch entwickelt und funktioniert noch nicht!"
@@ -127,7 +128,7 @@ export function PracticeHub({ courses, xp, badge: _badge }: PracticeHubProps) {
             </div>
           </section>
         )}
-      </div>
+      </Container>
     </div>
   );
 }
