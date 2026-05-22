@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router";
 import { useRouteContext } from "@ui/contexts/RouteContext";
 import { SidebarTopicNav } from "./SidebarTopicNav";
 import {
@@ -34,7 +34,7 @@ export function Sidebar({
   isAdmin,
   signOutAction,
 }: SidebarProps) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(pathname === "/");
   const [isPending, startTransition] = useTransition();
   const { theme, toggleTheme } = useTheme();

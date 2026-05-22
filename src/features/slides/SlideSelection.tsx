@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { Monitor, Presentation } from "lucide-react";
+import { AppLink } from "@components/AppLink";
 import styles from "./SlideSelection.module.css";
 
 type SlideSelectionProps = {
@@ -31,14 +31,14 @@ export function SlideSelection({ courseId, topicId, chapterId, slideIds, isLoadi
         <li key={id} className={styles.deckItem}>
           <span className={styles.deckName}>{id}</span>
           <div className={styles.deckActions}>
-            <Link href={`${basePath}/${id}`} className={styles.presenterLink}>
+            <AppLink href={`${basePath}/${id}`} className={styles.presenterLink}>
               <Presentation size={15} />
               Präsentation
-            </Link>
-            <Link href={`${basePath}/${id}/projector`} className={styles.projectorLink}>
+            </AppLink>
+            <AppLink href={`${basePath}/${id}/projector`} className={styles.projectorLink}>
               <Monitor size={15} />
               Projektor
-            </Link>
+            </AppLink>
           </div>
         </li>
       ))}

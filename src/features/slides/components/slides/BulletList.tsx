@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@ui/MarkdownRenderer";
 import styles from "./slide.module.css";
 
 type BulletListProps = {
@@ -25,7 +25,7 @@ export function BulletList({ bullets, accent, revealedCount, alwaysVisible }: Bu
               style={{ background: accent }}
             />
             <span className={styles.bulletText}>
-              <MarkdownRenderer markdown={mainText} />
+              <MarkdownRenderer markdown={mainText ?? ''} />
               {subLines.map((sub, j) => (
                 <span key={j} className={styles.bulletSubLine}>
                   <MarkdownRenderer markdown={sub} />

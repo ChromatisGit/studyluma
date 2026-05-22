@@ -1,7 +1,7 @@
 "use client";
 
 import type { QuizResultsDTO, QuizStateDTO } from "@schema/quizTypes";
-import { SlideHeader } from "@features/slides/components/slides/SlideHeader";
+import { SlideHeader } from "@ui/SlideHeader";
 import { QuizView } from "./QuizView";
 import styles from "./QuizProjectorOverlay.module.css";
 

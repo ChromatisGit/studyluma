@@ -1,18 +1,8 @@
-import "server-only";
+import { anonSQL, userSQL } from "@platform/db.server";
+import { hashPin } from "@platform/framework/auth";
 
-import { anonSQL, userSQL } from "@db/runSQL";
-import { hashPin } from "@server-lib/argon2";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export type UserDTO = {
-  id: string;
-  role: "admin" | "user";
-  groupKey: string | null;
-  courseIds: string[];
-};
+import type { UserDTO } from "@platform/auth/types";
+export type { UserDTO };
 
 // ---------------------------------------------------------------------------
 // User creation

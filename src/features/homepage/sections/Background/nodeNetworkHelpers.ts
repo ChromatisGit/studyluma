@@ -159,7 +159,7 @@ export function generateConnections(nodeList: NetworkNode[]): Connection[] {
     for (let j = 0; j < numConnections; j++) {
       connections.push({
         start: i,
-        end: nearby[j],
+        end: nearby[j]!,
         threshold: randFloat(MIN_THRESHOLD, MAX_THRESHOLD),
         randomOffset: 0,
         nextRandomChange: 0,
@@ -177,15 +177,17 @@ function findNearbyNodes(
 ): number[] {
   const nearby: number[] = [];
   const currentNode = nodeList[currentIndex];
+  if (!currentNode) return nearby;
 
   for (let j = 0; j < nodeList.length; j++) {
     if (j === currentIndex) continue;
+    const neighbor = nodeList[j]!;
 
     const distance = calculateDistance(
       currentNode.baseX,
       currentNode.baseY,
-      nodeList[j].baseX,
-      nodeList[j].baseY
+      neighbor.baseX,
+      neighbor.baseY
     );
 
     if (distance < maxDistance) {
@@ -272,6 +274,6 @@ const randInt = (min: number, max: number): number =>
 const shuffleInPlace = <T>(array: T[]): void => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [array[i], array[j]] = [array[j]!, array[i]!];
   }
 };

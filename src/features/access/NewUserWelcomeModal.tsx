@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { clearNewUserCodeAction } from "@actions/accessActions";
+import { useFetcher, useNavigate } from "react-router";
 import { AccessCodeModal } from "./AccessCodeModal";
 
 type NewUserWelcomeModalProps = {
@@ -12,13 +11,14 @@ type NewUserWelcomeModalProps = {
 
 export function NewUserWelcomeModal({ accessCode, activeQuizExists }: NewUserWelcomeModalProps) {
   const [open, setOpen] = useState(true);
-  const router = useRouter();
+  const fetcher = useFetcher();
+  const navigate = useNavigate();
 
   const handleConfirm = () => {
-    clearNewUserCodeAction().catch(() => {});
+    void fetcher.submit({ intent: "clear-new-user-code" }, { method: "post", action: "/access" });
     setOpen(false);
     if (activeQuizExists) {
-      router.push("/quiz");
+      void navigate("/quiz");
     }
   };
 

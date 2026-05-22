@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { ProgressTopicDTO, CourseId } from "@schema/courseTypes";
-import { setProgressAction } from "@actions/progressActions";
 import { Button } from "@components/Button";
 import { Roadmap } from "@components/Roadmap";
+import { postAdminAction } from "./routeActions";
 import styles from "./ProgressControl.module.css";
 import ADMIN_TEXT from "./admin.de.json";
 
@@ -28,7 +27,6 @@ export function ProgressControl({
   const [selectedTopicId, setSelectedTopicId] = useState(currentTopicId);
   const [selectedChapterId, setSelectedChapterId] = useState(currentChapterId);
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
 
   const hasChanges =
     selectedTopicId !== currentTopicId || selectedChapterId !== currentChapterId;
@@ -47,7 +45,12 @@ export function ProgressControl({
     }
 
     startTransition(async () => {
-      const result = await setProgressAction(courseId, selectedTopicId, selectedChapterId);
+      const result = await postAdminAction({
+        intent: "set-progress",
+        courseId,
+        topicId: selectedTopicId,
+        chapterId: selectedChapterId,
+      });
 
       if (!result.ok) {
         toast.error(result.error);
@@ -56,7 +59,6 @@ export function ProgressControl({
 
       toast.success(ADMIN_TEXT.courseDetail.progressControl.successMessage);
       onProgressUpdate?.(selectedTopicId, selectedChapterId);
-      router.refresh();
     });
   };
 

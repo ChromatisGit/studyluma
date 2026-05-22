@@ -8,7 +8,7 @@ export type ContainerProps = {
   children: ReactNode;
   size?: "narrow" | "wide" | "full";
   gutters?: boolean;
-  className?: string;
+  className?: string | undefined;
 };
 
 export function Container({ children, size = "wide", gutters = true, className }: ContainerProps) {

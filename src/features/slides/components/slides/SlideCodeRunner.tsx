@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { CodeRunner } from "@features/contentpage/components/CodeRunner/CodeRunner";
-import { useTsRunner } from "@features/contentpage/components/CodeRunner/useTsRunner";
+import { CodeRunner } from "@ui/CodeRunner";
+import { useTsRunner } from "@ui/useTsRunner";
 import { useMacroValue } from "@macros/state/useMacroValue";
 import { useMacroState } from "@macros/state/MacroStateContext";
 
@@ -21,8 +21,8 @@ const EMPTY_OUTPUT: CodeRunnerOutput = {
 type Props = {
   code: string;
   language: string;
-  storageKey?: string;
-  readOnly?: boolean;
+  storageKey?: string | undefined;
+  readOnly?: boolean | undefined;
 };
 
 export function SlideCodeRunner({ code: initialCode, language: _language, storageKey, readOnly = false }: Props) {

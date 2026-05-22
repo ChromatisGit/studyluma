@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useLocation, useNavigate } from "react-router";
 import type { StudentStreamEvent, StudentSnapshot } from "@schema/streamTypes";
 import { useQuizStream } from "./hooks/useQuizStream";
 import styles from "./QuizStartBanner.module.css";
@@ -17,8 +17,8 @@ const COUNTDOWN_SECONDS = 3;
  * Only renders for logged-in non-admin users (admin doesn't need auto-routing).
  */
 export function QuizStartBanner() {
-  const router = useRouter();
-  const pathname = usePathname();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [countdown, setCountdown] = useState<number | null>(null);
   const [shouldNavigate, setShouldNavigate] = useState(false);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -63,8 +63,8 @@ export function QuizStartBanner() {
   useQuizStream({ onEvent });
 
   useEffect(() => {
-    if (shouldNavigate) router.push("/quiz");
-  }, [shouldNavigate, router]);
+    if (shouldNavigate) void navigate("/quiz");
+  }, [shouldNavigate, navigate]);
 
   useEffect(() => {
     return () => {

@@ -1,6 +1,4 @@
-import "server-only";
-
-import { anonSQL, userSQL } from "@db/runSQL";
+import { anonSQL, userSQL } from "@platform/db.server";
 import type { UserDTO } from "@services/userService";
 import type {
   QuizPhase,
@@ -10,7 +8,6 @@ import type {
   QuizQuestionSummary,
   StoredQuestion,
 } from "@schema/quizTypes";
-import { publishToChannel } from "@server-lib/ablyServer";
 
 // ==========================================================================
 // Row types (DB → TypeScript)
@@ -38,6 +35,7 @@ type QuizResultsRow = QuizSessionRow & {
 
 function buildStateDTO(row: QuizSessionRow): QuizStateDTO {
   const q = row.questions[row.current_index];
+  if (!q) throw new Error(`No question at index ${row.current_index}`);
   const phase = row.phase as Exclude<QuizPhase, "closed">;
   return {
     sessionId: row.session_id,
@@ -59,11 +57,12 @@ function buildResultsDTO(
   allResponses?: { question_index: number; selected: number[] }[],
 ): QuizResultsDTO {
   const q = row.questions[row.current_index];
+  if (!q) throw new Error(`No question at index ${row.current_index}`);
   const responses = row.responses ?? [];
   const optionCounts = new Array<number>(q.options.length).fill(0);
   for (const selected of responses) {
     for (const idx of selected) {
-      if (idx >= 0 && idx < optionCounts.length) optionCounts[idx]++;
+      if (idx >= 0 && idx < optionCounts.length) optionCounts[idx] = (optionCounts[idx] ?? 0) + 1;
     }
   }
 
@@ -143,7 +142,7 @@ function buildQuestionSummaries(
     let correctCount = 0;
     for (const selected of responses) {
       for (const idx of selected) {
-        if (idx >= 0 && idx < optionCounts.length) optionCounts[idx]++;
+        if (idx >= 0 && idx < optionCounts.length) optionCounts[idx] = (optionCounts[idx] ?? 0) + 1;
       }
       const isCorrect =
         selected.length === q.correctIndices.length &&
@@ -160,38 +159,6 @@ function buildQuestionSummaries(
       percentCorrect: participants > 0 ? Math.round((correctCount / participants) * 100) : 0,
     };
   });
-}
-
-// ==========================================================================
-// Ably broadcast helpers (best-effort; DB is source of truth)
-// ==========================================================================
-
-async function publishQuizUpdate(sessionId: string): Promise<void> {
-  const [row] = await anonSQL<QuizResultsRow[]>`
-    SELECT * FROM get_quiz_broadcast_data(${sessionId})
-  `;
-  if (!row) return;
-
-  let allResponses: { question_index: number; selected: number[] }[] | undefined;
-  if (row.phase === "summary") {
-    allResponses = await anonSQL<{ question_index: number; selected: number[] }[]>`
-      SELECT question_index, selected FROM quiz_responses WHERE session_id = ${sessionId}
-    `;
-  }
-
-  const results = buildResultsDTO(row, allResponses);
-  const studentState = buildStudentDTOFromResults(results);
-  await Promise.all([
-    publishToChannel(`classroom:${results.courseId}:admin`, { type: "QUIZ_STATE", quiz: results }),
-    publishToChannel(`classroom:${results.courseId}:student`, { type: "QUIZ_STATE", quiz: studentState }),
-  ]);
-}
-
-async function publishQuizClosed(courseId: string): Promise<void> {
-  await Promise.all([
-    publishToChannel(`classroom:${courseId}:admin`, { type: "QUIZ_STATE", quiz: null }),
-    publishToChannel(`classroom:${courseId}:student`, { type: "QUIZ_STATE", quiz: null }),
-  ]);
 }
 
 // ==========================================================================
@@ -216,11 +183,6 @@ export async function startQuizSession(
       (${sessionId}, ${courseId}, ${questions as never})
   `;
 
-  await Promise.all([
-    publishToChannel(`classroom:${courseId}:student`, { type: "QUIZ_STARTED", courseId, sessionId }),
-    publishQuizUpdate(sessionId),
-  ]);
-
   return sessionId;
 }
 
@@ -236,7 +198,6 @@ export async function launchQuizQuestion(
     WHERE session_id = ${sessionId}
       AND phase = 'waiting'
   `;
-  await publishQuizUpdate(sessionId);
 }
 
 /** active → reveal_dist */
@@ -251,7 +212,6 @@ export async function revealDistribution(
     WHERE session_id = ${sessionId}
       AND phase IN ('active', 'waiting')
   `;
-  await publishQuizUpdate(sessionId);
 }
 
 /** reveal_dist → reveal_correct */
@@ -266,7 +226,6 @@ export async function revealCorrectAnswer(
     WHERE session_id = ${sessionId}
       AND phase = 'reveal_dist'
   `;
-  await publishQuizUpdate(sessionId);
 }
 
 /** reveal_correct → active for next question; increments current_index */
@@ -282,7 +241,6 @@ export async function nextQuizQuestion(
     WHERE session_id = ${sessionId}
       AND phase = 'reveal_correct'
   `;
-  await publishQuizUpdate(sessionId);
 }
 
 /**
@@ -300,7 +258,6 @@ export async function enterSummary(
     WHERE session_id = ${sessionId}
       AND phase = 'reveal_correct'
   `;
-  await publishQuizUpdate(sessionId);
 }
 
 /** summary → closed. Teacher dismisses the summary screen. */
@@ -308,14 +265,12 @@ export async function closeQuizSession(
   sessionId: string,
   user: UserDTO,
 ): Promise<void> {
-  const [row] = await userSQL(user)<Pick<QuizSessionRow, "course_id">[]>`
+  await userSQL(user)`
     UPDATE quiz_sessions
     SET phase      = 'closed',
         updated_at = now()
     WHERE session_id = ${sessionId}
-    RETURNING course_id
   `;
-  if (row) await publishQuizClosed(row.course_id);
 }
 
 /** Force-closes any active (non-closed) quiz session for a course. */
@@ -330,7 +285,6 @@ export async function closeActiveQuizForCourse(
     WHERE course_id = ${courseId}
       AND phase != 'closed'
   `;
-  await publishQuizClosed(courseId);
 }
 
 // ==========================================================================
@@ -347,7 +301,6 @@ export async function joinQuizSession(
     VALUES (${sessionId}, ${user.id})
     ON CONFLICT DO NOTHING
   `;
-  await publishQuizUpdate(sessionId);
 }
 
 /**
@@ -376,8 +329,6 @@ export async function submitQuizResponse(
     ON CONFLICT (session_id, user_id, question_index)
     DO UPDATE SET selected = EXCLUDED.selected
   `;
-
-  await publishQuizUpdate(sessionId);
 
   return { ok: true };
 }

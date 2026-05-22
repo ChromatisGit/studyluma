@@ -122,7 +122,7 @@
   --sn-font-bold: 700;
 }
 
-[data-theme='dark'] {
+.dark {
   /* === Neutrals (deep purple-slate — cohesive with the brand, not warm brown) === */
   --sn-bg: #0e0c1a;            /* very dark purple-black */
   --sn-surface: #161328;       /* dark card surface */

@@ -129,7 +129,7 @@ export class WorksheetStorage {
 
   /**
    * Merges data loaded from the DB into localStorage.
-   * DB task responses take precedence over existing localStorage values.
+   * Existing localStorage task responses take precedence over DB values.
    * submittedSections are unioned (any section submitted on any device is preserved).
    * Does NOT trigger onSave / onCheckpointSave callbacks.
    */
@@ -138,7 +138,7 @@ export class WorksheetStorage {
     const { state, record } = this.ensureRecord();
 
     for (const [taskKey, value] of Object.entries(responses)) {
-      if (value) {
+      if (value && !record.responses[taskKey]) {
         record.responses[taskKey] = { value, updatedAt: Date.now() };
       }
     }

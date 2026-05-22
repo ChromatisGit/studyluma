@@ -5,16 +5,7 @@ import { CheckCircle2 } from "lucide-react";
 import type { QuizResultsDTO, StoredQuestion } from "@schema/quizTypes";
 import type { QuizMacro } from "@macros/quiz/types";
 import type { Markdown } from "@schema/page";
-import {
-  startQuizAction,
-  launchQuizAction,
-  revealDistributionAction,
-  revealCorrectAnswerAction,
-  nextQuizQuestionAction,
-  enterSummaryAction,
-  closeQuizAction,
-  forceCloseQuizForCourseAction,
-} from "@actions/quizActions";
+import { postQuizAction } from "./routeActions";
 import { renderInlineMarkdown } from "@ui/lib/renderInlineMarkdown";
 import styles from "./QuizPresenterPanel.module.css";
 
@@ -77,7 +68,11 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
   const handleStart = useCallback(async () => {
     setBusy(true);
     setError(null);
-    const res = await startQuizAction(courseId, questions);
+    const res = await postQuizAction<{ sessionId: string }>({
+      intent: "start",
+      courseId,
+      questions,
+    });
     if (!res.ok) setError(res.error);
     setBusy(false);
   }, [courseId, questions]);
@@ -129,9 +124,12 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
               onClick={async () => {
                 setBusy(true);
                 setError(null);
-                const res = await forceCloseQuizForCourseAction(courseId);
+                const res = await postQuizAction({
+                  intent: "force-close-course",
+                  courseId,
+                });
                 if (res.ok) {
-                  handleStart();
+                  void handleStart();
                 } else {
                   setError((res as { ok: false; error: string }).error);
                   setBusy(false);
@@ -226,7 +224,7 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
           type="button"
           className={styles.primaryBtn}
           disabled={busy}
-          onClick={() => call(() => launchQuizAction(sessionId))}
+          onClick={() => call(() => postQuizAction({ intent: "launch", sessionId }))}
         >
           Starten
         </button>
@@ -237,7 +235,7 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
           type="button"
           className={styles.primaryBtn}
           disabled={busy}
-          onClick={() => call(() => revealDistributionAction(sessionId))}
+          onClick={() => call(() => postQuizAction({ intent: "reveal-distribution", sessionId }))}
         >
           Auswerten
         </button>
@@ -248,7 +246,7 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
           type="button"
           className={styles.primaryBtn}
           disabled={busy}
-          onClick={() => call(() => revealCorrectAnswerAction(sessionId))}
+          onClick={() => call(() => postQuizAction({ intent: "reveal-correct-answer", sessionId }))}
         >
           Richtige Antwort zeigen
         </button>
@@ -260,7 +258,7 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
             type="button"
             className={styles.primaryBtn}
             disabled={busy}
-            onClick={() => call(() => enterSummaryAction(sessionId))}
+            onClick={() => call(() => postQuizAction({ intent: "enter-summary", sessionId }))}
           >
             Zusammenfassung zeigen
           </button>
@@ -269,7 +267,7 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
             type="button"
             className={styles.primaryBtn}
             disabled={busy}
-            onClick={() => call(() => nextQuizQuestionAction(sessionId))}
+            onClick={() => call(() => postQuizAction({ intent: "next-question", sessionId }))}
           >
             Nächste Frage
           </button>
@@ -281,7 +279,7 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
           type="button"
           className={styles.primaryBtn}
           disabled={busy}
-          onClick={() => call(() => closeQuizAction(sessionId))}
+          onClick={() => call(() => postQuizAction({ intent: "close", sessionId }))}
         >
           Zum Unterricht zurück
         </button>
@@ -296,7 +294,7 @@ export function QuizPresenterPanel({ quizMacros, courseId, quizResults }: Props)
           type="button"
           className={styles.secondaryBtn}
           disabled={busy}
-          onClick={() => call(() => closeQuizAction(sessionId))}
+          onClick={() => call(() => postQuizAction({ intent: "close", sessionId }))}
         >
           Quiz beenden
         </button>

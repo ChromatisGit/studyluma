@@ -6,7 +6,7 @@ import styles from "./Box.module.css";
 
 export type BoxProps = {
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
   padding?: "sm" | "md" | "lg";
   hoverable?: boolean;
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { updatePresenceAction } from '@actions/worksheetActions';
+import { useFetcher } from 'react-router';
 import { useWorksheetStorage } from '@features/contentpage/storage/WorksheetStorageContext';
 import type { ProgressStatus } from '@schema/courseTypes';
 import { CategorySection, type Category } from '@features/contentpage/components/CategorySection/CategorySection';
@@ -14,16 +14,29 @@ interface WorksheetNavigatorProps {
   categories: Category[];
   chapterStatus: ProgressStatus;
   taskNumbers: Record<string, number>;
-  courseId?: string;
-  worksheetId?: string;
+  courseId?: string | undefined;
+  worksheetId?: string | undefined;
 }
 
 export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, courseId, worksheetId }: WorksheetNavigatorProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const presenceFetcher = useFetcher();
+  const presenceSubmitRef = useRef(presenceFetcher.submit);
+
+  useEffect(() => {
+    presenceSubmitRef.current = presenceFetcher.submit;
+  }, [presenceFetcher.submit]);
 
   useEffect(() => {
     if (!courseId || !worksheetId) return;
-    void updatePresenceAction(courseId, worksheetId, currentIndex);
+    const formData = new FormData();
+    formData.set('intent', 'presence');
+    formData.set('courseId', courseId);
+    formData.set('sectionIndex', String(currentIndex));
+    void presenceSubmitRef.current(formData, {
+      method: 'POST',
+      action: `/api/worksheet/${worksheetId}/presence`,
+    });
   }, [courseId, worksheetId, currentIndex]);
 
   // Track which sections are "done" (nav condition met)
@@ -114,11 +127,12 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
         block={category}
         categoryIndex={currentIndex}
         taskNumbers={taskNumbers}
-        onTaskSetCompleted={
-          category.kind !== 'checkpoint'
-            ? (itemIndex) => handleTaskSetCompleted(currentIndex, itemIndex)
-            : undefined
-        }
+        {...(category.kind !== 'checkpoint'
+          ? {
+              onTaskSetCompleted:
+                (itemIndex: number) => handleTaskSetCompleted(currentIndex, itemIndex),
+            }
+          : {})}
       />
 
       {category.kind === 'checkpoint' && isActive && (

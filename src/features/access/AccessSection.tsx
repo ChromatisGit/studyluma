@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
+import { useFetcher, useNavigate } from "react-router";
 import { BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
@@ -10,7 +10,6 @@ import { Input } from "@components/Input";
 import { Stack } from "@components/Stack";
 import { IconBox } from "@components/IconBox";
 import styles from "./AccessSection.module.css";
-import { continueAccessAction } from "@actions/accessActions";
 import ACCESS_TEXT from "./access.de.json";
 
 type AccessSectionProps = {
@@ -44,9 +43,16 @@ export default function AccessSection({
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [error, setError] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const fetcher = useFetcher<{ ok: false; error: string; redirectTo?: string }>();
+  const isPending = fetcher.state !== "idle";
+  const navigate = useNavigate();
 
-  const router = useRouter();
+  useEffect(() => {
+    if (!fetcher.data) return;
+    setError(fetcher.data.error);
+    toast.error(fetcher.data.error);
+    if (fetcher.data.redirectTo) void navigate(fetcher.data.redirectTo);
+  }, [fetcher.data, navigate]);
 
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);
@@ -55,7 +61,7 @@ export default function AccessSection({
     setPinConfirm("");
   };
 
-  const handleContinue = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleContinue = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
@@ -66,30 +72,19 @@ export default function AccessSection({
 
     const submittedAccessCode = activeTab === "register" ? "" : accessCode;
 
-    startTransition(async () => {
-      const result = await continueAccessAction({
-        accessCode: submittedAccessCode,
-        pin,
-        ctx: {
-          isCourseJoin,
-          groupKey,
-          courseId,
-          courseRoute,
-          isRegistrationOpen,
-          from,
-        },
-      });
-
-      if (!result.ok) {
-        setError(result.error);
-        if (result.redirectTo) {
-          router.push(result.redirectTo);
-        }
-        toast.error(result.error);
-        return;
-      }
-
-      window.location.href = result.redirectTo;
+    void fetcher.submit({
+      intent: "continue",
+      accessCode: submittedAccessCode,
+      pin,
+      isCourseJoin: String(isCourseJoin),
+      groupKey: groupKey ?? "",
+      courseId: courseId ?? "",
+      courseRoute: courseRoute ?? "",
+      isRegistrationOpen: String(isRegistrationOpen),
+      from: from ?? "",
+    }, {
+      method: "post",
+      action: "/access",
     });
   };
 
@@ -187,7 +182,7 @@ export default function AccessSection({
               type="button"
               variant="ghost"
               fullWidth
-              onClick={() => router.push("/")}
+              onClick={() => navigate("/")}
               disabled={isPending}
             >
               {ACCESS_TEXT.section.backToHome}

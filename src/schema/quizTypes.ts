@@ -16,7 +16,7 @@ export type StoredQuestion = {
   question: string;         // markdown string
   options: string[];        // markdown strings
   correctIndices: number[]; // indices into options that are correct
-  why?: string;             // optional markdown explanation
+  why?: string | undefined; // optional markdown explanation
 };
 
 /**
@@ -40,7 +40,7 @@ export type QuizStateDTO = {
   /** Present during reveal_dist, reveal_correct */
   answeredCount?: number;
   /** Present only during summary phase */
-  questionSummaries?: QuizQuestionSummary[];
+  questionSummaries?: QuizQuestionSummary[] | undefined;
   updatedAt: string;
 };
 
@@ -64,7 +64,7 @@ export type QuizResultsDTO = {
   /** Per-option submission count for the current question */
   optionCounts: number[];
   /** Present only during summary phase */
-  questionSummaries?: QuizQuestionSummary[];
+  questionSummaries?: QuizQuestionSummary[] | undefined;
   updatedAt: string;
 };
 

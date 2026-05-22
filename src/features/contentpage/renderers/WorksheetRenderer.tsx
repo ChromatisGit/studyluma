@@ -16,12 +16,14 @@ const DISPLAY_MACRO_TYPE_SET: ReadonlySet<string> = new Set(DISPLAY_MACRO_TYPES)
 
 interface WorksheetRendererProps {
   page: Page;
-  className?: string;
-  worksheetSlug?: string;
-  chapterStatus?: ProgressStatus;
-  userId?: string;
-  courseId?: string;
-  worksheetId?: string;
+  className?: string | undefined;
+  worksheetSlug?: string | undefined;
+  chapterStatus?: ProgressStatus | undefined;
+  userId?: string | undefined;
+  courseId?: string | undefined;
+  worksheetId?: string | undefined;
+  savedResponses?: Record<string, string> | undefined;
+  submittedSections?: number[] | undefined;
 }
 
 /**
@@ -39,7 +41,11 @@ function convertPageToCategories(page: Page): Category[] {
       if ('markdown' in node) {
         items.push({ kind: 'info', title: '', text: node.markdown });
       } else if ('type' in node && node.type === 'group') {
-        items.push({ kind: 'taskSet', intro: node.intro, tasks: node.macros });
+        items.push({
+          kind: 'taskSet',
+          tasks: node.macros,
+          ...(node.intro ? { intro: node.intro } : {}),
+        });
       } else if ('type' in node && node.type === 'subheader') {
         items.push({ kind: 'subheader', title: node.header.markdown });
       } else if ('type' in node && DISPLAY_MACRO_TYPE_SET.has(node.type)) {
@@ -88,12 +94,29 @@ function computeTaskNumbers(categories: Category[]): Record<string, number> {
  * When chapterStatus is 'current': forward navigation is gated on task/checkpoint completion.
  * Otherwise (default 'finished'): free navigation with no restrictions.
  */
-export function WorksheetRenderer({ page, className, worksheetSlug, chapterStatus = 'finished', userId, courseId, worksheetId }: WorksheetRendererProps) {
+export function WorksheetRenderer({
+  page,
+  className,
+  worksheetSlug,
+  chapterStatus = 'finished',
+  userId,
+  courseId,
+  worksheetId,
+  savedResponses,
+  submittedSections,
+}: WorksheetRendererProps) {
   const categories = convertPageToCategories(page);
   const taskNumbers = computeTaskNumbers(categories);
 
   return (
-    <WorksheetStorageProvider worksheetSlug={worksheetSlug} worksheetId={worksheetId} pageContent={page.content} userId={userId}>
+    <WorksheetStorageProvider
+      worksheetSlug={worksheetSlug}
+      worksheetId={worksheetId}
+      pageContent={page.content}
+      userId={userId}
+      savedResponses={savedResponses}
+      submittedSections={submittedSections}
+    >
       <Container size="narrow" gutters={false} className={clsx(styles.worksheet, className)}>
         {page.title && <PageHeader title={page.title} />}
         <WorksheetNavigator

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import clsx from "clsx";
 import type { ImageMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
@@ -17,7 +16,7 @@ export default function ImageRenderer({ macro }: Props) {
 
   return (
     <figure className={styles.figure}>
-      <Image
+      <img
         src={macro.source}
         alt=""
         width={macro.width}

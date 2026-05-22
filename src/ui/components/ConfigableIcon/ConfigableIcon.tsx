@@ -32,7 +32,7 @@ export function ConfigableIcon({ iconKey, ...iconProps }: ConfigableIconProps) {
 
     if (!importer) return;
 
-    importer().then(({ default: Loaded }) => {
+    void importer().then(({ default: Loaded }) => {
       if (cancelled) return;
       courseIconCache.set(iconKey, Loaded);
       setIcon(() => Loaded);

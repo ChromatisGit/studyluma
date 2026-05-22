@@ -1,7 +1,7 @@
 "use client";
 
 import type { Markdown } from "@schema/page";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@ui/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
 import styles from "./PresenterNotes.module.css";
 

@@ -98,9 +98,9 @@ type RoadmapTopicProps = {
   segmentIsFinished: boolean;
   isAdmin: boolean;
   isSelectionMode: boolean;
-  onChapterSelect?: (topicId: string, chapterId: string) => void;
+  onChapterSelect?: ((topicId: string, chapterId: string) => void) | undefined;
   isSelectedTopic: boolean;
-  selectedChapterId?: string;
+  selectedChapterId?: string | undefined;
 };
 
 function RoadmapTopic({
@@ -212,7 +212,7 @@ type RoadmapChapterProps = {
   topicId: string;
   isAdmin: boolean;
   isSelectionMode: boolean;
-  onChapterSelect?: (topicId: string, chapterId: string) => void;
+  onChapterSelect?: ((topicId: string, chapterId: string) => void) | undefined;
   isSelected: boolean;
 };
 

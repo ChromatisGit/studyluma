@@ -9,8 +9,8 @@ import styles from "./PracticeHub.module.css";
 
 type PracticeHubProps = {
   courses: SidebarCourseDTO[];
-  xp?: number;
-  badge?: string;
+  xp?: number | undefined;
+  badge?: string | undefined;
 };
 
 // Mock per-course data until backend is ready

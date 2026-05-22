@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import Link from "next/link";
+import { Link } from "react-router";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
 
 import { isExternalHref, isHashHref, normalizeHref, resolveLinkRel } from "@ui/lib/links";
@@ -10,8 +10,8 @@ export type AppLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>
   href: string;
   children: ReactNode;
   prefetch?: boolean;
-  active?: boolean;
-  activeClassName?: string;
+  active?: boolean | undefined;
+  activeClassName?: string | undefined;
 };
 
 export function AppLink({
@@ -50,8 +50,8 @@ export function AppLink({
 
   return (
     <Link
-      href={normalizedHref}
-      prefetch={prefetch}
+      to={normalizedHref}
+      {...(prefetch ? { prefetch: "intent" as const } : {})}
       target={target}
       rel={resolvedRel}
       aria-current={active ? "page" : undefined}

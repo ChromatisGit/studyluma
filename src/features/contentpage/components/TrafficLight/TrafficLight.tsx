@@ -8,17 +8,18 @@ import styles from './TrafficLight.module.css';
 
 interface TrafficLightProps {
   onSubmit: (response: CheckpointResponse) => void;
+  isSubmitting?: boolean | undefined;
 }
 
 const LEVELS: { value: UnderstandingLevel; colorClass: string }[] = [
-  { value: 'green',  colorClass: styles.levelGreen  },
-  { value: 'yellow', colorClass: styles.levelYellow },
-  { value: 'red',    colorClass: styles.levelRed    },
+  { value: 'green',  colorClass: styles['levelGreen'] ?? '' },
+  { value: 'yellow', colorClass: styles['levelYellow'] ?? '' },
+  { value: 'red',    colorClass: styles['levelRed'] ?? '' },
 ];
 
 const CAUSES: DifficultyCause[] = ['topic', 'task', 'approach', 'execution', 'mistake', 'other'];
 
-export function TrafficLight({ onSubmit }: TrafficLightProps) {
+export function TrafficLight({ onSubmit, isSubmitting = false }: TrafficLightProps) {
   const [selectedLevel, setSelectedLevel] = useState<UnderstandingLevel | null>(null);
   const [selectedCauses, setSelectedCauses] = useState<DifficultyCause[]>([]);
 
@@ -26,22 +27,24 @@ export function TrafficLight({ onSubmit }: TrafficLightProps) {
   const canSubmit = selectedLevel !== null && (!needsCause || selectedCauses.length > 0);
 
   const handleLevelSelect = (level: UnderstandingLevel) => {
+    if (isSubmitting) return;
     setSelectedLevel(level);
     if (level === 'green') setSelectedCauses([]);
   };
 
   const handleCauseToggle = (cause: DifficultyCause) => {
+    if (isSubmitting) return;
     setSelectedCauses(prev =>
       prev.includes(cause) ? prev.filter(c => c !== cause) : [...prev, cause]
     );
   };
 
   const handleSubmit = () => {
-    if (!canSubmit || selectedLevel === null) return;
+    if (!canSubmit || selectedLevel === null || isSubmitting) return;
     const response: CheckpointResponse = {
       understanding: selectedLevel,
-      causes: needsCause && selectedCauses.length > 0 ? selectedCauses : undefined,
       submittedAt: Date.now(),
+      ...(needsCause && selectedCauses.length > 0 ? { causes: selectedCauses } : {}),
     };
     onSubmit(response);
   };
@@ -58,6 +61,7 @@ export function TrafficLight({ onSubmit }: TrafficLightProps) {
             key={value}
             type="button"
             onClick={() => handleLevelSelect(value)}
+            disabled={isSubmitting}
             className={`${styles.levelButton} ${colorClass} ${selectedLevel === value ? styles.levelButtonSelected : ''}`}
           >
             <span className={styles.levelDot} aria-hidden />
@@ -77,6 +81,7 @@ export function TrafficLight({ onSubmit }: TrafficLightProps) {
                   value={cause}
                   checked={selectedCauses.includes(cause)}
                   onChange={() => handleCauseToggle(cause)}
+                  disabled={isSubmitting}
                   className={styles.causeRadioHidden}
                 />
                 <span className={`${styles.causeCheckbox} ${selectedCauses.includes(cause) ? styles.causeCheckboxChecked : ''}`}>
@@ -92,10 +97,10 @@ export function TrafficLight({ onSubmit }: TrafficLightProps) {
       <button
         type="button"
         onClick={handleSubmit}
-        disabled={!canSubmit}
+        disabled={!canSubmit || isSubmitting}
         className={styles.submitButton}
       >
-        {text.submitButton}
+        {isSubmitting ? 'Speichert...' : text.submitButton}
       </button>
     </div>
   );
