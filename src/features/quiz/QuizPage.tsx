@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router";
 import { ClipboardList } from "lucide-react";
 import { Container } from "@components/Container";
-import { joinQuizAction, submitQuizResponseAction } from "@actions/quizActions";
+import { postQuizAction } from "./routeActions";
 import type { QuizStateDTO } from "@schema/quizTypes";
 import type { StudentStreamEvent, StudentSnapshot } from "@schema/streamTypes";
 import { useQuizStream } from "./hooks/useQuizStream";
@@ -16,7 +16,7 @@ type QuizPageProps = {
 };
 
 export function QuizPage({ initialState }: QuizPageProps) {
-  const router = useRouter();
+  const navigate = useNavigate();
   const [quiz, setQuiz] = useState<QuizStateDTO | null>(initialState);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const lastIndexRef = useRef<number | null>(initialState?.currentIndex ?? null);
@@ -42,7 +42,7 @@ export function QuizPage({ initialState }: QuizPageProps) {
   // Join on mount if a session is already active (student arrived mid-quiz)
   useEffect(() => {
     if (initialState?.sessionId) {
-      joinQuizAction(initialState.sessionId).catch(() => {});
+      postQuizAction({ intent: "join", sessionId: initialState.sessionId }).catch(() => {});
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -51,7 +51,7 @@ export function QuizPage({ initialState }: QuizPageProps) {
   useEffect(() => {
     if (quiz?.sessionId && quiz.sessionId !== lastSessionRef.current) {
       lastSessionRef.current = quiz.sessionId;
-      joinQuizAction(quiz.sessionId).catch(() => {});
+      postQuizAction({ intent: "join", sessionId: quiz.sessionId }).catch(() => {});
     }
   }, [quiz?.sessionId]);
 
@@ -79,8 +79,8 @@ export function QuizPage({ initialState }: QuizPageProps) {
   useEffect(() => {
     if (quiz !== null || !wasActiveRef.current) return;
     wasActiveRef.current = false;
-    redirectTimerRef.current = setTimeout(() => router.push("/"), 400);
-  }, [quiz, router]);
+    redirectTimerRef.current = setTimeout(() => navigate("/"), 400);
+  }, [quiz, navigate]);
 
   useEffect(() => {
     return () => { if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current); };
@@ -111,7 +111,12 @@ export function QuizPage({ initialState }: QuizPageProps) {
   const handleSelect = async (i: number) => {
     if (!quiz || quiz.phase !== "active") return;
     setSelectedAnswer(i);
-    await submitQuizResponseAction(quiz.sessionId, quiz.currentIndex, [i]);
+    await postQuizAction({
+      intent: "submit",
+      sessionId: quiz.sessionId,
+      questionIndex: quiz.currentIndex,
+      selected: [i],
+    });
   };
 
   // ── No active quiz ──────────────────────────────────────────────────────

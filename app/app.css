@@ -1,0 +1,9 @@
+@import "@platform/framework/styles";
+@import "../src/ui/styles/globals.css";
+@import "tailwindcss";
+
+@source "../app/**/*.{ts,tsx}";
+@source "../src/**/*.{ts,tsx}";
+@source "../../reactRouterFramework/src/**/*.{ts,tsx}";
+
+/* StudyNode shell overrides can go here */

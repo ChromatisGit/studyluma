@@ -1,8 +1,5 @@
-import "server-only";
-
-import { notFound } from "next/navigation";
-import { anonSQL, userSQL } from "@db/runSQL";
-import { isAdmin } from "@services/authService";
+import { anonSQL, userSQL } from "@platform/db.server";
+import { isAdmin } from "@platform/auth/guards";
 import { getUserAccessCodeById } from "@services/userService";
 import type { UserDTO } from "@services/userService";
 import type { WorksheetRef, WorksheetFormat } from "@schema/courseContent";
@@ -56,7 +53,7 @@ async function fetchCourseRow(courseId: CourseId): Promise<CourseRow> {
   const rows = await anonSQL<CourseRow[]>`
     SELECT * FROM v_course_dto WHERE id = ${courseId} LIMIT 1
   `;
-  if (!rows[0]) notFound();
+  if (!rows[0]) throw new Response("Not found", { status: 404 });
   return rows[0];
 }
 
@@ -98,7 +95,7 @@ export async function getCourseId(groupKey: string, subjectKey: string): Promise
     WHERE slug = ${slug}
     LIMIT 1
   `;
-  if (!rows[0]) notFound();
+  if (!rows[0]) throw new Response("Not found", { status: 404 });
   return rows[0].id;
 }
 
@@ -272,7 +269,7 @@ export async function getTopicDTO({
   const topic = progressDTO.topics.find((t) => t.topicId === topicId);
 
   if (!topic || topic.status === "locked") {
-    notFound();
+    throw new Response("Not found", { status: 404 });
   }
 
   return topic;

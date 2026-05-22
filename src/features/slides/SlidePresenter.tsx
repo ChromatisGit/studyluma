@@ -6,7 +6,7 @@ import type { MacroStateAdapter } from "@macros/state/MacroStateAdapter";
 import type { AdminStreamEvent, AdminSnapshot } from "@schema/streamTypes";
 import type { QuizResultsDTO } from "@schema/quizTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
-import { broadcastSlideStateAction } from "@actions/slideActions";
+import { postSlideAction } from "./routeActions";
 import { useSlideState } from "./hooks/useSlideState";
 import { useSlideStream } from "./hooks/useSlideStream";
 import { useSlideKeyboard } from "./hooks/useSlideKeyboard";
@@ -36,7 +36,9 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
   useEffect(() => { stateRef.current = state; });
 
   const broadcast = useCallback(() => {
-    broadcastSlideStateAction(courseId, {
+    postSlideAction({
+      intent: "broadcast-state",
+      courseId,
       slideIndex: stateRef.current.slideIndex,
       blackout: stateRef.current.blackout,
       macroState: macroStateRef.current,

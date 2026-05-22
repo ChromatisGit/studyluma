@@ -799,7 +799,7 @@ self.onmessage = (event: MessageEvent<WorkerRequest>) => {
       runtime: {
         output: outputBuffer.join('\n'),
         passed,
-        error: runtimeError,
+        ...(runtimeError !== undefined ? { error: runtimeError } : {}),
       },
     };
 

@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { AppLink } from "@components/AppLink";
 import { ConfigableIcon, type IconName } from "@components/ConfigableIcon";
 import styles from "./Card.module.css";
-import { AccentColor } from "@schema/accentColors";
+import type { AccentColor } from "@schema/accentColors";
 
 export type CardProps = {
   title: string;

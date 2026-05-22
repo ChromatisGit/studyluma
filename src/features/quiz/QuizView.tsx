@@ -145,8 +145,8 @@ export function QuizView({ mode, quiz, selectedIndex, onSelect, correctCount = 0
           {options.map((opt, i) => {
             const isCorrect = phase === "reveal_correct" && correctIndices?.includes(i);
             const isSelected = selectedIndex === i;
-            const pct = Math.round(total > 0 ? (counts[i] / total) * 100 : 0);
-            const barWidth = barsReady ? `${(counts[i] / maxCount) * 100}%` : "0%";
+            const pct = Math.round(total > 0 ? (counts[i]! / total) * 100 : 0);
+            const barWidth = barsReady ? `${(counts[i]! / maxCount) * 100}%` : "0%";
 
             return (
               <div
@@ -231,8 +231,8 @@ export function QuizView({ mode, quiz, selectedIndex, onSelect, correctCount = 0
                     <div className={styles.summaryMiniBar}>
                       {s.options.map((opt, i) => {
                         const isC = s.correctIndices.includes(i);
-                        const pct = Math.round(totalAns > 0 ? (counts[i] / totalAns) * 100 : 0);
-                        const fillW = barsReady ? `${(counts[i] / maxC) * 100}%` : "0%";
+                        const pct = Math.round(totalAns > 0 ? (counts[i]! / totalAns) * 100 : 0);
+                        const fillW = barsReady ? `${(counts[i]! / maxC) * 100}%` : "0%";
                         return (
                           <div key={i} className={`${styles.miniBarRow} ${isC ? styles.miniBarCorrect : ""}`}>
                             <span className={styles.miniBarLetter}>{String.fromCharCode(65 + i)}</span>
@@ -273,8 +273,8 @@ export function QuizView({ mode, quiz, selectedIndex, onSelect, correctCount = 0
                 <div className={styles.summaryMiniBar}>
                   {s.options.map((opt, i) => {
                     const isC = s.correctIndices.includes(i);
-                    const pct = Math.round(totalAns > 0 ? (counts[i] / totalAns) * 100 : 0);
-                    const fillW = barsReady ? `${(counts[i] / maxC) * 100}%` : "0%";
+                    const pct = Math.round(totalAns > 0 ? (counts[i]! / totalAns) * 100 : 0);
+                    const fillW = barsReady ? `${(counts[i]! / maxC) * 100}%` : "0%";
                     return (
                       <div key={i} className={`${styles.miniBarRow} ${isC ? styles.miniBarCorrect : ""}`}>
                         <span className={styles.miniBarLetter}>{String.fromCharCode(65 + i)}</span>

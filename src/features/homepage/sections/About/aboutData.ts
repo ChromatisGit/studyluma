@@ -1,4 +1,4 @@
-import { LayoutGrid, GraduationCap, Network, LucideIcon } from "lucide-react";
+import { LayoutGrid, GraduationCap, Network, type LucideIcon } from "lucide-react";
 import HOMEPAGE_TEXT from "@features/homepage/homepage.de.json";
 
 export interface AboutGoal {

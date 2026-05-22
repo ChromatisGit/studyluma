@@ -2,7 +2,7 @@ import type { Macro } from "@macros/registry";
 
 export type Page = {
     title: string,
-    content?: Section[]
+    content?: Section[] | undefined
 }
 
 export type Section = {

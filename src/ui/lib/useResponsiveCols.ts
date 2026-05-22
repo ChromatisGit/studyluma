@@ -22,7 +22,7 @@ export function useResponsiveCols(opts: {
     if (!element) return;
 
     const observer = new ResizeObserver(([entry]) => {
-      const width = entry.contentRect.width;
+      const width = entry?.contentRect.width ?? 0;
       const raw = Math.floor((width + gap) / (minItemWidth + gap));
       setCols(clamp(raw, 1, maxCols));
     });

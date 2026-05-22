@@ -5,13 +5,13 @@ import { ChevronDown, ChevronRight, Shield } from "lucide-react";
 import { AppLink } from "@components/AppLink";
 import type { CourseDTO, ProgressDTO, CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
-import { listSlideDecksAction } from "@actions/slideActions";
+import { postAdminAction } from "./routeActions";
 import { ProgressControl } from "./ProgressControl";
 import { RegistrationControl } from "./RegistrationControl";
 import { WorksheetManagement } from "./WorksheetManagement";
 import styles from "./AdminCourseDetail.module.css";
 import ADMIN_TEXT from "./admin.de.json";
-import { SlideSelection } from "@features/slides/SlideSelection";
+import { SlideSelection } from "@ui/SlideSelection";
 
 type AdminCourseDetailProps = {
   course: CourseDTO;
@@ -48,8 +48,13 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
     setViewTopicId(topicId);
     setViewChapterId(chapterId);
     setIsLoadingSlides(true);
-    const result = await listSlideDecksAction(course.subjectId, topicId, chapterId);
-    setViewSlideIds(result.ok ? result.slideIds : []);
+    const result = await postAdminAction<{ slideIds: string[] }>({
+      intent: "list-slide-decks",
+      subject: course.subjectId,
+      topicId,
+      chapterId,
+    });
+    setViewSlideIds(result.ok ? result.data?.slideIds ?? [] : []);
     setIsLoadingSlides(false);
   };
 

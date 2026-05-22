@@ -21,8 +21,8 @@ export interface TaskSet {
 interface TaskSetComponentProps {
   taskSet: TaskSet;
   categoryType: 'checkpoint' | 'core' | 'challenge';
-  taskNumber?: number;
-  onTaskSetCompleted?: () => void;
+  taskNumber?: number | undefined;
+  onTaskSetCompleted?: (() => void) | undefined;
 }
 
 function TaskNumberBadge({ number }: { number: string | number }) {

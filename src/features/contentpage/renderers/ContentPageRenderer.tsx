@@ -9,12 +9,12 @@ import { getMarkdown } from "@macros/markdownParser";
 import { type Macro, type MacroRenderContext, renderMacro } from "@macros/registry";
 import styles from "./ContentPageRenderer.module.css";
 import { WorksheetCards } from "@components/WorksheetCards";
-import { WorksheetRef } from "@schema/courseContent";
+import type { WorksheetRef } from "@schema/courseContent";
 import CONTENTPAGE_TEXT from "../contentpage.de.json";
 
 type ContentPageRendererProps = Page & {
-  worksheets?: WorksheetRef[]
-  className?: string;
+  worksheets?: WorksheetRef[] | undefined;
+  className?: string | undefined;
 };
 
 const contentContext: MacroRenderContext = {};

@@ -5,7 +5,7 @@ import type { TypedSlideDeck } from "@schema/slideTypes";
 import type { AdminStreamEvent, LiveSlideState, AdminSnapshot } from "@schema/streamTypes";
 import type { QuizResultsDTO } from "@schema/quizTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
-import { QuizProjectorOverlay } from "@features/quiz/QuizProjectorOverlay";
+import { QuizProjectorOverlay } from "@ui/QuizProjectorOverlay";
 import { SlideRenderer } from "./components/SlideRenderer";
 import { useSlideStream } from "./hooks/useSlideStream";
 import styles from "./SlideProjector.module.css";

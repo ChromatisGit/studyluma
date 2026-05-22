@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@ui/MarkdownRenderer";
 import type { RecapSlide } from "@schema/slideTypes";
 import { SlideHeader } from "./SlideHeader";
 import styles from "./slide.module.css";

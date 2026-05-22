@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { CourseId } from "@schema/courseTypes";
 import type { WorksheetMonitorData } from "@services/worksheetService";
-import { getWorksheetMonitorAction } from "@actions/adminActions";
+import { postAdminAction } from "./routeActions";
 import styles from "./WorksheetMonitor.module.css";
 import ADMIN_TEXT from "./admin.de.json";
 
@@ -22,8 +22,12 @@ export function WorksheetMonitor({ courseId, worksheetId }: WorksheetMonitorProp
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const result = await getWorksheetMonitorAction(courseId, worksheetId);
-    setData(result);
+    const result = await postAdminAction<WorksheetMonitorData>({
+      intent: "worksheet-monitor",
+      courseId,
+      worksheetId,
+    });
+    setData(result.ok ? result.data ?? null : null);
     setLoading(false);
   }, [courseId, worksheetId]);
 

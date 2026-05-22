@@ -7,8 +7,8 @@ import styles from "./Sidebar.module.css";
 
 type SidebarTopicNavProps = {
   topics: ProgressTopicDTO[];
-  currentTopic?: string;
-  currentChapter?: string;
+  currentTopic?: string | undefined;
+  currentChapter?: string | undefined;
   progressCurrentTopicId: string;
   progressCurrentChapterId: string;
   onLinkClick: () => void;

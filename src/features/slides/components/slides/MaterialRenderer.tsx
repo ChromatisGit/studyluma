@@ -1,11 +1,11 @@
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@ui/MarkdownRenderer";
 import { SlideCodeRunner } from "./SlideCodeRunner";
 import type { SlideContentItem } from "@schema/slideTypes";
 import styles from "./slide.module.css";
 
 type MaterialRendererProps = {
   item: SlideContentItem;
-  projector?: boolean;
+  projector?: boolean | undefined;
 };
 
 export function MaterialRenderer({ item, projector }: MaterialRendererProps) {
@@ -24,8 +24,7 @@ export function MaterialRenderer({ item, projector }: MaterialRendererProps) {
   if (item.type === "image") {
     return (
       <div className={styles.imageWrap}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+          <img
           src={item.file}
           alt={typeof item.label === "string" ? item.label : ""}
           className={`${styles.image} ${projector ? styles.imageProjector : ""}`}

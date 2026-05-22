@@ -1,27 +1,27 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router";
 
 type CourseId = string;
 
 type RouteContextValue = {
   pathname: string;
-  routeParam1?: string;
-  routeParam2?: string;
-  topic?: string;
-  chapter?: string;
-  worksheet?: string;
+  routeParam1?: string | undefined;
+  routeParam2?: string | undefined;
+  topic?: string | undefined;
+  chapter?: string | undefined;
+  worksheet?: string | undefined;
   depth: number;
   hasTopicContext: boolean;
-  groupKey?: string;
-  subjectKey?: string;
-  courseId?: CourseId;
+  groupKey?: string | undefined;
+  subjectKey?: string | undefined;
+  courseId?: CourseId | undefined;
   isHome: boolean;
   isPrinciples: boolean;
   isGroupOverview: boolean;
   isAdminView: boolean;
-  adminCourseId?: string;
+  adminCourseId?: string | undefined;
 };
 
 const RouteContext = createContext<RouteContextValue | undefined>(undefined);
@@ -96,7 +96,7 @@ export function RouteProvider({
 }: {
   children: ReactNode;
 }) {
-  const pathname = usePathname() ?? "/";
+  const { pathname } = useLocation();
   const value = useMemo(() => buildRouteContext(pathname), [pathname]);
 
   return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;

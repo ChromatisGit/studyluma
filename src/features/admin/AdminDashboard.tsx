@@ -9,7 +9,7 @@ import { Stack } from "@components/Stack";
 import { PageHeader } from "@components/PageHeader";
 import type { IconName } from "@components/ConfigableIcon/ConfigableIcon";
 import styles from "./AdminDashboard.module.css";
-import { AccentColor } from "@schema/accentColors";
+import type { AccentColor } from "@schema/accentColors";
 import ADMIN_TEXT from "./admin.de.json";
 
 type AdminDashboardProps = {

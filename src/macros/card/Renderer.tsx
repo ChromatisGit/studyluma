@@ -25,18 +25,18 @@ const ICONS: Partial<Record<CardKind, React.ComponentType<{ className?: string }
 };
 
 const KIND_STYLE: Record<CardKind, string> = {
-  definition: styles.neutral,
-  concept: styles.neutral,
-  example: styles.neutral,
-  check: styles.neutral,
-  prompt: styles.task,
-  task: styles.task,
-  highlight: styles.emphasis,
-  recap: styles.emphasis,
-  remember: styles.emphasis,
-  warning: styles.warning,
-  answer: styles.answer,
-  plain: styles.plain,
+  definition: styles['neutral'] ?? '',
+  concept: styles['neutral'] ?? '',
+  example: styles['neutral'] ?? '',
+  check: styles['neutral'] ?? '',
+  prompt: styles['task'] ?? '',
+  task: styles['task'] ?? '',
+  highlight: styles['emphasis'] ?? '',
+  recap: styles['emphasis'] ?? '',
+  remember: styles['emphasis'] ?? '',
+  warning: styles['warning'] ?? '',
+  answer: styles['answer'] ?? '',
+  plain: styles['plain'] ?? '',
 };
 
 export default function CardRenderer({ macro }: Props) {
@@ -49,7 +49,7 @@ export default function CardRenderer({ macro }: Props) {
     <div className={clsx(styles.card, KIND_STYLE[macro.kind])}>
       {Icon && label && (
         <div className={styles.header}>
-          <Icon className={styles.icon} />
+          <Icon className={styles['icon'] ?? ''} />
           <span className={styles.label}>{label}</span>
         </div>
       )}

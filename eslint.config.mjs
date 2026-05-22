@@ -1,31 +1,68 @@
-import { defineConfig, globalIgnores } from "eslint/config";
-import nextVitals from "eslint-config-next/core-web-vitals";
-import nextTs from "eslint-config-next/typescript";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import reactHooks from "eslint-plugin-react-hooks";
 import boundaries from "eslint-plugin-boundaries";
 
-export default defineConfig([
-  ...nextVitals,
-  ...nextTs,
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-  globalIgnores([
-    ".next/**",
-    ".open-next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    ".generated/**",
-  ]),
+export default tseslint.config(
+  {
+    ignores: [
+      "node_modules/**",
+      "build/**",
+      ".react-router/**",
+    ],
+  },
+
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
 
   {
+    plugins: {
+      "react-hooks": reactHooks,
+    },
     rules: {
+      ...reactHooks.configs.recommended.rules,
+
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { prefer: "type-imports", fixStyle: "inline-type-imports" },
+      ],
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-non-null-assertion": "warn",
       "react-hooks/set-state-in-effect": "off",
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      "no-console": ["warn", { allow: ["warn", "error"] }],
+    },
+  },
+
+  {
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: ["react-router.config.ts", "vite.config.ts", "workers/*.ts"],
+        },
+        tsconfigRootDir: __dirname,
+      },
+    },
+  },
+
+  {
+    files: ["*.config.*", "scripts/**/*"],
+    rules: {
+      "no-console": "off",
+      "@typescript-eslint/no-floating-promises": "off",
     },
   },
 
   // ---------------------------------------------------------------------------
   // Ban raw postgres imports everywhere except src/server/db/
-  // tx.ts and runSQL.ts are the only files allowed to touch the postgres client.
   // ---------------------------------------------------------------------------
   {
     files: ["src/**/*.ts", "src/**/*.tsx"],
@@ -87,115 +124,64 @@ export default defineConfig([
         {
           default: "disallow",
           rules: [
-            // -------------------------
-            // app/ - can import public API (actions, services)
-            // -------------------------
             {
               from: "app",
               allow: ["app", "features", "ui", "macros", "schema", "types", "server-actions", "server-services", "server-lib"],
             },
-
-            // -------------------------
-            // features/ - isolated; no cross-feature imports
-            // -------------------------
             {
               from: "features",
               allow: ["ui", "macros", "schema", "types"],
               disallow: [["features", { feature: "!${from.feature}" }]],
             },
-
-            // -------------------------
-            // ui/
-            // -------------------------
             {
               from: "ui",
               allow: ["ui", "schema", "types"],
               disallow: ["app", "features", "server", "server-actions"],
             },
-
-            // -------------------------
-            // macros/
-            // -------------------------
             {
               from: "macros",
               allow: ["macros", "features", "ui", "schema", "types", "pipeline"],
               disallow: ["app", "server", "server-actions"],
             },
-
-            // -------------------------
-            // schema/ (pure types — no runtime deps)
-            // -------------------------
             {
               from: "schema",
               allow: ["schema", "macros"],
               disallow: ["app", "features", "ui", "server", "server-actions", "pipeline"],
             },
-
-            // -------------------------
-            // types/ (generated DB types)
-            // -------------------------
             {
               from: "types",
               allow: ["types"],
             },
-
-            // -------------------------
-            // server-actions - security boundary (auth checks, session gate)
-            // -------------------------
             {
               from: "server-actions",
               allow: ["server-actions", "server-services", "server-lib", "server-config", "schema", "types"],
               disallow: ["app", "features", "ui"],
             },
-
-            // -------------------------
-            // server-services - business logic; queries via anonSQL/userSQL from server-db
-            // -------------------------
             {
               from: "server-services",
               allow: ["server-services", "server-db", "server-providers", "server-lib", "server-config", "schema", "types"],
               disallow: ["app", "features", "ui"],
             },
-
-            // -------------------------
-            // server-db - tx.ts + runSQL.ts only; no upward imports
-            // -------------------------
             {
               from: "server-db",
               allow: ["server-db"],
               disallow: ["app", "features", "ui"],
             },
-
-            // -------------------------
-            // server-providers - content JSON loaders (no DB)
-            // -------------------------
             {
               from: "server-providers",
               allow: ["server-providers", "server-lib", "server-config", "schema"],
               disallow: ["app", "features", "ui"],
             },
-
-            // -------------------------
-            // server-lib - pure server utilities
-            // -------------------------
             {
               from: "server-lib",
               allow: ["server-lib", "server-config", "schema"],
               disallow: ["app", "features", "ui"],
             },
-
-            // -------------------------
-            // server-config - pure config
-            // -------------------------
             {
               from: "server-config",
               allow: ["server-config", "schema"],
               disallow: ["app", "features", "ui"],
             },
-
-            // -------------------------
-            // pipeline - content processing (server/pipeline only)
-            // -------------------------
             {
               from: "pipeline",
               allow: ["pipeline", "macros", "schema"],
@@ -206,4 +192,4 @@ export default defineConfig([
       ],
     },
   },
-]);
+);

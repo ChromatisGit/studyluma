@@ -1,121 +1,38 @@
-# StudyNode – Meilenstein-Roadmap
+# StudyNode Website
 
-## Meilenstein 1: Docusaurus Public
+React Router v7 SSR web application for the StudyNode learning platform.
 
-Ziele:
+## Quick Start
 
-* Ersten Prototyp erstellen (Proof of Concept)
-* Feedback in Informatik Didaktik erhalten
+```sh
+bun install
+cp .env.example .env.local   # set DATABASE_URL and SESSION_SECRET
+docker compose up -d          # start local Postgres
+bun run db:init               # apply schema migrations
+bun run dev                   # start dev server at localhost:5173
+```
 
----
+See [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md) for the full setup guide including content deployment.
 
-## Meilenstein 2: Next.js Rewrite
+## Scripts
 
-Ziele:
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Start Vite dev server with HMR |
+| `bun run build` | Production build |
+| `bun run typecheck` | TypeScript type check |
+| `bun run lint` | ESLint + architecture boundary check |
+| `bun run db:init` | Apply all schema migrations |
+| `bun run db:reset` | Drop and recreate the database |
+| `bun run cf:dev` | Local Cloudflare Workers dev (Miniflare) |
+| `bun run cf:build` | Build for Cloudflare Workers |
+| `bun run cf:deploy` | Build and deploy to Cloudflare Workers |
 
-* Ablösung der Docusaurus-Version
-* Entwicklung einer stabilen und vorzeigbaren Plattform auf Basis von Next.js
+## Docs
 
-Inhaltlicher Umfang:
-
-* Fertige und stabile öffentliche Next.js-Version
-* Trennung von Code- und Inhaltsrepository
-* Hostwechsel von Cloudflare zu Vercel
-* Datenbank einrichten
-
----
-
-## Meilenstein 3: Kollaboration und PDF
-
-Ziele:
-
-* Externe Mitarbeit an Inhalten ermöglichen
-* Unterrichtsmaterialien generieren, die in der Praxis einsetzbar sind
-
-Inhaltlicher Umfang:
-
-* Dev Modus ohne Datenbank
-* Finalisierung des Typst-PDF-Formats zur Preview
-* Dokumentation der Installationsschritte
-* Anleitung zur Inhaltserstellung
-* Externer Test: Eine Kommilitonin erstellt einen Arbeitsbogen komplett mit StudyNode
-
----
-
-## Meilenstein 4: Slides
-
-Ziele:
-
-* Durchführung des Unterrichts direkt aus StudyNode heraus ermöglichen
-
-Inhaltlicher Umfang:
-
-* Slides für das Praktikum
-* Nutzung eigener Komponenten (Code, Notizen, Bilder)
-* Präsentationsmodus für Beamer und Vollbild
-* Bedienung über Tastatursteuerung
-
----
-
-## Meilenstein 5: Accounts und Datenbank
-
-Ziele:
-
-* Personalisierte Nutzung und persistente Datenhaltung ermöglichen
-
-Inhaltlicher Umfang:
-
-* Service Layer in Postgres integrieren
-* Speicherung des Lernfortschritts
-* Verwaltung von Kursmitgliedschaften
-* Einbinden von Kursübergreifenden Prinzipien und Regeln
-
----
-
-## Meilenstein 6: Instanz und Plattform Splitting
-
-Ziele:
-
-* Plattform von eigener Instanz splitten, sodass andere Lehrer eigene Instanz hosten können
-
-Inhaltlicher Umfang:
-
-* Homepage Elemente trennen
-* site.yml hinzufügen als allgemeine Config
-* Anleitung wie eigene Instanz auf Vercel gehostet werden kann
-
----
-
-## Meilenstein 7+
-
-Mögliche Inhalte:
-
-* Aufgabenmacros erweitern (Erklärungen für weitere Aufgabentypen, Bilder in Aufgaben, weitere Aufgabentypen)
-
-* Vollwertige Mathematik-Module
-  * Freie Antwortfelder für Tablet unterstützen (#inkTask)
-  * Mathe Felder um Ergebnis zu vergleichen
-  * Möglichkeit Arbeitsblätter im PDF Format anzubieten
-
-* Practice Nodes (Wiederholung mit zeitlicher Verteilung)
-
-* Klausuren erstellen
-
-* Selbstevaluation der Lernenden:
-
-  * Einschätzung des eigenen Kenntnisstands
-  * Identifikation von Schwierigkeiten
-  * Definition persönlicher Übungsziele
-
-* StudyNode Mailserver einrichten
-
-* Code Quality
-
-  * Unit Tests und weitere Tests erstellen
-  * Performance Check
-
-* Einmalige von Base abweichende Kursinhalte hinzufügen (PDF mit besonderen Infos, AB von Vertretungsstunde)
-
-* Eingebautes Kahoot
-
-* Weboberfläche zum Designen von ABs (generiert Typst Syntax)
+- [Architecture](docs/ARCHITECTURE.md) — Two-repo model, layer rules, auth, content flow
+- [Local Development](docs/LOCAL_DEVELOPMENT.md) — Step-by-step setup guide
+- [Database](docs/DATABASE.md) — Schema overview, RLS, migrations
+- [Content Pipeline](docs/CONTENT_PIPELINE.md) — How content gets from Markdown to DB
+- [Markdown Content Format](docs/MARKDOWN_CONTENT_FORMAT.md) — Supported syntax for content authors
+- [Deployment](docs/DEPLOYMENT.md) — Node.js and Cloudflare Workers deployment

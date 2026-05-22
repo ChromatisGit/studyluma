@@ -6,17 +6,17 @@ import type { ReactNode } from "react";
 import styles from "./SectionShell.module.css";
 
 export type SectionShellProps = {
-  id?: string;
+  id?: string | undefined;
   title: ReactNode;
-  subtitle?: ReactNode;
+  subtitle?: ReactNode | undefined;
   children: ReactNode;
-  align?: "left" | "center";
-  className?: string;
-  innerClassName?: string;
-  cardClassName?: string;
-  headerClassName?: string;
-  titleClassName?: string;
-  subtitleClassName?: string;
+  align?: "left" | "center" | undefined;
+  className?: string | undefined;
+  innerClassName?: string | undefined;
+  cardClassName?: string | undefined;
+  headerClassName?: string | undefined;
+  titleClassName?: string | undefined;
+  subtitleClassName?: string | undefined;
 };
 
 export function SectionShell({

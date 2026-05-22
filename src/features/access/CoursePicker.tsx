@@ -1,6 +1,6 @@
 import { BookOpen } from "lucide-react";
 import { IconBox } from "@components/IconBox";
-import { CourseCard } from "@features/homepage/sections/CourseSection/CourseCard";
+import { CourseCard } from "@ui/CourseCard";
 import type { CourseDTO } from "@schema/courseTypes";
 import styles from "./AccessSection.module.css";
 import pickerStyles from "./CoursePicker.module.css";

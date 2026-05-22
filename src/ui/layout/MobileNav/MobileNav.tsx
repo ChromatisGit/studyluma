@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useLocation } from "react-router";
 import { BookOpen, GraduationCap, ArrowLeftRight, User, ShieldCheck } from "lucide-react";
 import clsx from "clsx";
 import { AppLink } from "@components/AppLink";
@@ -14,7 +14,7 @@ type MobileNavProps = {
 };
 
 export function MobileNav({ isAuthenticated, primaryCourseHref, isAdmin, enrolledCoursesCount }: MobileNavProps) {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
 
   if (!isAuthenticated) return null;
 

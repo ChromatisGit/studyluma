@@ -1,8 +1,5 @@
-import "server-only";
-
 import type { Page } from "@schema/page";
-import { notFound } from "next/navigation";
-import { getPage as getPageFromRepo } from "@providers/pageProvider";
+import { getChapterContent, getWorksheetContent } from "@platform/content.server";
 
 type Args = {
   subject: string;
@@ -12,7 +9,19 @@ type Args = {
 };
 
 export async function getPage(args: Args): Promise<Page> {
-  const page = await getPageFromRepo(args);
-  if (!page) notFound();
+  const page = args.worksheetId
+    ? await getWorksheetContent({
+        subject: args.subject,
+        topicId: args.topicId,
+        chapterId: args.chapterId,
+        worksheetId: args.worksheetId,
+      })
+    : await getChapterContent({
+        subject: args.subject,
+        topicId: args.topicId,
+        chapterId: args.chapterId,
+      });
+
+  if (!page) throw new Response("Not found", { status: 404 });
   return page;
 }

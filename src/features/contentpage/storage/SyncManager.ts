@@ -21,7 +21,7 @@ export class SyncManager {
   private maxIntervalTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
-    private readonly onSync: (responses: Record<string, string>) => Promise<void>,
+    private readonly onSync: (responses: Record<string, string>) => Promise<void> | void,
   ) {}
 
   markDirty(key: string, value: string): void {

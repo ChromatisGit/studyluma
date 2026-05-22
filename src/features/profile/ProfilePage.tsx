@@ -1,17 +1,17 @@
 "use client";
 
 import { useTransition } from "react";
+import { useFetcher } from "react-router";
 import { LogOut, Moon, Sun, Zap } from "lucide-react";
 import { Button } from "@components/Button";
 import { useTheme } from "@ui/contexts/ThemeContext";
 import styles from "./ProfilePage.module.css";
 
 type ProfilePageProps = {
-  accessCode?: string;
-  badge?: string;
-  xp?: number;
+  accessCode?: string | undefined;
+  badge?: string | undefined;
+  xp?: number | undefined;
   coursesCount: number;
-  signOutAction: () => Promise<void>;
 };
 
 export function ProfilePage({
@@ -19,14 +19,14 @@ export function ProfilePage({
   badge,
   xp,
   coursesCount,
-  signOutAction,
 }: ProfilePageProps) {
   const { theme, toggleTheme } = useTheme();
   const [isPending, startTransition] = useTransition();
+  const fetcher = useFetcher();
 
   const handleSignOut = () => {
     startTransition(async () => {
-      await signOutAction();
+      void fetcher.submit({ intent: "logout" }, { method: "post", action: "/access" });
     });
   };
 

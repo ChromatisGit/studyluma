@@ -2,7 +2,7 @@
  * Central Macro Registry (Client-side)
  *
  * This file exports types and rendering utilities for client components.
- * For parsing (server-side), see pipeline/pageParser/macros/macroRegistry.ts
+ * Parsing lives in the standalone studynode-content pipeline.
  *
  * To add a new macro:
  * 1. Create folder src/macros/[name]/ with types.ts, parser.ts, Renderer.tsx

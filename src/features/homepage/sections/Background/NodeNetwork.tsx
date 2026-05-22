@@ -99,9 +99,9 @@ export function NodeNetwork() {
 
       // Update node positions directly in DOM
       for (let i = 0; i < nodes.length; i++) {
-        const pos = calculateNodePosition(nodes[i], i, elapsed);
-        positions[i].x = pos.x;
-        positions[i].y = pos.y;
+        const pos = calculateNodePosition(nodes[i]!, i, elapsed);
+        positions[i]!.x = pos.x;
+        positions[i]!.y = pos.y;
 
         const el = nodeRefs.current[i];
         if (el) {
@@ -112,9 +112,9 @@ export function NodeNetwork() {
 
       // Update connections directly in DOM
       for (let i = 0; i < connections.length; i++) {
-        const conn = connections[i];
-        const startPos = positions[conn.start];
-        const endPos = positions[conn.end];
+        const conn = connections[i]!;
+        const startPos = positions[conn.start]!;
+        const endPos = positions[conn.end]!;
 
         const el = connectionRefs.current[i];
         if (el) {
@@ -124,14 +124,14 @@ export function NodeNetwork() {
           el.setAttribute('y2', String(endPos.y));
 
           // Update randomness state
-          const newRandomness = getConnectionRandomness(randomness[i], elapsed);
+          const newRandomness = getConnectionRandomness(randomness[i]!, elapsed);
           if (newRandomness !== randomness[i]) {
             randomness[i] = newRandomness;
           }
 
           const isActive = isConnectionActiveWithRandomness(
             conn.threshold,
-            randomness[i].offset,
+            randomness[i]!.offset,
             startPos,
             endPos
           );
@@ -176,10 +176,10 @@ export function NodeNetwork() {
             <line
               key={conn.key}
               ref={setConnectionRef(idx)}
-              x1={nodes[conn.start].baseX}
-              y1={nodes[conn.start].baseY}
-              x2={nodes[conn.end].baseX}
-              y2={nodes[conn.end].baseY}
+              x1={nodes[conn.start]!.baseX}
+              y1={nodes[conn.start]!.baseY}
+              x2={nodes[conn.end]!.baseX}
+              y2={nodes[conn.end]!.baseY}
               className={styles.connection}
               style={{
                 opacity: 0,

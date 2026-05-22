@@ -2,16 +2,11 @@
 
 import clsx from "clsx";
 import { useState, useTransition, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { CourseId } from "@schema/courseTypes";
-import {
-  closeRegistrationAction,
-  getRegistrationStatusAction,
-  openRegistrationAction,
-} from "@actions/registrationActions";
 import { Button } from "@components/Button";
 import { Grid } from "@components/Grid";
+import { postAdminAction } from "./routeActions";
 import styles from "./RegistrationControl.module.css";
 import ADMIN_TEXT from "./admin.de.json";
 
@@ -24,15 +19,17 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
   const [openUntil, setOpenUntil] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [timeRemaining, setTimeRemaining] = useState<string>("");
-  const router = useRouter();
 
   // Load initial status
   useEffect(() => {
     startTransition(async () => {
-      const result = await getRegistrationStatusAction(courseId);
+      const result = await postAdminAction<{ isOpen: boolean; openUntil: string | null }>({
+        intent: "registration-status",
+        courseId,
+      });
       if (result.ok) {
-        setIsOpen(result.isOpen);
-        setOpenUntil(result.openUntil);
+        setIsOpen(Boolean(result.data?.isOpen));
+        setOpenUntil(result.data?.openUntil ?? null);
       } else {
         toast.error(result.error);
       }
@@ -70,7 +67,10 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
 
   const handleOpen = () => {
     startTransition(async () => {
-      const result = await openRegistrationAction(courseId);
+      const result = await postAdminAction<{ openUntil: string | null }>({
+        intent: "open-registration",
+        courseId,
+      });
 
       if (!result.ok) {
         toast.error(result.error);
@@ -78,15 +78,17 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
       }
 
       setIsOpen(true);
-      setOpenUntil(result.openUntil);
+      setOpenUntil(result.data?.openUntil ?? null);
       toast.success(ADMIN_TEXT.courseDetail.registration.openSuccessMessage);
-      router.refresh();
     });
   };
 
   const handleClose = () => {
     startTransition(async () => {
-      const result = await closeRegistrationAction(courseId);
+      const result = await postAdminAction<{ openUntil: string | null }>({
+        intent: "close-registration",
+        courseId,
+      });
 
       if (!result.ok) {
         toast.error(result.error);
@@ -96,7 +98,6 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
       setIsOpen(false);
       setOpenUntil(null);
       toast.success(ADMIN_TEXT.courseDetail.registration.closeSuccessMessage);
-      router.refresh();
     });
   };
 

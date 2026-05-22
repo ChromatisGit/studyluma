@@ -1,31 +1,36 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { usePathname } from 'next/navigation';
+import { useFetcher, useLocation } from 'react-router';
 import { WorksheetStorage } from './WorksheetStorage';
 import { SyncManager } from './SyncManager';
 import type { Section } from '@schema/page';
 import { MacroStateProvider } from '@macros/state/MacroStateContext';
 import { createWorksheetAdapter } from '@macros/state/WorksheetStorageAdapter';
-import {
-  loadWorksheetDataAction,
-  syncWorksheetAction,
-  saveCheckpointAction,
-} from '@actions/worksheetActions';
-import { useState } from 'react';
 
 const WorksheetStorageContext = createContext<WorksheetStorage | null>(null);
+const WorksheetSyncContext = createContext({ checkpointState: 'idle' });
 
 interface WorksheetStorageProviderProps {
-  worksheetSlug?: string;
+  worksheetSlug?: string | undefined;
   /** The actual DB worksheet ID — used for DB reads/writes. */
-  worksheetId?: string;
-  pageContent?: Section[];
+  worksheetId?: string | undefined;
+  pageContent?: Section[] | undefined;
+  savedResponses?: Record<string, string> | undefined;
+  submittedSections?: number[] | undefined;
   storage?: WorksheetStorage | null;
   /** Pass the authenticated user's ID to enable DB sync. */
-  userId?: string;
+  userId?: string | undefined;
   children: ReactNode;
+}
+
+function createFormData(values: Record<string, string>): FormData {
+  const formData = new FormData();
+  for (const [key, value] of Object.entries(values)) {
+    formData.set(key, value);
+  }
+  return formData;
 }
 
 /**
@@ -44,13 +49,35 @@ export function WorksheetStorageProvider({
   worksheetSlug,
   worksheetId,
   pageContent,
+  savedResponses,
+  submittedSections,
   storage: manualStorage,
   userId,
   children
 }: WorksheetStorageProviderProps) {
   const [autoStorage, setAutoStorage] = useState<WorksheetStorage | null>(null);
-  const pathname = usePathname();
+  const { pathname } = useLocation();
+  const syncFetcher = useFetcher();
+  const checkpointFetcher = useFetcher();
   const syncManagerRef = useRef<SyncManager | null>(null);
+  const fetcherRef = useRef({
+    syncSubmit: syncFetcher.submit,
+    checkpointSubmit: checkpointFetcher.submit,
+  });
+  const syncInFlightRef = useRef(false);
+
+  useEffect(() => {
+    fetcherRef.current = {
+      syncSubmit: syncFetcher.submit,
+      checkpointSubmit: checkpointFetcher.submit,
+    };
+  }, [syncFetcher.submit, checkpointFetcher.submit]);
+
+  useEffect(() => {
+    if (syncFetcher.state === 'idle') {
+      syncInFlightRef.current = false;
+    }
+  }, [syncFetcher.state]);
 
   const worksheetSignature = useMemo(
     () => {
@@ -75,36 +102,61 @@ export function WorksheetStorageProvider({
 
     const slug = worksheetSlug || pathname || "worksheet";
     const instance = WorksheetStorage.forWorksheet(slug, worksheetSignature);
+    instance.mergeDbData(savedResponses ?? {}, submittedSections ?? []);
 
     if (userId && worksheetId) {
       const syncManager = new SyncManager(
-        async (responses) => { await syncWorksheetAction(worksheetId, responses); },
+        (responses) => {
+          if (syncInFlightRef.current) {
+            throw new Error('Worksheet sync already in progress');
+          }
+          syncInFlightRef.current = true;
+          try {
+            void fetcherRef.current.syncSubmit(
+              createFormData({
+                intent: 'sync-responses',
+                responses: JSON.stringify(responses),
+              }),
+              { method: 'POST', action: `/api/worksheet/${worksheetId}/save` },
+            );
+          } catch (error) {
+            syncInFlightRef.current = false;
+            throw error;
+          }
+        },
       );
       syncManagerRef.current = syncManager;
 
       instance.onSave = (key, value) => syncManager.markDirty(key, value);
       instance.onFlush = () => syncManager.flush();
       instance.onCheckpointSave = (idx, resp) => {
-        void saveCheckpointAction(worksheetId, idx, resp);
+        void fetcherRef.current.checkpointSubmit(
+          createFormData({
+            intent: 'checkpoint',
+            sectionIndex: String(idx),
+            checkpoint: JSON.stringify(resp),
+          }),
+          { method: 'POST', action: `/api/worksheet/${worksheetId}/checkpoint` },
+        );
       };
-
-      loadWorksheetDataAction(worksheetId).then((result) => {
-        if (result.ok) {
-          instance.mergeDbData(result.data.taskResponses, result.data.submittedSections);
-        }
-        setAutoStorage(instance);
-      }).catch(() => {
-        setAutoStorage(instance);
-      });
-    } else {
-      setAutoStorage(instance);
     }
+
+    setAutoStorage(instance);
 
     return () => {
       syncManagerRef.current?.destroy();
       syncManagerRef.current = null;
     };
-  }, [pathname, worksheetSignature, worksheetSlug, worksheetId, manualStorage, userId]);
+  }, [
+    pathname,
+    worksheetSignature,
+    worksheetSlug,
+    worksheetId,
+    manualStorage,
+    userId,
+    savedResponses,
+    submittedSections,
+  ]);
 
   // Flush on tab hide (user navigates away or switches tabs)
   useEffect(() => {
@@ -127,11 +179,17 @@ export function WorksheetStorageProvider({
   }, []);
 
   const storage = manualStorage !== undefined ? manualStorage : autoStorage;
+  const syncStatus = useMemo(
+    () => ({ checkpointState: checkpointFetcher.state }),
+    [checkpointFetcher.state],
+  );
 
   const content = (
-    <WorksheetStorageContext.Provider value={storage}>
-      {children}
-    </WorksheetStorageContext.Provider>
+    <WorksheetSyncContext.Provider value={syncStatus}>
+      <WorksheetStorageContext.Provider value={storage}>
+        {children}
+      </WorksheetStorageContext.Provider>
+    </WorksheetSyncContext.Provider>
   );
 
   if (storage) {
@@ -144,4 +202,8 @@ export function WorksheetStorageProvider({
 
 export function useWorksheetStorage(): WorksheetStorage | null {
   return useContext(WorksheetStorageContext);
+}
+
+export function useWorksheetSyncStatus() {
+  return useContext(WorksheetSyncContext);
 }

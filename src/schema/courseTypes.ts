@@ -9,7 +9,7 @@ export type CourseDTO = {
   groupKey: string;
   subjectId: string;
   slug: string;
-  icon?: string;
+  icon?: string | undefined;
   color: string;
   tags: string[];
 };
@@ -42,18 +42,16 @@ export type SidebarCourseDTO = {
   id: string;
   label: string;
   href: string;
-  icon?: string;
+  icon?: string | undefined;
 };
 
 export type SidebarDTO = ProgressDTO & {
   courses: SidebarCourseDTO[];
   isAuthenticated: boolean;
-  primaryGroupKey?: string;
-  accessCode?: string;
-  /** Display badge emoji for the user (e.g. "🎓"). Stub until DB field exists. */
-  badge?: string;
-  /** Total XP earned by the user. Stub until DB field exists. */
-  xp?: number;
+  primaryGroupKey?: string | undefined;
+  accessCode?: string | undefined;
+  badge?: string | undefined;
+  xp?: number | undefined;
 };
 
 export type CourseAccessGroups = {

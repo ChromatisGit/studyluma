@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useOptimistic, useTransition } from "react";
-import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { AppLink } from "@components/AppLink";
 import type { CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
-import { toggleWorksheetVisibilityAction, toggleWorksheetSolutionVisibilityAction } from "@actions/adminActions";
+import { postAdminAction } from "./routeActions";
 import { WorksheetMonitor } from "./WorksheetMonitor";
 import styles from "./WorksheetManagement.module.css";
 import ADMIN_TEXT from "./admin.de.json";
@@ -36,7 +36,12 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
     const newHidden = !optimisticHidden;
     startTransition(async () => {
       setOptimisticHidden(newHidden);
-      await toggleWorksheetVisibilityAction(courseId, worksheet.worksheetId, newHidden);
+      await postAdminAction({
+        intent: "toggle-worksheet-visibility",
+        courseId,
+        worksheetId: worksheet.worksheetId,
+        isHidden: newHidden,
+      });
     });
   };
 
@@ -44,7 +49,12 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
     const newHidden = !optimisticSolutionHidden;
     startTransition(async () => {
       setOptimisticSolutionHidden(newHidden);
-      await toggleWorksheetSolutionVisibilityAction(courseId, worksheet.worksheetId, newHidden);
+      await postAdminAction({
+        intent: "toggle-worksheet-solution-visibility",
+        courseId,
+        worksheetId: worksheet.worksheetId,
+        isSolutionHidden: newHidden,
+      });
     });
   };
 
@@ -55,10 +65,10 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
     <div className={styles.worksheetRow}>
       <div className={styles.worksheetMain}>
         <div className={styles.worksheetInfo}>
-          <Link href={worksheetHref} target="_blank" className={styles.worksheetLabel}>
+          <AppLink href={worksheetHref} target="_blank" className={styles.worksheetLabel}>
             {worksheet.label}
             <ExternalLink size={12} className={styles.worksheetLabelIcon} />
-          </Link>
+          </AppLink>
           <span className={styles.worksheetFilename}>{worksheet.sourceFilename}</span>
         </div>
         <div className={styles.worksheetActions}>
@@ -104,7 +114,7 @@ export function WorksheetManagement({ courseId, courseSlug, worksheets, chapterI
       byChapter[ws.chapterId] = [];
       chapterOrder.push(ws.chapterId);
     }
-    byChapter[ws.chapterId].push(ws);
+    byChapter[ws.chapterId]!.push(ws);
   }
 
   // When a chapterId filter is provided, show only that chapter
@@ -121,7 +131,7 @@ export function WorksheetManagement({ courseId, courseSlug, worksheets, chapterI
       {visibleChapterOrder.map((id) => (
         <div key={id} className={styles.chapter}>
           <div className={styles.worksheetList}>
-            {byChapter[id].map((ws) => {
+            {(byChapter[id] ?? []).map((ws) => {
               const monitorKey = `${ws.chapterId}:${ws.worksheetId}`;
               return (
                 <WorksheetRow

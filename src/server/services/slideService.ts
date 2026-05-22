@@ -1,13 +1,10 @@
-import "server-only";
-
 import type { TypedSlideDeck } from "@schema/slideTypes";
 import type { LiveSlideState } from "@schema/streamTypes";
-import { notFound } from "next/navigation";
 import {
-  getSlideDeck as getSlideDeckFromProvider,
-  listSlideDecks as listFromProvider,
-} from "@providers/slideProvider";
-import { anonSQL } from "@db/runSQL";
+  getSlideDeckContent,
+  listSlideDeckContent,
+} from "@platform/content.server";
+import { anonSQL } from "@platform/db.server";
 
 // ---------------------------------------------------------------------------
 // Slide decks (content)
@@ -21,15 +18,15 @@ type GetSlideDeckArgs = {
 };
 
 export async function getSlideDeck(args: GetSlideDeckArgs): Promise<TypedSlideDeck> {
-  const deck = await getSlideDeckFromProvider(args);
-  if (!deck) notFound();
+  const deck = await getSlideDeckContent(args);
+  if (!deck) throw new Response("Not found", { status: 404 });
   return deck;
 }
 
 export async function listSlideDecks(
   args: Omit<GetSlideDeckArgs, "slideId">
 ): Promise<string[]> {
-  return listFromProvider(args);
+  return listSlideDeckContent(args);
 }
 
 // ---------------------------------------------------------------------------

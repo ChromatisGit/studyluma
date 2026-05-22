@@ -1,15 +1,11 @@
-import "server-only";
-import { headers } from "next/headers";
-
-export async function getClientIp(): Promise<string> {
-  const headerList = await headers();
-  const forwarded = headerList.get("x-forwarded-for");
+export function getClientIp(request: Request): string {
+  const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0]?.trim() || "unknown";
 
-  const realIp = headerList.get("x-real-ip");
+  const realIp = request.headers.get("x-real-ip");
   if (realIp) return realIp.trim();
 
-  const cfIp = headerList.get("cf-connecting-ip");
+  const cfIp = request.headers.get("cf-connecting-ip");
   if (cfIp) return cfIp.trim();
 
   return "unknown";
