@@ -33,47 +33,40 @@ bun install
 
 ### 4. Configure environment
 
-```sh
-cp .env.example .env.local
-```
-
-Open `.env.local` and set:
+Create `studynode/.env.local` and set:
 
 ```
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/studynode
 SESSION_SECRET=<any-long-random-string>
 ```
 
-### 5. Start the database
-
-```sh
-docker compose up -d
-```
-
-This starts a Postgres 16 container on port 5432.
-
-### 6. Initialise the schema
+### 5. Start and initialise the database
 
 ```sh
 bun run db:init
 ```
 
-This runs the migration files in `sql/migrations/` in order and sets up all tables, indexes, functions, views, and RLS policies.
+This starts the local Postgres 16 container if needed, then runs the migration files in `sql/migrations/` in order and sets up all tables, indexes, functions, views, and RLS policies.
 
-### 7. Deploy content
+### 6. Deploy content
 
-In the `studynode-content` directory:
+In the `studynode-content` directory, create `studynode-content/.env.local` with the same `DATABASE_URL`:
+
+```sh
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/studynode
+```
+
+Then run:
 
 ```sh
 cd ../studynode-content
 bun install
-cp .env.example .env.local  # set the same DATABASE_URL
 bun run content:deploy
 ```
 
 This parses all Markdown content and writes it to the database. It takes 10–30 seconds depending on the amount of content.
 
-### 8. Start the dev server
+### 7. Start the dev server
 
 Back in `studynode-website`:
 
@@ -81,7 +74,7 @@ Back in `studynode-website`:
 bun run dev
 ```
 
-### 9. Open the app
+### 8. Open the app
 
 Visit [http://localhost:5173](http://localhost:5173).
 
@@ -95,27 +88,30 @@ Visit [http://localhost:5173](http://localhost:5173).
 | `bun run typecheck` | TypeScript type check (no emit) |
 | `bun run lint` | ESLint + architecture boundary check |
 | `bun run build` | Production build |
-| `bun run db:init` | Apply all migrations |
+| `bun run db:init` | Start the local database and apply all migrations |
 | `bun run db:reset` | Destroy and recreate the database |
 
 ## Adding an admin user
 
-After `db:init`, insert an admin user directly:
+`bun run db:init` starts the local database and creates the schema. It does not create an admin account.
 
-```sql
--- Run against the local database (e.g. via psql or a DB GUI)
-INSERT INTO users (id, role, access_code, pin_hash)
-VALUES (
-  gen_random_uuid(),
-  'admin',
-  'ADMIN-CODE',
-  '<argon2-hash-of-your-pin>'
-);
+Use the helper script in `studynode`:
+
+```sh
+# In studynode:
+ADMIN_ACCESS_CODE=ADMIN-CODE ADMIN_PIN=1234 bun run admin:create
 ```
 
-Or use the helper script in `studynode-content`:
+This writes an `admin` row into `users` using the configured `DATABASE_URL` and stores the PIN as a PBKDF2 hash.
+
+There is also a fixed local seed file in `studynode-content` if you want a prebuilt dev account instead:
 
 ```sh
 # In studynode-content:
 psql "$DATABASE_URL" -f dev-add-admin.sql
 ```
+
+That seed creates:
+
+- Access code: `dev`
+- PIN: `dev`

@@ -4,8 +4,13 @@
 
 PostgreSQL 16. Connection is managed via the `postgres` npm package (v3).
 
-- **Local dev**: Docker Compose (`docker compose up -d`)
-- **Production**: Neon serverless Postgres
+- **Local dev**: Docker Compose, typically started via `bun run db:init`
+- **Production**: Postgres accessible from the chosen deployment target
+
+For the currently supported deployment targets:
+
+- **Docker**: standard Postgres connection via `DATABASE_URL`
+- **Cloudflare Workers**: Neon serverless Postgres is the intended target
 
 ---
 
@@ -40,7 +45,7 @@ Chapter `status` values: `current`, `finished`, `locked`.
 
 | Table | Purpose |
 |-------|---------|
-| `users` | User accounts (access code + argon2 PIN hash) |
+| `users` | User accounts (access code + PBKDF2 PIN hash) |
 | `user_courses` | Which courses a user is enrolled in |
 | `user_progress` | Per-chapter progress status per user |
 

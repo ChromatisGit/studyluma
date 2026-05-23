@@ -1,6 +1,6 @@
-import { createDb, makeAnonSql, makeUserSql } from "@platform/framework/db";
-import { getDatabaseUrl, getDbDriver } from "@platform/framework/runtime";
-import type { DbClient, UserCtx } from "@platform/framework/db";
+import { createDb, makeAnonSql, makeUserSql } from "@chromatis/base/db";
+import { getDatabaseUrl, getDbDriver } from "@chromatis/base/runtime";
+import type { DbClient, UserCtx } from "@chromatis/base/db";
 
 let _db: DbClient | null = null;
 

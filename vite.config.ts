@@ -1,6 +1,5 @@
-import { fileURLToPath } from "node:url";
 import { mergeConfig } from "vite";
-import { createViteConfig } from "../reactRouterFramework/src/vite";
+import { createViteConfig } from "@chromatis/base/vite";
 
 export default createViteConfig().then((config) =>
   mergeConfig(config, {
@@ -13,14 +12,6 @@ export default createViteConfig().then((config) =>
         "motion",
         "framer-motion",
         "sonner",
-      ],
-      alias: [
-        {
-          find: "@platform/framework/styles",
-          replacement: fileURLToPath(
-            new URL("../reactRouterFramework/src/ui/style/consumer.css", import.meta.url),
-          ),
-        },
       ],
     },
   }),

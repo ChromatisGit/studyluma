@@ -27,7 +27,7 @@ studynode-content          studynode-website
 
 Built on **React Router v7** with SSR enabled (`ssr: true` in `react-router.config.ts`). Vite handles both client and server bundling.
 
-The shared framework package lives at `../reactRouterFramework` (a sibling directory, not an npm package) and is referenced via path aliases. It provides Vite config helpers, ESLint config, and the base TypeScript config.
+The shared framework is declared as a `file:` dependency (`@chromatis/base`) and installed via `bun install`. It provides Vite config helpers, ESLint config, and the base TypeScript config.
 
 ### Source Layout
 
@@ -63,7 +63,7 @@ Thin wrappers around framework primitives:
 
 ### Authentication
 
-Users authenticate with an access code + PIN. The PIN is hashed with **PBKDF2** via the Web Crypto API (`hashPin`/`verifyPin` from `@platform/framework/auth`) — no native modules, works on both Node.js and Cloudflare Workers.
+Users authenticate with an access code + PIN. The PIN is hashed with **PBKDF2** via the Web Crypto API (`hashPin`/`verifyPin` from `@chromatis/base/auth`) — no native modules, works on both Node.js and Cloudflare Workers.
 
 On successful login, a signed session cookie is issued. The cookie stores only a `user_id`; the platform layer resolves the full `UserDTO` on every request.
 
@@ -71,8 +71,9 @@ On successful login, a signed session cookie is issued. The cookie stores only a
 
 PostgreSQL everywhere:
 
-- **Local dev**: Docker Compose (`docker compose up -d`)
-- **Production**: Neon serverless Postgres (compatible with Cloudflare Workers via HTTP)
+- **Local dev**: Docker Compose, typically started via `bun run db:init`
+- **Docker deployment**: standard Postgres connection via `DATABASE_URL`
+- **Cloudflare deployment**: Neon serverless Postgres (compatible with Cloudflare Workers via HTTP)
 
 All writes go through `userSQL(user)` which sets three session-level parameters before executing:
 

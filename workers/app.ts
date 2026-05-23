@@ -1,5 +1,5 @@
 import { createRequestHandler, type ServerBuild } from "react-router";
-import { runWithRuntimeEnv } from "@platform/framework/runtime";
+import { runWithRuntimeEnv } from "@chromatis/base/runtime";
 
 type WorkerEnv = Record<string, string | undefined>;
 

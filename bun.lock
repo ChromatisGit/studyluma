@@ -5,6 +5,7 @@
     "": {
       "name": "studynode",
       "dependencies": {
+        "@chromatis/base": "git+https://github.com/ChromatisGit/personal-base-framework.git",
         "@react-router/node": "^7.0.0",
         "@tailwindcss/vite": "^4.3.0",
         "clsx": "^2.1.1",
@@ -102,6 +103,8 @@
     "@babel/types": ["@babel/types@7.28.5", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA=="],
 
     "@boundaries/elements": ["@boundaries/elements@1.2.0", "", { "dependencies": { "eslint-import-resolver-node": "0.3.9", "eslint-module-utils": "2.12.1", "handlebars": "4.7.8", "is-core-module": "2.16.1", "micromatch": "4.0.8" } }, "sha512-W65Gum02liMd3hmNrLmDBX1u5BmRMcunouFjLXyhxHnNY4YlK1kTxsgfflZ5XBGSnPnO0MkiUzAcoGzYrlx0RQ=="],
+
+    "@chromatis/base": ["@chromatis/base@github:ChromatisGit/personal-base-framework#306ac22", { "peerDependencies": { "lucide-react": ">=0.400.0", "motion": ">=12.0.0", "react": ">=19.0.0", "react-dom": ">=19.0.0", "react-router": ">=7.0.0", "sonner": ">=1.0.0" } }, "ChromatisGit-personal-base-framework-306ac22"],
 
     "@cloudflare/kv-asset-handler": ["@cloudflare/kv-asset-handler@0.5.0", "", {}, "sha512-jxQYkj8dSIzc0cD6cMMNdOc1UVjqSqu8BZdor5s8cGjW2I8BjODt/kWPVdY+u9zj3ms75Q5qaZgnxUad83+eAg=="],
 

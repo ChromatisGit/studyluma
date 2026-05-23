@@ -1,5 +1,5 @@
 import { BookOpen, Settings, User } from "lucide-react";
-import type { NavItem } from "@platform/framework";
+import type { NavItem } from "@chromatis/base";
 
 export const mainNavItems: readonly NavItem[] = [
   { path: "/", label: "Kurse", icon: BookOpen },

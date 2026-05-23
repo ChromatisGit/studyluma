@@ -2,36 +2,37 @@
 
 ## Target Environments
 
-StudyNode supports two deployment targets. Both support full login — PIN hashing uses PBKDF2 via the Web Crypto API (no native modules required).
+StudyNode supports two deployment targets. Both support full login - PIN hashing uses PBKDF2 via the Web Crypto API, so no native modules are required.
 
 | Target | Notes |
 |--------|-------|
-| Node.js (PM2 / VPS) | Traditional deployment, full Node.js API surface |
+| Docker container | Containerized SSR deployment using the shared framework Dockerfile |
 | Cloudflare Workers + Neon | Edge deployment, lower latency, free tier available |
 
 ---
 
-## Option 1: Node.js Deployment
+## Option 1: Docker Deployment
 
 ### Prerequisites
 
-- Node.js 20+ or Bun 1.x on the server
-- PostgreSQL accessible from the server
-- PM2 or another process manager (optional but recommended)
+- Docker
+- PostgreSQL accessible from the container
 
-### Build
+### Build the image
 
 ```sh
+bun install
 bun run build
+docker build -f node_modules/@chromatis/base/infra/docker/Dockerfile -t studynode .
 ```
 
-Output goes to `build/`.
+The Dockerfile comes from the installed `@chromatis/base` package. No app-local Dockerfile is maintained in this repo.
 
 ### Environment
 
-Set the following on the server:
+Set the following for the container:
 
-```
+```sh
 DATABASE_URL=postgres://user:pass@host:5432/studynode
 SESSION_SECRET=<long-random-string>
 NODE_ENV=production
@@ -40,15 +41,14 @@ NODE_ENV=production
 ### Run
 
 ```sh
-# Direct start:
-node build/server/index.js
-
-# Or with PM2:
-pm2 start build/server/index.js --name studynode
-pm2 save
+docker run --rm -p 3000:3000 \
+  -e DATABASE_URL=postgres://user:pass@host:5432/studynode \
+  -e SESSION_SECRET=<long-random-string> \
+  -e NODE_ENV=production \
+  studynode
 ```
 
-The server listens on port `3000` by default. Put Nginx or Caddy in front as a reverse proxy.
+The app listens on port `3000` inside the container.
 
 ---
 
@@ -56,15 +56,15 @@ The server listens on port `3000` by default. Put Nginx or Caddy in front as a r
 
 ### Prerequisites
 
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) — installed as a dev dependency (`bun run wrangler`)
-- A [Neon](https://neon.tech) database (free tier available)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) - installed as a dev dependency
+- A [Neon](https://neon.tech) database
 - Cloudflare account
 
 ### 1. Create a Neon database
 
 In the Neon console, create a new project and copy the connection string:
 
-```
+```sh
 postgres://user:pass@ep-xxx.eu-central-1.aws.neon.tech/neondb?sslmode=require
 ```
 
@@ -80,7 +80,7 @@ bunx wrangler secret put SESSION_SECRET
 
 ### 3. Initialise the schema
 
-Run `bun run db:init` with `DATABASE_URL` pointed at Neon (set it in `.env.local` or export it):
+Run `bun run db:init` with `DATABASE_URL` pointed at Neon:
 
 ```sh
 DATABASE_URL="postgres://..." bun run db:init
@@ -100,11 +100,11 @@ bun run content:deploy
 bun run cf:deploy
 ```
 
-This runs `bun run cf:build` (Vite + React Router build with the Cloudflare Vite plugin) and then `wrangler deploy`.
+This runs `bun run cf:build` and then `wrangler deploy`.
 
 ### Local Cloudflare dev
 
-To test the Workers build locally (uses Miniflare):
+To test the Workers build locally:
 
 ```sh
 bun run cf:dev
@@ -118,4 +118,4 @@ bun run cf:dev
 |----------|----------|-------------|
 | `DATABASE_URL` | Yes | Postgres connection string |
 | `SESSION_SECRET` | Yes | Secret key for signing session cookies |
-| `NODE_ENV` | No | `production` in production builds |
+| `NODE_ENV` | No | Use `production` for Docker deployments |

@@ -1,4 +1,4 @@
-import { verifyPin } from "@platform/framework/auth";
+import { verifyPin } from "@chromatis/base/auth";
 import { anonSQL } from "../db.server.js";
 import type { UserDTO } from "./types.js";
 

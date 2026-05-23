@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, useLoaderData } from "react-router";
-import { Layout, Sidebar } from "@platform/framework";
+import { Layout, Sidebar } from "@chromatis/base";
 import { adminNavItems, mainNavItems } from "@core/nav";
 import { RouteProvider } from "@ui/contexts/RouteContext";
 import { ThemeProvider } from "@ui/contexts/ThemeContext";

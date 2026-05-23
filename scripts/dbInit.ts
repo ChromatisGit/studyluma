@@ -1,3 +1,3 @@
-import { runDbMigrations } from "../../reactRouterFramework/infra/scripts/dbMigrations";
+import { runDbMigrations } from "@chromatis/base/db-migrations";
 
 await runDbMigrations("init");

@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { hashPin } from "../../reactRouterFramework/src/auth/hash.server";
+import { hashPin } from "@chromatis/base/auth";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -19,7 +19,7 @@ if (!accessCode) {
   process.exit(1);
 }
 
-const sql = postgres(DATABASE_URL, { ssl: "require" });
+const sql = postgres(DATABASE_URL);
 
 try {
   const pinHash = await hashPin(pin);

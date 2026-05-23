@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { runDbMigrations } from "../../reactRouterFramework/infra/scripts/dbMigrations";
+import { runDbMigrations } from "@chromatis/base/db-migrations";
 
 const url = process.env.DATABASE_URL;
 if (!url?.includes("localhost") && !url?.includes("127.0.0.1")) {

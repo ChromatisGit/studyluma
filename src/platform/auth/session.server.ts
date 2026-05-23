@@ -1,4 +1,4 @@
-import { createSessionService, getSessionCookie, buildSetSessionCookie } from "@platform/framework/auth";
+import { createSessionService, getSessionCookie, buildSetSessionCookie } from "@chromatis/base/auth";
 import { getUserById } from "@services/userService";
 
 export const { getSession, buildSessionCookie, buildLogoutCookie } = createSessionService({

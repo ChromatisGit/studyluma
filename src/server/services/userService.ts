@@ -1,5 +1,5 @@
 import { anonSQL, userSQL } from "@platform/db.server";
-import { hashPin } from "@platform/framework/auth";
+import { hashPin } from "@chromatis/base/auth";
 
 import type { UserDTO } from "@platform/auth/types";
 export type { UserDTO };

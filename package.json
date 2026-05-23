@@ -1,13 +1,16 @@
 {
   "name": "studynode",
   "version": "0.1.0",
+  "description": "React Router SSR web application for the StudyNode learning platform.",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
     "build": "react-router build",
+    "start": "node build/server/index.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && bun scripts/checkArchitectureBoundaries.ts",
+    "admin:create": "bun scripts/createAdmin.ts",
     "db:init": "bun scripts/dbInit.ts",
     "db:reset": "bun scripts/dbReset.ts",
     "check:arch": "bun scripts/checkArchitectureBoundaries.ts",
@@ -16,6 +19,7 @@
     "cf:deploy": "bun run cf:build && wrangler deploy --config build/server/wrangler.json"
   },
   "dependencies": {
+    "@chromatis/base": "git+https://github.com/ChromatisGit/personal-base-framework.git",
     "@react-router/node": "^7.0.0",
     "@tailwindcss/vite": "^4.3.0",
     "clsx": "^2.1.1",
