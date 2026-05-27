@@ -1,10 +1,10 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useFetcher } from "react-router";
+import { toggleTheme } from "@chromatis/base";
 import { LogOut, Moon, Sun, Zap } from "lucide-react";
 import { Button } from "@components/Button";
-import { useTheme } from "@ui/contexts/ThemeContext";
 import styles from "./ProfilePage.module.css";
 
 type ProfilePageProps = {
@@ -20,14 +20,37 @@ export function ProfilePage({
   xp,
   coursesCount,
 }: ProfilePageProps) {
-  const { theme, toggleTheme } = useTheme();
   const [isPending, startTransition] = useTransition();
   const fetcher = useFetcher();
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const syncTheme = () => {
+      setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
+    };
+
+    syncTheme();
+
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleSignOut = () => {
     startTransition(async () => {
       void fetcher.submit({ intent: "logout" }, { method: "post", action: "/access" });
     });
+  };
+
+  const handleToggleTheme = () => {
+    toggleTheme();
+    setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   };
 
   return (
@@ -58,7 +81,7 @@ export function ProfilePage({
                   : <Sun size={18} aria-hidden />}
                 <span>Theme</span>
               </div>
-              <Button variant="secondary" size="sm" onClick={toggleTheme}>
+              <Button variant="secondary" size="sm" onClick={handleToggleTheme}>
                 {theme === "dark" ? "Light" : "Dark"}
               </Button>
             </div>

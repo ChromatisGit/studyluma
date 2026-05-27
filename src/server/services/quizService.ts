@@ -1,4 +1,4 @@
-import { anonSQL, userSQL } from "@platform/db.server";
+import { userSQL } from "@platform/db.server";
 import type { UserDTO } from "@services/userService";
 import type {
   QuizPhase,
@@ -92,37 +92,6 @@ function buildResultsDTO(
   return dto;
 }
 
-function buildStudentDTOFromResults(results: QuizResultsDTO): QuizStateDTO {
-  const phase = results.phase as Exclude<QuizPhase, "closed">;
-  const isReveal = phase === "reveal_dist" || phase === "reveal_correct";
-
-  const dto: QuizStateDTO = {
-    sessionId: results.sessionId,
-    courseId: results.courseId,
-    phase,
-    currentIndex: results.currentIndex,
-    totalQuestions: results.totalQuestions,
-    question: results.question,
-    options: results.options,
-    participants: results.participants,
-    updatedAt: results.updatedAt,
-  };
-
-  if (phase === "reveal_correct" || phase === "summary") {
-    dto.correctIndices = results.correctIndices;
-  }
-
-  if (isReveal) {
-    dto.optionCounts = results.optionCounts;
-    dto.answeredCount = results.answeredCount;
-  }
-
-  if (phase === "summary" && results.questionSummaries) {
-    dto.questionSummaries = results.questionSummaries;
-  }
-
-  return dto;
-}
 
 function buildQuestionSummaries(
   questions: StoredQuestion[],
@@ -337,6 +306,7 @@ export async function submitQuizResponse(
 // Student: poll for current quiz state
 // ==========================================================================
 
+// TODO: wire to presenter panel route (QuizPresenterPanel)
 export async function getActiveQuizForCourse(
   courseId: string,
   user: UserDTO,
@@ -370,6 +340,7 @@ export async function getActiveQuizForUser(user: UserDTO): Promise<QuizStateDTO 
 // Admin: live results polling
 // ==========================================================================
 
+// TODO: wire to presenter panel route (QuizPresenterPanel)
 export async function getActiveQuizResults(
   courseId: string,
   user: UserDTO,
@@ -401,6 +372,7 @@ export async function getActiveQuizResults(
   return buildResultsDTO(row, allResponses);
 }
 
+// TODO: wire to student quiz results route
 export async function getQuizResults(
   sessionId: string,
   user: UserDTO,
@@ -425,6 +397,7 @@ export async function getQuizResults(
 // Admin: post-session summary
 // ==========================================================================
 
+// TODO: wire to quiz summary route
 export async function getQuizSummary(
   sessionId: string,
   user: UserDTO,
@@ -465,6 +438,7 @@ export type QuizSessionMeta = {
   createdAt: string;
 };
 
+// TODO: wire to quiz history route
 export async function listQuizSessions(
   courseId: string,
   user: UserDTO,

@@ -6,7 +6,7 @@
   opacity: 0.45;
 }
 
-:global([data-theme='dark']) .nodeNetwork {
+:global(html.dark) .nodeNetwork {
   color: var(--sn-purple-accent);
   opacity: 0.55;
 }

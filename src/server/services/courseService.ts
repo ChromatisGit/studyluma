@@ -80,6 +80,7 @@ export async function getCourseDTO(courseId: string): Promise<CourseDTO> {
   return rowToCourseDTO(row);
 }
 
+// TODO: wire to route
 export async function getCourseDTOs(courseIds: string[]): Promise<CourseDTO[]> {
   if (courseIds.length === 0) return [];
   const rows = await anonSQL<CourseRow[]>`
@@ -104,6 +105,7 @@ export async function getCourseId(groupKey: string, subjectKey: string): Promise
  * Prefers non-public (enrolled) courses over public demo courses so that
  * quiz sessions are associated with the class students are actually enrolled in.
  */
+// TODO: wire to route
 export async function getCourseIdBySubjectId(subjectId: string): Promise<CourseId | null> {
   const rows = await anonSQL<{ id: string }[]>`
     SELECT c.course_id AS id
@@ -121,6 +123,7 @@ export async function coursePublic(courseId: CourseId): Promise<boolean> {
   return row.is_public;
 }
 
+// TODO: wire to route
 export async function courseListed(courseId: CourseId): Promise<boolean> {
   const row = await fetchCourseRow(courseId);
   return row.is_listed;
@@ -256,6 +259,7 @@ export async function getProgressDTO(
   return rows[0]?.get_progress_dto ?? EMPTY_PROGRESS;
 }
 
+// TODO: wire to route
 export async function getTopicDTO({
   courseId,
   topicId,

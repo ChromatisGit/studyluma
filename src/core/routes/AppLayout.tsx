@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Outlet, useLoaderData } from "react-router";
 import { Layout, Sidebar } from "@chromatis/base";
-import { adminNavItems, mainNavItems } from "@core/nav";
+import { adminNavItem, mainNavItems, profileNavItem } from "@core/nav";
 import { RouteProvider } from "@ui/contexts/RouteContext";
-import { ThemeProvider } from "@ui/contexts/ThemeContext";
 import { getSession } from "@platform/index.server";
 
 const BRAND = { name: "StudyNode", initial: "S" } as const;
@@ -17,13 +16,16 @@ export default function AppLayout() {
   const { user } = useLoaderData<typeof loader>();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const secondaryNavItems = user?.role === "admin" ? adminNavItems : [];
+  const footerNavItems = [
+    profileNavItem,
+    ...(user?.role === "admin" ? [adminNavItem] : []),
+  ];
 
   const sidebar = (
     <Sidebar
       brand={BRAND}
       mainNavItems={mainNavItems}
-      secondaryNavItems={secondaryNavItems}
+      footerNavItems={footerNavItems}
       collapsed={sidebarCollapsed}
       onCollapsedChange={setSidebarCollapsed}
       collapsible
@@ -31,17 +33,15 @@ export default function AppLayout() {
   );
 
   return (
-    <ThemeProvider>
-      <RouteProvider>
-        <Layout
-          brand={BRAND}
-          mainNavItems={mainNavItems}
-          menuNavItems={secondaryNavItems}
-          sidebar={sidebar}
-        >
-          <Outlet />
-        </Layout>
-      </RouteProvider>
-    </ThemeProvider>
+    <RouteProvider>
+      <Layout
+        brand={BRAND}
+        mainNavItems={mainNavItems}
+        menuNavItems={footerNavItems}
+        sidebar={sidebar}
+      >
+        <Outlet />
+      </Layout>
+    </RouteProvider>
   );
 }

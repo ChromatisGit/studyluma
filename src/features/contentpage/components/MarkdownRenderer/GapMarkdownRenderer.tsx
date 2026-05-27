@@ -7,7 +7,6 @@ import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeReact from "rehype-react";
 import * as prod from "react/jsx-runtime";
-import { InlineMath, BlockMath } from "react-katex";
 import { Highlight } from "prism-react-renderer";
 import { visit } from "unist-util-visit";
 import {
@@ -18,6 +17,7 @@ import {
   CodeBlock,
 } from "./remarkTransforms";
 import { codeTheme } from "./codeTheme";
+import { InlineMath, BlockMath } from "./KatexMath";
 
 // ── Context ──────────────────────────────────────────────────────────
 

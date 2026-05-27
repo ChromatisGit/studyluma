@@ -1,20 +1,19 @@
 import postgres from "postgres";
-import { runDbMigrations } from "@chromatis/base/db-migrations";
+import { readFileSync } from "fs";
+import { join } from "path";
 
-const url = process.env.DATABASE_URL;
-if (!url?.includes("localhost") && !url?.includes("127.0.0.1")) {
-  console.error("dbReset: will only run against localhost databases");
-  process.exit(1);
+const { DATABASE_URL } = process.env;
+if (!DATABASE_URL) throw new Error("DATABASE_URL is not set");
+
+const sql = postgres(DATABASE_URL, { max: 1 });
+const root = join(import.meta.dir, "..");
+
+try {
+  await sql`DROP SCHEMA public CASCADE`;
+  await sql`CREATE SCHEMA public`;
+  await sql.unsafe(readFileSync(join(root, "sql/migrations/1.0.0__initial.sql"), "utf-8"));
+  await sql.unsafe(readFileSync(join(root, "sql/seeds/access_code_words.sql"), "utf-8"));
+  console.log("Database reset.");
+} finally {
+  await sql.end();
 }
-
-const sql = postgres(url!);
-await sql.unsafe(`
-  DROP SCHEMA public CASCADE;
-  CREATE SCHEMA public;
-  GRANT ALL ON SCHEMA public TO studynode;
-  GRANT ALL ON SCHEMA public TO public;
-`);
-await sql.end();
-
-await runDbMigrations("init");
-console.log("[db-reset] Done.");

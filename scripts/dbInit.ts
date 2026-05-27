@@ -1,3 +1,17 @@
-import { runDbMigrations } from "@chromatis/base/db-migrations";
+import postgres from "postgres";
+import { readFileSync } from "fs";
+import { join } from "path";
 
-await runDbMigrations("init");
+const { DATABASE_URL } = process.env;
+if (!DATABASE_URL) throw new Error("DATABASE_URL is not set");
+
+const sql = postgres(DATABASE_URL, { max: 1 });
+const root = join(import.meta.dir, "..");
+
+try {
+  await sql.unsafe(readFileSync(join(root, "sql/migrations/1.0.0__initial.sql"), "utf-8"));
+  await sql.unsafe(readFileSync(join(root, "sql/seeds/access_code_words.sql"), "utf-8"));
+  console.log("Database initialized.");
+} finally {
+  await sql.end();
+}

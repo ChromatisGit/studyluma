@@ -91,7 +91,7 @@ DATABASE_URL="postgres://..." bun run db:init
 In `studynode-content`, point `DATABASE_URL` at Neon and run:
 
 ```sh
-bun run content:deploy
+bun run publish
 ```
 
 ### 5. Build and deploy
@@ -109,6 +109,27 @@ To test the Workers build locally:
 ```sh
 bun run cf:dev
 ```
+
+---
+
+## Planned: GitHub Release Artifacts
+
+> TODO (post-alpha): Automate release publishing so teachers never need to clone this repo.
+
+Two artifacts should be published for each tagged release (`v0.x.x`):
+
+**Docker image** — pushed to `ghcr.io/yourorg/studynode:<version>` and `ghcr.io/yourorg/studynode:latest`.
+Teachers pull this via the `docker-compose.yml` in `studynode-content` — no build step needed.
+
+**Cloudflare Workers bundle** — the output of `bun run cf:build` (`build/server/`) zipped and attached as a GitHub release asset.
+Teachers download, unzip, and run `wrangler deploy --config wrangler.json` directly — no clone or build needed.
+
+The CI workflow should:
+1. On push to a `v*` tag: build both targets
+2. Push the Docker image to GHCR with the version tag and `latest`
+3. Zip `build/server/` and attach it to the GitHub release
+
+Until this is in place, teachers deploying to Cloudflare need to clone the repo and run `bun run cf:deploy`.
 
 ---
 

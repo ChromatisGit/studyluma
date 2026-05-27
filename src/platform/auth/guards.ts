@@ -14,7 +14,7 @@ export function assertAdminAccess(session: Session | null): asserts session is S
   if (!session || !isAdmin(session.user)) throw new Response("Not found", { status: 404 });
 }
 
-export function canUserAccessPage(
+function canUserAccessPage(
   user: UserDTO | null,
   groupKey: string,
   courseIsPublic: boolean,

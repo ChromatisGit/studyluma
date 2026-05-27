@@ -35,13 +35,13 @@ studynode-content/
 
 ```sh
 # In studynode-content, with DATABASE_URL set in .env.local:
-bun run content:deploy
+bun pipeline/deploy.ts
 ```
 
 Dry run (validates content without writing to DB):
 
 ```sh
-bun run content:validate
+bun pipeline/deploy.ts --dry-run
 ```
 
 ---

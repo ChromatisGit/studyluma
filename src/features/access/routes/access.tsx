@@ -183,7 +183,7 @@ export async function action({ request }: { request: Request }) {
       getActiveQuizForUser(user),
       user.courseIds.length > 0 ? getCourseSlug(user.courseIds[0]!) : Promise.resolve(null),
     ]);
-    redirectTo = activeQuiz ? "/quiz" : ctx.from ?? (isAdmin(user) ? "/admin" : primaryCourseSlug ?? "/");
+    redirectTo = activeQuiz ? "/quiz" : ctx.from ?? primaryCourseSlug ?? "/";
     headers.append("Set-Cookie", buildSessionCookie(user.id));
   } else {
     const { groupKey, courseId, courseRoute } = courseCtx!;

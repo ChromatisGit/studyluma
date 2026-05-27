@@ -18,7 +18,7 @@ const requestHandler = createRequestHandler(
 );
 
 export default {
-	async fetch(request: Request, env: WorkerEnv, ctx: WorkerExecutionContext) {
+	async fetch(request: Request, env: WorkerEnv, _ctx: WorkerExecutionContext) {
 		return runWithRuntimeEnv(env, () => requestHandler(request));
 	},
 } satisfies WorkerHandler;

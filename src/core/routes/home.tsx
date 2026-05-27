@@ -13,8 +13,8 @@ export async function loader({ request }: { request: Request }) {
   ]);
 
   const url = new URL(request.url);
-  if (user && !url.searchParams.get("home") && sidebarData.courses.length > 0) {
-    throw redirect(isAdmin(user) ? "/admin" : sidebarData.courses[0]!.href);
+  if (user && !url.searchParams.get("home") && sidebarData.courses.length > 0 && !isAdmin(user)) {
+    throw redirect(sidebarData.courses[0]!.href);
   }
 
   return { publicCourses };
