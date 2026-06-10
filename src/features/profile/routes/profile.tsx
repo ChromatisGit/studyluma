@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
-import { getSession } from "@platform/index.server";
-import { assertLoggedIn } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { assertLoggedIn } from "@core/auth/guards";
 import { getSidebarDTO } from "@services/courseService";
 import { ProfilePage } from "@features/profile/ProfilePage";
 
@@ -15,7 +15,7 @@ export default function Profile() {
   const { sidebarData } = useLoaderData<typeof loader>();
   return (
     <ProfilePage
-      accessCode={sidebarData.accessCode}
+      username={sidebarData.username}
       badge={sidebarData.badge}
       xp={sidebarData.xp}
       coursesCount={sidebarData.courses.length}

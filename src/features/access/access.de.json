@@ -6,8 +6,8 @@
     "loginSubtitle": "Gib deinen Benutzername und dein Passwort ein.",
     "tabLogin": "Ich habe einen Benutzername",
     "tabRegister": "Neu hier",
-    "accessCodeLabel": "Benutzername",
-    "accessCodePlaceholder": "Benutzername eingeben",
+    "usernameLabel": "Benutzername",
+    "usernamePlaceholder": "Benutzername eingeben",
     "pinLabel": "Passwort",
     "pinPlaceholder": "Passwort eingeben",
     "pinLabelChoose": "Passwort wählen",
@@ -32,8 +32,8 @@
   },
   "modal": {
     "title": "Speichere deinen Benutzername",
-    "description": "Du benötigst diesen Code zusammen mit deiner Passwort, um dich erneut anzumelden.",
-    "codeLabel": "Dein Benutzername",
+    "description": "Du benötigst diesen Benutzernamen zusammen mit deinem Passwort, um dich erneut anzumelden.",
+    "usernameLabel": "Dein Benutzername",
     "checkboxLabel": "Ich habe meinen Benutzername gespeichert",
     "continueButton": "Weiter"
   }

@@ -1,6 +1,6 @@
 import { redirect, useLoaderData } from "react-router";
-import { getSession } from "@platform/index.server";
-import { isAdmin } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { isAdmin } from "@core/auth/guards";
 import { getPublicNavbarCourses, getSidebarDTO } from "@services/courseService";
 import { PublicHomePage } from "@features/homepage/PublicHomePage";
 

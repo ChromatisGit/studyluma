@@ -34,7 +34,7 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ["react-router.config.ts", "vite.config.ts", "workers/*.ts"],
+          allowDefaultProject: ["react-router.config.ts", "vite.config.ts"],
         },
         tsconfigRootDir: __dirname,
       },

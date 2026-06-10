@@ -1,17 +1,11 @@
+import { isAdmin, assertLoggedIn as _assertLoggedIn, assertAdminAccess } from "@chromatis/base/auth";
 import type { UserDTO, Session } from "./types.js";
 
 export type { Session };
-
-export function isAdmin(user: UserDTO): boolean {
-  return user.role === "admin";
-}
+export { isAdmin, assertAdminAccess };
 
 export function assertLoggedIn(session: Session | null): asserts session is Session {
-  if (!session) throw new Response(null, { status: 302, headers: { Location: "/access" } });
-}
-
-export function assertAdminAccess(session: Session | null): asserts session is Session {
-  if (!session || !isAdmin(session.user)) throw new Response("Not found", { status: 404 });
+  _assertLoggedIn(session, "/access");
 }
 
 function canUserAccessPage(

@@ -73,9 +73,9 @@ Content under the subheading...
 All standard Markdown syntax is supported:
 
 ```markdown
-**Bold text**  
-*Italic text*  
-`inline code`  
+**Bold text**
+*Italic text*
+`inline code`
 [Link text](https://example.com)
 
 - Bullet list item

@@ -1,5 +1,5 @@
 import { verifyPin } from "@chromatis/base/auth";
-import { anonSQL } from "../db.server.js";
+import { anonSQL } from "@core/db.server.js";
 import type { UserDTO } from "./types.js";
 
 type RawAttemptResult = {
@@ -11,19 +11,20 @@ type StoredUserRow = {
   id: string;
   role: "admin" | "user";
   group_key: string | null;
-  access_code: string;
+  username: string;
   pin_hash: string;
+  enabled: boolean;
   course_ids: string[];
 };
 
 export async function getAuthenticatedUser(
-  accessCode: string,
+  username: string,
   pin: string,
   ip: string,
 ): Promise<UserDTO | null> {
   const normalizedIp = ip?.trim() || "unknown";
   const ipKey = `ip:${normalizedIp}`;
-  const codeKey = `code_ip:${accessCode}:${normalizedIp}`;
+  const usernameKey = `username_ip:${username}:${normalizedIp}`;
 
   const checkAttempt = async (bucketKey: string, success: boolean): Promise<boolean> => {
     const rows = await anonSQL<{ check_and_record_attempt: RawAttemptResult }[]>`
@@ -35,26 +36,28 @@ export async function getAuthenticatedUser(
   };
 
   try {
-    const [ipAllowed, codeAllowed] = await Promise.all([
+    const [ipAllowed, usernameAllowed] = await Promise.all([
       checkAttempt(ipKey, false),
-      checkAttempt(codeKey, false),
+      checkAttempt(usernameKey, false),
     ]);
-    if (!ipAllowed || !codeAllowed) return null;
+    if (!ipAllowed || !usernameAllowed) return null;
 
     const rows = await anonSQL<StoredUserRow[]>`
-      SELECT id, role, group_key, access_code, pin_hash, course_ids
-      FROM get_user_for_login(${accessCode})
+      SELECT id, role, group_key, username, pin_hash, enabled, course_ids
+      FROM get_user_for_login(${username})
     `;
     const stored = rows[0];
+    if (!stored || !stored.enabled) return null;
+
     const ok = stored ? await verifyPin(pin, stored.pin_hash) : false;
 
     if (ok) {
-      await Promise.all([checkAttempt(ipKey, true), checkAttempt(codeKey, true)]);
+      await Promise.all([checkAttempt(ipKey, true), checkAttempt(usernameKey, true)]);
       return {
-        id: stored!.id,
-        role: stored!.role,
-        groupKey: stored!.group_key,
-        courseIds: stored!.course_ids,
+        id: stored.id,
+        role: stored.role,
+        groupKey: stored.group_key,
+        courseIds: stored.course_ids,
       };
     }
 

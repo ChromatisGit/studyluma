@@ -2,6 +2,7 @@ import { type RouteConfig, index, layout, route } from "@react-router/dev/routes
 
 export default [
   route("access", "../src/features/access/routes/access.tsx"),
+  route("admin/register", "../src/features/access/routes/adminRegister.tsx"),
   route("api/admin", "../src/features/admin/routes/api.tsx"),
   route("api/quiz", "../src/features/quiz/routes/api.tsx"),
   route("api/slides", "../src/features/slides/routes/api.tsx"),

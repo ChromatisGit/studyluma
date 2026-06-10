@@ -1,5 +1,5 @@
-import { getSession } from "@platform/index.server";
-import { assertAdminAccess, assertLoggedIn } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { assertAdminAccess, assertLoggedIn } from "@core/auth/guards";
 import {
   closeActiveQuizForCourse,
   closeQuizSession,

@@ -1,5 +1,5 @@
--- Generate an access code from a rotating word list and permuted 2-digit suffix
-CREATE OR REPLACE FUNCTION generate_access_code()
+-- Generate a username from a rotating word list and permuted 2-digit suffix
+CREATE OR REPLACE FUNCTION generate_username()
 RETURNS TEXT
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -14,18 +14,18 @@ DECLARE
   word_index INTEGER;
   word       TEXT;
   num        TEXT;
-  v_code     TEXT;
+  v_username TEXT;
   i          INTEGER;
 BEGIN
   FOR i IN 1..max_tries LOOP
-    n := nextval('public.access_code_counter');
+    n := nextval('public.username_counter');
 
     word_index := ((a * n) % word_count)::INTEGER;
 
-    SELECT acw.word
+    SELECT uw.word
     INTO word
-    FROM public.access_code_words acw
-    WHERE acw.pos = word_index;
+    FROM public.username_words uw
+    WHERE uw.pos = word_index;
 
     IF word IS NULL THEN
       RAISE EXCEPTION 'Missing word at index % (must be contiguous 0..%)',
@@ -34,17 +34,17 @@ BEGIN
 
     -- Permuted 2-digit number in range 01..99
     num := LPAD((((b * n) % 99) + 1)::TEXT, 2, '0');
-    v_code := word || num;
+    v_username := word || num;
 
     IF NOT EXISTS (
       SELECT 1
       FROM public.users u
-      WHERE u.access_code = v_code
+      WHERE u.username = v_username
     ) THEN
-      RETURN v_code;
+      RETURN v_username;
     END IF;
   END LOOP;
 
-  RAISE EXCEPTION 'No unused access code available in current cycle (word_count=%)', word_count;
+  RAISE EXCEPTION 'No unused username available in current cycle (word_count=%)', word_count;
 END;
 $$;

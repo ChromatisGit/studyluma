@@ -105,7 +105,7 @@
 
     "@boundaries/elements": ["@boundaries/elements@1.2.0", "", { "dependencies": { "eslint-import-resolver-node": "0.3.9", "eslint-module-utils": "2.12.1", "handlebars": "4.7.8", "is-core-module": "2.16.1", "micromatch": "4.0.8" } }, "sha512-W65Gum02liMd3hmNrLmDBX1u5BmRMcunouFjLXyhxHnNY4YlK1kTxsgfflZ5XBGSnPnO0MkiUzAcoGzYrlx0RQ=="],
 
-    "@chromatis/base": ["@chromatis/base@github:ChromatisGit/personal-base-framework#ced0d45", { "peerDependencies": { "lucide-react": ">=0.400.0", "motion": ">=12.0.0", "react": ">=19.0.0", "react-dom": ">=19.0.0", "react-router": ">=7.0.0", "sonner": ">=1.0.0" } }, "ChromatisGit-personal-base-framework-ced0d45"],
+    "@chromatis/base": ["@chromatis/base@github:ChromatisGit/personal-base-framework#b3a1ab5", { "dependencies": { "@sqlite.org/sqlite-wasm": "3.53.0-build1", "yaml": "^2.7.0" }, "peerDependencies": { "lucide-react": ">=0.400.0", "motion": ">=12.0.0", "react": ">=19.0.0", "react-dom": ">=19.0.0", "react-router": ">=7.0.0", "sonner": ">=1.0.0" } }, "ChromatisGit-personal-base-framework-b3a1ab5"],
 
     "@cloudflare/kv-asset-handler": ["@cloudflare/kv-asset-handler@0.5.0", "", {}, "sha512-jxQYkj8dSIzc0cD6cMMNdOc1UVjqSqu8BZdor5s8cGjW2I8BjODt/kWPVdY+u9zj3ms75Q5qaZgnxUad83+eAg=="],
 
@@ -420,6 +420,8 @@
     "@sindresorhus/is": ["@sindresorhus/is@7.2.0", "", {}, "sha512-P1Cz1dWaFfR4IR+U13mqqiGsLFf1KbayybWwdd2vfctdV6hDpUkgCY0nKOLLTMSoRd/jJNjtbqzf13K8DCCXQw=="],
 
     "@speed-highlight/core": ["@speed-highlight/core@1.2.15", "", {}, "sha512-BMq1K3DsElxDWawkX6eLg9+CKJrTVGCBAWVuHXVUV2u0s2711qiChLSId6ikYPfxhdYocLNt3wWwSvDiTvFabw=="],
+
+    "@sqlite.org/sqlite-wasm": ["@sqlite.org/sqlite-wasm@3.53.0-build1", "", {}, "sha512-PfWPWN2n+/37doa8oh2/oUXk4OOsRYZsxc1W1sDXIGb/Pu5Yrb+f2eyYpgQMGITVX7HVgxhs9P18Rc6I97ym/g=="],
 
     "@tailwindcss/node": ["@tailwindcss/node@4.3.0", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "enhanced-resolve": "^5.21.0", "jiti": "^2.6.1", "lightningcss": "1.32.0", "magic-string": "^0.30.21", "source-map-js": "^1.2.1", "tailwindcss": "4.3.0" } }, "sha512-aFb4gUhFOgdh9AXo4IzBEOzBkkAxm9VigwDJnMIYv3lcfXCJVesNfbEaBl4BNgVRyid92AmdviqwBUBRKSeY3g=="],
 

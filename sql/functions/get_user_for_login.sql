@@ -1,11 +1,12 @@
--- Login bootstrap lookup by access code
-CREATE OR REPLACE FUNCTION get_user_for_login(p_access_code TEXT)
+-- Login bootstrap lookup by username
+CREATE OR REPLACE FUNCTION get_user_for_login(p_username TEXT)
 RETURNS TABLE (
   id          TEXT,
   role        TEXT,
   group_key   TEXT,
-  access_code TEXT,
+  username    TEXT,
   pin_hash    TEXT,
+  enabled     BOOLEAN,
   course_ids  TEXT[]
 )
 LANGUAGE sql
@@ -18,10 +19,11 @@ AS $$
       u.id,
       u.role,
       u.group_key,
-      u.access_code,
-      u.pin_hash
+      u.username,
+      u.pin_hash,
+      u.enabled
     FROM public.users u
-    WHERE LOWER(u.access_code) = LOWER(p_access_code)
+    WHERE LOWER(u.username) = LOWER(p_username)
   ),
   user_courses_agg AS (
     SELECT
@@ -36,8 +38,9 @@ AS $$
     su.id,
     su.role,
     su.group_key,
-    su.access_code,
+    su.username,
     su.pin_hash,
+    su.enabled,
     COALESCE(uca.course_ids, ARRAY[]::TEXT[]) AS course_ids
   FROM selected_user su
   LEFT JOIN user_courses_agg uca

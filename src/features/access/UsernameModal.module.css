@@ -22,7 +22,7 @@
   margin: 0;
 }
 
-.codeBox {
+.usernameBox {
   background: var(--sn-surface-raised);
   border: 1px solid var(--sn-border);
   border-radius: var(--sn-radius-sm);
@@ -30,7 +30,7 @@
   margin-bottom: var(--sn-space-md);
 }
 
-.codeLabel {
+.usernameLabel {
   font-size: var(--sn-text-xs);
   color: var(--sn-text-muted);
   text-transform: uppercase;
@@ -38,7 +38,7 @@
   margin-bottom: var(--sn-space-xs);
 }
 
-.code {
+.username {
   font-size: var(--sn-text-display);
   font-weight: var(--sn-font-bold);
   font-family: var(--sn-font-mono);

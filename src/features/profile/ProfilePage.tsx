@@ -8,14 +8,14 @@ import { Button } from "@components/Button";
 import styles from "./ProfilePage.module.css";
 
 type ProfilePageProps = {
-  accessCode?: string | undefined;
+  username?: string | undefined;
   badge?: string | undefined;
   xp?: number | undefined;
   coursesCount: number;
 };
 
 export function ProfilePage({
-  accessCode,
+  username,
   badge,
   xp,
   coursesCount,
@@ -61,7 +61,7 @@ export function ProfilePage({
         {/* Identity card */}
         <div className={styles.identityCard}>
           {badge && <div className={styles.badgeEmoji} aria-hidden>{badge}</div>}
-          <h2 className={styles.username}>{accessCode ?? "Student"}</h2>
+          <h2 className={styles.username}>{username ?? "Student"}</h2>
           {xp !== undefined && (
             <div className={styles.xpBadge}>
               <Zap size={14} aria-hidden />

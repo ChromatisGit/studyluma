@@ -4,7 +4,6 @@
 
 - [Bun](https://bun.sh) 1.x
 - [Docker](https://www.docker.com) (for the local Postgres instance)
-- Node.js 20+ (needed for `bun run db:init` and related scripts)
 
 ---
 
@@ -31,40 +30,33 @@ git clone <studynode-content-url>
 bun install
 ```
 
-### 4. Configure environment
+### 4. Configure the project
 
-Create `studynode/.env.local` and set:
+```sh
+cp CONFIG.template.yaml CONFIG.yaml
+```
 
-```
-DATABASE_URL=postgres://studynode:studynode@localhost:5432/studynode_dev
-SESSION_SECRET=<any-long-random-string>
-```
+`CONFIG.yaml` is pre-filled with the local database URL. No changes needed to get started. Add your production credentials later when deploying.
 
 ### 5. Start and initialise the database
 
 ```sh
-bun run db:init
+bun run db
 ```
 
-This starts the local Postgres 16 container if needed (`docker compose up -d --wait`), then applies the schema migration and seeds the word list.
+This starts the local Postgres 16 container if needed and applies all schema migrations.
 
 ### 6. Deploy content
 
-In the `studynode-content` directory, create `studynode-content/.env.local` with the same `DATABASE_URL`:
+In the `studynode-content` directory:
 
 ```sh
-DATABASE_URL=postgres://studynode:studynode@localhost:5432/studynode_dev
-```
-
-Then run:
-
-```sh
-cd ../studynode-content
+cp CONFIG.template.yaml CONFIG.yaml   # local URL is pre-filled
 bun install
-bun pipeline/deploy.ts
+bun run preview
 ```
 
-This parses all Markdown content and writes it to the database. It takes 10–30 seconds depending on the amount of content.
+This parses all Markdown content and writes it to the database. Takes 10–30 seconds depending on content volume.
 
 ### 7. Start the dev server
 
@@ -85,15 +77,14 @@ Visit [http://localhost:5173](http://localhost:5173).
 | Command | Description |
 |---------|-------------|
 | `bun run dev` | Start Vite dev server with HMR |
-| `bun run typecheck` | TypeScript type check (no emit) |
-| `bun run lint` | ESLint + architecture boundary check |
+| `bun run check` | TypeScript type check + ESLint + architecture boundaries |
 | `bun run build` | Production build |
-| `bun run db:init` | Apply all schema migrations to `DATABASE_URL` |
-| `bun run db:reset` | Destroy and recreate the local database |
+| `bun run db` | Start local database and apply pending migrations |
+| `bun run db:reset` | Wipe and reinitialize local database |
 
 ## Adding an admin user
 
-`bun run db:init` applies the schema but does not create an admin account.
+`bun run db` applies the schema but does not create an admin account.
 
 Use the script in `studynode-content`:
 
@@ -102,8 +93,8 @@ Use the script in `studynode-content`:
 bun run create-admin
 ```
 
-This creates an admin with access code `dev` and PIN `dev`. To use different credentials:
+This creates an admin with username `dev` and PIN `dev`. To use different credentials:
 
 ```sh
-ADMIN_ACCESS_CODE=mycode ADMIN_PIN=5678 bun pipeline/createAdmin.ts
+ADMIN_USERNAME=mycode ADMIN_PIN=5678 bun pipeline/createAdmin.ts
 ```

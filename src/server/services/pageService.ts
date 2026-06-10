@@ -1,5 +1,5 @@
 import type { Page } from "@schema/page";
-import { getChapterContent, getWorksheetContent } from "@platform/content.server";
+import { getChapterContent, getWorksheetContent } from "@core/content.server";
 
 type Args = {
   subject: string;

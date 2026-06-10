@@ -17,7 +17,6 @@
     "exactOptionalPropertyTypes": true,
     "rootDirs": [".", "./.react-router/types"],
     "paths": {
-      "@platform/*": ["./src/platform/*"],
       "@features/*": ["./src/features/*"],
       "@homepage/*": ["./src/features/homepage/*"],
       "@core/*": ["./src/core/*"],

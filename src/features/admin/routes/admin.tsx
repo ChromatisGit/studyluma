@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
-import { getSession } from "@platform/index.server";
-import { assertAdminAccess } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { assertAdminAccess } from "@core/auth/guards";
 import { getCourseDTO, getCoursesByAccess } from "@services/courseService";
 import { getUserCount } from "@services/userService";
 import { AdminDashboard } from "@features/admin/AdminDashboard";

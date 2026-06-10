@@ -1,13 +1,13 @@
 import { redirect, useLoaderData } from "react-router";
 import {
-  buildClearNewUserCodeCookie,
+  buildClearNewUserUsernameCookie,
   buildLogoutCookie,
-  buildNewUserCodeCookie,
+  buildNewUserUsernameCookie,
   buildSessionCookie,
   getAuthenticatedUser,
   getSession,
-} from "@platform/index.server";
-import { isAdmin } from "@platform/auth/guards";
+} from "@core/index.server";
+import { isAdmin } from "@core/auth/guards";
 import { getClientIp } from "@server-lib/getClientIp";
 import {
   addCourseToUser,
@@ -124,7 +124,7 @@ export async function loader({ request }: { request: Request }) {
     courseRoute,
     courseName,
     isRegistrationOpen: registrationOpen,
-    currentUserAccessCode: null,
+    currentUserUsername: null,
     from,
   };
 }
@@ -137,16 +137,16 @@ export async function action({ request }: { request: Request }) {
     throw redirect("/access", { headers: { "Set-Cookie": buildLogoutCookie() } });
   }
 
-  if (intent === "clear-new-user-code") {
+  if (intent === "clear-new-user-username") {
     return new Response(JSON.stringify({ ok: true }), {
       headers: {
         "content-type": "application/json",
-        "Set-Cookie": buildClearNewUserCodeCookie(),
+        "Set-Cookie": buildClearNewUserUsernameCookie(),
       },
     });
   }
 
-  const accessCode = stringOrNull(formData.get("accessCode")) ?? "";
+  const username = stringOrNull(formData.get("username")) ?? "";
   const pin = stringOrNull(formData.get("pin")) ?? "";
   const ctx = {
     isCourseJoin: bool(formData.get("isCourseJoin")),
@@ -157,9 +157,9 @@ export async function action({ request }: { request: Request }) {
     from: sanitizeFrom(stringOrNull(formData.get("from"))),
   };
 
-  const hasCode = accessCode.trim().length > 0;
+  const hasUsername = username.trim().length > 0;
   const hasPin = pin.trim().length > 0;
-  if (!hasCode && !hasPin) return fail("Please enter your credentials.");
+  if (!hasUsername && !hasPin) return fail("Please enter your credentials.");
 
   const courseCtx =
     ctx.isCourseJoin && ctx.groupKey && ctx.courseId && ctx.courseRoute
@@ -169,15 +169,15 @@ export async function action({ request }: { request: Request }) {
 
   const ip = getClientIp(request);
   const mode: "normal" | "course-auth" | "course-pin" =
-    !ctx.isCourseJoin ? "normal" : hasCode ? "course-auth" : "course-pin";
+    !ctx.isCourseJoin ? "normal" : hasUsername ? "course-auth" : "course-pin";
 
   let user: UserDTO | null = null;
   let redirectTo = "/";
   const headers = new Headers();
 
   if (mode === "normal") {
-    if (!hasCode || !hasPin) return fail("Invalid credentials.");
-    user = await getAuthenticatedUser(accessCode, pin, ip);
+    if (!hasUsername || !hasPin) return fail("Invalid credentials.");
+    user = await getAuthenticatedUser(username, pin, ip);
     if (!user) return fail("Invalid credentials.");
     const [activeQuiz, primaryCourseSlug] = await Promise.all([
       getActiveQuizForUser(user),
@@ -197,7 +197,7 @@ export async function action({ request }: { request: Request }) {
       headers.append("Set-Cookie", buildSessionCookie(user.id));
     } else if (mode === "course-auth") {
       if (!hasPin) return fail("Invalid credentials.");
-      const authenticated = await getAuthenticatedUser(accessCode, pin, ip);
+      const authenticated = await getAuthenticatedUser(username, pin, ip);
       if (!authenticated) return fail("Invalid credentials.");
       if (!registrationOpen && !hasCourseAccess(authenticated, groupKey, courseId)) {
         return fail("Registration window not open.", "/");
@@ -213,7 +213,7 @@ export async function action({ request }: { request: Request }) {
       if (!user) return fail("Failed to enroll in course.", "/");
       redirectTo = ctx.from ?? courseRoute;
       headers.append("Set-Cookie", buildSessionCookie(user.id));
-      headers.append("Set-Cookie", buildNewUserCodeCookie(created.accessCode));
+      headers.append("Set-Cookie", buildNewUserUsernameCookie(created.username));
     }
   }
 

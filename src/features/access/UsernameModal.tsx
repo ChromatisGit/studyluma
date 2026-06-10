@@ -6,16 +6,16 @@ import { Key } from "lucide-react";
 import { Modal } from "@components/Modal";
 import { Button } from "@components/Button";
 import { IconBox } from "@components/IconBox";
-import styles from "./AccessCodeModal.module.css";
+import styles from "./UsernameModal.module.css";
 import ACCESS_TEXT from "./access.de.json";
 
-type AccessCodeModalProps = {
-  accessCode: string;
+type UsernameModalProps = {
+  username: string;
   isOpen: boolean;
   onConfirm: () => void;
 };
 
-export function AccessCodeModal({ accessCode, isOpen, onConfirm }: AccessCodeModalProps) {
+export function UsernameModal({ username, isOpen, onConfirm }: UsernameModalProps) {
   const [hasSaved, setHasSaved] = useState(false);
 
   return (
@@ -30,9 +30,9 @@ export function AccessCodeModal({ accessCode, isOpen, onConfirm }: AccessCodeMod
         </p>
       </div>
 
-      <div className={styles.codeBox}>
-        <div className={styles.codeLabel}>{ACCESS_TEXT.modal.codeLabel}</div>
-        <span className={styles.code}>{accessCode}</span>
+      <div className={styles.usernameBox}>
+        <div className={styles.usernameLabel}>{ACCESS_TEXT.modal.usernameLabel}</div>
+        <span className={styles.username}>{username}</span>
       </div>
 
       <label className={styles.checkboxRow}>

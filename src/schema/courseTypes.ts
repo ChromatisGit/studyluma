@@ -49,7 +49,7 @@ export type SidebarDTO = ProgressDTO & {
   courses: SidebarCourseDTO[];
   isAuthenticated: boolean;
   primaryGroupKey?: string | undefined;
-  accessCode?: string | undefined;
+  username?: string | undefined;
   badge?: string | undefined;
   xp?: number | undefined;
 };

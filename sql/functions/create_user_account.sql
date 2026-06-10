@@ -1,7 +1,7 @@
 -- Atomic user account creation
 CREATE OR REPLACE FUNCTION create_user_account(
   p_user_id     TEXT,
-  p_access_code TEXT,
+  p_username TEXT,
   p_pin_hash    TEXT,
   p_group_key   TEXT,
   p_course_ids  TEXT[]
@@ -12,8 +12,8 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
   WITH inserted_user AS (
-    INSERT INTO public.users (id, role, group_key, access_code, pin_hash)
-    VALUES (p_user_id, 'user', p_group_key, p_access_code, p_pin_hash)
+    INSERT INTO public.users (id, role, group_key, username, pin_hash)
+    VALUES (p_user_id, 'user', p_group_key, p_username, p_pin_hash)
     RETURNING id
   ),
   requested_courses AS (

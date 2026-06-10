@@ -6,7 +6,7 @@ React Router v7 SSR web application for the StudyNode learning platform.
 
 ```sh
 bun install
-bun run db:init               # start local Postgres and apply schema migrations
+bun run db                    # start local Postgres and apply schema migrations
 bun run dev                   # start dev server at localhost:5173
 ```
 
@@ -26,13 +26,12 @@ See [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md) for the full setup gu
 | `bun run dev` | Start Vite dev server with HMR |
 | `bun run build` | Production build |
 | `bun run start` | Start the built SSR server |
-| `bun run typecheck` | TypeScript type check |
-| `bun run lint` | ESLint + architecture boundary check |
-| `bun run db:init` | Start the local database and apply all schema migrations |
-| `bun run db:reset` | Drop and recreate the database |
-| `bun run cf:dev` | Local Cloudflare Workers dev (Miniflare) |
-| `bun run cf:build` | Build for Cloudflare Workers |
-| `bun run cf:deploy` | Build and deploy to Cloudflare Workers |
+| `bun run check` | TypeScript type check + ESLint + architecture boundaries |
+| `bun run db` | Start local Postgres and apply pending migrations |
+| `bun run db:reset` | Wipe and reinitialize local database |
+| `bun run db:deploy` | Apply pending migrations to production database |
+| `bun run cf:dev` | Local Cloudflare Workers dev |
+| `bun run cf:deploy` | Sync secrets from CONFIG.yaml, build and deploy to Cloudflare |
 
 ## Docs
 

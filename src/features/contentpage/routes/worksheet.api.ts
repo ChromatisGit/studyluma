@@ -1,5 +1,5 @@
-import { getSession } from "@platform/index.server";
-import { assertLoggedIn } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { assertLoggedIn } from "@core/auth/guards";
 import {
   saveCheckpointResponseService,
   syncWorksheetResponses,

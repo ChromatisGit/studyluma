@@ -3,7 +3,7 @@ import { Outlet, useLoaderData } from "react-router";
 import { Layout, Sidebar } from "@chromatis/base";
 import { adminNavItem, mainNavItems, profileNavItem } from "@core/nav";
 import { RouteProvider } from "@ui/contexts/RouteContext";
-import { getSession } from "@platform/index.server";
+import { getSession } from "@core/index.server";
 
 const BRAND = { name: "StudyNode", initial: "S" } as const;
 

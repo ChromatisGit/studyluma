@@ -4,7 +4,7 @@
 
 PostgreSQL 16. Connection is managed via the `postgres` npm package (v3).
 
-- **Local dev**: Docker Compose, typically started via `bun run db:init`
+- **Local dev**: Docker Compose, typically started via `bun run db`
 - **Production**: Postgres accessible from the chosen deployment target
 
 For the currently supported deployment targets:
@@ -45,7 +45,7 @@ Chapter `status` values: `current`, `finished`, `locked`.
 
 | Table | Purpose |
 |-------|---------|
-| `users` | User accounts (access code + PBKDF2 PIN hash) |
+| `users` | User accounts (username + PBKDF2 PIN hash) |
 | `user_courses` | Which courses a user is enrolled in |
 | `user_progress` | Per-chapter progress status per user |
 
@@ -55,7 +55,7 @@ Chapter `status` values: `current`, `finished`, `locked`.
 |-------|---------|
 | `content_pages` | Parsed Markdown pages stored as JSONB |
 
-### Quiz
+### Quiz (TODO temp will be removed from DB)
 
 | Table | Purpose |
 |-------|---------|
@@ -141,7 +141,7 @@ RLS is enabled on all user-facing tables. Access decisions are driven by three s
 
 ## Migrations
 
-Migration files live in `sql/migrations/`. They are applied in lexicographic filename order by `bun run db:init`.
+Migration files live in `sql/migrations/`. They are applied in lexicographic filename order.
 
 ```
 sql/migrations/
@@ -152,6 +152,7 @@ sql/migrations/
 
 1. Create a new file: `sql/migrations/1.0.1__description.sql`
 2. Write idempotent SQL (use `IF NOT EXISTS`, `IF EXISTS`, `CREATE OR REPLACE`, etc.)
-3. Run `bun run db:init` — the migration runner tracks which versions have been applied and skips them
+3. Run `bun run db` locally — applies pending migrations to the local database
+4. Run `bun run db:deploy` before the next production deployment — shows pending migrations, asks for confirmation, then applies
 
-The applied versions are tracked in a `schema_migrations` table created by the init script.
+Applied versions are tracked in the `app_schema_migrations` table. Each migration runs inside a Postgres transaction — if any statement fails, the entire migration rolls back with no partial state.

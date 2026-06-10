@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
-import { getSession } from "@platform/index.server";
-import { assertLoggedIn } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { assertLoggedIn } from "@core/auth/guards";
 import { getActiveQuizForUser } from "@services/quizService";
 import { QuizPage } from "@features/quiz/QuizPage";
 

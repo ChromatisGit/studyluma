@@ -20,8 +20,10 @@ studynode-content/
 │       └── <course-id>/
 │           └── course.yml       Which topics/chapters to include
 └── pipeline/                    TypeScript pipeline code
-    ├── deploy.ts                Entry point
+    ├── preview.ts               Entry point for local deployment
+    ├── publish.ts               Entry point for production deployment
     ├── main.ts                  Orchestrator
+    ├── config.ts                Reads CONFIG.yaml for database URLs
     ├── configParser/            Loads and validates YAML configs
     ├── markdownParser/          Parses Markdown to typed JSON
     ├── pageParser/              Converts parsed content to DB format
@@ -34,14 +36,11 @@ studynode-content/
 ## Running the Pipeline
 
 ```sh
-# In studynode-content, with DATABASE_URL set in .env.local:
-bun pipeline/deploy.ts
-```
+# Local — starts Docker, reads CONFIG.yaml local profile:
+bun run preview
 
-Dry run (validates content without writing to DB):
-
-```sh
-bun pipeline/deploy.ts --dry-run
+# Production — reads CONFIG.yaml production profile, asks for confirmation:
+bun run publish
 ```
 
 ---
@@ -136,7 +135,7 @@ topics:
 
 1. Create `content/courses/<course-id>/course.yml` following the format above
 2. Ensure the referenced `topicId` / `chapterId` directories exist under `content/base/<subject>/`
-3. Run `bun run content:deploy`
+3. Run `bun run preview`
 
 The pipeline is idempotent — running it multiple times is safe. Unchanged content pages (same hash) are not re-written.
 

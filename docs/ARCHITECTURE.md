@@ -9,12 +9,12 @@ StudyNode is split across two independent repositories:
 | `studynode-website` | React Router v7 SSR web application |
 | `studynode-content` | Markdown content source + build pipeline |
 
-The repos are completely independent — they share no code, no submodule relationship, and no shared file system state at runtime. The **only coupling** between them is the database: the content pipeline writes to the Postgres database, and the website reads from it.
+The repos are completely independent. The **only coupling** between them is the database: the content pipeline writes to the Postgres database, and the website reads from it.
 
 ```
 studynode-content          studynode-website
      │                           │
-     │  bun run content:deploy   │  bun run dev / deploy
+     │ bun run preview / publish │  bun run dev / deploy
      │                           │
      └──────► Postgres ◄─────────┘
 ```
@@ -27,7 +27,7 @@ studynode-content          studynode-website
 
 Built on **React Router v7** with SSR enabled (`ssr: true` in `react-router.config.ts`). Vite handles both client and server bundling.
 
-The shared framework is declared as a `file:` dependency (`@chromatis/base`) and installed via `bun install`. It provides Vite config helpers, ESLint config, and the base TypeScript config.
+A custom framework is declared as a `file:` dependency (`@chromatis/base`) and installed via `bun install`. It provides Vite config helpers, ESLint config, and the base TypeScript config.
 
 ### Source Layout
 
@@ -63,7 +63,7 @@ Thin wrappers around framework primitives:
 
 ### Authentication
 
-Users authenticate with an access code + PIN. The PIN is hashed with **PBKDF2** via the Web Crypto API (`hashPin`/`verifyPin` from `@chromatis/base/auth`) — no native modules, works on both Node.js and Cloudflare Workers.
+Users authenticate with a username + PIN. The PIN is hashed with **PBKDF2** via the Web Crypto API (`hashPin`/`verifyPin` from `@chromatis/base/auth`) — no native modules, works on both Node.js and Cloudflare Workers.
 
 On successful login, a signed session cookie is issued. The cookie stores only a `user_id`; the platform layer resolves the full `UserDTO` on every request.
 
@@ -71,7 +71,7 @@ On successful login, a signed session cookie is issued. The cookie stores only a
 
 PostgreSQL everywhere:
 
-- **Local dev**: Docker Compose, typically started via `bun run db:init`
+- **Local dev**: Docker Compose, typically started via `bun run db`
 - **Docker deployment**: standard Postgres connection via `DATABASE_URL`
 - **Cloudflare deployment**: Neon serverless Postgres (compatible with Cloudflare Workers via HTTP)
 
@@ -87,11 +87,11 @@ Row-Level Security policies on each table use these parameters to enforce access
 
 ### Content
 
-Content pages are stored as parsed JSONB in the `content_pages` table. The website **never reads Markdown files**; it only reads the pre-parsed JSON produced by the pipeline. At request time, `platform/content.server.ts` fetches the relevant row and the React Router loader passes it to the renderer.
+Content pages are stored as parsed JSONB in the `content_pages` table. The website only reads the pre-parsed JSON produced by the pipeline. At request time, `platform/content.server.ts` fetches the relevant row and the React Router loader passes it to the renderer.
 
 ### Realtime
 
-Intentionally not implemented. Live quiz state is polled by clients on a short interval; there is no WebSocket or SSE infrastructure.
+Not implemented yet ToDo
 
 ---
 
@@ -115,4 +115,4 @@ pipeline/                    Build pipeline (TypeScript)
 
 ### Pipeline
 
-`bun run content:deploy` reads the YAML course definitions and all Markdown source files, parses them into typed JSON, and writes course structure + content pages to the database. See [CONTENT_PIPELINE.md](CONTENT_PIPELINE.md).
+`bun run preview / publish` reads the YAML course definitions and all Markdown source files, parses them into typed JSON, and writes course structure + content pages to the database. See [CONTENT_PIPELINE.md](CONTENT_PIPELINE.md).

@@ -1,6 +1,6 @@
-import { anonSQL, userSQL } from "@platform/db.server";
-import { isAdmin } from "@platform/auth/guards";
-import { getUserAccessCodeById } from "@services/userService";
+import { anonSQL, userSQL } from "@core/db.server";
+import { isAdmin } from "@core/auth/guards";
+import { getUserUsernameById } from "@services/userService";
 import type { UserDTO } from "@services/userService";
 import type { WorksheetRef, WorksheetFormat } from "@schema/courseContent";
 
@@ -293,14 +293,14 @@ export async function getSidebarDTO({
   const isAuthenticated = Boolean(user);
   const primaryGroupKey = user && !isAdmin(user) ? (user.groupKey ?? undefined) : undefined;
 
-  const [courses, progress, accessCode] = await Promise.all([
+  const [courses, progress, username] = await Promise.all([
     user
       ? getNavbarCourses(user)
       : getPublicNavbarCourses().then((cs) =>
           cs.map((c) => ({ id: c.id, label: c.label, href: c.slug, icon: c.icon })),
         ),
     courseId ? getProgressDTO(courseId, user) : Promise.resolve(EMPTY_PROGRESS),
-    user && !isAdmin(user) ? getUserAccessCodeById(user.id) : Promise.resolve(null),
+    user && !isAdmin(user) ? getUserUsernameById(user.id) : Promise.resolve(null),
   ]);
 
   return {
@@ -308,7 +308,7 @@ export async function getSidebarDTO({
     courses,
     isAuthenticated,
     primaryGroupKey,
-    accessCode: accessCode ?? undefined,
+    username: username ?? undefined,
     // TODO: replace stubs with real DB fields once badge/XP columns exist
     badge: isAuthenticated ? "🎓" : undefined,
     xp: isAuthenticated ? 0 : undefined,

@@ -1,4 +1,4 @@
-import { anonSQL } from "./db.server.js";
+import { anonSQL } from "@core/db.server.js";
 import type { Page } from "@schema/page";
 import type { TypedSlideDeck } from "@schema/slideTypes";
 

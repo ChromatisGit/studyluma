@@ -5,20 +5,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "react-router dev",
+    "dev": "bun run node_modules/@chromatis/base/infra/scripts/devServer.ts",
     "build": "react-router build",
     "start": "node build/server/index.js",
-    "deadcode": "knip --files --exports --no-config-hints",
-    "deadcode:exports": "knip --exports --no-config-hints",
-    "deadcode:prod": "knip --production --files --exports --no-config-hints",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . && bun scripts/checkArchitectureBoundaries.ts",
-    "db:init": "docker compose up -d --wait && bun --env-file .env.local scripts/dbInit.ts",
-    "db:reset": "docker compose up -d --wait && bun --env-file .env.local scripts/dbReset.ts",
-    "db:content": "docker compose up -d --wait && bun --cwd ../studynode-content --env-file .env.local pipeline/deploy.ts",
-    "cf:dev": "WRANGLER=1 wrangler dev",
-    "cf:build": "WRANGLER=1 react-router build",
-    "cf:deploy": "bun run cf:build && wrangler deploy --config build/server/wrangler.json"
+    "check": "react-router typegen && tsc --noEmit && eslint . && bun run node_modules/@chromatis/base/infra/scripts/checkArchitectureBoundaries.ts",
+    "db": "bun run node_modules/@chromatis/base/infra/scripts/db.ts",
+    "db:reset": "bun run node_modules/@chromatis/base/infra/scripts/dbReset.ts",
+    "db:deploy": "bun run node_modules/@chromatis/base/infra/scripts/dbDeploy.ts",
+    "cf:dev": "bun run node_modules/@chromatis/base/infra/scripts/cfDev.ts",
+    "cf:deploy": "bun run node_modules/@chromatis/base/infra/scripts/cfDeploy.ts"
   },
   "dependencies": {
     "@chromatis/base": "git+https://github.com/ChromatisGit/personal-base-framework.git",
