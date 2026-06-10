@@ -1,4 +1,4 @@
-import { userSQL } from "@platform/db.server";
+import { userSQL } from "@core/db.server";
 import type { CheckpointResponse, UnderstandingLevel, DifficultyCause } from "@schema/checkpointTypes";
 import type { UserDTO } from "@services/userService";
 

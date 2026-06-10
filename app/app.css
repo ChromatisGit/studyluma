@@ -1,9 +1,9 @@
-@import "@platform/framework/styles";
+@import "@chromatis/base/styles";
 @import "../src/ui/styles/globals.css";
 @import "tailwindcss";
 
 @source "../app/**/*.{ts,tsx}";
 @source "../src/**/*.{ts,tsx}";
-@source "../../reactRouterFramework/src/**/*.{ts,tsx}";
+@source "../node_modules/@chromatis/base/src/**/*.{ts,tsx}";
 
 /* StudyNode shell overrides can go here */

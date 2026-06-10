@@ -1,0 +1,16 @@
+{
+  "entry": [
+    "workers/**/*.ts"
+  ],
+  "project": [
+    "app/**/*.{ts,tsx}",
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.ts",
+    "workers/**/*.ts"
+  ],
+  "includeEntryExports": true,
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true
+  }
+}

@@ -20,7 +20,7 @@ type AccessSectionProps = {
   courseRoute: string | null;
   courseName: string;
   isRegistrationOpen: boolean;
-  currentUserAccessCode: string | null;
+  currentUserUsername: string | null;
   from: string | null;
 };
 
@@ -34,12 +34,12 @@ export default function AccessSection({
   courseRoute,
   courseName,
   isRegistrationOpen,
-  currentUserAccessCode,
+  currentUserUsername,
   from,
 }: AccessSectionProps) {
   // Default to "register" tab when joining a course (new students land here first)
   const [activeTab, setActiveTab] = useState<Tab>(showRegister ? "register" : "login");
-  const [accessCode, setAccessCode] = useState(currentUserAccessCode ?? "");
+  const [username, setUsername] = useState(currentUserUsername ?? "");
   const [pin, setPin] = useState("");
   const [pinConfirm, setPinConfirm] = useState("");
   const [error, setError] = useState("");
@@ -70,11 +70,11 @@ export default function AccessSection({
       return;
     }
 
-    const submittedAccessCode = activeTab === "register" ? "" : accessCode;
+    const submittedUsername = activeTab === "register" ? "" : username;
 
     void fetcher.submit({
       intent: "continue",
-      accessCode: submittedAccessCode,
+      username: submittedUsername,
       pin,
       isCourseJoin: String(isCourseJoin),
       groupKey: groupKey ?? "",
@@ -134,11 +134,11 @@ export default function AccessSection({
           <Stack gap="md">
             {activeTab === "login" && (
               <Input
-                label={ACCESS_TEXT.section.accessCodeLabel}
-                value={accessCode}
-                onChange={(event) => setAccessCode(event.target.value)}
-                placeholder={ACCESS_TEXT.section.accessCodePlaceholder}
-                disabled={isPending || !!currentUserAccessCode}
+                label={ACCESS_TEXT.section.usernameLabel}
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                placeholder={ACCESS_TEXT.section.usernamePlaceholder}
+                disabled={isPending || !!currentUserUsername}
               />
             )}
 

@@ -1,5 +1,5 @@
-import { getSession } from "@platform/index.server";
-import { assertAdminAccess } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { assertAdminAccess } from "@core/auth/guards";
 import { getClientIp } from "@server-lib/getClientIp";
 import {
   closeRegistration,

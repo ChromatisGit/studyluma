@@ -108,11 +108,12 @@ CREATE TABLE IF NOT EXISTS course_worksheets (
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS users (
-  id          TEXT PRIMARY KEY,
+  id          TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
   role        TEXT NOT NULL CHECK (role IN ('admin', 'user')),
   group_key   TEXT,
-  access_code TEXT UNIQUE NOT NULL,
+  username    TEXT UNIQUE NOT NULL,
   pin_hash    TEXT NOT NULL,
+  enabled     BOOLEAN NOT NULL DEFAULT TRUE,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT check_admin_no_group CHECK (
@@ -166,7 +167,7 @@ CREATE TABLE IF NOT EXISTS worksheet_presence (
 );
 
 -- ============================================================
--- 7) Auth and access code config
+-- 7) Auth and username config
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS auth_attempts (
@@ -176,12 +177,12 @@ CREATE TABLE IF NOT EXISTS auth_attempts (
   locked_until  TIMESTAMPTZ
 );
 
-CREATE TABLE IF NOT EXISTS access_code_words (
+CREATE TABLE IF NOT EXISTS username_words (
   pos  INTEGER PRIMARY KEY,
   word TEXT NOT NULL UNIQUE
 );
 
-CREATE SEQUENCE IF NOT EXISTS access_code_counter
+CREATE SEQUENCE IF NOT EXISTS username_counter
   START WITH 1
   INCREMENT BY 1
   MINVALUE 1
@@ -307,7 +308,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_course_topics_one_current
 CREATE UNIQUE INDEX IF NOT EXISTS ux_course_chapters_one_current
   ON course_chapters(course_id) WHERE status = 'current';
 
-CREATE INDEX IF NOT EXISTS idx_users_access_code   ON users(access_code);
+CREATE INDEX IF NOT EXISTS idx_users_username   ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_group_key     ON users(group_key);
 
 CREATE INDEX IF NOT EXISTS idx_user_courses_user   ON user_courses(user_id);
@@ -596,7 +597,7 @@ JOIN chapters ch   ON ch.chapter_id   = cw.chapter_id;
 -- 16) Functions
 -- ============================================================
 
-CREATE OR REPLACE FUNCTION generate_access_code()
+CREATE OR REPLACE FUNCTION generate_username()
 RETURNS TEXT
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -611,17 +612,17 @@ DECLARE
   word_index INTEGER;
   word       TEXT;
   num        TEXT;
-  v_code     TEXT;
+  v_username TEXT;
   i          INTEGER;
 BEGIN
   FOR i IN 1..max_tries LOOP
-    n := nextval('public.access_code_counter');
+    n := nextval('public.username_counter');
     word_index := ((a * n) % word_count)::INTEGER;
 
-    SELECT acw.word
+    SELECT uw.word
     INTO word
-    FROM public.access_code_words acw
-    WHERE acw.pos = word_index;
+    FROM public.username_words uw
+    WHERE uw.pos = word_index;
 
     IF word IS NULL THEN
       RAISE EXCEPTION 'Missing word at index % (must be contiguous 0..%)',
@@ -629,16 +630,16 @@ BEGIN
     END IF;
 
     num := LPAD((((b * n) % 99) + 1)::TEXT, 2, '0');
-    v_code := word || num;
+    v_username := word || num;
 
     IF NOT EXISTS (
-      SELECT 1 FROM public.users u WHERE u.access_code = v_code
+      SELECT 1 FROM public.users u WHERE u.username = v_username
     ) THEN
-      RETURN v_code;
+      RETURN v_username;
     END IF;
   END LOOP;
 
-  RAISE EXCEPTION 'No unused access code available in current cycle (word_count=%)', word_count;
+  RAISE EXCEPTION 'No unused username available in current cycle (word_count=%)', word_count;
 END;
 $$;
 
@@ -714,7 +715,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION create_user_account(
   p_user_id     TEXT,
-  p_access_code TEXT,
+  p_username TEXT,
   p_pin_hash    TEXT,
   p_group_key   TEXT,
   p_course_ids  TEXT[]
@@ -725,8 +726,8 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
   WITH inserted_user AS (
-    INSERT INTO public.users (id, role, group_key, access_code, pin_hash)
-    VALUES (p_user_id, 'user', p_group_key, p_access_code, p_pin_hash)
+    INSERT INTO public.users (id, role, group_key, username, pin_hash)
+    VALUES (p_user_id, 'user', p_group_key, p_username, p_pin_hash)
     RETURNING id
   ),
   requested_courses AS (
@@ -741,7 +742,7 @@ AS $$
   ON CONFLICT (user_id, course_id) DO NOTHING;
 $$;
 
-CREATE OR REPLACE FUNCTION create_user_with_code(
+CREATE OR REPLACE FUNCTION create_user_with_username(
   p_user_id   TEXT,
   p_pin_hash  TEXT,
   p_group_key TEXT
@@ -752,27 +753,27 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 DECLARE
-  v_code            TEXT;
+  v_username        TEXT;
   v_attempts        INTEGER := 0;
   v_constraint_name TEXT;
 BEGIN
   LOOP
     v_attempts := v_attempts + 1;
     IF v_attempts > 100 THEN
-      RAISE EXCEPTION 'Failed to create user with a unique access code after 100 attempts';
+      RAISE EXCEPTION 'Failed to create user with a unique username after 100 attempts';
     END IF;
 
-    v_code := public.generate_access_code();
+    v_username := public.generate_username();
 
     BEGIN
       PERFORM public.create_user_account(
-        p_user_id, v_code, p_pin_hash, p_group_key, ARRAY[]::TEXT[]
+        p_user_id, v_username, p_pin_hash, p_group_key, ARRAY[]::TEXT[]
       );
-      RETURN v_code;
+      RETURN v_username;
     EXCEPTION
       WHEN unique_violation THEN
         GET STACKED DIAGNOSTICS v_constraint_name = CONSTRAINT_NAME;
-        IF v_constraint_name = 'users_access_code_key' THEN
+        IF v_constraint_name = 'users_username_key' THEN
           CONTINUE;
         END IF;
         RAISE;
@@ -881,12 +882,12 @@ AS $$
   FROM selected_user su LEFT JOIN user_courses_agg uca ON uca.user_id = su.id;
 $$;
 
-CREATE OR REPLACE FUNCTION get_user_for_login(p_access_code TEXT)
+CREATE OR REPLACE FUNCTION get_user_for_login(p_username TEXT)
 RETURNS TABLE (
   id          TEXT,
   role        TEXT,
   group_key   TEXT,
-  access_code TEXT,
+  username TEXT,
   pin_hash    TEXT,
   course_ids  TEXT[]
 )
@@ -896,26 +897,26 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
   WITH selected_user AS (
-    SELECT u.id, u.role, u.group_key, u.access_code, u.pin_hash
-    FROM public.users u WHERE LOWER(u.access_code) = LOWER(p_access_code)
+    SELECT u.id, u.role, u.group_key, u.username, u.pin_hash
+    FROM public.users u WHERE LOWER(u.username) = LOWER(p_username)
   ),
   user_courses_agg AS (
     SELECT uc.user_id, array_agg(uc.course_id ORDER BY uc.course_id) AS course_ids
     FROM public.user_courses uc JOIN selected_user su ON su.id = uc.user_id GROUP BY uc.user_id
   )
-  SELECT su.id, su.role, su.group_key, su.access_code, su.pin_hash,
+  SELECT su.id, su.role, su.group_key, su.username, su.pin_hash,
          COALESCE(uca.course_ids, ARRAY[]::TEXT[]) AS course_ids
   FROM selected_user su LEFT JOIN user_courses_agg uca ON uca.user_id = su.id;
 $$;
 
-CREATE OR REPLACE FUNCTION get_user_access_code(p_user_id TEXT)
+CREATE OR REPLACE FUNCTION get_user_username(p_user_id TEXT)
 RETURNS TEXT
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
-  SELECT u.access_code FROM public.users u WHERE u.id = p_user_id;
+  SELECT u.username FROM public.users u WHERE u.id = p_user_id;
 $$;
 
 CREATE OR REPLACE FUNCTION set_registration_open_until(p_course_id TEXT, p_open_until TIMESTAMPTZ)

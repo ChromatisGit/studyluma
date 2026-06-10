@@ -2,6 +2,7 @@ import { type RouteConfig, index, layout, route } from "@react-router/dev/routes
 
 export default [
   route("access", "../src/features/access/routes/access.tsx"),
+  route("admin/register", "../src/features/access/routes/adminRegister.tsx"),
   route("api/admin", "../src/features/admin/routes/api.tsx"),
   route("api/quiz", "../src/features/quiz/routes/api.tsx"),
   route("api/slides", "../src/features/slides/routes/api.tsx"),
@@ -22,9 +23,9 @@ export default [
     route(":group", "../src/core/routes/group.tsx"),
     route(":group/:course", "../src/core/routes/CourseLayout.tsx", [
       index("../src/features/course/routes/course.tsx"),
-      route(":topic", "../src/features/course/routes/topic.tsx"),
-      route(":topic/:chapter", "../src/features/course/routes/chapter.tsx"),
       route(":topic/:chapter/:worksheet", "../src/features/contentpage/routes/worksheet.tsx"),
+      route(":topic/:chapter", "../src/features/course/routes/chapter.tsx"),
+      route(":topic", "../src/features/course/routes/topic.tsx"),
     ]),
   ]),
 ] satisfies RouteConfig;

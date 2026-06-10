@@ -1,9 +1,9 @@
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import js from "@eslint/js";
 import tseslint from "typescript-eslint";
-import reactHooks from "eslint-plugin-react-hooks";
 import boundaries from "eslint-plugin-boundaries";
+
+import base from "@chromatis/base/infra/eslint";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -16,28 +16,16 @@ export default tseslint.config(
     ],
   },
 
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...base,
 
   {
-    plugins: {
-      "react-hooks": reactHooks,
-    },
     rules: {
-      ...reactHooks.configs.recommended.rules,
-
-      "@typescript-eslint/consistent-type-imports": [
-        "error",
-        { prefer: "type-imports", fixStyle: "inline-type-imports" },
-      ],
-      "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-non-null-assertion": "warn",
-      "react-hooks/set-state-in-effect": "off",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
-      "no-console": ["warn", { allow: ["warn", "error"] }],
+      "react-hooks/set-state-in-effect": "off",
     },
   },
 
@@ -46,18 +34,10 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ["react-router.config.ts", "vite.config.ts", "workers/*.ts"],
+          allowDefaultProject: ["react-router.config.ts", "vite.config.ts"],
         },
         tsconfigRootDir: __dirname,
       },
-    },
-  },
-
-  {
-    files: ["*.config.*", "scripts/**/*"],
-    rules: {
-      "no-console": "off",
-      "@typescript-eslint/no-floating-promises": "off",
     },
   },
 

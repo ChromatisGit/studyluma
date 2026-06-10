@@ -16,7 +16,7 @@ type PracticeHubProps = {
 // Mock per-course data until backend is ready
 const MOCK_TOPICS = ["Lineare Gleichungen", "Quadratische Gleichungen", "Vektoren", "Trigonometrie", "Differentialrechnung"];
 
-function getMockModule(courseId: string, index: number) {
+function getMockModule(_courseId: string, index: number) {
   return {
     topic: MOCK_TOPICS[index % MOCK_TOPICS.length] ?? "Aktuelles Thema",
     courseXp: 200 + index * 130,

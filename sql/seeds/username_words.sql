@@ -1,4 +1,4 @@
-INSERT INTO access_code_words (pos, word)
+INSERT INTO username_words (pos, word)
 VALUES
   (0, 'Sonne'),
   (1, 'Mond'),

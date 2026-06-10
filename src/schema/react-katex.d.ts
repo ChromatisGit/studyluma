@@ -8,4 +8,11 @@ declare module "react-katex" {
 
   export const InlineMath: ComponentType<MathProps>;
   export const BlockMath: ComponentType<MathProps>;
+
+  const ReactKatex: {
+    InlineMath: ComponentType<MathProps>;
+    BlockMath: ComponentType<MathProps>;
+  };
+
+  export default ReactKatex;
 }

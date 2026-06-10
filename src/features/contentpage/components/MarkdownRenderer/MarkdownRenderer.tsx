@@ -5,8 +5,8 @@ import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 import rehypeReact from "rehype-react";
 import * as prod from "react/jsx-runtime";
-import { InlineMath, BlockMath } from "react-katex";
 import { remarkMarkdownTransforms, CodeBlock } from "./remarkTransforms";
+import { InlineMath, BlockMath } from "./KatexMath";
 
 const processor = unified()
   .use(remarkParse)

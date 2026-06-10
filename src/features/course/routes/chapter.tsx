@@ -1,6 +1,6 @@
 import { useLoaderData } from "react-router";
-import { getSession } from "@platform/index.server";
-import { assertCanAccessPage } from "@platform/auth/guards";
+import { getSession } from "@core/index.server";
+import { assertCanAccessPage } from "@core/auth/guards";
 import {
   coursePublic,
   getCourseId,

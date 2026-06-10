@@ -3,8 +3,8 @@ import type { LiveSlideState } from "@schema/streamTypes";
 import {
   getSlideDeckContent,
   listSlideDeckContent,
-} from "@platform/content.server";
-import { anonSQL } from "@platform/db.server";
+} from "@core/content.server";
+import { anonSQL } from "@core/db.server";
 
 // ---------------------------------------------------------------------------
 // Slide decks (content)

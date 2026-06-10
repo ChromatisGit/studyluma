@@ -2,25 +2,25 @@
 
 import { useState } from "react";
 import { useFetcher, useNavigate } from "react-router";
-import { AccessCodeModal } from "./AccessCodeModal";
+import { UsernameModal } from "./UsernameModal";
 
 type NewUserWelcomeModalProps = {
-  accessCode: string;
+  username: string;
   activeQuizExists: boolean;
 };
 
-export function NewUserWelcomeModal({ accessCode, activeQuizExists }: NewUserWelcomeModalProps) {
+export function NewUserWelcomeModal({ username, activeQuizExists }: NewUserWelcomeModalProps) {
   const [open, setOpen] = useState(true);
   const fetcher = useFetcher();
   const navigate = useNavigate();
 
   const handleConfirm = () => {
-    void fetcher.submit({ intent: "clear-new-user-code" }, { method: "post", action: "/access" });
+    void fetcher.submit({ intent: "clear-new-user-username" }, { method: "post", action: "/access" });
     setOpen(false);
     if (activeQuizExists) {
       void navigate("/quiz");
     }
   };
 
-  return <AccessCodeModal accessCode={accessCode} isOpen={open} onConfirm={handleConfirm} />;
+  return <UsernameModal username={username} isOpen={open} onConfirm={handleConfirm} />;
 }
