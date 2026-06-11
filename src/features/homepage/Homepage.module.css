@@ -2,8 +2,8 @@
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background: var(--sn-bg);
-  color: var(--sn-text);
+  background: var(--background);
+  color: var(--foreground);
 }
 
 .networkLayer {
@@ -15,16 +15,16 @@
 
 .homeSection {
   z-index: 1;
-  --sn-section-padding: 3.5rem var(--sn-page-padding, 1.5rem);
-  --sn-section-max-width: var(--sn-content-width-wide, 1120px);
-  --sn-section-card-padding: 2rem;
-  --sn-section-header-margin: 1.75rem;
-  --sn-section-title-size: var(--sn-text-xl);
-  --sn-section-title-gap: 0.5rem;
+  --section-padding: 3.5rem var(--page-padding, 1.5rem);
+  --section-max-width: var(--content-width-wide, 1120px);
+  --section-card-padding: 2rem;
+  --section-header-margin: 1.75rem;
+  --section-title-size: var(--text-xl);
+  --section-title-gap: 0.5rem;
 }
 
 @media screen and (max-width: 768px) {
   .homeSection {
-    --sn-section-padding: 2.5rem 1.25rem;
+    --section-padding: 2.5rem 1.25rem;
   }
 }

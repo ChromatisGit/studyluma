@@ -1,5 +1,5 @@
 .bodyText {
-  color: var(--sn-text);
+  color: var(--foreground);
   line-height: 1.5;
   white-space: pre-wrap;
 }

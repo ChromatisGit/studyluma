@@ -5,12 +5,12 @@ import { BulletList } from "./BulletList";
 import { MaterialRenderer } from "./MaterialRenderer";
 import styles from "./slide.module.css";
 
-const ACCENT = "var(--sn-orange-accent)";
+const ACCENT = "var(--warning)";
 
 type Props = { slide: HookSlide; revealStep: number; projector?: boolean };
 
 export function HookSlideView({ slide, revealStep, projector }: Props) {
-  const hasMaterial = !!slide.material;
+  const material = slide.material;
   const bullets = slide.bullets ?? [];
   const isManual = slide.reveal === "manual";
 
@@ -34,11 +34,11 @@ export function HookSlideView({ slide, revealStep, projector }: Props) {
     <>
       <SlideHeader title={slide.header} badge="Einstieg" accent="orange" />
       <div className={styles.slideContent}>
-        {hasMaterial ? (
+        {material ? (
           <div className={styles.split}>
             {body}
             <div className={styles.splitMaterial}>
-              <MaterialRenderer item={slide.material!} projector={projector} />
+              <MaterialRenderer item={material} projector={projector} />
             </div>
           </div>
         ) : body}

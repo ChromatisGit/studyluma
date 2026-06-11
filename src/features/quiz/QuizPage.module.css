@@ -1,7 +1,7 @@
 .page {
   min-height: 100%;
-  padding-top: var(--sn-space-xl);
-  padding-bottom: var(--sn-space-xl);
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
   display: flex;
   align-items: flex-start;
 }
@@ -9,7 +9,7 @@
 .inner {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
 }
 
 /* ===== Empty / no-quiz state ===== */
@@ -19,25 +19,25 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--sn-space-md);
-  padding: var(--sn-space-2xl) var(--sn-space-lg);
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-6);
   margin: auto;
 }
 
 .emptyIcon {
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .emptyTitle {
-  font-size: var(--sn-text-xl);
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-text);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
   margin: 0;
 }
 
 .emptyDesc {
-  font-size: var(--sn-text-md);
-  color: var(--sn-text-muted);
+  font-size: var(--text-base);
+  color: var(--muted-foreground);
   margin: 0;
   max-width: 360px;
 }
@@ -47,14 +47,14 @@
 .progressTrack {
   height: 4px;
   border-radius: 999px;
-  background: var(--sn-surface-deep);
+  background: var(--surface-deep);
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
   border-radius: 999px;
-  background: var(--sn-purple-accent);
+  background: var(--primary);
   transition: width 400ms ease;
 }
 
@@ -62,7 +62,7 @@
 
 .statusMsg {
   text-align: center;
-  font-size: var(--sn-text-sm);
-  color: var(--sn-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
   margin: 0;
 }

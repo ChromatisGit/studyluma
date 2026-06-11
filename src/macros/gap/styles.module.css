@@ -8,8 +8,8 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
-  --gap-base-surface: var(--sn-surface);
-  --gap-text: var(--sn-text);
+  --gap-base-surface: var(--card);
+  --gap-text: var(--foreground);
   z-index: 1;
 }
 
@@ -19,11 +19,11 @@
   width: 100%;
   padding: 0.12rem 0.2rem;
   border: 0;
-  border-bottom: 2px solid var(--gap-border, var(--sn-purple-accent));
-  background: var(--gap-bg, var(--sn-surface));
+  border-bottom: 2px solid var(--gap-border, var(--primary));
+  background: var(--gap-bg, var(--card));
   color: var(--gap-text);
-  font-family: var(--sn-font-mono);
-  font-size: var(--sn-text-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
   outline: none;
   transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
   z-index: 2;
@@ -42,26 +42,26 @@
   transform: translateY(-50%);
   width: 0.85rem;
   height: 0.85rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   pointer-events: none;
   z-index: 3;
 }
 
 /* Gap states */
 .gapActive {
-  --gap-border: var(--sn-purple-accent);
+  --gap-border: var(--primary);
 }
 
 .gapCorrect {
-  --gap-bg: var(--sn-green-accent-soft-bg);
-  --gap-border: var(--sn-green-accent);
-  --gap-text: var(--sn-green-accent-strong);
+  --gap-bg: var(--success-light);
+  --gap-border: var(--success);
+  --gap-text: var(--success-strong);
 }
 
 .gapWrong {
-  --gap-bg: var(--sn-red-accent-soft-bg);
-  --gap-border: var(--sn-red-accent);
-  --gap-text: var(--sn-red-accent-strong);
+  --gap-bg: var(--destructive-light);
+  --gap-border: var(--destructive);
+  --gap-text: var(--destructive-strong);
 }
 
 .gapWrong .gapControl {
@@ -90,8 +90,8 @@
 
 /* Gap inside code block */
 .gapInCode {
-  --gap-bg: var(--sn-code-bg);
-  --gap-text: var(--sn-code-text);
+  --gap-bg: var(--code-background);
+  --gap-text: var(--code-foreground);
 }
 
 .gapInCode.gapCorrect,

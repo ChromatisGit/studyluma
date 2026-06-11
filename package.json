@@ -1,7 +1,7 @@
 {
-  "name": "studynode",
+  "name": "studyluma",
   "version": "0.1.0",
-  "description": "React Router SSR web application for the StudyNode learning platform.",
+  "description": "React Router SSR web application for the StudyLuma learning platform.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,8 @@
     "db:reset": "bun run node_modules/@chromatis/base/infra/scripts/dbReset.ts",
     "db:deploy": "bun run node_modules/@chromatis/base/infra/scripts/dbDeploy.ts",
     "cf:dev": "bun run node_modules/@chromatis/base/infra/scripts/cfDev.ts",
-    "cf:deploy": "bun run node_modules/@chromatis/base/infra/scripts/cfDeploy.ts"
+    "cf:deploy": "bun run node_modules/@chromatis/base/infra/scripts/cfDeploy.ts",
+    "cf:deploy:demo": "bun run scripts/cfDeployDemo.ts"
   },
   "dependencies": {
     "@chromatis/base": "git+https://github.com/ChromatisGit/personal-base-framework.git",

@@ -2,17 +2,17 @@
 
 ## Two-Repo Structure
 
-StudyNode is split across two independent repositories:
+StudyLuma is split across two independent repositories:
 
 | Repo | Purpose |
 |------|---------|
-| `studynode-website` | React Router v7 SSR web application |
-| `studynode-content` | Markdown content source + build pipeline |
+| `studyluma-website` | React Router v7 SSR web application |
+| `studyluma-content` | Markdown content source + build pipeline |
 
 The repos are completely independent. The **only coupling** between them is the database: the content pipeline writes to the Postgres database, and the website reads from it.
 
 ```
-studynode-content          studynode-website
+studyluma-content          studyluma-website
      │                           │
      │ bun run preview / publish │  bun run dev / deploy
      │                           │
@@ -21,11 +21,11 @@ studynode-content          studynode-website
 
 ---
 
-## studynode-website
+## studyluma-website
 
 ### Framework
 
-Built on **React Router v7** with SSR enabled (`ssr: true` in `react-router.config.ts`). Vite handles both client and server bundling.
+Built on **React Router v7** with SSR enabled. Vite handles both client and server bundling.
 
 A custom framework is declared as a `file:` dependency (`@chromatis/base`) and installed via `bun install`. It provides Vite config helpers, ESLint config, and the base TypeScript config.
 
@@ -95,7 +95,7 @@ Not implemented yet ToDo
 
 ---
 
-## studynode-content
+## studyluma-content
 
 ### Structure
 

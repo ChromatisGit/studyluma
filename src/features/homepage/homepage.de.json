@@ -1,23 +1,23 @@
 {
   "hero": {
-    "title": "Willkommen bei StudyNode",
+    "title": "Willkommen bei StudyLuma",
     "lead": "Lernen neu gedacht - mit Sinn und Struktur",
     "primaryCta": {
       "label": "Anmelden",
-      "ariaLabel": "Bei StudyNode anmelden"
+      "ariaLabel": "Bei StudyLuma anmelden"
     },
     "secondaryCta": {
       "label": "Kurs beitreten",
       "ariaLabel": "Einen Kurs beitreten"
     },
     "tertiaryCta": {
-      "label": "Was ist StudyNode?",
-      "ariaLabel": "Mehr über StudyNode erfahren"
+      "label": "Was ist StudyLuma?",
+      "ariaLabel": "Mehr über StudyLuma erfahren"
     }
   },
   "about": {
-    "title": "Was ist StudyNode?",
-    "subtitle": "StudyNode ist eine zentrale Lernplattform für den Informatik- und Mathematikunterricht von Herrn Holst.",
+    "title": "Was ist StudyLuma?",
+    "subtitle": "StudyLuma ist eine zentrale Lernplattform für den Informatik- und Mathematikunterricht von Herrn Holst.",
     "intro": "Wissen entsteht als Netzwerk: Jede Idee ist ein Knoten, der mit anderen verbunden ist. Die Plattform macht diese Zusammenhänge sichtbar, bietet strukturierte Aufgaben mit direktem Feedback und fördert selbstbestimmtes Arbeiten. Sie basiert auf modernen Web-Standards, die für eine zugängliche und zeitgemäße Lernumgebung sorgen. Denn im Fokus steht das erfolgreiche Lernen, ohne Werbung, ohne Schnickschnack.",
     "note": "Die Plattform befindet sich noch in der Aufbauphase. Ich freue mich über sämtliches Feedback!",
     "goals": {
@@ -54,7 +54,7 @@
     "copyright": "© {year} Christian Holst."
   },
   "meta": {
-    "title": "StudyNode",
+    "title": "StudyLuma",
     "description": "Lernplattform für Informatik und Mathematik"
   }
 }

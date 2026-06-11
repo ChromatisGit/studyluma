@@ -79,7 +79,7 @@ export function SlidePresenter({ deck, courseId, projectorPath }: SlidePresenter
   useSlideStream({ courseId, onEvent });
 
   const openProjector = useCallback(() => {
-    const w = window.open(projectorPath, "studynode-projector", "popup");
+    const w = window.open(projectorPath, "studyluma-projector", "popup");
     if (w) projectorWindowRef.current = w;
   }, [projectorPath]);
 

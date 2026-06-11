@@ -4,11 +4,11 @@
 }
 
 .question {
-  font-weight: var(--sn-font-medium);
+  font-weight: var(--font-weight-medium);
 }
 
-.question :global(.sn-markdown),
-.question :global(.sn-markdown) > * {
+.question :global(.content-markdown),
+.question :global(.content-markdown) > * {
   margin: 0;
 }
 
@@ -16,14 +16,14 @@
 .optionGridRow {
   display: flex;
   align-items: center;
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
 }
 
 .optionGrid {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
 }
 
 @media (max-width: 640px) {
@@ -41,20 +41,20 @@
 }
 
 .wrongIcon {
-  width: var(--sn-text-xl);
-  height: var(--sn-text-xl);
-  color: var(--sn-red-accent);
+  width: var(--text-xl);
+  height: var(--text-xl);
+  color: var(--destructive);
 }
 
 .option {
   display: flex;
   align-items: center;
-  gap: var(--sn-space-sm);
-  padding: var(--sn-space-sm) var(--sn-space-md);
-  border: 2px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
-  background: var(--sn-surface);
-  font-size: var(--sn-text-base);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  font-size: var(--text-base);
   text-align: left;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -62,7 +62,7 @@
 }
 
 .option:hover:not(:disabled) {
-  border-color: var(--sn-purple-accent);
+  border-color: var(--primary);
 }
 
 .option:disabled {
@@ -72,29 +72,29 @@
 /* ── Option state variants ── */
 
 .option--default {
-  border-color: var(--sn-border);
-  background: var(--sn-surface);
+  border-color: var(--border);
+  background: var(--card);
 }
 
 .option--active {
-  border-color: var(--sn-purple-accent);
-  background: var(--sn-purple-accent-soft-bg);
+  border-color: var(--primary);
+  background: var(--primary-light);
 }
 
 .option--correct {
-  border-color: var(--sn-green-accent);
-  background: var(--sn-green-accent-soft-bg);
+  border-color: var(--success);
+  background: var(--success-light);
 }
 
 .option--wrong {
-  border-color: var(--sn-red-accent);
-  background: var(--sn-red-accent-soft-bg);
+  border-color: var(--destructive);
+  background: var(--destructive-light);
 }
 
 /* Missed = correct answer the user didn't select */
 .option--missed {
-  border-color: var(--sn-green-accent);
-  background: var(--sn-surface);
+  border-color: var(--success);
+  background: var(--card);
 }
 
 /* Checkbox/Radio indicator */
@@ -104,12 +104,12 @@
   min-width: 14px;
   min-height: 14px;
   flex-shrink: 0;
-  border: 2px solid var(--sn-border);
+  border: 2px solid var(--border);
   border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sn-surface);
+  background: var(--card);
   transition: all 0.15s ease;
 }
 
@@ -118,36 +118,36 @@
 }
 
 .indicator--default {
-  border-color: var(--sn-border);
-  background: var(--sn-surface);
+  border-color: var(--border);
+  background: var(--card);
 }
 
 .indicator--active {
-  border-color: var(--sn-purple-accent);
-  background: var(--sn-purple-accent);
+  border-color: var(--primary);
+  background: var(--primary);
 }
 
 .indicator--correct {
-  border-color: var(--sn-green-accent);
-  background: var(--sn-green-accent);
+  border-color: var(--success);
+  background: var(--success);
 }
 
 .indicator--wrong {
-  border-color: var(--sn-red-accent);
-  background: var(--sn-red-accent);
+  border-color: var(--destructive);
+  background: var(--destructive);
 }
 
 /* Missed: correct answer not selected — show empty green outline */
 .indicator--missed {
-  border-color: var(--sn-green-accent);
-  background: var(--sn-surface);
+  border-color: var(--success);
+  background: var(--card);
 }
 
 .checkbox {
   width: 12px;
   height: 12px;
   display: block;
-  color: var(--sn-text-on-accent);
+  color: var(--text-on-accent);
   stroke-width: 4;
 }
 
@@ -158,7 +158,7 @@
   min-height: 6px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--sn-text-on-accent);
+  background: var(--text-on-accent);
 }
 
 /* Option text */
@@ -168,22 +168,22 @@
   overflow-wrap: anywhere;
 }
 
-.optionText :global(.sn-markdown),
-.optionText :global(.sn-markdown) > * {
+.optionText :global(.content-markdown),
+.optionText :global(.content-markdown) > * {
   margin: 0;
 }
 
 /* Detailed mode: result icon at the far right of the option */
 .resultIcon {
-  width: var(--sn-space-md);
-  height: var(--sn-space-md);
+  width: var(--space-4);
+  height: var(--space-4);
   flex-shrink: 0;
 }
 
 .option--wrong .resultIcon {
-  color: var(--sn-red-accent);
+  color: var(--destructive);
 }
 
 .option--missed .resultIcon {
-  color: var(--sn-green-accent);
+  color: var(--success);
 }

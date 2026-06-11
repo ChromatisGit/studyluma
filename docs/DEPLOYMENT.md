@@ -2,7 +2,7 @@
 
 ## Target Environments
 
-StudyNode supports two deployment targets.
+StudyLuma supports two deployment targets.
 
 | Target | Notes |
 |--------|-------|
@@ -21,7 +21,7 @@ cp CONFIG.template.yaml CONFIG.yaml
 
 ```yaml
 local:
-  database: postgres://studynode:studynode@localhost:5432/studynode_dev
+  database: postgres://studyluma:studyluma@localhost:5432/studyluma_dev
   session_secret: dev
 
 production:
@@ -43,7 +43,7 @@ production:
 ```sh
 bun install
 bun run build
-docker build -f node_modules/@chromatis/base/infra/docker/Dockerfile -t studynode .
+docker build -f node_modules/@chromatis/base/infra/docker/Dockerfile -t studyluma .
 ```
 
 The Dockerfile comes from the installed `@chromatis/base` package.
@@ -58,7 +58,7 @@ Shows pending migrations and asks for confirmation before applying. Run this onc
 
 ### 3. Deploy content
 
-In `studynode-content`, set the production database URL in `CONFIG.yaml`, then:
+In `studyluma-content`, set the production database URL in `CONFIG.yaml`, then:
 
 ```sh
 bun run publish
@@ -68,10 +68,10 @@ bun run publish
 
 ```sh
 docker run --rm -p 3000:3000 \
-  -e DATABASE_URL=postgres://user:pass@host:5432/studynode \
+  -e DATABASE_URL=postgres://user:pass@host:5432/studyluma \
   -e SESSION_SECRET=<long-random-string> \
   -e NODE_ENV=production \
-  studynode
+  studyluma
 ```
 
 The app listens on port `3000` inside the container.
@@ -100,7 +100,7 @@ Shows pending migrations and asks for confirmation before applying to Neon.
 
 ### 3. Deploy content
 
-In `studynode-content`, set the Neon URL in `CONFIG.yaml` production profile, then:
+In `studyluma-content`, set the Neon URL in `CONFIG.yaml` production profile, then:
 
 ```sh
 bun run publish
@@ -132,8 +132,8 @@ This writes a `.dev.vars` file from your `CONFIG.yaml` local profile and starts 
 
 Two artifacts should be published for each tagged release (`v0.x.x`):
 
-**Docker image** — pushed to `ghcr.io/yourorg/studynode:<version>` and `ghcr.io/yourorg/studynode:latest`.
-Teachers pull this via the `docker-compose.yml` in `studynode-content` — no build step needed.
+**Docker image** — pushed to `ghcr.io/yourorg/studyluma:<version>` and `ghcr.io/yourorg/studyluma:latest`.
+Teachers pull this via the `docker-compose.yml` in `studyluma-content` — no build step needed.
 
 **Cloudflare Workers bundle** — the output of `bun run build` zipped and attached as a GitHub release asset.
 Teachers download, unzip, and run `wrangler deploy --config wrangler.json` directly — no clone or build needed.

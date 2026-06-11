@@ -1,21 +1,29 @@
-# StudyNode Website
+# StudyLuma Website
 
-React Router v7 SSR web application for the StudyNode learning platform.
+React Router v7 SSR web application for the StudyLuma learning platform.
 
 ## Quick Start
 
 ```sh
 bun install
+cp CONFIG.template.yaml CONFIG.yaml
 bun run db                    # start local Postgres and apply schema migrations
 bun run dev                   # start dev server at localhost:5173
 ```
 
-Create `studynode/.env.local` with:
+`CONFIG.yaml` is git-ignored and uses named profiles:
 
-```sh
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/studynode
-SESSION_SECRET=<any-long-random-string>
+```yaml
+local:
+  database: postgres://studyluma:studyluma@localhost:5432/studyluma_dev
+  session_secret: dev
+
+production:
+  database: ""        # Neon or self-hosted Postgres connection string
+  session_secret: ""  # Long random string, e.g. openssl rand -base64 32
 ```
+
+The local profile is ready to run after copying the template. To publish on Cloudflare, edit `CONFIG.yaml`, set `production.database` to your Neon or self-hosted Postgres connection string, set `production.session_secret` to a long random value, then run `bun run cf:deploy`.
 
 See [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md) for the full setup guide including content deployment.
 

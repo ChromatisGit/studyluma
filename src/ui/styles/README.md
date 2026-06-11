@@ -1,18 +1,18 @@
-# StudyNode Style Architecture
+# StudyLuma Style Architecture
 
 ## Layers (import order)
 
-1. `tokens/` - design tokens only (CSS variables, no selectors)
-2. `foundation/` - reset + document/base element defaults
-3. `content/` - rich content rendering (`.sn-markdown`, code blocks)
-4. `utilities/` - small utility classes
-5. `integrations/` - third-party library overrides (KaTeX, Prism, Sonner)
+1. `foundation/` - document/base element defaults that extend the framework base
+2. `content/` - rich content rendering (`.content-markdown`, code blocks)
+3. `utilities/` - small utility classes
+4. `integrations/` - third-party library overrides (KaTeX, Prism, Sonner)
 
-`globals.css` is the only entrypoint imported by Next.js.
+`app/app.css` is the stylesheet entrypoint. Project-level theme overrides live in `app/theme.project.css` and use the framework token names.
 
 ## Rules for Refactors
 
-- Add new variables only inside `tokens/`.
+- Add new theme variables to the framework first when they are generally useful.
+- Add StudyLuma-specific theme values only in `app/theme.project.css`.
 - Do not hardcode colors/sizes when token alternatives exist.
 - Put component-specific styles in component CSS modules, not here.
 - Keep integration overrides isolated in `integrations/`.

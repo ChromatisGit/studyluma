@@ -1,69 +1,69 @@
 .header {
   text-align: center;
-  margin-bottom: var(--sn-space-md);
+  margin-bottom: var(--space-4);
 }
 
 .icon {
   display: flex;
   justify-content: center;
-  margin-bottom: var(--sn-space-sm);
+  margin-bottom: var(--space-3);
 }
 
 .title {
-  font-size: var(--sn-text-display);
-  font-weight: var(--sn-font-bold);
-  color: var(--sn-text);
-  margin: 0 0 var(--sn-space-xs);
+  font-size: var(--text-display);
+  font-weight: var(--font-weight-bold);
+  color: var(--foreground);
+  margin: 0 0 var(--space-2);
 }
 
 .description {
-  font-size: var(--sn-text-md);
-  color: var(--sn-text-muted);
+  font-size: var(--text-base);
+  color: var(--muted-foreground);
   margin: 0;
 }
 
 .usernameBox {
-  background: var(--sn-surface-raised);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-sm);
-  padding: var(--sn-space-md);
-  margin-bottom: var(--sn-space-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .usernameLabel {
-  font-size: var(--sn-text-xs);
-  color: var(--sn-text-muted);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: var(--sn-space-xs);
+  margin-bottom: var(--space-2);
 }
 
 .username {
-  font-size: var(--sn-text-display);
-  font-weight: var(--sn-font-bold);
-  font-family: var(--sn-font-mono);
-  color: var(--sn-purple-accent);
+  font-size: var(--text-display);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-mono);
+  color: var(--primary);
   letter-spacing: 0.1em;
 }
 
 .checkboxRow {
   display: flex;
   align-items: flex-start;
-  gap: var(--sn-space-sm);
-  margin-bottom: var(--sn-space-md);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .checkbox {
   margin-top: 2px;
   width: 18px;
   height: 18px;
-  accent-color: var(--sn-purple-accent);
+  accent-color: var(--primary);
   cursor: pointer;
 }
 
 .checkboxLabel {
-  font-size: var(--sn-text-md);
-  color: var(--sn-text);
+  font-size: var(--text-base);
+  color: var(--foreground);
   cursor: pointer;
   user-select: none;
 }

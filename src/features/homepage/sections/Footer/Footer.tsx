@@ -14,7 +14,7 @@ export function Footer() {
       <Container size="wide" className={styles.footerInner}>
         <div className={styles.footerGrid}>
           <div>
-            <h3 className={styles.footerTitle}>StudyNode</h3>
+            <h3 className={styles.footerTitle}>StudyLuma</h3>
             <p className={styles.footerText}>{footer.description}</p>
           </div>
 

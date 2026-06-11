@@ -21,6 +21,9 @@ export default defineConfig(async () => {
 
   return {
     plugins,
+    define: {
+      __DEMO_MODE__: process.env.DEMO_MODE === "true",
+    },
     esbuild: {
       jsx: "automatic",
       jsxImportSource: "react",

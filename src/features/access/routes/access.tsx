@@ -179,14 +179,16 @@ export async function action({ request }: { request: Request }) {
     if (!hasUsername || !hasPin) return fail("Invalid credentials.");
     user = await getAuthenticatedUser(username, pin, ip);
     if (!user) return fail("Invalid credentials.");
+    const primaryCourseId = user.courseIds[0];
     const [activeQuiz, primaryCourseSlug] = await Promise.all([
       getActiveQuizForUser(user),
-      user.courseIds.length > 0 ? getCourseSlug(user.courseIds[0]!) : Promise.resolve(null),
+      primaryCourseId ? getCourseSlug(primaryCourseId) : Promise.resolve(null),
     ]);
     redirectTo = activeQuiz ? "/quiz" : ctx.from ?? primaryCourseSlug ?? "/";
     headers.append("Set-Cookie", buildSessionCookie(user.id));
   } else {
-    const { groupKey, courseId, courseRoute } = courseCtx!;
+    if (!courseCtx) return fail("Invalid course link.");
+    const { groupKey, courseId, courseRoute } = courseCtx;
     const registrationOpen = await isRegistrationOpen(courseId);
     const session = await getSession(request);
     const currentUser = session?.user ?? null;

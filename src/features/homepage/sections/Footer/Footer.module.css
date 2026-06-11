@@ -1,19 +1,19 @@
 .footer {
   position: relative;
   z-index: 1;
-  box-shadow: var(--sn-shadow-lw);
-  background: var(--sn-surface);
+  box-shadow: var(--shadow-sm);
+  background: var(--card);
 }
 
 .footerInner {
-  padding-top: var(--sn-space-xl);
-  padding-bottom: var(--sn-space-lg);
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-6);
 }
 
 .footerGrid {
   display: flex;
   justify-content: space-between;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
 }
 
 .footerGrid > div:last-child {
@@ -28,35 +28,35 @@
 }
 
 .footerTitle {
-  margin-bottom: var(--sn-space-xs);
+  margin-bottom: var(--space-2);
 }
 
 .footerText {
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .footerPrompt {
-  margin-top: var(--sn-space-xs);
+  margin-top: var(--space-2);
 }
 
 .footerLink {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .footerLink:hover {
-  color: var(--sn-purple-accent);
+  color: var(--primary);
   text-decoration: none;
 }
 
 .footerBar {
-  margin-top: var(--sn-space-lg);
-  padding-top: var(--sn-space-md);
-  border-top: 1px solid var(--sn-border);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
   text-align: center;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   display: grid;
   gap: 0.35rem;
 }

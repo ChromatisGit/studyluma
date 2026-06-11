@@ -1,15 +1,15 @@
 .controls {
   display: flex;
   align-items: center;
-  gap: var(--sn-space-xs);
+  gap: var(--space-2);
 }
 
 .navButton {
-  padding: var(--sn-space-xs) var(--sn-space-sm);
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-sm);
-  color: var(--sn-text);
+  padding: var(--space-2) var(--space-3);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--foreground);
   cursor: pointer;
   font-size: 0.8rem;
 }
@@ -20,7 +20,7 @@
 }
 
 .navButton:hover:not(:disabled) {
-  background: var(--sn-surface-raised);
+  background: var(--surface-raised);
 }
 
 .counter {
@@ -28,47 +28,47 @@
   font-variant-numeric: tabular-nums;
   min-width: 4em;
   text-align: center;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .separator {
   width: 1px;
   height: 1.2rem;
-  background: var(--sn-border);
-  margin: 0 var(--sn-space-xs);
+  background: var(--border);
+  margin: 0 var(--space-2);
 }
 
 .actionButton {
-  padding: var(--sn-space-xs) var(--sn-space-sm);
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-sm);
-  color: var(--sn-text);
+  padding: var(--space-2) var(--space-3);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--foreground);
   cursor: pointer;
   font-size: 0.8rem;
-  font-weight: var(--sn-font-semibold);
+  font-weight: var(--font-weight-semibold);
 }
 
 .actionButton:hover {
-  background: var(--sn-surface-raised);
+  background: var(--surface-raised);
 }
 
 .actionButton.active {
-  background: var(--sn-purple-accent);
-  border-color: var(--sn-purple-accent);
-  color: var(--sn-text-on-accent);
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-on-accent);
 }
 
 .projectorButton {
-  padding: var(--sn-space-xs) var(--sn-space-md);
-  background: var(--sn-purple-accent);
+  padding: var(--space-2) var(--space-4);
+  background: var(--primary);
   border: 1px solid transparent;
-  border-radius: var(--sn-radius-sm);
-  color: var(--sn-text-on-accent);
+  border-radius: var(--radius-md);
+  color: var(--text-on-accent);
   cursor: pointer;
   font-size: 0.8rem;
-  font-weight: var(--sn-font-semibold);
-  margin-left: var(--sn-space-sm);
+  font-weight: var(--font-weight-semibold);
+  margin-left: var(--space-3);
 }
 
 .projectorButton:hover {

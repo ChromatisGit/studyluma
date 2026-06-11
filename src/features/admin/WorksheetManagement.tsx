@@ -110,11 +110,13 @@ export function WorksheetManagement({ courseId, courseSlug, worksheets, chapterI
   const chapterOrder: string[] = [];
   const byChapter: Record<string, AdminWorksheetRef[]> = {};
   for (const ws of worksheets) {
-    if (!byChapter[ws.chapterId]) {
-      byChapter[ws.chapterId] = [];
+    let chapterWorksheets = byChapter[ws.chapterId];
+    if (!chapterWorksheets) {
+      chapterWorksheets = [];
+      byChapter[ws.chapterId] = chapterWorksheets;
       chapterOrder.push(ws.chapterId);
     }
-    byChapter[ws.chapterId]!.push(ws);
+    chapterWorksheets.push(ws);
   }
 
   // When a chapterId filter is provided, show only that chapter

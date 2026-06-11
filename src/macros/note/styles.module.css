@@ -1,11 +1,11 @@
 .note {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-xs);
-  padding: var(--sn-space-sm) var(--sn-space-md);
-  border-radius: var(--sn-radius-sm);
-  border: 1px solid var(--sn-border);
-  background: var(--sn-surface);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--card);
 }
 
 .header {
@@ -17,13 +17,13 @@
 .icon {
   width: 1rem;
   height: 1rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .label {
-  font-weight: var(--sn-font-bold);
-  font-size: var(--sn-text-sm);
-  color: var(--sn-text);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-sm);
+  color: var(--foreground);
 }
 
 .content > :first-child {

@@ -12,21 +12,21 @@
 ### 1. Clone the website repo
 
 ```sh
-git clone <studynode-website-url>
-cd studynode-website
+git clone <studyluma-website-url>
+cd studyluma-website
 ```
 
 ### 2. Clone the content repo (separately)
 
 ```sh
-git clone <studynode-content-url>
+git clone <studyluma-content-url>
 # Keep it as a sibling — the pipeline runs independently
 ```
 
 ### 3. Install dependencies
 
 ```sh
-# In studynode-website:
+# In studyluma-website:
 bun install
 ```
 
@@ -48,7 +48,7 @@ This starts the local Postgres 16 container if needed and applies all schema mig
 
 ### 6. Deploy content
 
-In the `studynode-content` directory:
+In the `studyluma-content` directory:
 
 ```sh
 cp CONFIG.template.yaml CONFIG.yaml   # local URL is pre-filled
@@ -60,7 +60,7 @@ This parses all Markdown content and writes it to the database. Takes 10–30 se
 
 ### 7. Start the dev server
 
-Back in `studynode-website`:
+Back in `studyluma-website`:
 
 ```sh
 bun run dev
@@ -86,10 +86,10 @@ Visit [http://localhost:5173](http://localhost:5173).
 
 `bun run db` applies the schema but does not create an admin account.
 
-Use the script in `studynode-content`:
+Use the script in `studyluma-content`:
 
 ```sh
-# In studynode-content:
+# In studyluma-content:
 bun run create-admin
 ```
 

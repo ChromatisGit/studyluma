@@ -1,24 +1,24 @@
 .box {
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-lg);
-  background: var(--sn-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 }
 
 .hoverable:hover {
   transform: translateY(-2px);
-  box-shadow: var(--sn-shadow-md);
-  border-color: var(--sn-purple-accent-soft-border);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-border);
 }
 
 .padding-sm {
-  padding: var(--sn-space-sm);
+  padding: var(--space-3);
 }
 
 .padding-md {
-  padding: var(--sn-space-md);
+  padding: var(--space-4);
 }
 
 .padding-lg {
-  padding: var(--sn-space-lg);
+  padding: var(--space-6);
 }

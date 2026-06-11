@@ -1,12 +1,12 @@
 .textarea {
   width: 100%;
-  padding: var(--sn-space-sm);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
-  background: var(--sn-surface);
-  color: var(--sn-text);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  color: var(--foreground);
   font-family: inherit;
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
   line-height: 1.5;
   resize: none;
   overflow: hidden;
@@ -15,10 +15,10 @@
 
 .textarea:focus {
   outline: none;
-  border-color: var(--sn-purple-accent);
+  border-color: var(--primary);
 }
 
 .textarea:disabled {
-  background: var(--sn-surface-raised);
+  background: var(--surface-raised);
   cursor: default;
 }

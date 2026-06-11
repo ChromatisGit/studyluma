@@ -33,7 +33,8 @@ export function QuizStartBanner() {
     countdownRef.current = setInterval(() => {
       setCountdown((c) => {
         if (c === null || c <= 1) {
-          clearInterval(countdownRef.current!);
+          const interval = countdownRef.current;
+          if (interval) clearInterval(interval);
           countdownRef.current = null;
           setShouldNavigate(true);
           return null;
@@ -53,7 +54,6 @@ export function QuizStartBanner() {
         break;
       }
       case "QUIZ_STARTED": {
-        console.log("[banner] QUIZ_STARTED");
         startCountdown();
         break;
       }

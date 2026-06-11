@@ -1,11 +1,11 @@
 .quiz {
-  padding: var(--sn-space-lg);
-  background: var(--sn-surface);
-  border: 2px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
+  padding: var(--space-6);
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-md);
+  gap: var(--space-4);
 }
 
 .questionLabel {
@@ -13,26 +13,26 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--sn-text-secondary);
+  color: var(--foreground-secondary);
 }
 
 .question {
   font-size: 1.125rem;
   font-weight: 500;
-  color: var(--sn-text);
+  color: var(--foreground);
   line-height: 1.5;
 }
 
 .options {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-xs);
-  padding-left: var(--sn-space-lg);
+  gap: var(--space-2);
+  padding-left: var(--space-6);
   margin: 0;
 }
 
 .option {
-  color: var(--sn-text-secondary);
+  color: var(--foreground-secondary);
   font-size: 0.9375rem;
   line-height: 1.4;
 }

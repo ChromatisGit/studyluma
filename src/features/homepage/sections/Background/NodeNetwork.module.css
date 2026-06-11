@@ -2,12 +2,12 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  color: var(--sn-purple-accent-soft-border);
+  color: var(--primary-border);
   opacity: 0.45;
 }
 
 :global(html.dark) .nodeNetwork {
-  color: var(--sn-purple-accent);
+  color: var(--primary);
   opacity: 0.55;
 }
 

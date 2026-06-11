@@ -65,7 +65,7 @@ export function remarkMarkdownTransforms() {
         // Strong: check if it's underline syntax
         case "strong":
           if (isUnderlineStrong(node, source)) {
-            setHName(node, "span", { className: "sn-underline" });
+            setHName(node, "span", { className: "content-underline" });
           }
           break;
 
@@ -137,7 +137,7 @@ export function CodeBlock({
   return (
     <Highlight theme={codeTheme} code={code} language={language as unknown as Parameters<typeof Highlight>[0]['language']}>
       {({ tokens, getLineProps, getTokenProps }) => (
-        <pre className="sn-code-block">
+        <pre className="content-code-block">
           {tokens.map((line, i) => (
             <div key={i} {...getLineProps({ line })}>
               {line.map((token, key) => (

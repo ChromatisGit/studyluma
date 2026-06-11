@@ -5,7 +5,7 @@ import { adminNavItem, mainNavItems, profileNavItem } from "@core/nav";
 import { RouteProvider } from "@ui/contexts/RouteContext";
 import { getSession } from "@core/index.server";
 
-const BRAND = { name: "StudyNode", initial: "S" } as const;
+const BRAND = { name: "StudyLuma", initial: "S" } as const;
 
 export async function loader({ request }: { request: Request }) {
   const session = await getSession(request);

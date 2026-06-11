@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "title": "Entwicklung & Ausblick — StudyLuma",
+    "description": "Woher StudyLuma kommt und wohin die Plattform sich entwickeln soll."
+  },
+  "page": {
+    "backLink": "Zurück zur Startseite",
+    "title": "Entwicklung & Ausblick",
+    "intro": "StudyLuma ist noch im Aufbau. Die Plattform entsteht aus der Frage, wie digitale Materialien im Unterricht weniger verstreut und besser nutzbar werden können. Angefangen hat das Projekt als kleines Werkzeug für meinen eigenen Unterricht. Schritt für Schritt soll daraus eine offene Plattform werden, mit der Lehrkräfte Themen, Materialien, Aufgaben und Wiederholung besser zusammenbringen können."
+  },
+  "roadmap": [
+    {
+      "date": "November 2025",
+      "title": "Beginn des ersten Prototyps",
+      "body": [
+        "In dieser ersten Version entstanden zwei Grundideen, die bis heute zentral sind: Eine Roadmap, die Lernenden den Aufbau einer Themenreihe zeigt und interaktive Arbeitsblätter, die direkt in diese Struktur eingebunden sind."
+      ],
+      "bullets": [
+        "Roadmap-Ansicht zur Orientierung innerhalb einer Themenreihe",
+        "interaktive Arbeitsblätter für den Einsatz im Unterricht",
+        "Markdown-Integration zur Erstellung von Inhalten"
+      ]
+    },
+    {
+      "date": "März 2026",
+      "title": "Erste Erprobung im Unterricht",
+      "body": [
+        "Im März wurde der Prototyp in einem vierwöchigen Schulpraktikum im Unterricht eingesetzt. Dabei ging es vor allem darum, zu sehen, ob die Struktur in der Praxis funktioniert und ob Lernende sich damit besser orientieren können."
+      ],
+      "bullets": [
+        "Einsatz im realen Unterricht",
+        "Rückmeldungen zu Übersichtlichkeit, Materialien und Bedienung",
+        "Weiterentwicklung auf Grundlage konkreter Unterrichtssituationen"
+      ]
+    },
+    {
+      "date": "Juni 2026",
+      "title": "Öffentliche Demo & Projektseite",
+      "body": [
+        "Mit StudyLuma.org möchte ich das Projekt erstmals öffentlich zeigen. Die Demo soll einen Eindruck davon geben, wie StudyLuma im Unterricht eingesetzt werden kann und welche Ideen hinter der Plattform stehen."
+      ],
+      "bullets": [
+        "öffentliche Demo mit Einblick in zentrale Funktionen",
+        "Erklärung des aktuellen Entwicklungsstands"
+      ],
+      "current": true
+    },
+    {
+      "date": "Sommer 2026",
+      "title": "Presenter Mode & integriertes Quiz",
+      "body": [
+        "Ein wichtiges Ziel ist, im Unterricht weniger zwischen verschiedenen Tools wechseln zu müssen. Der Presenter Mode soll Inhalte, Aufgaben und kurze Verständnisfragen direkt in StudyLuma nutzbar machen.",
+        "Das Quiz-Modul ist dabei nicht als Spielerei gedacht, sondern als Werkzeug für Unterrichtseinstiege oder kurzer Wiederholung von Inhalten"
+      ],
+      "bullets": [
+        "Inhalte und Aufgaben im Unterricht präsentieren",
+        "Quizfragen für Einstieg, Wiederholung und Verständnischecks",
+        "Teilnahme direkt über StudyLuma statt über externe Quiz-Plattformen"
+      ]
+    },
+    {
+      "date": "Sommer 2026",
+      "title": "Inhalte & Aufgabentypen",
+      "body": [
+        "Damit StudyLuma nicht nur als leere Plattform funktioniert, werden weitere Mathematik-Inhalte und neue Aufgabenformate ergänzt. Inhalte und interaktive Aufgaben sollen stärker zusammenwachsen."
+      ],
+      "bullets": [
+        "Ausbau vorbereiteter Mathematik-Inhalte",
+        "weitere digitale und interaktive Aufgabenformate"
+      ]
+    },
+    {
+      "date": "Herbst 2026",
+      "title": "Einsatz im eigenen Unterricht",
+      "body": [
+        "Ab Herbst soll StudyLuma regelmäßig im eigenen Unterricht eingesetzt werden. Dabei wird sich zeigen, welche Funktionen im Schulalltag wirklich hilfreich sind und welche noch vereinfacht oder verändert werden müssen."
+      ],
+      "bullets": [
+        "regelmäßiger Einsatz in der eigenen Schulpraxis",
+        "Weiterentwicklung aus dem Unterricht heraus",
+        "Prüfung von Struktur, Quiz, Materialien und Aufgaben im Alltag"
+      ]
+    },
+    {
+      "date": "Herbst/Winter 2026",
+      "title": "Lerntraining",
+      "body": [
+        "Mit dem Lerntraining soll eine niedrigschwellige Möglichkeit entstehen, Unterrichtsinhalte regelmäßig zu üben. Lernende sollen leicht eine kleine Übungssession starten und kurze Aufgaben zu den Themen bearbeiten, die gerade wichtig sind. So können sie eine kurze, regelmäßige Routine in den Lernalltag einbauen.",
+        "Für Lehrkräfte soll dadurch auch sichtbar werden, welche Themen schon sicher sitzen und wo Wiederholung sinnvoll wäre."
+      ],
+      "bullets": [
+        "kurze Übungsaufgaben zu einzelnen Themen und Konzepten",
+        "Wiederholung in kleinen Einheiten, auch außerhalb des Unterrichts",
+        "bessere Grundlage für Übungsphasen und Wiederholungsaufgaben im Unterricht"
+      ]
+    },
+    {
+      "date": "2026/27",
+      "title": "Masterarbeit & didaktische Analyse",
+      "body": [
+        "Die weitere Entwicklung von StudyLuma soll im Rahmen einer Masterarbeit didaktisch analysiert und reflektiert werden. Dabei geht es um die Frage, welche Kriterien ein digitales Unterrichtswerkzeug erfüllen sollte und wie StudyLuma diese Ideen bereits umsetzt oder noch weiterentwickeln muss."
+      ],
+      "bullets": [
+        "didaktische Designkriterien für digitale Unterrichtswerkzeuge herausarbeiten",
+        "Stärken, Grenzen und nächste Entwicklungsschritte sichtbar machen",
+        "wissenschaftliche Grundlage für die weitere Entwicklung"
+      ]
+    },
+    {
+      "date": "Ab 2027",
+      "title": "Erprobung mit ausgewählten Lehrkräften",
+      "body": [
+        "Eigene StudyLuma-Instanzen sind grundsätzlich bereits möglich. Ab 2027 soll die Plattform gezielter mit interessierten Lehrkräften erprobt werden, um zu sehen, wie sie in unterschiedlichen Unterrichtssituationen funktioniert und was dafür noch fehlt."
+      ],
+      "bullets": [
+        "Erprobung mit interessierten Lehrkräften",
+        "Einsatz eigener Materialien und Unterrichtsreihen",
+        "Feedback als Grundlage für die weitere Entwicklung"
+      ]
+    },
+    {
+      "date": "Langfristig",
+      "title": "Offenes Projekt & Verein",
+      "body": [
+        "Langfristig soll StudyLuma nicht nur mein eigenes Unterrichtswerkzeug bleiben. Die Idee ist, daraus ein offenes Projekt zu machen, das auch andere Lehrkräfte nutzen und mitgestalten können.",
+        "Perspektivisch soll ein gemeinnütziger Verein die Weiterentwicklung tragen. Ziel wäre eine kostenlose und offene Plattform, die Lehrkräfte bei digitaler Unterrichtsarbeit unterstützt und Materialien frei zugänglich macht."
+      ],
+      "bullets": [
+        "offene und kostenlose Plattform für digitale Unterrichtsarbeit",
+        "Möglichkeit, eigene Instanzen zu betreiben",
+        "gemeinsame Weiterentwicklung von Inhalten und Materialien",
+        "langfristige Trägerstruktur durch einen gemeinnützigen Verein"
+      ]
+    }
+  ]
+}

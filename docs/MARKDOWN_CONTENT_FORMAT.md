@@ -1,6 +1,6 @@
 # Markdown Content Format
 
-This document describes the Markdown syntax supported by the StudyNode content pipeline (`studynode-content`). All worksheet and slide deck files are written in this format.
+This document describes the Markdown syntax supported by the StudyLuma content pipeline (`studyluma-content`). All worksheet and slide deck files are written in this format.
 
 ---
 

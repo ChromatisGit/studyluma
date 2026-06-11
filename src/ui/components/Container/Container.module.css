@@ -2,8 +2,8 @@
   width: 100%;
   margin-left: auto;
   margin-right: auto;
-  padding-left: var(--sn-page-padding);
-  padding-right: var(--sn-page-padding);
+  padding-left: var(--page-padding);
+  padding-right: var(--page-padding);
 }
 
 .noGutters {
@@ -12,11 +12,11 @@
 }
 
 .narrow {
-  max-width: var(--sn-content-width-narrow);
+  max-width: var(--content-width-narrow);
 }
 
 .wide {
-  max-width: var(--sn-content-width-wide);
+  max-width: var(--content-width-wide);
 }
 
 .full {

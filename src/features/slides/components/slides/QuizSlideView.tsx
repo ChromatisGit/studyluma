@@ -23,7 +23,7 @@ export function QuizSlideView({ slide, projector }: Props) {
   return (
     <>
       <SlideHeader title={slide.header} badge="Quiz" accent="teal" />
-      <div style={{ padding: "var(--sn-space-md) var(--sn-space-xl)", flex: 1, display: "flex", flexDirection: "column", gap: "var(--sn-space-md)", overflowY: "auto" }}>
+      <div style={{ padding: "var(--space-4) var(--space-8)", flex: 1, display: "flex", flexDirection: "column", gap: "var(--space-4)", overflowY: "auto" }}>
         {slide.questions.map((q, qi) => (
           <div key={qi} className={styles.quizQuestion}>
             <div className={styles.quizQuestionText}>

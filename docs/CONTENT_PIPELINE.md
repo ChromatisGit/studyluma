@@ -1,13 +1,13 @@
 # Content Pipeline
 
-The `studynode-content` repository is a standalone build tool. It reads Markdown source files and YAML configuration, then writes parsed course structure and content pages to the Postgres database.
+The `studyluma-content` repository is a standalone build tool. It reads Markdown source files and YAML configuration, then writes parsed course structure and content pages to the Postgres database.
 
 ---
 
 ## Repo Structure
 
 ```
-studynode-content/
+studyluma-content/
 ├── content/
 │   ├── definitions.yml          Groups, subjects, and variant definitions
 │   ├── base/                    Subject content (independent of any course)

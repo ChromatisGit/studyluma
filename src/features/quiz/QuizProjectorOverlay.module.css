@@ -5,21 +5,21 @@
   z-index: 10;
   display: flex;
   align-items: stretch;
-  background: var(--sn-bg);
-  padding: var(--sn-space-lg);
+  background: var(--background);
+  padding: var(--space-6);
   box-sizing: border-box;
 
   /* Scale quiz text for the projector */
-  --sn-text-xs: 0.95rem;
-  --sn-text-sm: 1.1rem;
-  --sn-text-md: 1.35rem;
-  --sn-text-lg: 2rem;
-  --sn-text-xl: 2.5rem;
-  --sn-space-xs: 6px;
-  --sn-space-sm: 10px;
-  --sn-space-md: 16px;
-  --sn-space-lg: 24px;
-  --sn-space-xl: 36px;
+  --text-xs: 0.95rem;
+  --text-sm: 1.1rem;
+  --text-base: 1.35rem;
+  --text-lg: 2rem;
+  --text-xl: 2.5rem;
+  --space-2: 6px;
+  --space-3: 10px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 36px;
 }
 
 /* Card matching slide visual identity */
@@ -27,10 +27,10 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-xl);
-  background: var(--sn-surface);
-  box-shadow: var(--sn-shadow-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
@@ -40,6 +40,6 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  padding: 0 var(--sn-space-xl) var(--sn-space-xl);
+  padding: 0 var(--space-8) var(--space-8);
   overflow-y: auto;
 }
