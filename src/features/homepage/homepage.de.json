@@ -18,6 +18,7 @@
   "about": {
     "title": "Was ist StudyLuma?",
     "subtitle": "StudyLuma ist eine zentrale Lernplattform für den Informatik- und Mathematikunterricht von Herrn Holst.",
+    "learnMoreLabel": "Mehr über StudyLuma erfahren",
     "intro": "Wissen entsteht als Netzwerk: Jede Idee ist ein Knoten, der mit anderen verbunden ist. Die Plattform macht diese Zusammenhänge sichtbar, bietet strukturierte Aufgaben mit direktem Feedback und fördert selbstbestimmtes Arbeiten. Sie basiert auf modernen Web-Standards, die für eine zugängliche und zeitgemäße Lernumgebung sorgen. Denn im Fokus steht das erfolgreiche Lernen, ohne Werbung, ohne Schnickschnack.",
     "note": "Die Plattform befindet sich noch in der Aufbauphase. Ich freue mich über sämtliches Feedback!",
     "goals": {
@@ -51,7 +52,9 @@
     "contactHeading": "Kontakt",
     "contactPrompt": "Fragen zu der Webseite oder den Inhalten? Melde dich gerne bei mir!",
     "tagline": "Gebaut mit 💜 fürs Lernen",
-    "copyright": "© {year} Christian Holst."
+    "copyright": "© {year} Christian Holst.",
+    "studylumaLabel": "studyluma.org",
+    "impressumLabel": "Impressum"
   },
   "meta": {
     "title": "StudyLuma",

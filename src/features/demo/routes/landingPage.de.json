@@ -8,36 +8,35 @@
     "roadmap": "Roadmap"
   },
   "hero": {
-    "claim": "Willkommen bei StudyLuma",
+    "claim": "Guter Unterricht hat eine Logik. StudyLuma macht sie sichtbar.",
     "lead": "Ein offenes Unterrichtssystem für Lernwege, Arbeitsblätter und Übung.",
     "ctaPrimary": "Demo starten",
-    "ctaSecondary": "Geschichte lesen"
+    "ctaSecondary": "Fortschritt & Ausblick"
   },
   "about": {
     "title": "Was ist StudyLuma?",
-    "intro": "Lernen heißt, Licht ins Unklare zu bringen. Die Plattform unterstützt diesen Prozess, indem sie Inhalte strukturiert darstellt, passende Aufgaben bereitstellt und direkte Rückmeldungen gibt. Schüler sehen, wo sie stehen. Lehrkräfte sehen, wo die Klasse steht. Denn im Fokus steht das Lernen — ohne Ablenkung, ohne Schnickschnack.",
+    "intro": "Lernen heißt, Licht ins Unklare zu bringen. Die Plattform unterstützt diesen Prozess, indem sie Inhalte strukturiert darstellt, passende Aufgaben bereitstellt und direkte Rückmeldungen gibt. Schüler sehen, wo sie stehen. Lehrkräfte sehen, wo die Klasse steht. Denn im Fokus steht das Lernen — ohne Werbung, ohne Schnickschnack.",
     "note": "Die Plattform befindet sich noch in der Aufbauphase. Ich freue mich über sämtliches Feedback."
   },
   "features": {
-    "title": "Was ist aktuell da?",
+    "title": "Bausteine für digitalen Unterricht",
     "roadmap": {
       "title": "Lernwege",
-      "description": "Themenreihen als strukturierter Weg — Schüler sehen immer, wo sie stehen und was als Nächstes kommt."
+      "description": "Themenreihen werden als klarer Weg dargestellt. Lernende sehen, wo sie stehen und was als Nächstes kommt."
     },
     "worksheets": {
       "title": "Interaktive Arbeitsblätter",
-      "description": "Materialien, Formeln und Aufgaben direkt im Lernweg, ohne Wechsel zwischen verschiedenen Tools."
+      "description": "Erklärungen, Beispiele und Aufgaben werden zu interaktiven Arbeitsbereichen. Lehrkräfte können sie in Markdown erstellen und direkt im Unterricht einsetzen."
     },
     "lerntraining": {
       "title": "Lerntraining",
-      "description": "Kurze Übungseinheiten, die Wissen frisch halten — wann immer gerade Zeit ist. In Entwicklung.",
-      "roadmapCta": "In Planung"
+      "description": "Kurze Übungseinheiten helfen dabei, Wissen regelmäßig aufzufrischen und passende Aufgaben bereitzustellen."
     }
   },
   "story": {
     "title": "Die Projektgeschichte",
-    "body": "Woher kommt StudyLuma, wo steht es gerade, wohin soll es führen? Der Weg des Projekts.",
-    "cta": "Geschichte lesen"
+    "body": "StudyLuma ist nicht als fertige Plattform gestartet, sondern aus konkreter Unterrichtsvorbereitung heraus entstanden. Die Projektgeschichte zeigt die ersten Schritte und welche Richtung das Projekt langfristig nehmen soll.",
+    "cta": "Fortschritt & Ausblick"
   },
   "demo": {
     "title": "Demo ausprobieren",
@@ -48,15 +47,11 @@
     "title": "Über das Projekt",
     "body": "StudyLuma ist ein Nebenprojekt von Christian Holst, angehender Lehrer für berufliche Schulen mit den Fächern Mathematik und Informatik. Es entstand aus der eigenen Unterrichtsvorbereitung mit dem Ziel, ein offenes Werkzeug zu bauen, das langfristig auch anderen Lehrkräften helfen kann.",
     "githubLabel": "GitHub",
-    "email": "kontakt@studyluma.org"
+    "email": "christian.contactmail@gmail.com"
   },
   "footer": {
+    "tagline": "Gebaut mit 💜 fürs Lernen",
     "copyright": "© {year} Christian Holst",
-    "links": {
-      "demo": "Demo",
-      "roadmap": "Roadmap",
-      "github": "GitHub",
-      "impressum": "Impressum"
-    }
+    "impressum": "Impressum"
   }
 }

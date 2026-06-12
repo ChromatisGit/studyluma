@@ -1,11 +1,11 @@
 {
   "meta": {
-    "title": "Entwicklung & Ausblick — StudyLuma",
+    "title": "Fortschritt & Ausblick — StudyLuma",
     "description": "Woher StudyLuma kommt und wohin die Plattform sich entwickeln soll."
   },
   "page": {
     "backLink": "Zurück zur Startseite",
-    "title": "Entwicklung & Ausblick",
+    "title": "Fortschritt & Ausblick",
     "intro": "StudyLuma ist noch im Aufbau. Die Plattform entsteht aus der Frage, wie digitale Materialien im Unterricht weniger verstreut und besser nutzbar werden können. Angefangen hat das Projekt als kleines Werkzeug für meinen eigenen Unterricht. Schritt für Schritt soll daraus eine offene Plattform werden, mit der Lehrkräfte Themen, Materialien, Aufgaben und Wiederholung besser zusammenbringen können."
   },
   "roadmap": [
@@ -50,7 +50,7 @@
       "title": "Presenter Mode & integriertes Quiz",
       "body": [
         "Ein wichtiges Ziel ist, im Unterricht weniger zwischen verschiedenen Tools wechseln zu müssen. Der Presenter Mode soll Inhalte, Aufgaben und kurze Verständnisfragen direkt in StudyLuma nutzbar machen.",
-        "Das Quiz-Modul ist dabei nicht als Spielerei gedacht, sondern als Werkzeug für Unterrichtseinstiege oder kurzer Wiederholung von Inhalten"
+        "Das Quiz-Modul ist dabei nicht als Spielerei gedacht, sondern als Werkzeug für Unterrichtseinstiege oder kurze Wiederholung von Inhalten"
       ],
       "bullets": [
         "Inhalte und Aufgaben im Unterricht präsentieren",

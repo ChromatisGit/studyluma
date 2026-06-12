@@ -32,11 +32,13 @@ export default [
   route("slides/:courseId/:topic/:chapter/:slideId/projector", "../src/features/slides/routes/projector.tsx"),
 
   ...(DEMO_MODE ? [
-    // Demo mode: standalone landing page at /, role-picker entry, then app inside DemoAppLayout
-    index("../src/features/demo/routes/landingPage.tsx"),
+    // Demo mode: public pages share sidebar via PublicLayout; role-picker is standalone; app inside DemoAppLayout
+    layout("../src/features/demo/routes/PublicLayout.tsx", [
+      index("../src/features/demo/routes/landingPage.tsx"),
+      route("roadmap", "../src/features/demo/routes/roadmap.tsx"),
+      route("impressum", "../src/features/demo/routes/impressum.tsx"),
+    ]),
     route("demo", "../src/features/demo/routes/demo.tsx"),
-    route("roadmap", "../src/features/demo/routes/roadmap.tsx"),
-    route("impressum", "../src/features/demo/routes/impressum.tsx"),
     layout("../src/features/demo/routes/DemoAppLayout.tsx", appRoutes),
   ] : [
     // Normal mode: app shell with standard home page

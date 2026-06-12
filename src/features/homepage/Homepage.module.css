@@ -28,3 +28,9 @@
     --section-padding: 2.5rem 1.25rem;
   }
 }
+
+.learnMoreSection {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-4) var(--page-padding, 1.5rem);
+}

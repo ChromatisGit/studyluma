@@ -6,7 +6,7 @@
 
 /* ── Nav ── */
 .navInner {
-  max-width: 960px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 1rem 1.5rem;
   display: flex;
@@ -28,6 +28,32 @@
   gap: 1.5rem;
   font-size: 0.875rem;
 }
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms, background 150ms;
+}
+
+.themeToggle:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+/* CSS-driven icon swap — no React state needed */
+.iconSun { display: none; }
+.iconMoon { display: block; }
+
+:global(html.dark) .iconSun { display: block; }
+:global(html.dark) .iconMoon { display: none; }
 
 /* ── Hero ── */
 .hero {
@@ -65,78 +91,83 @@
 
 /* ── Sections ── */
 .section {
-  padding: 4rem 1.5rem;
+  padding: 3rem 1.5rem;
 }
 
-.sectionAlt {
+/* Featured section (Features): subtle tinted background */
+.sectionAccent {
   background: var(--muted);
 }
 
 .sectionInner {
-  max-width: 680px;
+  max-width: 1120px;
   margin: 0 auto;
 }
 
-.sectionInnerWide {
-  max-width: 960px;
-  margin: 0 auto;
-}
-
-/* ── Feature cards ── */
-.featureGrid {
+/* ── WhatIs two-column ── */
+.whatIsGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-  margin-top: 2rem;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  align-items: start;
 }
 
-.featureCard {
-  padding: 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow-sm);
+@media (min-width: 768px) {
+  .whatIsGrid {
+    grid-template-columns: 3fr 2fr;
+    gap: var(--space-10, 3rem);
+    align-items: stretch;
+  }
 }
 
-/* ── Planned list ── */
-.plannedList {
-  list-style: none;
-  padding: 0;
-  margin: 1.5rem 0 2rem;
+.leftCol {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
 }
 
-.plannedItem {
+.featureStack {
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.storyBlock {
+  margin-top: auto;
+  padding-top: var(--space-6);
+}
+
+.whatIsNote {
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--border);
   color: var(--muted-foreground);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
-.plannedItem::before {
-  content: "→";
-  color: var(--primary);
-  font-size: 0.75rem;
-  flex-shrink: 0;
-}
-
-/* ── Demo hint ── */
-.demoHintBox {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2rem;
-  background: var(--card);
-  text-align: center;
-  max-width: 540px;
+/* ── Story + Demo two-column ── */
+.storyDemoGrid {
+  max-width: 1120px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  align-items: start;
 }
 
-/* ── About ── */
+@media (min-width: 768px) {
+  .storyDemoGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+.centeredBox {
+  text-align: center;
+}
+
+/* ── About (author bio) ── */
 .aboutInner {
-  max-width: 680px;
+  max-width: 1120px;
   margin: 0 auto;
   display: flex;
   gap: 2rem;
@@ -167,35 +198,9 @@
   flex-shrink: 0;
 }
 
-/* ── Footer ── */
-.footer {
-  padding: 1.5rem;
-  border-top: 1px solid var(--border);
-  font-size: 0.8125rem;
-  color: var(--muted-foreground);
-}
-
-.footerInner {
-  max-width: 960px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.footerLinks {
-  display: flex;
-  gap: 1.25rem;
-}
 
 /* ── Responsive ── */
 @media (max-width: 767px) {
-  .featureGrid {
-    grid-template-columns: 1fr;
-  }
-
   .aboutInner {
     flex-direction: column;
   }
@@ -205,10 +210,5 @@
   .heroActions {
     flex-direction: column;
     align-items: center;
-  }
-
-  .footerInner {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }

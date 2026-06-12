@@ -16,6 +16,15 @@ export function Footer() {
           <div>
             <h3 className={styles.footerTitle}>StudyLuma</h3>
             <p className={styles.footerText}>{footer.description}</p>
+            <a
+              href="https://studyluma.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={clsx(styles.footerLink, styles.footerSiteLink)}
+              aria-label="StudyLuma-Projektseite öffnen"
+            >
+              {footer.studylumaLabel} ↗
+            </a>
           </div>
 
           <div>
@@ -32,7 +41,10 @@ export function Footer() {
 
         <div className={styles.footerBar}>
           <span>{footer.tagline}</span>
-          <span>{copyrightText}</span>
+          <div className={styles.footerBarRight}>
+            <a href="/impressum" className={styles.footerNavLink}>{footer.impressumLabel}</a>
+            <span>{copyrightText}</span>
+          </div>
         </div>
       </Container>
     </footer>

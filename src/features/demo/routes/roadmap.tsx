@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 
 import { Container } from "@components/Container";
+import { LightField } from "../components/LightField/LightField";
+import { SiteFooter } from "./SiteFooter";
 import TEXT from "./roadmap.de.json";
 import styles from "./roadmap.module.css";
 
@@ -55,23 +57,30 @@ export function meta() {
 
 export default function RoadmapPage() {
   return (
-    <main className={styles.page}>
-      <Container size="narrow">
-        <nav className={styles.backNav}>
-          <a href="/" className={styles.backLink}>
-            <span aria-hidden>←</span>
-            {TEXT.page.backLink}
-          </a>
-        </nav>
+    <>
+      <main className={styles.page}>
+        <LightField />
+        <div className={styles.pageGlow} aria-hidden />
+        <Container size="narrow">
+          <div className={styles.card}>
+            <nav className={clsx(styles.backNav, "md:hidden")}>
+              <a href="/" className={styles.backLink}>
+                <span aria-hidden>←</span>
+                {TEXT.page.backLink}
+              </a>
+            </nav>
 
-        <header className={styles.header}>
-          <h1 className={styles.title}>{TEXT.page.title}</h1>
-          <p className={styles.intro}>{TEXT.page.intro}</p>
-        </header>
+            <header className={styles.header}>
+              <h1 className={styles.title}>{TEXT.page.title}</h1>
+              <p className={styles.intro}>{TEXT.page.intro}</p>
+            </header>
 
-        <ProjectRoadmap items={TEXT.roadmap} />
-      </Container>
-    </main>
+            <ProjectRoadmap items={TEXT.roadmap} />
+          </div>
+        </Container>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
 
@@ -130,7 +139,12 @@ function RoadmapEntry({
         <article className={styles.content}>
           <div className={styles.heading}>
             <span className={styles.date}>{item.date}</span>
-            <h2 className={styles.entryTitle}>{item.title}</h2>
+            <div className={styles.titleRow}>
+              <h2 className={styles.entryTitle}>{item.title}</h2>
+              {status === "current" && (
+                <span className={styles.currentBadge}>Aktueller Stand</span>
+              )}
+            </div>
           </div>
 
           <div className={styles.body}>
