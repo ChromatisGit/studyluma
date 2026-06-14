@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  font-weight: var(--sn-font-bold);
+  font-weight: var(--font-weight-bold);
   text-decoration: none;
   border-radius: 999px;
   border: 1px solid transparent;
@@ -28,52 +28,52 @@
 
 .size-sm {
   padding: 0.5rem 0.9rem;
-  font-size: var(--sn-text-sm);
+  font-size: var(--text-sm);
 }
 
 .size-md {
   padding: 0.65rem 1.15rem;
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
 }
 
 .size-lg {
   padding: 0.8rem 1.3rem;
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
 }
 
 /* === Variants === */
 
 .variant-primary {
-  background: var(--sn-purple-accent);
-  border-color: var(--sn-purple-accent-strong);
-  color: var(--sn-text-on-accent);
-  box-shadow: var(--sn-shadow-lw);
+  background: var(--primary);
+  border-color: var(--primary-strong);
+  color: var(--text-on-accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .variant-primary:hover:not(:disabled) {
-  background: var(--sn-purple-accent-strong);
+  background: var(--primary-strong);
 }
 
 .variant-secondary {
-  background: var(--sn-surface-raised);
-  border-color: var(--sn-border);
-  color: var(--sn-text);
+  background: var(--surface-raised);
+  border-color: var(--border);
+  color: var(--foreground);
 }
 
 .variant-secondary:hover:not(:disabled) {
-  background: var(--sn-surface-deep);
-  border-color: var(--sn-border);
+  background: var(--surface-deep);
+  border-color: var(--border);
 }
 
 .variant-ghost {
-  background: var(--sn-surface);
-  border-color: var(--sn-border);
-  color: var(--sn-text);
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--foreground);
 }
 
 .variant-ghost:hover:not(:disabled) {
-  background: var(--sn-purple-accent-soft-bg);
-  border-color: var(--sn-purple-accent-soft-border);
+  background: var(--primary-light);
+  border-color: var(--primary-border);
 }
 
 /* === Full Width === */

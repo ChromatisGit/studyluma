@@ -1,37 +1,37 @@
 .section {
   position: relative;
-  padding: var(--sn-section-padding, 3rem var(--sn-page-padding, 1.5rem));
+  padding: var(--section-padding, 3rem var(--page-padding, 1.5rem));
 }
 
 .inner {
-  max-width: var(--sn-section-max-width, var(--sn-content-width-wide, 1120px));
+  max-width: var(--section-max-width, var(--content-width-wide, 1120px));
   margin: 0 auto;
 }
 
 .card {
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  box-shadow: var(--sn-shadow-lw);
-  border-radius: var(--sn-section-card-radius, var(--sn-radius-lg, 14px));
-  padding: var(--sn-section-card-padding, 2rem);
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--section-card-radius, var(--radius-xl, 14px));
+  padding: var(--section-card-padding, 2rem);
 }
 
 .header {
-  margin-bottom: var(--sn-section-header-margin, 1.25rem);
-  text-align: var(--sn-section-header-align, left);
+  margin-bottom: var(--section-header-margin, 1.25rem);
+  text-align: var(--section-header-align, left);
 }
 
 .title {
-  margin: 0 0 var(--sn-section-title-gap, 0.5rem);
-  font-size: var(--sn-section-title-size, var(--sn-text-xl));
-  color: var(--sn-text);
+  margin: 0 0 var(--section-title-gap, 0.5rem);
+  font-size: var(--section-title-size, var(--text-xl));
+  color: var(--foreground);
 }
 
 .subtitle {
   margin: 0;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .alignCenter {
-  --sn-section-header-align: center;
+  --section-header-align: center;
 }

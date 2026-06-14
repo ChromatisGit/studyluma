@@ -30,5 +30,5 @@ interface MarkdownRendererProps {
 
 export function MarkdownRenderer({ markdown }: MarkdownRendererProps): ReactNode {
   const rendered = processor.processSync(markdown).result as ReactNode;
-  return <div className="sn-markdown">{rendered}</div>;
+  return <div className="content-markdown">{rendered}</div>;
 }

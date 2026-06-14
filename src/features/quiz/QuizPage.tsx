@@ -136,7 +136,7 @@ export function QuizPage({ initialState }: QuizPageProps) {
 
   return (
     <div className={styles.page}>
-      <Container size="narrow" gutters={false} className={styles.inner}>
+      <Container size="narrow" className={styles.inner}>
         {/* Question progress bar */}
         <div className={styles.progressTrack}>
           <div

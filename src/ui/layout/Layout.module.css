@@ -2,16 +2,16 @@
   display: flex;
   height: 100dvh;
   overflow: hidden;
-  background: var(--sn-bg);
+  background: var(--background);
 }
 
 .main {
   flex: 1;
   min-width: 0;
   overflow-y: auto;
-  padding-inline: var(--sn-page-padding);
+  padding-inline: var(--page-padding);
   /* on mobile, reserve space for fixed bottom nav */
-  padding-bottom: var(--sn-bottom-nav-height);
+  padding-bottom: var(--bottom-nav-height);
 }
 
 .mainFullWidth {
@@ -26,7 +26,7 @@
 
 @media (max-width: 767px) {
   .main {
-    padding-inline: var(--sn-space-md);
+    padding-inline: var(--space-4);
   }
 
 }

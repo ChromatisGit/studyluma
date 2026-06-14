@@ -3,13 +3,13 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--sn-space-lg);
+  padding: var(--space-6);
   box-sizing: border-box;
 }
 
 /* Presenter: spacing around card */
 .slidePreview {
-  padding: var(--sn-space-lg) var(--sn-space-lg) var(--sn-space-lg) 0;
+  padding: var(--space-6) var(--space-6) var(--space-6) 0;
 }
 
 /* White card */
@@ -18,10 +18,10 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-xl);
-  background: var(--sn-surface);
-  box-shadow: var(--sn-shadow-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
   transition: opacity 0.15s ease-out;
 }
@@ -35,7 +35,7 @@
 
 /* Section slide uses full purple card — no inner content layout */
 .cardSection {
-  background: var(--sn-purple-accent);
+  background: var(--primary);
 }
 
 /* Fade-in when slide changes */
@@ -54,10 +54,10 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-xl);
-  background: var(--sn-surface);
-  box-shadow: var(--sn-shadow-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
@@ -67,24 +67,24 @@
 }
 
 .slideHeader {
-  margin: var(--sn-space-md) var(--sn-space-xl) var(--sn-space-sm);
-  padding: 4px 0 4px var(--sn-space-md);
-  border-left: 5px solid var(--sn-purple-accent);
+  margin: var(--space-4) var(--space-8) var(--space-3);
+  padding: 4px 0 4px var(--space-4);
+  border-left: 5px solid var(--primary);
   flex-shrink: 0;
 }
 
 .headerTitle {
   margin: 0;
   font-size: 1.05em;
-  font-weight: var(--sn-font-bold);
-  color: var(--sn-text);
+  font-weight: var(--font-weight-bold);
+  color: var(--foreground);
 }
 
 .contentInner {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-lg);
-  padding: 0 var(--sn-space-xl) var(--sn-space-xl);
+  gap: var(--space-6);
+  padding: 0 var(--space-8) var(--space-8);
   font-size: 1.08em;
   line-height: 1.7;
   flex: 1;

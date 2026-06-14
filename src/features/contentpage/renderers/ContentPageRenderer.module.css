@@ -1,15 +1,15 @@
 .content {
-  padding-top: var(--sn-space-xl);
-  padding-bottom: var(--sn-space-2xl);
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-12);
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
 }
 
 .sections {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
 }
 
 .section {
@@ -19,15 +19,15 @@
 }
 
 .sectionTitle {
-  font-size: var(--sn-text-xl);
+  font-size: var(--text-xl);
   margin: 0;
 }
 
 .subheader {
-  font-size: var(--sn-text-lg);
+  font-size: var(--text-lg);
   font-weight: 600;
   margin: 0;
-  color: var(--sn-text);
+  color: var(--foreground);
 }
 
 .sectionBody {
@@ -42,18 +42,18 @@
   gap: 0.5rem;
 }
 
-.textBlock .sn-markdown {
+.textBlock .content-markdown {
   width: 100%;
 }
 
 .code {
-  background: var(--sn-surface-raised);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 1rem;
   overflow-x: auto;
-  font-family: var(--sn-font-mono);
-  font-size: var(--sn-text-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
   margin: 0;
 }
 

@@ -1,12 +1,12 @@
 .callout {
   width: 100%;
-  padding: var(--sn-space-sm) var(--sn-space-lg);
-  border-radius: var(--sn-radius-md);
-  background: color-mix(in srgb, var(--sn-purple-accent) 8%, var(--sn-surface));
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--primary) 8%, var(--card));
   text-align: center;
   font-size: 1.05em;
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-purple-accent-strong);
+  font-weight: var(--font-weight-semibold);
+  color: var(--primary-strong);
 }
 
 .callout > :first-child {

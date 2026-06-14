@@ -1,0 +1,47 @@
+.footer {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+.inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+.inner > :last-child {
+  text-align: right;
+}
+
+.link {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: color 150ms;
+}
+
+.link:hover {
+  color: var(--foreground);
+}
+
+@media (max-width: 540px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .inner > :nth-child(2) {
+    grid-column: 1 / -1;
+    text-align: center;
+    order: -1;
+  }
+
+  .inner > :last-child {
+    text-align: right;
+  }
+}

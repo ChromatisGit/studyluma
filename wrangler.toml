@@ -1,4 +1,4 @@
-name = "studynode"
+name = "studyluma"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 main = "./workers/app.ts"
@@ -10,3 +10,12 @@ DB_DRIVER = "worker"
 # Set secrets via wrangler:
 # wrangler secret put DATABASE_URL
 # wrangler secret put SESSION_SECRET
+
+# Demo deployment (studyluma.org) — for internal use only, not part of normal instance setup
+[env.demo]
+name = "studyluma-demo"
+
+[env.demo.vars]
+NODE_ENV = "production"
+DB_DRIVER = "worker"
+DEMO_MODE = "true"

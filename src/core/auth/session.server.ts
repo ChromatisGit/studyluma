@@ -3,17 +3,17 @@ import { getUserById } from "@services/userService";
 
 export const { getSession, buildSessionCookie, buildLogoutCookie } = createSessionService({
   getUserById,
-  cookieName: "sn-session",
+  cookieName: "studyluma-session",
 });
 
 export function buildNewUserUsernameCookie(username: string): string {
-  return buildSetSessionCookie(username, { name: "sn-new-username", maxAge: 120, path: "/" });
+  return buildSetSessionCookie(username, { name: "studyluma-new-username", maxAge: 120, path: "/" });
 }
 
 export function buildClearNewUserUsernameCookie(): string {
-  return buildSetSessionCookie("", { name: "sn-new-username", maxAge: 0, path: "/" });
+  return buildSetSessionCookie("", { name: "studyluma-new-username", maxAge: 0, path: "/" });
 }
 
 export function getNewUserUsernameCookie(request: Request): string | null {
-  return getSessionCookie(request, { name: "sn-new-username" });
+  return getSessionCookie(request, { name: "studyluma-new-username" });
 }

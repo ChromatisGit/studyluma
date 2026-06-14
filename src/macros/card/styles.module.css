@@ -1,37 +1,37 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-xs);
-  padding: var(--sn-space-md) var(--sn-space-lg);
-  border-radius: var(--sn-radius-md);
-  border: 1px solid var(--sn-border);
-  border-left: 4px solid var(--sn-border);
-  background: var(--sn-surface-raised);
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  background: var(--surface-raised);
 }
 
 /* Kind variants — left accent line + subtle tinted background */
 .task {
-  border: 1px solid color-mix(in srgb, var(--sn-blue-accent) 35%, var(--sn-border));
-  border-left: 4px solid var(--sn-blue-accent);
-  background: color-mix(in srgb, var(--sn-blue-accent) 8%, var(--sn-surface));
+  border: 1px solid color-mix(in srgb, var(--info) 35%, var(--border));
+  border-left: 4px solid var(--info);
+  background: color-mix(in srgb, var(--info) 8%, var(--card));
 }
 
 .emphasis {
-  border: 1px solid color-mix(in srgb, var(--sn-purple-accent) 35%, var(--sn-border));
-  border-left: 4px solid var(--sn-purple-accent);
-  background: color-mix(in srgb, var(--sn-purple-accent) 8%, var(--sn-surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border));
+  border-left: 4px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--card));
 }
 
 .warning {
-  border: 1px solid color-mix(in srgb, var(--sn-orange-accent) 35%, var(--sn-border));
-  border-left: 4px solid var(--sn-orange-accent);
-  background: color-mix(in srgb, var(--sn-orange-accent) 8%, var(--sn-surface));
+  border: 1px solid color-mix(in srgb, var(--warning) 35%, var(--border));
+  border-left: 4px solid var(--warning);
+  background: color-mix(in srgb, var(--warning) 8%, var(--card));
 }
 
 .answer {
-  border: 1px solid color-mix(in srgb, var(--sn-green-accent) 35%, var(--sn-border));
-  border-left: 4px solid var(--sn-green-accent);
-  background: color-mix(in srgb, var(--sn-green-accent) 8%, var(--sn-surface));
+  border: 1px solid color-mix(in srgb, var(--success) 35%, var(--border));
+  border-left: 4px solid var(--success);
+  background: color-mix(in srgb, var(--success) 8%, var(--card));
 }
 
 .plain {
@@ -47,48 +47,48 @@
 .icon {
   width: 1.05rem;
   height: 1.05rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   flex-shrink: 0;
 }
 
 .task .icon {
-  color: var(--sn-blue-accent);
+  color: var(--info);
 }
 
 .emphasis .icon {
-  color: var(--sn-purple-accent);
+  color: var(--primary);
 }
 
 .warning .icon {
-  color: var(--sn-orange-accent);
+  color: var(--warning);
 }
 
 .label {
-  font-weight: var(--sn-font-semibold);
-  font-size: var(--sn-text-xs);
-  color: var(--sn-text-muted);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .task .label {
-  color: var(--sn-blue-accent-strong);
+  color: var(--info-strong);
 }
 
 .emphasis .label {
-  color: var(--sn-purple-accent-strong);
+  color: var(--primary-strong);
 }
 
 .warning .label {
-  color: var(--sn-orange-accent-strong);
+  color: var(--warning-strong);
 }
 
 .answer .icon {
-  color: var(--sn-green-accent);
+  color: var(--success);
 }
 
 .answer .label {
-  color: var(--sn-green-accent-strong);
+  color: var(--success-strong);
 }
 
 .content > :first-child {

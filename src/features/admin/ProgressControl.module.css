@@ -1,27 +1,27 @@
 .form {
-  padding: var(--sn-space-lg);
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-lg);
-  box-shadow: var(--sn-shadow-lw);
+  padding: var(--space-6);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 .roadmapContainer {
-  margin-bottom: var(--sn-space-lg);
+  margin-bottom: var(--space-6);
 }
 
 .actions {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-md);
+  gap: var(--space-4);
   align-items: flex-start;
 }
 
 .selectionInfo {
   margin: 0;
-  padding: var(--sn-space-sm) var(--sn-space-md);
-  background: var(--sn-purple-accent-soft-bg);
-  border-radius: var(--sn-radius-md);
-  color: var(--sn-text);
-  font-size: var(--sn-text-md);
+  padding: var(--space-3) var(--space-4);
+  background: var(--primary-light);
+  border-radius: var(--radius-lg);
+  color: var(--foreground);
+  font-size: var(--text-base);
 }

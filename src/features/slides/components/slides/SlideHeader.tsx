@@ -3,11 +3,11 @@ import styles from "./slide.module.css";
 type AccentColor = "purple" | "orange" | "blue" | "teal" | "muted";
 
 const ACCENT_CSS: Record<AccentColor, string> = {
-  purple: "var(--sn-purple-accent)",
-  orange: "var(--sn-orange-accent)",
-  blue:   "var(--sn-blue-accent)",
-  teal:   "var(--sn-teal-accent)",
-  muted:  "var(--sn-text-muted)",
+  purple: "var(--primary)",
+  orange: "var(--warning)",
+  blue:   "var(--info)",
+  teal:   "var(--support)",
+  muted:  "var(--muted-foreground)",
 };
 
 type SlideHeaderProps = {

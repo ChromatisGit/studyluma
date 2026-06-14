@@ -5,8 +5,8 @@ import { FocusBox } from "./FocusBox";
 import { ResultBox } from "./ResultBox";
 import styles from "./slide.module.css";
 
-const ACCENT = "var(--sn-blue-accent)";
-const RESULT_ACCENT = "var(--sn-purple-accent)";
+const ACCENT = "var(--info)";
+const RESULT_ACCENT = "var(--primary)";
 
 type Props = { slide: CompareSlide; revealStep: number };
 

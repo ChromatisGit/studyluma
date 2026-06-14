@@ -1,36 +1,36 @@
 .container {
   display: grid;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
 }
 
 .statusCard {
-  padding: var(--sn-space-lg);
-  border-radius: var(--sn-radius-lg);
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
   border: 1px solid;
   transition: all 0.2s ease;
 }
 
 .statusOpen {
-  background: var(--sn-green-accent-soft-bg);
-  border-color: var(--sn-green-accent-soft-border);
+  background: var(--success-light);
+  border-color: var(--success-border);
 }
 
 .statusClosed {
-  background: var(--sn-surface-raised);
-  border-color: var(--sn-border);
+  background: var(--surface-raised);
+  border-color: var(--border);
 }
 
 .statusHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--sn-space-xs);
+  margin-bottom: var(--space-2);
 }
 
 .statusIndicator {
   display: flex;
   align-items: center;
-  gap: var(--sn-space-xs);
+  gap: var(--space-2);
 }
 
 .statusDot {
@@ -41,11 +41,11 @@
 }
 
 .dotOpen {
-  background: var(--sn-green-accent);
+  background: var(--success);
 }
 
 .dotClosed {
-  background: var(--sn-text-muted);
+  background: var(--muted-foreground);
   animation: none;
 }
 
@@ -59,19 +59,19 @@
 }
 
 .statusLabel {
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-text);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
 }
 
 .timer {
-  font-weight: var(--sn-font-bold);
-  font-size: var(--sn-text-md);
-  color: var(--sn-green-accent);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-base);
+  color: var(--success);
   font-variant-numeric: tabular-nums;
 }
 
 .statusText {
   margin: 0;
-  color: var(--sn-text-muted);
-  font-size: var(--sn-text-sm);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
 }

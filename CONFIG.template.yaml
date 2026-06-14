@@ -1,11 +1,16 @@
-# StudyNode configuration
+# StudyLuma configuration
 # Copy this file to CONFIG.yaml and fill in your values.
 # CONFIG.yaml is git-ignored - never commit it!
 
 local:
-  database: postgres://studynode:studynode@localhost:5432/studynode_dev
+  database: postgres://studyluma:studyluma@localhost:5432/studyluma_dev
   session_secret: dev
 
 production:
-  database: ""   # Your Neon connection string (or self-hosted postgres URL)
+  database: ""   # Your Neon connection string (or self-hosted Postgres URL)
   session_secret: ""  # Long random string — run: openssl rand -base64 32
+
+# demo profile — only needed for the studyluma.org demo deployment, not for normal instances
+# demo:
+#   database: ""
+#   session_secret: ""

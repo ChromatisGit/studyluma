@@ -56,30 +56,30 @@ export default function PasswordBruteForce() {
         <CharsetTag
           label="Zahlen (10)"
           active={estimate.usedCharsets.digits}
-          accentVar="--sn-blue-accent"
-          softBgVar="--sn-blue-accent-soft-bg"
-          softBorderVar="--sn-blue-accent-soft-border"
+          accentVar="--info"
+          softBgVar="--info-light"
+          softBorderVar="--info-border"
         />
         <CharsetTag
           label="Kleinbuchstaben (26)"
           active={estimate.usedCharsets.lowercase}
-          accentVar="--sn-teal-accent"
-          softBgVar="--sn-teal-accent-soft-bg"
-          softBorderVar="--sn-teal-accent-soft-border"
+          accentVar="--support"
+          softBgVar="--support-light"
+          softBorderVar="--support-border"
         />
         <CharsetTag
           label="Großbuchstaben (26)"
           active={estimate.usedCharsets.uppercase}
-          accentVar="--sn-orange-accent"
-          softBgVar="--sn-orange-accent-soft-bg"
-          softBorderVar="--sn-orange-accent-soft-border"
+          accentVar="--warning"
+          softBgVar="--warning-light"
+          softBorderVar="--warning-border"
         />
         <CharsetTag
           label="Sonderzeichen (32)"
           active={estimate.usedCharsets.symbols}
-          accentVar="--sn-purple-accent"
-          softBgVar="--sn-purple-accent-soft-bg"
-          softBorderVar="--sn-purple-accent-soft-border"
+          accentVar="--primary"
+          softBgVar="--primary-light"
+          softBorderVar="--primary-border"
         />
       </div>
 

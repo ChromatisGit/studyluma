@@ -6,21 +6,21 @@
 
 .heroShell {
   position: relative;
-  max-width: var(--sn-content-width-narrow, 960px);
+  max-width: var(--content-width-narrow, 960px);
   margin: 0 auto;
   text-align: center;
   padding: 2.75rem 2.5rem;
-  border-radius: var(--sn-radius-xl);
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  box-shadow: var(--sn-shadow-lw);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
 .heroGlow {
   position: absolute;
   inset: -20%;
-  background: radial-gradient(circle at 40% 30%, color-mix(in srgb, var(--sn-purple-accent) 22%, transparent) 0%, transparent 60%);
+  background: radial-gradient(circle at 40% 30%, color-mix(in srgb, var(--primary) 22%, transparent) 0%, transparent 60%);
   opacity: 0.5;
   filter: blur(36px);
   pointer-events: none;
@@ -37,27 +37,27 @@
   justify-content: center;
   width: 64px;
   height: 64px;
-  border-radius: var(--sn-radius-lg);
-  background: var(--sn-purple-accent);
-  color: var(--sn-text-on-accent);
-  box-shadow: var(--sn-shadow-md);
-  margin-bottom: var(--sn-space-md);
+  border-radius: var(--radius-xl);
+  background: var(--primary);
+  color: var(--text-on-accent);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--space-4);
 }
 
 .heroTitle {
-  font-size: var(--sn-text-display);
-  font-weight: var(--sn-font-bold);
+  font-size: var(--text-display);
+  font-weight: var(--font-weight-bold);
   line-height: 1.15;
-  margin-bottom: var(--sn-space-sm);
-  color: var(--sn-text);
+  margin-bottom: var(--space-3);
+  color: var(--foreground);
 }
 
 .heroLead {
-  font-size: var(--sn-text-lg);
+  font-size: var(--text-lg);
   line-height: 1.6;
   max-width: 560px;
-  margin: 0 auto var(--sn-space-md);
-  color: var(--sn-text-muted);
+  margin: 0 auto var(--space-4);
+  color: var(--muted-foreground);
 }
 
 .heroActions {
@@ -65,8 +65,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: var(--sn-space-sm);
-  margin-top: var(--sn-space-lg);
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
 @media (max-width: 479px) {
@@ -82,6 +82,6 @@
   }
 
   .heroShell {
-    padding: 2.25rem var(--sn-space-lg);
+    padding: 2.25rem var(--space-6);
   }
 }

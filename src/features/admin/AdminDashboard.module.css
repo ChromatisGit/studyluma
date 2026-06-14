@@ -1,30 +1,30 @@
 .container {
-  padding-top: var(--sn-space-xl);
-  padding-bottom: var(--sn-space-xl);
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
 }
 
 .statLabel {
-  margin: 0 0 var(--sn-space-xs) 0;
-  color: var(--sn-text-muted);
-  font-size: var(--sn-text-sm);
-  font-weight: var(--sn-font-semibold);
+  margin: 0 0 var(--space-2) 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .statValue {
   margin: 0;
-  color: var(--sn-text);
-  font-size: var(--sn-text-display);
-  font-weight: var(--sn-font-bold);
+  color: var(--foreground);
+  font-size: var(--text-display);
+  font-weight: var(--font-weight-bold);
 }
 
 .sectionTitle {
-  margin: 0 0 var(--sn-space-xs) 0;
-  color: var(--sn-text);
-  font-size: var(--sn-text-xl);
-  font-weight: var(--sn-font-bold);
+  margin: 0 0 var(--space-2) 0;
+  color: var(--foreground);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
 }
 
 .sectionSubtitle {
   margin: 0;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }

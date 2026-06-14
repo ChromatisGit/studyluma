@@ -3,83 +3,83 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--sn-space-lg);
+  padding: var(--space-6);
 }
 
 .card {
   width: 100%;
   max-width: 28rem;
-  padding: var(--sn-space-xl);
-  background: var(--sn-surface);
-  border-radius: var(--sn-radius-xl);
-  box-shadow: var(--sn-shadow-md);
+  padding: var(--space-8);
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
 }
 
 .header {
   text-align: center;
-  margin-bottom: var(--sn-space-xl);
+  margin-bottom: var(--space-8);
 }
 
 .header > :first-child {
-  margin: 0 auto var(--sn-space-md);
+  margin: 0 auto var(--space-4);
 }
 
 .title {
-  font-size: var(--sn-text-xl);
-  font-weight: var(--sn-font-bold);
-  margin: 0 0 var(--sn-space-xs);
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  margin: 0 0 var(--space-2);
 }
 
 .subtitle {
   margin: 0;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .message {
-  border-radius: var(--sn-radius-md);
-  padding: var(--sn-space-sm);
-  background: var(--sn-red-accent-soft-bg);
-  border: 1px solid var(--sn-red-accent-soft-border);
-  color: var(--sn-red-accent);
-  font-size: var(--sn-text-sm);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  background: var(--destructive-light);
+  border: 1px solid var(--destructive-border);
+  color: var(--destructive);
+  font-size: var(--text-sm);
 }
 
 .tabs {
   display: flex;
-  border-radius: var(--sn-radius-md);
-  background: var(--sn-surface-deep);
+  border-radius: var(--radius-lg);
+  background: var(--surface-deep);
   padding: 3px;
   gap: 2px;
-  margin-bottom: var(--sn-space-lg);
+  margin-bottom: var(--space-6);
 }
 
 .tab {
   flex: 1;
-  padding: var(--sn-space-xs) var(--sn-space-sm);
-  border-radius: calc(var(--sn-radius-md) - 2px);
+  padding: var(--space-2) var(--space-3);
+  border-radius: calc(var(--radius-lg) - 2px);
   border: none;
   background: transparent;
-  color: var(--sn-text-muted);
-  font-size: var(--sn-text-sm);
-  font-weight: var(--sn-font-medium);
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
 }
 
 .tab:hover:not(.tabActive) {
-  background: var(--sn-surface-raised);
-  color: var(--sn-text);
+  background: var(--surface-raised);
+  color: var(--foreground);
 }
 
 .tabActive {
-  background: var(--sn-surface);
-  color: var(--sn-text);
-  box-shadow: var(--sn-shadow-sm);
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: var(--shadow-sm);
 }
 
 .footer {
-  margin-top: var(--sn-space-lg);
+  margin-top: var(--space-6);
   text-align: center;
-  font-size: var(--sn-text-sm);
-  color: var(--sn-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
 }

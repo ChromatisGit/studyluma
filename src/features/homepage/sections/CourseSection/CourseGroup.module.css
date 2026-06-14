@@ -1,6 +1,6 @@
 .groupTitle {
   margin: 0;
-  font-size: var(--sn-text-md);
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-text);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
 }

@@ -1,12 +1,12 @@
 .figure {
-  margin: var(--sn-space-md) 0;
+  margin: var(--space-4) 0;
   text-align: center;
 }
 
 .image {
   max-width: 100%;
   height: auto;
-  border-radius: var(--sn-radius-md);
+  border-radius: var(--radius-lg);
 }
 
 .small {

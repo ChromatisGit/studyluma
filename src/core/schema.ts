@@ -1,6 +1,6 @@
-// Single source of truth for the StudyNode domain schema.
+// Single source of truth for the StudyLuma domain schema.
 //
-// StudyNode is currently server-only (no local SQLite). The schema is defined
+// StudyLuma is currently server-only (no local SQLite). The schema is defined
 // here using the same defineTable() DSL as DropSort so that:
 //   1. Server-side TypeScript types are generated from a single definition.
 //   2. When offline support is added, the SQLite DDL and sync metadata are

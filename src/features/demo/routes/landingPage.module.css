@@ -1,0 +1,214 @@
+.page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* ── Nav ── */
+.navInner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+
+.navBrand {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  color: var(--muted-foreground);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms, background 150ms;
+}
+
+.themeToggle:hover {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+/* CSS-driven icon swap — no React state needed */
+.iconSun { display: none; }
+.iconMoon { display: block; }
+
+:global(html.dark) .iconSun { display: block; }
+:global(html.dark) .iconMoon { display: none; }
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  padding: 5rem 1.5rem 4.5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.heroGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    color-mix(in srgb, var(--primary) 10%, transparent),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.heroActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+/* ── Sections ── */
+.section {
+  padding: 3rem 1.5rem;
+}
+
+/* Featured section (Features): subtle tinted background */
+.sectionAccent {
+  background: var(--muted);
+}
+
+.sectionInner {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* ── WhatIs two-column ── */
+.whatIsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .whatIsGrid {
+    grid-template-columns: 3fr 2fr;
+    gap: var(--space-10, 3rem);
+    align-items: stretch;
+  }
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.featureStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.storyBlock {
+  margin-top: auto;
+  padding-top: var(--space-6);
+}
+
+.whatIsNote {
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* ── Story + Demo two-column ── */
+.storyDemoGrid {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+@media (min-width: 768px) {
+  .storyDemoGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+  }
+}
+
+.centeredBox {
+  text-align: center;
+}
+
+/* ── About (author bio) ── */
+.aboutInner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.photo {
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.photoPlaceholder {
+  width: 96px;
+  height: 96px;
+  min-width: 96px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.375rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .aboutInner {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 540px) {
+  .heroActions {
+    flex-direction: column;
+    align-items: center;
+  }
+}

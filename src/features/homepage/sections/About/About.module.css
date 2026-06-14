@@ -6,21 +6,21 @@
 }
 
 .goalTitle {
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
   margin: 0.35rem 0 0;
 }
 
 .goalText {
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   margin: 0.4rem 0 0;
 }
 
 .infoNote {
-  margin-top: var(--sn-space-lg);
+  margin-top: var(--space-6);
   padding: 1.25rem 1.4rem;
-  border-radius: var(--sn-radius-md);
-  background: var(--sn-surface-raised);
-  color: var(--sn-text-muted);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  color: var(--muted-foreground);
   text-align: left;
 }
 
@@ -29,5 +29,5 @@
 }
 
 .infoNote p + p {
-  margin-top: var(--sn-space-sm);
+  margin-top: var(--space-3);
 }

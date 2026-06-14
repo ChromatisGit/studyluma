@@ -66,7 +66,7 @@ function CodeBlockWithGaps({
   const segments = code.split(GAP_SPLIT);
 
   return (
-    <pre className="sn-code-block">
+    <pre className="content-code-block">
       {segments.map((segment, i) => {
         if (i % 2 === 1) {
           // Odd indices are captured gap index strings
@@ -122,7 +122,8 @@ function remarkGapPlaceholders() {
       tree,
       "inlineCode",
       (node: MarkdownNode, index: number | undefined, parent: MarkdownNode | undefined) => {
-        if (!parent?.children || index == null || !node.value) return;
+        const children = parent?.children;
+        if (!children || index == null || !node.value) return;
         if (!GAP_SENTINEL_REGEX.test(node.value)) return;
 
         const parts: MarkdownNode[] = [];
@@ -150,7 +151,7 @@ function remarkGapPlaceholders() {
         }
 
         if (parts.length > 0) {
-          parent.children!.splice(index, 1, ...parts);
+          children.splice(index, 1, ...parts);
           return index;
         }
       }
@@ -161,7 +162,8 @@ function remarkGapPlaceholders() {
       tree,
       "text",
       (node: MarkdownNode, index: number | undefined, parent: MarkdownNode | undefined) => {
-        if (!parent?.children || index == null || !node.value) return;
+        const children = parent?.children;
+        if (!children || index == null || !node.value) return;
         if (!GAP_SENTINEL_REGEX.test(node.value)) return;
 
         const parts: MarkdownNode[] = [];
@@ -189,7 +191,7 @@ function remarkGapPlaceholders() {
         }
 
         if (parts.length > 0) {
-          parent.children!.splice(index, 1, ...parts);
+          children.splice(index, 1, ...parts);
           return index;
         }
       }
@@ -210,7 +212,7 @@ function remarkGapMarkdownTransforms() {
           break;
         case "strong":
           if (isUnderlineStrong(node, source)) {
-            setHName(node, "span", { className: "sn-underline" });
+            setHName(node, "span", { className: "content-underline" });
           }
           break;
         case "inlineMath":
@@ -287,5 +289,5 @@ export function GapMarkdownRenderer({
   markdown,
 }: GapMarkdownRendererProps): ReactNode {
   const rendered = gapProcessor.processSync(markdown).result as ReactNode;
-  return <div className="sn-markdown">{rendered}</div>;
+  return <div className="content-markdown">{rendered}</div>;
 }

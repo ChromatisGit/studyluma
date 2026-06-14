@@ -2,24 +2,24 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: var(--sn-bg);
+  background: var(--background);
   overflow: hidden;
   /* Needed so quiz overlay can use position: absolute */
   isolation: isolate;
   font-size: 1.5rem;
 
   /* Scale up semantic text tokens so code blocks and macros also get bigger */
-  --sn-text-xs: 1.1rem;
-  --sn-text-sm: 1.3rem;
-  --sn-text-md: 1.5rem;
-  --sn-text-lg: 1.65rem;
-  --sn-text-xl: 1.9rem;
+  --text-xs: 1.1rem;
+  --text-sm: 1.3rem;
+  --text-base: 1.5rem;
+  --text-lg: 1.65rem;
+  --text-xl: 1.9rem;
 }
 
 .blackout {
   position: fixed;
   inset: 0;
-  background: var(--sn-surface);
+  background: var(--card);
   z-index: 9999;
 }
 
@@ -30,8 +30,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--sn-bg);
-  color: var(--sn-text-muted);
+  background: var(--background);
+  color: var(--muted-foreground);
   font-size: 1rem;
 }
 
@@ -44,8 +44,8 @@
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
-  background: var(--sn-bg);
-  color: var(--sn-text-muted);
+  background: var(--background);
+  color: var(--muted-foreground);
   font-size: 1rem;
 }
 

@@ -1,61 +1,61 @@
 .monitor {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-md);
-  padding: var(--sn-space-md);
-  background: var(--sn-bg);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-sm);
-  margin-top: var(--sn-space-xs);
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-2);
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-xs);
+  gap: var(--space-2);
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
 }
 
 .sectionTitle {
   font-size: 0.875rem;
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-text);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
   margin: 0;
 }
 
 .presenceNote {
   font-size: 0.75rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   margin: 0;
 }
 
 .noData {
   font-size: 0.8125rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   margin: 0;
 }
 
 .refreshButton {
   font-size: 0.75rem;
-  padding: var(--sn-space-xs) var(--sn-space-sm);
-  background: var(--sn-surface-raised);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-xs);
-  color: var(--sn-text);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--foreground);
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
   flex-shrink: 0;
 }
 
 .refreshButton:hover:not(:disabled) {
-  background: var(--sn-surface-deep);
-  border-color: var(--sn-purple-accent);
+  background: var(--surface-deep);
+  border-color: var(--primary);
 }
 
 .refreshButton:disabled {
@@ -74,12 +74,12 @@
 .presenceRow {
   display: flex;
   align-items: center;
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
 }
 
 .presenceLabel {
   font-size: 0.8125rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   width: 6rem;
   flex-shrink: 0;
 }
@@ -87,23 +87,23 @@
 .barTrack {
   flex: 1;
   height: 1.25rem;
-  background: var(--sn-surface-raised);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-xxs);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xxs);
   overflow: hidden;
 }
 
 .barFill {
   height: 100%;
-  background: var(--sn-purple-accent-soft-bg);
-  border-right: 2px solid var(--sn-purple-accent);
+  background: var(--primary-light);
+  border-right: 2px solid var(--primary);
   transition: width 0.3s ease;
   min-width: 2px;
 }
 
 .presenceCount {
   font-size: 0.8125rem;
-  color: var(--sn-text);
+  color: var(--foreground);
   width: 5rem;
   text-align: right;
   flex-shrink: 0;
@@ -113,15 +113,15 @@
 
 .trafficRow {
   display: flex;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
   font-size: 0.9375rem;
-  font-weight: var(--sn-font-medium);
-  padding: var(--sn-space-xs) 0;
+  font-weight: var(--font-weight-medium);
+  padding: var(--space-2) 0;
 }
 
-.green { color: var(--sn-green-accent-strong); }
-.yellow { color: var(--sn-yellow-accent-strong); }
-.red { color: var(--sn-red-accent-strong); }
+.green { color: var(--success-strong); }
+.yellow { color: var(--hint-strong); }
+.red { color: var(--destructive-strong); }
 
 /* Causes */
 
@@ -129,14 +129,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  padding-top: var(--sn-space-xs);
-  border-top: 1px solid var(--sn-border);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
 }
 
 .causesTitle {
   font-size: 0.75rem;
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-text-muted);
+  font-weight: var(--font-weight-semibold);
+  color: var(--muted-foreground);
   margin: 0 0 0.25rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -150,12 +150,12 @@
 }
 
 .causeLabel {
-  color: var(--sn-text);
+  color: var(--foreground);
 }
 
 .causeCount {
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-text-muted);
+  font-weight: var(--font-weight-semibold);
+  color: var(--muted-foreground);
   min-width: 1.5rem;
   text-align: right;
 }

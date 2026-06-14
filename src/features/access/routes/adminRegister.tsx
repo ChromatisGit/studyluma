@@ -4,7 +4,7 @@ import { registerUser } from "@chromatis/base/auth";
 import { anonSQL } from "@core/db.server.js";
 import { buildSessionCookie, getSession } from "@core/auth/session.server.js";
 export function meta() {
-  return [{ title: "Admin Registration — StudyNode" }];
+  return [{ title: "Admin Registration — StudyLuma" }];
 }
 
 export async function loader({ request }: { request: Request }) {

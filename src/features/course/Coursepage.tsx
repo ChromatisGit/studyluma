@@ -33,7 +33,7 @@ export function CoursepagePage({ model }: CoursepagePageProps) {
 
   return (
     <div className={styles.page}>
-      <Container size="narrow" gutters={false} className={styles.inner}>
+      <Container size="narrow" className={styles.inner}>
         <PageHeader
           title={`${label} ${COURSE_TEXT.intro.titleSuffix}`}
           subtitle={description}

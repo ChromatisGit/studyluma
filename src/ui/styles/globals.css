@@ -1,16 +1,13 @@
-/* StudyNode Global Styles */
+/* StudyLuma Global Styles */
 
-/* Layer 1: design tokens */
-@import "./tokens/index.css";
-
-/* Layer 2: foundation */
+/* Layer 1: foundation */
 @import "./foundation/index.css";
 
-/* Layer 3: rich content */
+/* Layer 2: rich content */
 @import "./content/index.css";
 
-/* Layer 4: utilities */
+/* Layer 3: utilities */
 @import "./utilities/index.css";
 
-/* Layer 5: third-party integrations */
+/* Layer 4: third-party integrations */
 @import "./integrations/index.css";

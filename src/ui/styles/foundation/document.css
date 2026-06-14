@@ -4,9 +4,9 @@ html {
 
 body {
   margin: 0;
-  background: var(--sn-bg);
-  color: var(--sn-text);
-  font-family: var(--sn-font-body);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
   line-height: 1.6;
   overflow-x: hidden;
 }

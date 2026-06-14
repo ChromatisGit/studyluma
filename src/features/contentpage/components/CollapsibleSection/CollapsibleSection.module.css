@@ -1,40 +1,40 @@
 .collapsible {
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  --collapsible-accent: var(--sn-purple-accent);
+  --collapsible-accent: var(--primary);
 }
 
 .collapsibleHint {
-  --collapsible-accent: var(--sn-yellow-accent);
+  --collapsible-accent: var(--hint);
 }
 
 .collapsibleSolution {
-  --collapsible-accent: var(--sn-green-accent-strong);
+  --collapsible-accent: var(--success-strong);
 }
 
 .collapsibleHeader {
-  background: var(--sn-surface);
+  background: var(--card);
   width: 100%;
   display: flex;
   align-items: center;
   gap: 0.55rem;
   padding: 0.75rem 0.9rem;
   border: 0;
-  color: var(--sn-text);
+  color: var(--foreground);
   cursor: pointer;
   transition: background 120ms ease;
 }
 
 .collapsibleHeader:hover {
-  background: var(--sn-surface-raised);
+  background: var(--surface-raised);
   cursor: pointer;
 }
 
 .collapsibleCaret {
   width: 1rem;
   height: 1rem;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .collapsibleIcon {
@@ -44,19 +44,19 @@
 }
 
 .collapsibleLabel {
-  font-weight: var(--sn-font-bold);
-  font-size: var(--sn-text-xs);
-  color: var(--sn-text);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-xs);
+  color: var(--foreground);
 }
 
 .collapsibleContent {
   padding: 0.85rem 0.9rem;
-  border-top: 1px solid var(--sn-border);
-  background: var(--sn-yellow-accent-soft-bg);
+  border-top: 1px solid var(--border);
+  background: var(--hint-light);
 }
 
 .collapsibleSolution .collapsibleContent {
-  background: var(--sn-green-accent-soft-bg);
+  background: var(--success-light);
 }
 
 .collapsibleContent > :first-child {

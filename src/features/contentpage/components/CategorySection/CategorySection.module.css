@@ -1,15 +1,15 @@
 .category {
-  --accent: var(--sn-purple-accent);
-  --accent-strong: var(--sn-purple-accent-strong);
-  --accent-surface: var(--sn-surface);
-  --accent-border: var(--sn-border);
-  --accent-rail: var(--sn-purple-accent);
-  --accent-muted: var(--sn-text-muted);
-  --accent-stripe-outline: var(--sn-border);
-  --accent-banner: var(--sn-purple-accent);
-  --accent-banner-border: var(--sn-purple-accent-soft-border);
-  --accent-banner-border-inner: var(--sn-purple-accent-soft-border);
-  --accent-badge-bg: var(--sn-surface);
+  --accent: var(--primary);
+  --accent-strong: var(--primary-strong);
+  --accent-surface: var(--card);
+  --accent-border: var(--border);
+  --accent-rail: var(--primary);
+  --accent-muted: var(--muted-foreground);
+  --accent-stripe-outline: var(--border);
+  --accent-banner: var(--primary);
+  --accent-banner-border: var(--primary-border);
+  --accent-banner-border-inner: var(--primary-border);
+  --accent-badge-bg: var(--card);
   position: relative;
   padding-left: 1.4rem;
   display: flex;
@@ -18,24 +18,24 @@
 }
 
 .categoryCheckpoint {
-  --accent: var(--sn-teal-accent);
-  --accent-strong: var(--sn-teal-accent-strong);
-  --accent-rail: var(--sn-teal-accent);
-  --accent-banner: var(--sn-teal-accent);
+  --accent: var(--support);
+  --accent-strong: var(--support-strong);
+  --accent-rail: var(--support);
+  --accent-banner: var(--support);
 }
 
 .categoryCore {
-  --accent: var(--sn-blue-accent);
-  --accent-strong: var(--sn-blue-accent-strong);
-  --accent-rail: var(--sn-blue-accent);
-  --accent-banner: var(--sn-blue-accent);
+  --accent: var(--info);
+  --accent-strong: var(--info-strong);
+  --accent-rail: var(--info);
+  --accent-banner: var(--info);
 }
 
 .categoryChallenge {
-  --accent: var(--sn-orange-accent);
-  --accent-strong: var(--sn-orange-accent-strong);
-  --accent-rail: var(--sn-orange-accent);
-  --accent-banner: var(--sn-orange-accent);
+  --accent: var(--warning);
+  --accent-strong: var(--warning-strong);
+  --accent-rail: var(--warning);
+  --accent-banner: var(--warning);
 }
 
 .categoryStripe {
@@ -44,7 +44,7 @@
   width: 6px;
   border-radius: 999px;
   background: var(--accent);
-  box-shadow: var(--sn-shadow-md);
+  box-shadow: var(--shadow-md);
   opacity: 0.95;
 }
 
@@ -54,11 +54,11 @@
   align-items: center;
   gap: 0.6rem;
   padding: 0.8rem 1rem;
-  border-radius: var(--sn-radius-md);
+  border-radius: var(--radius-lg);
   background: var(--accent-banner);
-  color: var(--sn-text-on-accent);
+  color: var(--text-on-accent);
   font-weight: 700;
-  box-shadow: var(--sn-shadow-md);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
 }
 
@@ -66,7 +66,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: var(--sn-radius-md);
+  border-radius: var(--radius-lg);
   pointer-events: none;
 }
 
@@ -77,7 +77,7 @@
 
 .categoryBannerTitle {
   margin: 0;
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
 }
 
 .sectionSpacing {
@@ -87,7 +87,7 @@
 }
 
 .subheader {
-  font-size: var(--sn-text-lg);
+  font-size: var(--text-lg);
   font-weight: 600;
   margin: 0;
 }

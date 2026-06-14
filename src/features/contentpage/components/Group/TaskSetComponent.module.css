@@ -1,29 +1,29 @@
 .taskCard {
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
-  padding: var(--sn-space-md);
-  box-shadow: var(--sn-shadow-lw);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
 }
 
 .taskStack {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
 
 }
 
 .taskIntro {
   display: flex;
   align-items: flex-start;
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
 }
 
 .taskItem {
   display: flex;
   align-items: flex-start;
-  gap: var(--sn-space-sm);
-  padding-left: var(--sn-space-md);
+  gap: var(--space-3);
+  padding-left: var(--space-4);
 }
 
 .taskItemSolo {
@@ -32,8 +32,8 @@
 
 .taskLabel {
   min-width: 1.6rem;
-  font-weight: var(--sn-font-bold);
-  color: var(--sn-text);
+  font-weight: var(--font-weight-bold);
+  color: var(--foreground);
   display: inline-flex;
   align-items: center;
 }
@@ -56,9 +56,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: var(--sn-font-bold);
-  background: var(--sn-surface-deep);
-  color: var(--sn-text);
+  font-weight: var(--font-weight-bold);
+  background: var(--surface-deep);
+  color: var(--foreground);
 }
 
 .taskIntroText {
@@ -66,27 +66,27 @@
 }
 
 .taskActions {
-  padding-top: var(--sn-space-xs);
+  padding-top: var(--space-2);
 }
 
 .checkButton {
   display: inline-flex;
   align-items: center;
-  gap: var(--sn-space-xs);
-  padding: var(--sn-space-xs) var(--sn-space-md);
-  background: var(--sn-gray);
-  color: var(--sn-text-on-accent);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--neutral);
+  color: var(--text-on-accent);
   border-radius: 999px;
-  border: 1px solid var(--sn-gray-border);
-  font-weight: var(--sn-font-bold);
+  border: 1px solid var(--neutral-border);
+  font-weight: var(--font-weight-bold);
   cursor: pointer;
   transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
-  box-shadow: var(--sn-shadow-lw);
+  box-shadow: var(--shadow-sm);
 }
 
 .checkButton:hover {
-  background: var(--sn-gray-hover);
-  box-shadow: var(--sn-shadow-md);
+  background: var(--neutral-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .checkButton:active {

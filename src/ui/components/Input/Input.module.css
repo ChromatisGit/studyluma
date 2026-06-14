@@ -7,62 +7,62 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-weight: var(--sn-font-semibold);
+  font-weight: var(--font-weight-semibold);
   margin-bottom: 0.35rem;
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
 }
 
 .hint {
-  font-size: var(--sn-text-xs);
-  font-weight: var(--sn-font-medium);
-  color: var(--sn-text-muted);
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--muted-foreground);
 }
 
 .input {
   width: 100%;
   padding: 0.7rem 0.9rem;
-  border-radius: var(--sn-radius-md);
-  border: 1px solid var(--sn-border);
-  background: var(--sn-surface);
-  color: var(--sn-text);
-  font-size: var(--sn-text-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--foreground);
+  font-size: var(--text-base);
   font-family: inherit;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--sn-purple-accent-soft-border);
-  box-shadow: 0 0 0 3px var(--sn-purple-accent-soft-bg);
+  border-color: var(--primary-border);
+  box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: var(--sn-surface-raised);
+  background: var(--surface-raised);
 }
 
 .input::placeholder {
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
 }
 
 .inputError {
-  border-color: var(--sn-red-accent-soft-border);
+  border-color: var(--destructive-border);
 }
 
 .inputError:focus {
-  border-color: var(--sn-red-accent);
-  box-shadow: 0 0 0 3px var(--sn-red-accent-soft-bg);
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px var(--destructive-light);
 }
 
 .helper {
   margin: 0.35rem 0 0;
-  font-size: var(--sn-text-xs);
-  color: var(--sn-text-muted);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
 }
 
 .error {
   margin: 0.35rem 0 0;
-  font-size: var(--sn-text-xs);
-  color: var(--sn-red-accent);
+  font-size: var(--text-xs);
+  color: var(--destructive);
 }

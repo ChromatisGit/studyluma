@@ -1,26 +1,26 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
   height: 100%;
-  padding: var(--sn-space-md);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
-  background: var(--sn-surface);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
   text-decoration: none;
   max-width: 520px;
   transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
 
   /* Color accent variables - overridden by color classes */
-  --card-accent: var(--sn-purple-accent-strong);
-  --card-accent-bg: var(--sn-purple-accent-soft-bg);
-  --card-accent-border: var(--sn-purple-accent-soft-border);
+  --card-accent: var(--primary-strong);
+  --card-accent-bg: var(--primary-light);
+  --card-accent-border: var(--primary-border);
 }
 
 .card:hover {
   transform: translateY(-2px);
   border-color: var(--card-accent-border);
-  box-shadow: var(--sn-shadow-md);
+  box-shadow: var(--shadow-md);
 }
 
 /* === Header === */
@@ -28,7 +28,7 @@
 .header {
   display: flex;
   align-items: center;
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
 }
 
 .header:has(.subtitle) {
@@ -42,7 +42,7 @@
   width: 2.75rem;
   height: 2.75rem;
   flex-shrink: 0;
-  border-radius: var(--sn-radius-sm);
+  border-radius: var(--radius-md);
   background: var(--card-accent-bg);
   border: 1px solid var(--card-accent);
   color: var(--card-accent);
@@ -62,16 +62,16 @@
 
 .title {
   margin: 0;
-  font-size: var(--sn-text-md);
-  font-weight: var(--sn-font-semibold);
-  color: var(--sn-text);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
   line-height: 1.3;
 }
 
 .subtitle {
   margin: 0;
-  font-size: var(--sn-text-sm);
-  color: var(--sn-text-muted);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
   line-height: 1.4;
 }
 
@@ -80,17 +80,17 @@
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sn-space-xs);
+  gap: var(--space-2);
 }
 
 .tag {
   display: inline-flex;
   padding: 0.2rem 0.6rem;
-  border-radius: var(--sn-radius-xs);
+  border-radius: var(--radius-sm);
   background: var(--card-accent-bg);
   color: var(--card-accent);
-  font-size: var(--sn-text-sm);
-  font-weight: var(--sn-font-semibold);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* === Footer === */
@@ -101,8 +101,8 @@
   gap: 0.4rem;
   margin-top: auto;
   color: var(--card-accent);
-  font-weight: var(--sn-font-bold);
-  font-size: var(--sn-text-md);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-base);
 }
 
 .footerButton {
@@ -112,13 +112,13 @@
   gap: 0.4rem;
   margin-top: auto;
   width: 100%;
-  padding: var(--sn-space-xs) var(--sn-space-sm);
+  padding: var(--space-2) var(--space-3);
   background: var(--card-accent-bg);
   border: 1px solid var(--card-accent-border);
-  border-radius: var(--sn-radius-xs);
+  border-radius: var(--radius-sm);
   color: var(--card-accent);
-  font-weight: var(--sn-font-bold);
-  font-size: var(--sn-text-md);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-base);
   transition: background 150ms ease, border-color 150ms ease;
 }
 
@@ -130,37 +130,37 @@
 /* === Color Variants === */
 
 .color-purple {
-  --card-accent: var(--sn-purple-accent-strong);
-  --card-accent-bg: var(--sn-purple-accent-soft-bg);
-  --card-accent-border: var(--sn-purple-accent-soft-border);
+  --card-accent: var(--primary-strong);
+  --card-accent-bg: var(--primary-light);
+  --card-accent-border: var(--primary-border);
 }
 
 .color-blue {
-  --card-accent: var(--sn-blue-accent-strong);
-  --card-accent-bg: var(--sn-blue-accent-soft-bg);
-  --card-accent-border: var(--sn-blue-accent-soft-border);
+  --card-accent: var(--info-strong);
+  --card-accent-bg: var(--info-light);
+  --card-accent-border: var(--info-border);
 }
 
 .color-green {
-  --card-accent: var(--sn-green-accent-strong);
-  --card-accent-bg: var(--sn-green-accent-soft-bg);
-  --card-accent-border: var(--sn-green-accent-soft-border);
+  --card-accent: var(--success-strong);
+  --card-accent-bg: var(--success-light);
+  --card-accent-border: var(--success-border);
 }
 
 .color-orange {
-  --card-accent: var(--sn-orange-accent-strong);
-  --card-accent-bg: var(--sn-orange-accent-soft-bg);
-  --card-accent-border: var(--sn-orange-accent-soft-border);
+  --card-accent: var(--warning-strong);
+  --card-accent-bg: var(--warning-light);
+  --card-accent-border: var(--warning-border);
 }
 
 .color-teal {
-  --card-accent: var(--sn-teal-accent-strong);
-  --card-accent-bg: var(--sn-teal-accent-soft-bg);
-  --card-accent-border: var(--sn-teal-accent-soft-border);
+  --card-accent: var(--support-strong);
+  --card-accent-bg: var(--support-light);
+  --card-accent-border: var(--support-border);
 }
 
 .color-red {
-  --card-accent: var(--sn-red-accent-strong);
-  --card-accent-bg: var(--sn-red-accent-soft-bg);
-  --card-accent-border: var(--sn-red-accent-soft-border);
+  --card-accent: var(--destructive-strong);
+  --card-accent-bg: var(--destructive-light);
+  --card-accent-border: var(--destructive-border);
 }

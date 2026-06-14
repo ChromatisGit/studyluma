@@ -78,7 +78,7 @@ export function ContentPageRenderer({ title, content, worksheets, className }: C
   const hasContent = content && content.length > 0;
 
   return (
-    <Container size="narrow" gutters={false} className={clsx(styles.content, className)}>
+    <Container size="narrow" className={clsx(styles.content, className)}>
       {title && <PageHeader title={title} />}
       {hasContent && (
         <div className={styles.sections}>

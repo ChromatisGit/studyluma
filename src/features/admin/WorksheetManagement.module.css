@@ -1,14 +1,14 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-lg);
+  gap: var(--space-6);
 }
 
 .empty {
   margin: 0;
-  color: var(--sn-text-muted);
+  color: var(--muted-foreground);
   font-style: italic;
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
 }
 
 /* Chapter */
@@ -16,7 +16,7 @@
 .chapter {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-sm);
+  gap: var(--space-3);
 }
 
 /* Worksheet list */
@@ -24,7 +24,7 @@
 .worksheetList {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-xs);
+  gap: var(--space-2);
 }
 
 /* Worksheet row */
@@ -32,11 +32,11 @@
 .worksheetRow {
   display: flex;
   flex-direction: column;
-  gap: var(--sn-space-sm);
-  padding: var(--sn-space-sm) var(--sn-space-md);
-  background: var(--sn-surface-raised);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   transition: border-color 120ms ease;
 }
 
@@ -44,7 +44,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sn-space-md);
+  gap: var(--space-4);
 }
 
 .worksheetInfo {
@@ -58,16 +58,16 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: var(--sn-text-md);
-  font-weight: var(--sn-font-medium);
-  color: var(--sn-text);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
   text-decoration: none;
   overflow: hidden;
   transition: color 120ms ease;
 }
 
 .worksheetLabel:hover {
-  color: var(--sn-purple-accent);
+  color: var(--primary);
 }
 
 .worksheetLabelIcon {
@@ -81,15 +81,15 @@
 }
 
 .worksheetFilename {
-  font-size: var(--sn-text-xs);
-  color: var(--sn-text-muted);
-  font-family: var(--sn-font-mono);
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
 }
 
 .worksheetActions {
   display: flex;
   align-items: center;
-  gap: var(--sn-space-xs);
+  gap: var(--space-2);
   flex-shrink: 0;
 }
 
@@ -97,10 +97,10 @@
 
 .toggleVisible,
 .toggleHidden {
-  font-size: var(--sn-text-sm);
-  font-weight: var(--sn-font-medium);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
   padding: 0.3rem 0.75rem;
-  border-radius: var(--sn-radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
@@ -109,36 +109,36 @@
 }
 
 .toggleVisible {
-  background: var(--sn-green-accent-soft-bg);
-  border-color: var(--sn-green-accent-soft-border);
-  color: var(--sn-green-accent-strong);
+  background: var(--success-light);
+  border-color: var(--success-border);
+  color: var(--success-strong);
 }
 
 .toggleVisible:hover {
-  background: var(--sn-green-accent);
-  border-color: var(--sn-green-accent);
-  color: var(--sn-text-on-accent);
+  background: var(--success);
+  border-color: var(--success);
+  color: var(--text-on-accent);
 }
 
 .toggleHidden {
-  background: var(--sn-surface);
-  border-color: var(--sn-border);
-  color: var(--sn-text-muted);
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--muted-foreground);
 }
 
 .toggleHidden:hover {
-  border-color: var(--sn-purple-accent);
-  color: var(--sn-text);
+  border-color: var(--primary);
+  color: var(--foreground);
 }
 
 /* Solution toggle buttons */
 
 .solutionVisible,
 .solutionHidden {
-  font-size: var(--sn-text-sm);
-  font-weight: var(--sn-font-medium);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
   padding: 0.3rem 0.75rem;
-  border-radius: var(--sn-radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   border: 1px solid transparent;
   transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
@@ -147,58 +147,58 @@
 }
 
 .solutionVisible {
-  background: var(--sn-yellow-accent-soft-bg);
-  border-color: var(--sn-yellow-accent);
-  color: var(--sn-yellow-accent-strong);
+  background: var(--hint-light);
+  border-color: var(--hint);
+  color: var(--hint-strong);
 }
 
 .solutionVisible:hover {
-  background: var(--sn-yellow-accent);
-  border-color: var(--sn-yellow-accent);
-  color: var(--sn-text);
+  background: var(--hint);
+  border-color: var(--hint);
+  color: var(--foreground);
 }
 
 .solutionHidden {
-  background: var(--sn-surface);
-  border-color: var(--sn-border);
-  color: var(--sn-text-muted);
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--muted-foreground);
 }
 
 .solutionHidden:hover {
-  border-color: var(--sn-yellow-accent);
-  color: var(--sn-text);
+  border-color: var(--hint);
+  color: var(--foreground);
 }
 
 /* Monitor button */
 
 .monitorButton,
 .monitorButtonActive {
-  font-size: var(--sn-text-sm);
-  font-weight: var(--sn-font-medium);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
   padding: 0.3rem 0.75rem;
-  border-radius: var(--sn-radius-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  border: 1px solid var(--sn-border);
+  border: 1px solid var(--border);
   transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
 .monitorButton {
-  background: var(--sn-surface);
-  color: var(--sn-text);
+  background: var(--card);
+  color: var(--foreground);
 }
 
 .monitorButton:hover {
-  border-color: var(--sn-purple-accent);
+  border-color: var(--primary);
 }
 
 .monitorButtonActive {
-  background: var(--sn-purple-accent-soft-bg);
-  border-color: var(--sn-purple-accent-soft-border);
-  color: var(--sn-purple-accent-strong);
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+  color: var(--primary-strong);
 }
 
 .monitorButtonActive:hover {
-  background: var(--sn-surface);
-  border-color: var(--sn-border);
-  color: var(--sn-text);
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--foreground);
 }

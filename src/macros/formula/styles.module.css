@@ -1,18 +1,18 @@
 .formula {
   display: flex;
   justify-content: center;
-  margin: var(--sn-space-sm) 0;
+  margin: var(--space-3) 0;
 }
 
 .box {
   display: inline-block;
-  padding: var(--sn-space-sm) var(--sn-space-lg);
-  border-top: 2px solid var(--sn-purple-accent);
-  border-bottom: 2px solid var(--sn-purple-accent);
-  border-left: 1px solid var(--sn-border);
-  border-right: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
-  background: color-mix(in srgb, var(--sn-purple-accent) 6%, var(--sn-surface));
+  padding: var(--space-3) var(--space-6);
+  border-top: 2px solid var(--primary);
+  border-bottom: 2px solid var(--primary);
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
   font-size: 1.1em;
   text-align: center;
 }

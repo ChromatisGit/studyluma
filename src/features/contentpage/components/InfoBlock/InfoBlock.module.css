@@ -1,9 +1,9 @@
 .infoBlock {
-  background: var(--sn-surface);
-  border: 1px solid var(--sn-border);
-  border-radius: var(--sn-radius-md);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 1.1rem 1.2rem;
-  box-shadow: var(--sn-shadow-lw);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
@@ -18,9 +18,9 @@
 .infoBadge {
   width: 2rem;
   height: 2rem;
-  border-radius: var(--sn-radius-xs);
-  background: var(--sn-surface-deep);
-  color: var(--sn-text);
+  border-radius: var(--radius-sm);
+  background: var(--surface-deep);
+  color: var(--foreground);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -28,11 +28,11 @@
 }
 
 .infoBadgeSymbol {
-  font-size: var(--sn-text-md);
+  font-size: var(--text-base);
 }
 
 .infoHeading {
   margin: 0;
-  font-size: var(--sn-text-md);
-  color: var(--sn-text);
+  font-size: var(--text-base);
+  color: var(--foreground);
 }

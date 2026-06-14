@@ -117,7 +117,7 @@ export function WorksheetRenderer({
       savedResponses={savedResponses}
       submittedSections={submittedSections}
     >
-      <Container size="narrow" gutters={false} className={clsx(styles.worksheet, className)}>
+      <Container size="narrow" className={clsx(styles.worksheet, className)}>
         {page.title && <PageHeader title={page.title} />}
         <WorksheetNavigator
           categories={categories}
