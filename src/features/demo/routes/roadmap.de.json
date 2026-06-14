@@ -17,7 +17,7 @@
       ],
       "bullets": [
         "Roadmap-Ansicht zur Orientierung innerhalb einer Themenreihe",
-        "interaktive Arbeitsblätter für den Einsatz im Unterricht",
+        "Interaktive Arbeitsblätter für den Einsatz im Unterricht",
         "Markdown-Integration zur Erstellung von Inhalten"
       ]
     },
@@ -40,7 +40,7 @@
         "Mit StudyLuma.org möchte ich das Projekt erstmals öffentlich zeigen. Die Demo soll einen Eindruck davon geben, wie StudyLuma im Unterricht eingesetzt werden kann und welche Ideen hinter der Plattform stehen."
       ],
       "bullets": [
-        "öffentliche Demo mit Einblick in zentrale Funktionen",
+        "Öffentliche Demo mit Einblick in zentrale Funktionen",
         "Erklärung des aktuellen Entwicklungsstands"
       ],
       "current": true
@@ -66,7 +66,7 @@
       ],
       "bullets": [
         "Ausbau vorbereiteter Mathematik-Inhalte",
-        "weitere digitale und interaktive Aufgabenformate"
+        "Weitere digitale und interaktive Aufgabenformate"
       ]
     },
     {
@@ -76,7 +76,7 @@
         "Ab Herbst soll StudyLuma regelmäßig im eigenen Unterricht eingesetzt werden. Dabei wird sich zeigen, welche Funktionen im Schulalltag wirklich hilfreich sind und welche noch vereinfacht oder verändert werden müssen."
       ],
       "bullets": [
-        "regelmäßiger Einsatz in der eigenen Schulpraxis",
+        "Regelmäßiger Einsatz in der eigenen Schulpraxis",
         "Weiterentwicklung aus dem Unterricht heraus",
         "Prüfung von Struktur, Quiz, Materialien und Aufgaben im Alltag"
       ]
@@ -89,9 +89,9 @@
         "Für Lehrkräfte soll dadurch auch sichtbar werden, welche Themen schon sicher sitzen und wo Wiederholung sinnvoll wäre."
       ],
       "bullets": [
-        "kurze Übungsaufgaben zu einzelnen Themen und Konzepten",
+        "Kurze Übungsaufgaben zu einzelnen Themen und Konzepten",
         "Wiederholung in kleinen Einheiten, auch außerhalb des Unterrichts",
-        "bessere Grundlage für Übungsphasen und Wiederholungsaufgaben im Unterricht"
+        "Bessere Grundlage für Übungsphasen und Wiederholungsaufgaben im Unterricht"
       ]
     },
     {
@@ -101,9 +101,9 @@
         "Die weitere Entwicklung von StudyLuma soll im Rahmen einer Masterarbeit didaktisch analysiert und reflektiert werden. Dabei geht es um die Frage, welche Kriterien ein digitales Unterrichtswerkzeug erfüllen sollte und wie StudyLuma diese Ideen bereits umsetzt oder noch weiterentwickeln muss."
       ],
       "bullets": [
-        "didaktische Designkriterien für digitale Unterrichtswerkzeuge herausarbeiten",
+        "Didaktische Designkriterien für digitale Unterrichtswerkzeuge herausarbeiten",
         "Stärken, Grenzen und nächste Entwicklungsschritte sichtbar machen",
-        "wissenschaftliche Grundlage für die weitere Entwicklung"
+        "Wissenschaftliche Grundlage für die weitere Entwicklung"
       ]
     },
     {
@@ -126,10 +126,10 @@
         "Perspektivisch soll ein gemeinnütziger Verein die Weiterentwicklung tragen. Ziel wäre eine kostenlose und offene Plattform, die Lehrkräfte bei digitaler Unterrichtsarbeit unterstützt und Materialien frei zugänglich macht."
       ],
       "bullets": [
-        "offene und kostenlose Plattform für digitale Unterrichtsarbeit",
+        "Offene und kostenlose Plattform für digitale Unterrichtsarbeit",
         "Möglichkeit, eigene Instanzen zu betreiben",
-        "gemeinsame Weiterentwicklung von Inhalten und Materialien",
-        "langfristige Trägerstruktur durch einen gemeinnützigen Verein"
+        "Gemeinsame Weiterentwicklung von Inhalten und Materialien",
+        "Langfristige Trägerstruktur durch einen gemeinnützigen Verein"
       ]
     }
   ]

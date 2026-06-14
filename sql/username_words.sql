@@ -89,7 +89,7 @@ VALUES
   (81, 'Winkel'),
   (82, 'Linie'),
   (83, 'Bruch'),
-  (84, 'Gerade'),
+  (84, 'Laser'),
   (85, 'Vektor'),
   (86, 'Block'),
   (87, 'Punkt'),
@@ -105,4 +105,4 @@ VALUES
   (97, 'Web'),
   (98, 'Netz'),
   (99, 'Code'),
-  (100, 'Laser')
+  (100, 'Stern')

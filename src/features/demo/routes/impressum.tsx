@@ -22,7 +22,7 @@ export default function ImpressumPage() {
 
           <section style={{ display: "flex", flexDirection: "column", gap: "1rem", lineHeight: 1.7 }}>
             <p>
-              StudyLuma ist ein nicht-kommerzielles Bildungs- und Open-Source-Entwicklungsprojekt von Christian H.
+              StudyLuma ist ein nicht-kommerzielles Bildungs- und Open-Source-Entwicklungsprojekt von Christian Holst.
             </p>
 
             <p>

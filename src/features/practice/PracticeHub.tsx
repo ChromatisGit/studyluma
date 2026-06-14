@@ -31,7 +31,7 @@ export function PracticeHub({ courses, xp, badge: _badge }: PracticeHubProps) {
 
   return (
     <div className={styles.page}>
-      <Container size="narrow" gutters={false} className={styles.inner}>
+      <Container size="narrow" className={styles.inner}>
         <PageHeader
           title="Work in Progress"
           subtitle="Dieses Feature wird gerade noch entwickelt und funktioniert noch nicht!"

@@ -12,6 +12,8 @@
     "db": "bun run node_modules/@chromatis/base/infra/scripts/db.ts",
     "db:reset": "bun run node_modules/@chromatis/base/infra/scripts/dbReset.ts",
     "db:deploy": "bun run node_modules/@chromatis/base/infra/scripts/dbDeploy.ts",
+    "db:seed-demo": "bun run scripts/seedDemo.ts",
+    "db:seed-demo:local": "bun run scripts/seedDemo.ts --local",
     "cf:dev": "bun run node_modules/@chromatis/base/infra/scripts/cfDev.ts",
     "cf:deploy": "bun run node_modules/@chromatis/base/infra/scripts/cfDeploy.ts",
     "cf:deploy:demo": "bun run scripts/cfDeployDemo.ts"

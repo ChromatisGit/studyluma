@@ -33,16 +33,6 @@
   margin-bottom: 2.5rem;
 }
 
-.backLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  color: var(--muted-foreground);
-  font-size: 0.875rem;
-  text-decoration: none;
-  transition: color 0.15s ease;
-}
-
 .backLink:hover {
   color: var(--foreground);
 }
@@ -60,9 +50,8 @@
 }
 
 .intro {
-  max-width: 60ch;
   margin: 0;
-  color: var(--muted-foreground);
+  color: var(--foreground);
   line-height: 1.7;
 }
 
@@ -93,8 +82,8 @@
 .segment {
   position: absolute;
   left: 15px;
-  top: 34px;
-  bottom: 2px;
+  top: calc(0.2rem + 15px);
+  bottom: calc(-0.2rem - 15px);
   width: 3px;
   transform: translateX(-50%);
   z-index: 0;
@@ -198,8 +187,7 @@
 .body {
   display: grid;
   gap: 0.65rem;
-  max-width: 66ch;
-  color: var(--muted-foreground);
+  color: var(--foreground);
   font-size: 0.95rem;
   line-height: 1.65;
 }

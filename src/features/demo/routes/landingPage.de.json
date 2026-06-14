@@ -44,8 +44,8 @@
     "cta": "Demo starten"
   },
   "project": {
-    "title": "Über das Projekt",
-    "body": "StudyLuma ist ein Nebenprojekt von Christian Holst, angehender Lehrer für berufliche Schulen mit den Fächern Mathematik und Informatik. Es entstand aus der eigenen Unterrichtsvorbereitung mit dem Ziel, ein offenes Werkzeug zu bauen, das langfristig auch anderen Lehrkräften helfen kann.",
+    "title": "Über den Autor",
+    "body": "StudyLuma ist ein Nebenprojekt von Christian Holst, angehender Lehrer für berufliche Schulen mit den Fächern Mathematik und Informatik. Es entstand aus meiner eigenen Unterrichtserfahrung mit dem Ziel, ein kostenloses Werkzeug zu bauen, das langfristig auch anderen Lehrkräften helfen kann.",
     "githubLabel": "GitHub",
     "email": "christian.contactmail@gmail.com"
   },

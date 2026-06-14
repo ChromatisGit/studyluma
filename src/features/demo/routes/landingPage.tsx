@@ -6,6 +6,7 @@ import { toggleTheme } from "@chromatis/base";
 import { getSession } from "@core/index.server";
 import { isAdmin } from "@core/auth/guards";
 import { getSidebarDTO } from "@services/courseService";
+
 import { Button } from "@components/Button";
 import { Box } from "@components/Box";
 import { IconBox } from "@components/IconBox";
@@ -25,8 +26,7 @@ export async function loader({ request }: { request: Request }) {
   const session = await getSession(request);
   const user = session?.user ?? null;
 
-  if (user) {
-    if (isAdmin(user)) return redirect("/admin");
+  if (user && !isAdmin(user)) {
     const sidebar = await getSidebarDTO({ courseId: null, user });
     const firstCourse = sidebar.courses[0];
     if (firstCourse) return redirect(firstCourse.href);

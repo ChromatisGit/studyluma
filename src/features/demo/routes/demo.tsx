@@ -1,4 +1,4 @@
-import { Form, redirect } from "react-router";
+import { Form, redirect, useActionData } from "react-router";
 import { buildSessionCookie } from "@core/index.server";
 import { getDemoUser, type DemoRole } from "@features/demo/demoSession.server";
 
@@ -19,16 +19,21 @@ export async function action({ request }: { request: Request }) {
     return { error: "Demo-Nutzer nicht gefunden. Bitte Demo-Daten einspielen." };
   }
 
-  return redirect("/", {
+  const dest = role === "teacher" ? "/admin" : "/demo/math";
+  return redirect(dest, {
     headers: { "Set-Cookie": buildSessionCookie(user.id) },
   });
 }
 
 export default function DemoEntryPage() {
+  const actionData = useActionData<typeof action>();
   return (
     <main style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", gap: "2rem" }}>
       <h1 style={{ fontSize: "1.5rem", fontWeight: 700 }}>StudyLuma Demo</h1>
       <p style={{ color: "var(--muted-foreground)" }}>Wähle eine Perspektive, um die Demo zu starten.</p>
+      {actionData?.error && (
+        <p style={{ color: "red" }}>{actionData.error}</p>
+      )}
       <Form method="post" style={{ display: "flex", gap: "1rem" }}>
         <button type="submit" name="role" value="student">
           Als Schüler fortfahren

@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Form, Outlet, redirect, useLoaderData } from "react-router";
+import { Form, Outlet, useLoaderData } from "react-router";
 import { Layout, Sidebar } from "@chromatis/base";
 import { mainNavItems } from "@core/nav";
 import { RouteProvider } from "@ui/contexts/RouteContext";
-import { getSession, buildSessionCookie } from "@core/index.server";
-import { getDemoUser, demoRoleFromUser, type DemoRole } from "@features/demo/demoSession.server";
+import { getSession } from "@core/index.server";
+
+type DemoRole = "student" | "teacher";
 
 const BRAND = { name: "StudyLuma", initial: "S" } as const;
 
@@ -13,28 +14,13 @@ export async function loader({ request }: { request: Request }) {
   return { user: session?.user ?? null };
 }
 
-export async function action({ request }: { request: Request }) {
-  const form = await request.formData();
-  const role = form.get("role") as DemoRole | null;
-
-  if (role !== "student" && role !== "teacher") return redirect("/demo");
-
-  const user = await getDemoUser(role);
-  if (!user) return redirect("/demo");
-
-  const { pathname } = new URL(request.url);
-  return redirect(pathname, {
-    headers: { "Set-Cookie": buildSessionCookie(user.id) },
-  });
-}
-
 function DemoRoleSwitcher({ currentRole, collapsed }: { currentRole: DemoRole; collapsed: boolean }) {
   const targetRole: DemoRole = currentRole === "teacher" ? "student" : "teacher";
   const currentLabel = currentRole === "teacher" ? "Lehrersicht" : "Schülersicht";
   const targetLabel = currentRole === "teacher" ? "Schülersicht" : "Lehrersicht";
 
   return (
-    <Form method="post">
+    <Form method="post" action="/demo">
       <input type="hidden" name="role" value={targetRole} />
       {collapsed ? (
         <button
@@ -63,7 +49,7 @@ export default function DemoAppLayout() {
   const { user } = useLoaderData<typeof loader>();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  const currentRole: DemoRole = user ? demoRoleFromUser(user) : "student";
+  const currentRole: DemoRole = user?.role === "admin" ? "teacher" : "student";
 
   const sidebar = (
     <Sidebar
@@ -85,6 +71,7 @@ export default function DemoAppLayout() {
         brand={BRAND}
         mainNavItems={mainNavItems}
         menuNavItems={[]}
+        menuFooterSlot={<DemoRoleSwitcher currentRole={currentRole} collapsed={false} />}
         sidebar={sidebar}
       >
         <Outlet />
