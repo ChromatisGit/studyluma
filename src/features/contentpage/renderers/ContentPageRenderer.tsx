@@ -10,11 +10,14 @@ import { type Macro, type MacroRenderContext, renderMacro } from "@macros/regist
 import styles from "./ContentPageRenderer.module.css";
 import { WorksheetCards } from "@components/WorksheetCards";
 import type { WorksheetRef } from "@schema/courseContent";
+import type { ProgressDTO } from "@schema/courseTypes";
+import { Breadcrumbs } from "@ui/layout/Breadcrumbs/Breadcrumbs";
 import CONTENTPAGE_TEXT from "../contentpage.de.json";
 
 type ContentPageRendererProps = Page & {
   worksheets?: WorksheetRef[] | undefined;
   className?: string | undefined;
+  progress?: ProgressDTO | undefined;
 };
 
 const contentContext: MacroRenderContext = {};
@@ -74,11 +77,12 @@ function renderContentItem(item: Node, index: number) {
   );
 }
 
-export function ContentPageRenderer({ title, content, worksheets, className }: ContentPageRendererProps) {
+export function ContentPageRenderer({ title, content, worksheets, className, progress }: ContentPageRendererProps) {
   const hasContent = content && content.length > 0;
 
   return (
     <Container size="narrow" className={clsx(styles.content, className)}>
+      {progress && <Breadcrumbs topics={progress.topics} />}
       {title && <PageHeader title={title} />}
       {hasContent && (
         <div className={styles.sections}>
