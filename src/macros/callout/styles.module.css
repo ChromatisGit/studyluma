@@ -1,12 +1,7 @@
 .callout {
-  width: 100%;
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--primary) 8%, var(--card));
-  text-align: center;
-  font-size: 1.05em;
-  font-weight: var(--font-weight-semibold);
-  color: var(--primary-strong);
+  font-style: italic;
+  color: var(--muted-foreground);
+  font-size: 0.95em;
 }
 
 .callout > :first-child {

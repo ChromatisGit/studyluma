@@ -9,7 +9,7 @@ StudyLuma is split across two independent repositories:
 | `studyluma-website` | React Router v7 SSR web application |
 | `studyluma-content` | Markdown content source + build pipeline |
 
-The repos are completely independent. The **only coupling** between them is the database: the content pipeline writes to the Postgres database, and the website reads from it.
+The repos are completely independent — no shared filesystem, no relative paths between them. The **only coupling** is shared infrastructure: the content pipeline writes to the Postgres database and the website reads from it, and binary assets (currently: images) referenced from Markdown flow through the same database by default, or through S3-compatible object storage (Cloudflare R2, MinIO, ...) if configured. See [CONTENT_PIPELINE.md](CONTENT_PIPELINE.md#images--binary-assets).
 
 ```
 studyluma-content          studyluma-website
@@ -88,6 +88,8 @@ Row-Level Security policies on each table use these parameters to enforce access
 ### Content
 
 Content pages are stored as parsed JSONB in the `content_pages` table. The website only reads the pre-parsed JSON produced by the pipeline. At request time, `platform/content.server.ts` fetches the relevant row and the React Router loader passes it to the renderer.
+
+Images referenced from Markdown are content-addressed (`<sha256-of-bytes>.<ext>`) and served via `GET /content-assets/:key`, which resolves the key through `core/assets.server.ts` (Postgres `content_assets` table by default, or S3-compatible storage — see [CONTENT_PIPELINE.md](CONTENT_PIPELINE.md#images--binary-assets)). There is no per-asset access control beyond the key being unguessable, matching `content_pages`.
 
 ### Realtime
 

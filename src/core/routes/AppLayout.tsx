@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { Outlet, useLoaderData, useMatches } from "react-router";
+import { Outlet, useLoaderData } from "react-router";
 import { Layout, Sidebar } from "@chromatis/base";
 import { adminNavItem, mainNavItems, profileNavItem } from "@core/nav";
-import { RouteProvider, useRouteContext } from "@ui/contexts/RouteContext";
+import { RouteProvider } from "@ui/contexts/RouteContext";
 import { getSession } from "@core/index.server";
 import { getSidebarDTO } from "@services/courseService";
-import { CourseNavTree } from "@ui/layout/CourseNav/CourseNavTree";
-import { CourseList } from "@ui/layout/CourseNav/CourseList";
-import type { ProgressDTO, SidebarDTO } from "@schema/courseTypes";
+import { useSidebarNav } from "@ui/layout/CourseNav/useSidebarNav";
+import type { SidebarDTO } from "@schema/courseTypes";
 
 const BRAND = { name: "StudyLuma", initial: "S" } as const;
 
@@ -31,30 +30,7 @@ function AppLayoutInner({
   sidebarCollapsed,
   setSidebarCollapsed,
 }: AppLayoutInnerProps) {
-  const { hasTopicContext, topic, chapter, groupKey, subjectKey } = useRouteContext();
-  const matches = useMatches();
-
-  const progress = matches
-    .map((m) => (m.data as { progress?: ProgressDTO } | null))
-    .find((d) => d?.progress != null)?.progress;
-
-  const courseHref = groupKey && subjectKey ? `/${groupKey}/${subjectKey}` : "/";
-
-  const hasCourses = sidebarData.courses.length > 0;
-
-  const navSlot =
-    hasTopicContext && progress && topic ? (
-      <CourseNavTree
-        progress={progress}
-        currentTopic={topic}
-        currentChapter={chapter}
-        courseHref={courseHref}
-      />
-    ) : hasCourses ? (
-      <CourseList courses={sidebarData.courses} />
-    ) : null;
-
-  const sidebarMainNavItems = hasCourses || hasTopicContext ? [] : mainNavItems;
+  const { navSlot, mainNavItems: sidebarMainNavItems } = useSidebarNav(sidebarData, mainNavItems);
 
   const sidebar = (
     <Sidebar

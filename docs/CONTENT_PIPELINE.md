@@ -141,6 +141,47 @@ The pipeline is idempotent — running it multiple times is safe. Unchanged cont
 
 ---
 
+## Images / Binary Assets
+
+Images are written with standard Markdown syntax (`![](./diagram.svg)`, relative to the
+`.md` file). Since the two repos share no filesystem, the pipeline never copies the file
+into `studyluma-website`. Instead, each image is content-addressed - `<sha256-of-bytes>.<ext>`
+- and uploaded through an `AssetStore` (`pipeline/assets/`) once parsing finishes. The
+website resolves a key back to bytes on request via `GET /content-assets/:key`
+(`src/core/assets.server.ts`).
+
+Backend is chosen with `asset_driver` in `CONFIG.yaml` (same profile as `database`) -
+**must be set the same way in both repos' `CONFIG.yaml`**:
+
+```yaml
+local:
+  database: postgres://...
+  asset_driver: postgres   # default - no extra setup, stored in the content_assets table.
+                            # Fine for small/medium content and local dev.
+
+  # asset_driver: s3       # for deployments with many/large assets. Requires:
+  # asset_s3_endpoint: ""
+  # asset_s3_bucket: ""
+  # asset_s3_region: ""
+  # asset_s3_access_key_id: ""
+  # asset_s3_secret_access_key: ""
+```
+
+`asset_driver: s3` works against any S3-compatible endpoint (Cloudflare R2, MinIO, AWS S3, ...)
+via Bun's built-in S3 client - no extra dependency.
+
+There is no per-asset access control - anyone with the key (an unguessable hash) can fetch
+it, same trust model as a public CDN link. Course-level access control (public vs. gated
+courses) is unaffected, since it's enforced before a content page - and the asset URLs it
+contains - is ever sent to the client.
+
+PDFs (`compilePdfToPublic` in `pipeline/io.ts`) do **not** go through this mechanism yet and
+still write directly to `studyluma-website/public/.generated/pdf` - which only works when
+both repos happen to be sibling directories on the same machine. This is a known gap, not
+addressed by the asset store above.
+
+---
+
 ## Content Format
 
 See [MARKDOWN_CONTENT_FORMAT.md](MARKDOWN_CONTENT_FORMAT.md) for the full Markdown syntax reference.

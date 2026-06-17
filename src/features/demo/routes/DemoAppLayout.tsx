@@ -4,6 +4,9 @@ import { Layout, Sidebar } from "@chromatis/base";
 import { mainNavItems } from "@core/nav";
 import { RouteProvider } from "@ui/contexts/RouteContext";
 import { getSession } from "@core/index.server";
+import { getSidebarDTO } from "@services/courseService";
+import { useSidebarNav } from "@ui/layout/CourseNav/useSidebarNav";
+import type { SidebarDTO } from "@schema/courseTypes";
 
 type DemoRole = "student" | "teacher";
 
@@ -11,7 +14,9 @@ const BRAND = { name: "StudyLuma", initial: "S" } as const;
 
 export async function loader({ request }: { request: Request }) {
   const session = await getSession(request);
-  return { user: session?.user ?? null };
+  const user = session?.user ?? null;
+  const sidebarData = await getSidebarDTO({ courseId: null, user });
+  return { user, sidebarData };
 }
 
 function DemoRoleSwitcher({ currentRole, collapsed }: { currentRole: DemoRole; collapsed: boolean }) {
@@ -45,17 +50,29 @@ function DemoRoleSwitcher({ currentRole, collapsed }: { currentRole: DemoRole; c
   );
 }
 
-export default function DemoAppLayout() {
-  const { user } = useLoaderData<typeof loader>();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+type DemoAppLayoutInnerProps = {
+  user: { role?: string } | null;
+  sidebarData: SidebarDTO;
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (v: boolean) => void;
+};
+
+function DemoAppLayoutInner({
+  user,
+  sidebarData,
+  sidebarCollapsed,
+  setSidebarCollapsed,
+}: DemoAppLayoutInnerProps) {
+  const { navSlot, mainNavItems: sidebarMainNavItems } = useSidebarNav(sidebarData, mainNavItems);
 
   const currentRole: DemoRole = user?.role === "admin" ? "teacher" : "student";
 
   const sidebar = (
     <Sidebar
       brand={BRAND}
-      mainNavItems={mainNavItems}
+      mainNavItems={sidebarMainNavItems}
       footerNavItems={[]}
+      navSlot={navSlot}
       collapsed={sidebarCollapsed}
       onCollapsedChange={setSidebarCollapsed}
       collapsible
@@ -66,16 +83,30 @@ export default function DemoAppLayout() {
   );
 
   return (
+    <Layout
+      brand={BRAND}
+      mainNavItems={mainNavItems}
+      menuNavItems={[]}
+      menuFooterSlot={<DemoRoleSwitcher currentRole={currentRole} collapsed={false} />}
+      sidebar={sidebar}
+    >
+      <Outlet />
+    </Layout>
+  );
+}
+
+export default function DemoAppLayout() {
+  const { user, sidebarData } = useLoaderData<typeof loader>();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  return (
     <RouteProvider>
-      <Layout
-        brand={BRAND}
-        mainNavItems={mainNavItems}
-        menuNavItems={[]}
-        menuFooterSlot={<DemoRoleSwitcher currentRole={currentRole} collapsed={false} />}
-        sidebar={sidebar}
-      >
-        <Outlet />
-      </Layout>
+      <DemoAppLayoutInner
+        user={user}
+        sidebarData={sidebarData}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
+      />
     </RouteProvider>
   );
 }

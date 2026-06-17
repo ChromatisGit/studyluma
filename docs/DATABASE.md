@@ -54,6 +54,7 @@ Chapter `status` values: `current`, `finished`, `locked`.
 | Table | Purpose |
 |-------|---------|
 | `content_pages` | Parsed Markdown pages stored as JSONB |
+| `content_assets` | Binary assets (images) referenced from content, content-addressed by hash. Only populated when the content pipeline uses `asset_driver: postgres` (the default) - see [CONTENT_PIPELINE.md](CONTENT_PIPELINE.md#images--binary-assets) |
 
 ### Quiz (TODO temp will be removed from DB)
 
@@ -145,7 +146,8 @@ Migration files live in `sql/migrations/`. They are applied in lexicographic fil
 
 ```
 sql/migrations/
-└── 1.0.0__initial.sql    Full initial schema
+├── 1.0.0__initial.sql           Full initial schema
+└── 1.0.1__content_assets.sql    content_assets table
 ```
 
 ### How to add a migration

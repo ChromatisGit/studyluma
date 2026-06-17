@@ -14,6 +14,11 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/content-assets/:key": {
+    params: {
+      "key": string;
+    };
+  };
   "/access": {
     params: {};
   };
@@ -120,7 +125,11 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/access" | "/admin/register" | "/api/admin" | "/api/quiz" | "/api/slides" | "/api/worksheet/:worksheetId/save" | "/api/worksheet/:worksheetId/checkpoint" | "/api/worksheet/:worksheetId/presence" | "/slides" | "/slides/:courseId/:topic/:chapter/:slideId" | "/slides/:courseId/:topic/:chapter/:slideId/projector" | "/practice" | "/quiz" | "/profile" | "/admin" | "/admin/:courseId" | "/:group" | "/:group/:course" | "/:group/:course/:topic/:chapter/:worksheet" | "/:group/:course/:topic/:chapter" | "/:group/:course/:topic";
+    page: "/" | "/content-assets/:key" | "/access" | "/admin/register" | "/api/admin" | "/api/quiz" | "/api/slides" | "/api/worksheet/:worksheetId/save" | "/api/worksheet/:worksheetId/checkpoint" | "/api/worksheet/:worksheetId/presence" | "/slides" | "/slides/:courseId/:topic/:chapter/:slideId" | "/slides/:courseId/:topic/:chapter/:slideId/projector" | "/practice" | "/quiz" | "/profile" | "/admin" | "/admin/:courseId" | "/:group" | "/:group/:course" | "/:group/:course/:topic/:chapter/:worksheet" | "/:group/:course/:topic/:chapter" | "/:group/:course/:topic";
+  };
+  "../src/core/routes/contentAsset.ts": {
+    id: "../src/core/routes/contentAsset";
+    page: "/content-assets/:key";
   };
   "../src/features/access/routes/access.tsx": {
     id: "../src/features/access/routes/access";
@@ -220,6 +229,7 @@ type RouteFiles = {
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
+  "../src/core/routes/contentAsset": unknown;
   "../src/features/access/routes/access": unknown;
   "../src/features/access/routes/adminRegister": unknown;
   "../src/features/admin/routes/api": unknown;

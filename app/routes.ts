@@ -19,6 +19,7 @@ const appRoutes = [
 ];
 
 export default [
+  route("content-assets/:key", "../src/core/routes/contentAsset.ts"),
   route("access", "../src/features/access/routes/access.tsx"),
   route("admin/register", "../src/features/access/routes/adminRegister.tsx"),
   route("api/admin", "../src/features/admin/routes/api.tsx"),
