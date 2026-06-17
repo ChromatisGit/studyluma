@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useOptimistic, useTransition } from "react";
+import { useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { AppLink } from "@components/AppLink";
 import type { CourseId } from "@schema/courseTypes";
@@ -28,34 +28,31 @@ interface WorksheetRowProps {
 }
 
 function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggleMonitor }: WorksheetRowProps) {
-  const [optimisticHidden, setOptimisticHidden] = useOptimistic(worksheet.isHidden);
-  const [optimisticSolutionHidden, setOptimisticSolutionHidden] = useOptimistic(worksheet.isSolutionHidden);
-  const [, startTransition] = useTransition();
+  const [isHidden, setIsHidden] = useState(worksheet.isHidden);
+  const [isSolutionHidden, setIsSolutionHidden] = useState(worksheet.isSolutionHidden);
 
-  const handleToggle = () => {
-    const newHidden = !optimisticHidden;
-    startTransition(async () => {
-      setOptimisticHidden(newHidden);
-      await postAdminAction({
-        intent: "toggle-worksheet-visibility",
-        courseId,
-        worksheetId: worksheet.worksheetId,
-        isHidden: newHidden,
-      });
+  const handleToggle = async () => {
+    const newHidden = !isHidden;
+    setIsHidden(newHidden);
+    const result = await postAdminAction({
+      intent: "toggle-worksheet-visibility",
+      courseId,
+      worksheetId: worksheet.worksheetId,
+      isHidden: newHidden,
     });
+    if (!result.ok) setIsHidden(!newHidden);
   };
 
-  const handleSolutionToggle = () => {
-    const newHidden = !optimisticSolutionHidden;
-    startTransition(async () => {
-      setOptimisticSolutionHidden(newHidden);
-      await postAdminAction({
-        intent: "toggle-worksheet-solution-visibility",
-        courseId,
-        worksheetId: worksheet.worksheetId,
-        isSolutionHidden: newHidden,
-      });
+  const handleSolutionToggle = async () => {
+    const newHidden = !isSolutionHidden;
+    setIsSolutionHidden(newHidden);
+    const result = await postAdminAction({
+      intent: "toggle-worksheet-solution-visibility",
+      courseId,
+      worksheetId: worksheet.worksheetId,
+      isSolutionHidden: newHidden,
     });
+    if (!result.ok) setIsSolutionHidden(!newHidden);
   };
 
   const isPdfCourse = worksheet.worksheetFormat === "pdfSolution";
@@ -74,19 +71,19 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
         <div className={styles.worksheetActions}>
           {isPdfCourse && (
             <button
-              className={optimisticSolutionHidden ? styles.solutionHidden : styles.solutionVisible}
+              className={isSolutionHidden ? styles.solutionHidden : styles.solutionVisible}
               onClick={handleSolutionToggle}
-              title={optimisticSolutionHidden ? TEXT.solutionHidden : TEXT.solutionVisible}
+              title={isSolutionHidden ? TEXT.solutionHidden : TEXT.solutionVisible}
             >
-              {optimisticSolutionHidden ? TEXT.solutionHidden : TEXT.solutionVisible}
+              {isSolutionHidden ? TEXT.solutionHidden : TEXT.solutionVisible}
             </button>
           )}
           <button
-            className={optimisticHidden ? styles.toggleHidden : styles.toggleVisible}
+            className={isHidden ? styles.toggleHidden : styles.toggleVisible}
             onClick={handleToggle}
-            title={optimisticHidden ? TEXT.hidden : TEXT.visible}
+            title={isHidden ? TEXT.hidden : TEXT.visible}
           >
-            {optimisticHidden ? TEXT.hidden : TEXT.visible}
+            {isHidden ? TEXT.hidden : TEXT.visible}
           </button>
           <button
             className={isMonitorOpen ? styles.monitorButtonActive : styles.monitorButton}

@@ -2,7 +2,7 @@ import type { CardMacro, CardKind } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
-import { Info, BookOpen, FlaskConical, Check, HelpCircle, CheckSquare, Star, RefreshCw, Bookmark, AlertTriangle, CheckCircle } from "lucide-react";
+import { Info, BookOpen, FlaskConical, Check, HelpCircle, CheckSquare, RefreshCw, Bookmark, AlertTriangle, CheckCircle } from "lucide-react";
 import clsx from "clsx";
 import styles from "./styles.module.css";
 import MACROS_TEXT from "@macros/macros.de.json";
@@ -11,12 +11,10 @@ type Props = MacroComponentProps<CardMacro>;
 
 const ICONS: Partial<Record<CardKind, React.ComponentType<{ className?: string }>>> = {
   definition: BookOpen,
-  concept: Info,
   example: FlaskConical,
   check: Check,
   prompt: HelpCircle,
   task: CheckSquare,
-  highlight: Star,
   recap: RefreshCw,
   remember: Bookmark,
   warning: AlertTriangle,
@@ -26,7 +24,7 @@ const ICONS: Partial<Record<CardKind, React.ComponentType<{ className?: string }
 
 const KIND_STYLE: Record<CardKind, string> = {
   definition: styles['neutral'] ?? '',
-  concept: styles['neutral'] ?? '',
+  concept: styles['example'] ?? '',
   example: styles['neutral'] ?? '',
   check: styles['neutral'] ?? '',
   prompt: styles['task'] ?? '',

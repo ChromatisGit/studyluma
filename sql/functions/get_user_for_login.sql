@@ -1,5 +1,6 @@
 -- Login bootstrap lookup by username
-CREATE OR REPLACE FUNCTION get_user_for_login(p_username TEXT)
+DROP FUNCTION IF EXISTS get_user_for_login(TEXT);
+CREATE FUNCTION get_user_for_login(p_username TEXT)
 RETURNS TABLE (
   id          TEXT,
   role        TEXT,

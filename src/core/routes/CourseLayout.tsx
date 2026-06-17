@@ -1,7 +1,7 @@
 import { Outlet, useLoaderData } from "react-router";
 import { getSession } from "@core/index.server";
 import { assertCanAccessPage } from "@core/auth/guards";
-import { coursePublic, getCourseDTO, getCourseId } from "@services/courseService";
+import { coursePublic, getCourseDTO, getCourseId, getProgressDTO } from "@services/courseService";
 
 export async function loader({
   request,
@@ -18,9 +18,14 @@ export async function loader({
   const courseId = await getCourseId(groupKey, subjectKey);
   const isPublic = await coursePublic(courseId);
   assertCanAccessPage(session, groupKey, isPublic, courseId);
-  const course = await getCourseDTO(courseId);
 
-  return { courseId, course, user: session?.user ?? null };
+  const user = session?.user ?? null;
+  const [course, progress] = await Promise.all([
+    getCourseDTO(courseId),
+    getProgressDTO(courseId, user),
+  ]);
+
+  return { courseId, course, progress, user };
 }
 
 export default function CourseLayout() {

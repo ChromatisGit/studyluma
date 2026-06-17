@@ -1,19 +1,22 @@
 "use client";
 
+import { useState } from "react";
 import clsx from "clsx";
-import { ChevronRight, House } from "lucide-react";
-
+import { ChevronRight, House, List, CheckCircle, CircleDot } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@chromatis/base";
 import { AppLink } from "@components/AppLink";
 import { useRouteContext } from "@ui/contexts/RouteContext";
-import type { SidebarDTO } from "@schema/courseTypes";
+import type { ProgressTopicDTO } from "@schema/courseTypes";
 import styles from "./Breadcrumbs.module.css";
 import LAYOUT_TEXT from "../layout.de.json";
 
 type BreadcrumbsProps = {
-  data: SidebarDTO;
+  topics: ProgressTopicDTO[];
 };
 
-export function Breadcrumbs({ data }: BreadcrumbsProps) {
+export function Breadcrumbs({ topics }: BreadcrumbsProps) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+
   const {
     hasTopicContext,
     courseId,
@@ -39,16 +42,14 @@ export function Breadcrumbs({ data }: BreadcrumbsProps) {
   let chapterLabel = chapter;
   let worksheetLabel = worksheet;
 
-  if (courseId) {
-    const topicData = data.topics.find((entry) => entry.topicId === topic);
-    topicLabel = topicData?.label ?? topicLabel;
-    const chapterData = topicData?.chapters.find((entry) => entry.chapterId === chapter);
-    chapterLabel = chapterData?.label ?? chapterLabel;
-    const worksheetData = chapterData?.worksheets?.find(
-      (entry) => entry.worksheetId === worksheet
-    );
-    worksheetLabel = worksheetData?.label ?? worksheetLabel;
-  }
+  const topicData = topics.find((entry) => entry.topicId === topic);
+  topicLabel = topicData?.label ?? topicLabel;
+  const chapterData = topicData?.chapters.find((entry) => entry.chapterId === chapter);
+  chapterLabel = chapterData?.label ?? chapterLabel;
+  const worksheetData = chapterData?.worksheets?.find(
+    (entry) => entry.worksheetId === worksheet
+  );
+  worksheetLabel = worksheetData?.label ?? worksheetLabel;
 
   if (topic) {
     const topicUrl =
@@ -86,31 +87,77 @@ export function Breadcrumbs({ data }: BreadcrumbsProps) {
     });
   }
 
-  return (
-    <nav className={styles.breadcrumbs} aria-label={LAYOUT_TEXT.breadcrumbs.ariaLabel}>
-      <ol className={styles.list}>
-        <li className={styles.item}>
-          <AppLink href={homeUrl} className={clsx(styles.link, styles.home)}>
-            <House size={16} />
-          </AppLink>
-        </li>
+  const visibleChapters = topicData?.chapters.filter(
+    (c) => c.status === "finished" || c.status === "current",
+  ) ?? [];
 
-        {items.flatMap((item, index) => [
-          <li key={`sep-${item.href}`} className={styles.separator} aria-hidden="true">
-            <ChevronRight size={12} />
-          </li>,
-          <li key={item.href} className={styles.item}>
-            <AppLink
-              href={item.href}
-              className={styles.link}
-              active={index === items.length - 1}
-              activeClassName={styles.linkActive}
-            >
-              {item.label}
+  return (
+    <>
+      <nav className={styles.breadcrumbs} aria-label={LAYOUT_TEXT.breadcrumbs.ariaLabel}>
+        <ol className={styles.list}>
+          <li className={styles.item}>
+            <AppLink href={homeUrl} className={clsx(styles.link, styles.home)}>
+              <House size={16} />
             </AppLink>
-          </li>,
-        ])}
-      </ol>
-    </nav>
+          </li>
+
+          {items.flatMap((item, index) => [
+            <li key={`sep-${item.href}`} className={styles.separator} aria-hidden="true">
+              <ChevronRight size={12} />
+            </li>,
+            <li key={item.href} className={styles.item}>
+              <AppLink
+                href={item.href}
+                className={styles.link}
+                active={index === items.length - 1}
+                activeClassName={styles.linkActive}
+              >
+                {item.label}
+              </AppLink>
+            </li>,
+          ])}
+        </ol>
+
+        {visibleChapters.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setSheetOpen(true)}
+            className={clsx(styles.sheetTrigger, "md:hidden")}
+            aria-label="Kapitel-Navigation öffnen"
+          >
+            <List size={16} aria-hidden />
+          </button>
+        )}
+      </nav>
+
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="bottom">
+          <SheetHeader>
+            <SheetTitle>{topicData?.label ?? "Kapitel"}</SheetTitle>
+          </SheetHeader>
+          <div className={styles.sheetChapters}>
+            {visibleChapters.map((c) => {
+              const isActive = c.chapterId === chapter;
+              const isFinished = c.status === "finished";
+              return (
+                <AppLink
+                  key={c.chapterId}
+                  href={c.href}
+                  className={clsx(styles.sheetChapter, isActive && styles.sheetChapterActive)}
+                  onClick={() => setSheetOpen(false)}
+                >
+                  {isActive ? (
+                    <CircleDot size={15} className={styles.sheetChapterIcon} aria-hidden />
+                  ) : isFinished ? (
+                    <CheckCircle size={15} className={styles.sheetChapterIcon} aria-hidden />
+                  ) : null}
+                  <span>{c.label}</span>
+                </AppLink>
+              );
+            })}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }

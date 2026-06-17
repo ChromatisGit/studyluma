@@ -17,8 +17,7 @@
 }
 
 .emphasis {
-  border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border));
-  border-left: 4px solid var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
   background: color-mix(in srgb, var(--primary) 8%, var(--card));
 }
 
@@ -36,6 +35,15 @@
 
 .plain {
   border-left-width: 1px;
+}
+
+.example {
+  border: none;
+  border-left: 3px solid var(--border);
+  background: transparent;
+  border-radius: 0;
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
 }
 
 .header {

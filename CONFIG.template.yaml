@@ -5,10 +5,20 @@
 local:
   database: postgres://studyluma:studyluma@localhost:5432/studyluma_dev
   session_secret: dev
+  # asset_driver: postgres   # default - images/PDFs are stored in the content_assets table.
+                              # Set to "s3" (plus asset_s3_* below) to use S3-compatible
+                              # storage (Cloudflare R2, MinIO, ...) instead. Must match the
+                              # asset_driver set in studyluma-content's CONFIG.yaml.
+  # asset_s3_endpoint: ""
+  # asset_s3_bucket: ""
+  # asset_s3_region: ""
+  # asset_s3_access_key_id: ""
+  # asset_s3_secret_access_key: ""
 
 production:
   database: ""   # Your Neon connection string (or self-hosted Postgres URL)
   session_secret: ""  # Long random string — run: openssl rand -base64 32
+  # asset_driver: postgres   # see comment under "local" above
 
 # demo profile — only needed for the studyluma.org demo deployment, not for normal instances
 # demo:

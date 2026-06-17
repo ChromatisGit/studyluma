@@ -57,3 +57,64 @@
   color: var(--primary);
   font-weight: var(--font-weight-semibold);
 }
+
+/* Mobile sheet trigger */
+
+.sheetTrigger {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--muted-foreground);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 120ms ease, background 120ms ease;
+  flex-shrink: 0;
+}
+
+.sheetTrigger:hover {
+  color: var(--foreground);
+  background: var(--surface-raised);
+}
+
+/* Chapter sheet content */
+
+.sheetChapters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4) var(--space-4);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sheetChapter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.sheetChapter:hover {
+  background: var(--surface-raised);
+  color: var(--foreground);
+}
+
+.sheetChapterActive {
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.sheetChapterIcon {
+  flex-shrink: 0;
+}

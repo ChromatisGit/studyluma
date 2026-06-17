@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "studynode",
+      "name": "studyluma",
       "dependencies": {
         "@chromatis/base": "git+https://github.com/ChromatisGit/personal-base-framework.git",
         "@react-router/node": "^7.0.0",
@@ -105,7 +105,7 @@
 
     "@boundaries/elements": ["@boundaries/elements@1.2.0", "", { "dependencies": { "eslint-import-resolver-node": "0.3.9", "eslint-module-utils": "2.12.1", "handlebars": "4.7.8", "is-core-module": "2.16.1", "micromatch": "4.0.8" } }, "sha512-W65Gum02liMd3hmNrLmDBX1u5BmRMcunouFjLXyhxHnNY4YlK1kTxsgfflZ5XBGSnPnO0MkiUzAcoGzYrlx0RQ=="],
 
-    "@chromatis/base": ["@chromatis/base@github:ChromatisGit/personal-base-framework#c6ce5e4", { "dependencies": { "@sqlite.org/sqlite-wasm": "3.53.0-build1", "yaml": "^2.7.0" }, "peerDependencies": { "lucide-react": ">=0.400.0", "motion": ">=12.0.0", "react": ">=19.0.0", "react-dom": ">=19.0.0", "react-router": ">=7.0.0", "sonner": ">=1.0.0" } }, "ChromatisGit-personal-base-framework-c6ce5e4"],
+    "@chromatis/base": ["@chromatis/base@github:ChromatisGit/personal-base-framework#e485320", { "dependencies": { "@sqlite.org/sqlite-wasm": "3.53.0-build1", "yaml": "^2.7.0" }, "peerDependencies": { "lucide-react": ">=0.400.0", "motion": ">=12.0.0", "react": ">=19.0.0", "react-dom": ">=19.0.0", "react-router": ">=7.0.0", "sonner": ">=1.0.0" } }, "ChromatisGit-personal-base-framework-e485320"],
 
     "@cloudflare/kv-asset-handler": ["@cloudflare/kv-asset-handler@0.5.0", "", {}, "sha512-jxQYkj8dSIzc0cD6cMMNdOc1UVjqSqu8BZdor5s8cGjW2I8BjODt/kWPVdY+u9zj3ms75Q5qaZgnxUad83+eAg=="],
 

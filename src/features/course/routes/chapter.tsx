@@ -39,16 +39,17 @@ export async function loader({
     getPage({ subject: subject.id, topicId, chapterId }),
     getWorksheetRefs({ courseId, topicId, chapterId, user }),
   ]);
-  return { page, worksheets };
+  return { page, worksheets, progress };
 }
 
 export default function Chapter() {
-  const { page, worksheets } = useLoaderData<typeof loader>();
+  const { page, worksheets, progress } = useLoaderData<typeof loader>();
   return (
     <ContentPageRenderer
       title={page.title}
       content={page.content}
       worksheets={worksheets ?? undefined}
+      progress={progress}
     />
   );
 }
