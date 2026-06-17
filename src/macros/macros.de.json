@@ -19,5 +19,14 @@
   },
   "textTask": {
     "placeholder": "Schreibe deine Antwort hier..."
+  },
+  "inputTask": {
+    "checkButton": "Prüfen",
+    "correct": "Richtig!",
+    "wrong": "Nicht ganz — versuche es nochmal."
+  },
+  "handwrittenTask": {
+    "openInGoodnotes": "In GoodNotes öffnen",
+    "downloadPdf": "PDF herunterladen"
   }
 }

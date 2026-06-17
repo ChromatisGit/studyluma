@@ -12,7 +12,8 @@
   },
   "sections": {
     "hint": "Hinweis anzeigen",
-    "solution": "Musterlösung anzeigen"
+    "answer": "Musterlösung anzeigen",
+    "why": "Erklärung anzeigen"
   },
   "navigation": {
     "previous": "Zurück",

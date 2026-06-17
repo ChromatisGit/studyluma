@@ -9,8 +9,12 @@
   --collapsible-accent: var(--hint);
 }
 
-.collapsibleSolution {
+.collapsibleAnswer {
   --collapsible-accent: var(--success-strong);
+}
+
+.collapsibleWhy {
+  --collapsible-accent: var(--primary);
 }
 
 .collapsibleHeader {
@@ -55,8 +59,12 @@
   background: var(--hint-light);
 }
 
-.collapsibleSolution .collapsibleContent {
+.collapsibleAnswer .collapsibleContent {
   background: var(--success-light);
+}
+
+.collapsibleWhy .collapsibleContent {
+  background: var(--primary-light, #eff4ff);
 }
 
 .collapsibleContent > :first-child {

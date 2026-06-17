@@ -54,6 +54,37 @@ bun run publish
 5. **Write to database**:
    - `deployCourseStructure`: upserts rows in `groups`, `subjects`, `courses`, `topics`, `chapters`, `worksheets`, and junction tables
    - `deployContentPages`: upserts rows in `content_pages` (only re-writes rows whose `content_hash` has changed)
+6. **Generate PDFs** (`deployContentPdfs`): for each `@pdf` section in any content page, renders a PDF using `@react-pdf/renderer` + KaTeX SVG, uploads to AssetStore (content-addressed — unchanged PDFs are skipped), stores the asset key in the DB
+
+---
+
+## PDF Generation
+
+PDFs are generated for every `@pdf` section found in any content page. The pipeline step `deployContentPdfs` runs after `deployContentPages`.
+
+**Tooling:** `@react-pdf/renderer` for layout + `katex` for math (LaTeX → SVG). No Chrome or native binary dependency.
+
+**Storage:** PDFs are stored in the AssetStore (same mechanism as images — Postgres `content_assets` table by default, or S3-compatible storage). The asset key is the SHA-256 hash of the PDF bytes. If the content hash of a page has not changed, its PDF is not re-generated.
+
+**Served via:** The existing `GET /content-assets/:key` route on the website. No new website infrastructure needed.
+
+**Return URL in footer:** Every page of the PDF includes a footer linking to `https://studyluma.de/w/<contentKey>`. This URL is course-independent (see below).
+
+---
+
+## `/w/:contentKey` Redirect Route
+
+A lightweight route on `studyluma-website` that resolves a content key to the correct course-specific worksheet URL for the logged-in student.
+
+**Flow:**
+1. Student taps the return link in the PDF → `GET /w/:contentKey`
+2. Not logged in → redirect to login with return URL
+3. Logged in → query DB for courses the student is enrolled in that contain this content key (RLS enforces access automatically)
+4. Exactly one match → redirect to the course worksheet URL
+5. Multiple matches → show a simple course picker (edge case: teacher enrolled in two courses)
+6. No match → 404 / "you don't have access to this content"
+
+This keeps the PDF URL permanently stable and course-independent. The same PDF is reused across all courses that include the same worksheet.
 
 ---
 

@@ -1,0 +1,140 @@
+.inputTask {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── Field containers ── */
+
+.fields {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.vectorParens {
+  font-size: var(--text-xl);
+  color: var(--muted-foreground);
+  line-height: 1;
+  user-select: none;
+}
+
+/* Fraction layout */
+.fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.fractionLine {
+  width: 100%;
+  height: 1.5px;
+  background: var(--foreground);
+  margin: 2px 0;
+}
+
+/* Power layout */
+.power {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.exponentField {
+  align-self: flex-start;
+  margin-top: -4px;
+}
+
+/* ── Individual field ── */
+
+.field {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.fieldInput {
+  width: 4.5rem;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: var(--text-base);
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  -moz-appearance: textfield;
+}
+
+.fieldInput::-webkit-inner-spin-button,
+.fieldInput::-webkit-outer-spin-button {
+  appearance: none;
+}
+
+.fieldInput:focus {
+  border-color: var(--primary);
+}
+
+.fieldInput--sm {
+  width: 3rem;
+  font-size: var(--text-sm);
+  padding: var(--space-1) var(--space-2);
+}
+
+/* ── Result states ── */
+
+.fieldInput--correct {
+  border-color: var(--success);
+  background: var(--success-light);
+  color: var(--success-strong);
+}
+
+.fieldInput--wrong {
+  border-color: var(--destructive);
+  background: var(--destructive-light);
+  color: var(--destructive-strong);
+}
+
+/* ── Check button row ── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.checkButton {
+  padding: var(--space-2) var(--space-4);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--text-on-accent);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.checkButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.checkButton:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.resultCorrect {
+  color: var(--success-strong);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.resultWrong {
+  color: var(--destructive);
+  font-size: var(--text-sm);
+}

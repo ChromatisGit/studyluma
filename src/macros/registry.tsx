@@ -18,7 +18,9 @@ import type { MacroRenderContext, MacroComponentProps } from "./componentTypes";
 
 import type { NoteMacro } from "./note/types";
 import type { CardMacro } from "./card/types";
+import type { HandwrittenTaskMacro } from "./handwrittenTask/types";
 import type { ImageMacro } from "./image/types";
+import type { InputTaskMacro } from "./inputTask/types";
 import type { TableMacro } from "./table/types";
 import type { CodeRunnerMacro } from "./codeRunner/types";
 import type { GapMacro } from "./gap/types";
@@ -37,7 +39,9 @@ import type { ComponentMacro } from "./component/types";
 
 import NoteRenderer from "./note/Renderer";
 import CardRenderer from "./card/Renderer";
+import HandwrittenTaskRenderer from "./handwrittenTask/Renderer";
 import ImageRenderer from "./image/Renderer";
+import InputTaskRenderer from "./inputTask/Renderer";
 import TableRenderer from "./table/Renderer";
 import CodeRunnerRenderer from "./codeRunner/Renderer";
 import GapRenderer from "./gap/Renderer";
@@ -57,7 +61,9 @@ import ComponentRenderer from "./component/Renderer";
 export type Macro =
   | NoteMacro
   | CardMacro
+  | HandwrittenTaskMacro
   | ImageMacro
+  | InputTaskMacro
   | TableMacro
   | CodeRunnerMacro
   | GapMacro
@@ -78,20 +84,22 @@ export type MacroType = Macro["type"];
 // ============================================================================
 
 const macros = {
-  layout:     { Component: LayoutRenderer,     category: "display" as const, state: "none" as const },
-  note:       { Component: NoteRenderer,       category: "display" as const, state: "none" as const },
-  card:       { Component: CardRenderer,       category: "display" as const, state: "none" as const },
-  image:      { Component: ImageRenderer,      category: "display" as const, state: "none" as const },
-  table:      { Component: TableRenderer,      category: "display" as const, state: "none" as const },
-  codeRunner: { Component: CodeRunnerRenderer, category: "display" as const, state: "interactive" as const },
-  gap:        { Component: GapRenderer,        category: "input" as const,   state: "interactive" as const },
-  mcq:        { Component: McqRenderer,        category: "input" as const,   state: "interactive" as const },
-  quiz:       { Component: QuizRenderer,       category: "display" as const, state: "none" as const },
-  codeTask:   { Component: CodeTaskRenderer,   category: "input" as const,   state: "interactive" as const },
-  textTask:   { Component: TextTaskRenderer,   category: "input" as const,   state: "interactive" as const },
-  formula:    { Component: FormulaRenderer,    category: "display" as const, state: "none" as const },
-  callout:    { Component: CalloutRenderer,    category: "display" as const, state: "none" as const },
-  component:  { Component: ComponentRenderer,  category: "display" as const, state: "interactive" as const },
+  layout:          { Component: LayoutRenderer,          category: "display" as const, state: "none" as const },
+  note:            { Component: NoteRenderer,            category: "display" as const, state: "none" as const },
+  card:            { Component: CardRenderer,            category: "display" as const, state: "none" as const },
+  image:           { Component: ImageRenderer,           category: "display" as const, state: "none" as const },
+  table:           { Component: TableRenderer,           category: "display" as const, state: "none" as const },
+  codeRunner:      { Component: CodeRunnerRenderer,      category: "display" as const, state: "interactive" as const },
+  gap:             { Component: GapRenderer,             category: "input" as const,   state: "interactive" as const },
+  mcq:             { Component: McqRenderer,             category: "input" as const,   state: "interactive" as const },
+  quiz:            { Component: QuizRenderer,            category: "display" as const, state: "none" as const },
+  codeTask:        { Component: CodeTaskRenderer,        category: "input" as const,   state: "interactive" as const },
+  textTask:        { Component: TextTaskRenderer,        category: "input" as const,   state: "interactive" as const },
+  inputTask:       { Component: InputTaskRenderer,       category: "input" as const,   state: "interactive" as const },
+  handwrittenTask: { Component: HandwrittenTaskRenderer, category: "input" as const,   state: "interactive" as const },
+  formula:         { Component: FormulaRenderer,         category: "display" as const, state: "none" as const },
+  callout:         { Component: CalloutRenderer,         category: "display" as const, state: "none" as const },
+  component:       { Component: ComponentRenderer,       category: "display" as const, state: "interactive" as const },
 };
 
 type MacroName = keyof typeof macros;

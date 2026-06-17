@@ -35,7 +35,8 @@ export default function TextTaskRenderer({ macro, context }: Props) {
 
   const instruction = getMarkdown(macro.instruction);
   const hint = getMarkdown(macro.hint);
-  const solution = getMarkdown(macro.solution);
+  const answerMd = getMarkdown(macro.answer);
+  const why = getMarkdown(macro.why);
 
   return (
     <Stack gap="md">
@@ -50,16 +51,23 @@ export default function TextTaskRenderer({ macro, context }: Props) {
         placeholder={MACROS_TEXT.textTask.placeholder}
       />
 
-      {(hint || (isChecked && solution)) && (
+      {(hint || (isChecked && answerMd) || (isChecked && why)) && (
         <Stack gap="sm">
           {hint && (
             <CollapsibleSection type="hint" content={<MarkdownRenderer markdown={hint} />} />
           )}
-          {isChecked && solution && (
+          {isChecked && answerMd && (
             <CollapsibleSection
-              type="solution"
+              type="answer"
               defaultOpen
-              content={<MarkdownRenderer markdown={solution} />}
+              content={<MarkdownRenderer markdown={answerMd} />}
+            />
+          )}
+          {isChecked && why && (
+            <CollapsibleSection
+              type="why"
+              defaultOpen
+              content={<MarkdownRenderer markdown={why} />}
             />
           )}
         </Stack>

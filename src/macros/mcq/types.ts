@@ -8,4 +8,5 @@ export type McqMacro = {
   single: boolean;
   shuffleOptions: boolean;
   wideLayout: boolean;
+  why?: Markdown;
 };
