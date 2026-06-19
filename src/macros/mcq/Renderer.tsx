@@ -7,9 +7,11 @@ import { Check, X, AlertCircle } from "lucide-react";
 import type { McqMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
 import { getMarkdown } from "@macros/markdownParser";
 import { useMacroValue } from "@macros/state/useMacroValue";
 import { useMacroCheck } from "@macros/state/useMacroCheck";
+import { Stack } from "@components/Stack";
 import styles from "./styles.module.css";
 
 type Props = MacroComponentProps<McqMacro>;
@@ -30,6 +32,7 @@ export default function McqRenderer({ macro, context }: Props) {
   });
 
   const question = getMarkdown(macro.question);
+  const why = getMarkdown(macro.why);
   const isSingleChoice = macro.single;
   const isDetailed = context.detailedFeedback ?? false;
 
@@ -71,6 +74,7 @@ export default function McqRenderer({ macro, context }: Props) {
   };
 
   return (
+    <Stack gap="sm">
     <div className={styles.mcq}>
       {question && (
         <div className={styles.question}>
@@ -150,5 +154,13 @@ export default function McqRenderer({ macro, context }: Props) {
 
       </div>
     </div>
+    {checkResult !== "none" && why && (
+      <CollapsibleSection
+        type="why"
+        defaultOpen
+        content={<MarkdownRenderer markdown={why} />}
+      />
+    )}
+    </Stack>
   );
 }

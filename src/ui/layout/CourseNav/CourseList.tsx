@@ -3,6 +3,7 @@
 import { Link, useLocation } from "react-router";
 import clsx from "clsx";
 import type { SidebarCourseDTO } from "@schema/courseTypes";
+import { ConfigableIcon, type IconName } from "@components/ConfigableIcon";
 
 type Props = {
   courses: SidebarCourseDTO[];
@@ -15,6 +16,7 @@ export function CourseList({ courses }: Props) {
     <div className="flex flex-col gap-0.5">
       {courses.map((course) => {
         const isActive = pathname.startsWith(course.href);
+        const iconKey = (course.icon ?? "book-open") as IconName;
         return (
           <Link
             key={course.id}
@@ -26,11 +28,7 @@ export function CourseList({ courses }: Props) {
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
-            {course.icon && (
-              <span className="flex-shrink-0 text-base leading-none" aria-hidden>
-                {course.icon}
-              </span>
-            )}
+            <ConfigableIcon iconKey={iconKey} size={16} className="flex-shrink-0" />
             <span className="truncate">{course.label}</span>
           </Link>
         );

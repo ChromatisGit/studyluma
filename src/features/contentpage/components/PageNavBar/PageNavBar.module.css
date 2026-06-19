@@ -22,16 +22,17 @@
   box-shadow: var(--shadow-sm);
 }
 
-.navButton:hover:not(:disabled) {
+.navButton:hover:not(:disabled):not(.navButtonLocked) {
   background: var(--surface-deep);
   box-shadow: var(--shadow-md);
 }
 
-.navButton:active:not(:disabled) {
+.navButton:active:not(:disabled):not(.navButtonLocked) {
   transform: translateY(1px);
 }
 
-.navButton:disabled {
+.navButton:disabled,
+.navButtonLocked {
   opacity: 0.4;
   cursor: not-allowed;
   box-shadow: none;

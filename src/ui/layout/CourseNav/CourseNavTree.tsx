@@ -1,7 +1,7 @@
 "use client";
 
 import { Link, useLocation } from "react-router";
-import { ArrowLeft, CheckCircle, CircleDot } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import clsx from "clsx";
 import type { ProgressDTO } from "@schema/courseTypes";
 
@@ -39,7 +39,6 @@ export function CourseNavTree({ progress, currentTopic, currentChapter, courseHr
 
       {visibleChapters.map((chapter) => {
         const isActive = location.pathname === chapter.href || chapter.chapterId === currentChapter;
-        const isFinished = chapter.status === "finished";
 
         return (
           <Link
@@ -52,11 +51,15 @@ export function CourseNavTree({ progress, currentTopic, currentChapter, courseHr
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
-            {isActive ? (
-              <CircleDot size={14} className="flex-shrink-0" aria-hidden />
-            ) : isFinished ? (
-              <CheckCircle size={14} className="flex-shrink-0" aria-hidden />
-            ) : null}
+            <span
+              className={clsx(
+                "h-2 w-2 flex-shrink-0 rounded-full transition-colors",
+                isActive
+                  ? "bg-primary"
+                  : "bg-foreground/18",
+              )}
+              aria-hidden
+            />
             <span className="truncate">{chapter.label}</span>
           </Link>
         );

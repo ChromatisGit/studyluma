@@ -2,11 +2,13 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useFetcher } from 'react-router';
+import { toast } from 'sonner';
 import { useWorksheetStorage } from '@features/contentpage/storage/WorksheetStorageContext';
 import type { ProgressStatus } from '@schema/courseTypes';
 import { CategorySection, type Category } from '@features/contentpage/components/CategorySection/CategorySection';
 import { CheckpointOverlay } from '@features/contentpage/components/CheckpointOverlay/CheckpointOverlay';
 import { PageNavBar } from '@features/contentpage/components/PageNavBar/PageNavBar';
+import { WorksheetPdfCard } from '@features/contentpage/components/WorksheetPdfCard/WorksheetPdfCard';
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
 import styles from './WorksheetNavigator.module.css';
 
@@ -20,6 +22,7 @@ interface WorksheetNavigatorProps {
 
 export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, courseId, worksheetId }: WorksheetNavigatorProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [triggerCheck, setTriggerCheck] = useState(0);
   const presenceFetcher = useFetcher();
   const presenceSubmitRef = useRef(presenceFetcher.submit);
 
@@ -39,11 +42,18 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
     });
   }, [courseId, worksheetId, currentIndex]);
 
-  // Track which sections are "done" (nav condition met)
+  useEffect(() => {
+    setTriggerCheck(0);
+  }, [currentIndex]);
+
+  // Track which sections are "done" (nav condition met). Sections with no task
+  // sets to compare (info-only) or PDF sections (solutions are already visible
+  // on the page itself - no compare-to-solution step makes sense there) start
+  // out completed; everything else needs the page-level compare button clicked.
   const [completedSections, setCompletedSections] = useState<ReadonlySet<number>>(() => {
     const initial = new Set<number>();
     categories.forEach((cat, i) => {
-      if (cat.kind !== 'checkpoint' && !cat.items.some(item => item.kind === 'taskSet')) {
+      if (cat.isPdf || (cat.kind !== 'checkpoint' && !cat.items.some(item => item.kind === 'taskSet'))) {
         initial.add(i);
       }
     });
@@ -59,28 +69,17 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
     });
   }, []);
 
-  // Track task set completions per section: Map<sectionIndex, Set<itemIndex>>
-  const taskSetCompletionsRef = useRef<Map<number, Set<number>>>(new Map());
-
-  const handleTaskSetCompleted = useCallback((sectionIndex: number, itemIndex: number) => {
-    const sectionMap = taskSetCompletionsRef.current.get(sectionIndex) ?? new Set<number>();
-    sectionMap.add(itemIndex);
-    taskSetCompletionsRef.current.set(sectionIndex, sectionMap);
-
-    const section = categories[sectionIndex];
-    if (!section || section.kind === 'checkpoint') return;
-
-    const expectedCount = section.items.filter(i => i.kind === 'taskSet').length;
-    if (sectionMap.size >= expectedCount) {
-      markSectionCompleted(sectionIndex);
-    }
-  }, [categories, markSectionCompleted]);
-
   const storage = useWorksheetStorage();
   const isActive = chapterStatus === 'current';
 
+  const category = categories[currentIndex];
   const canGoBack = currentIndex > 0;
   const canGoNext = !isActive || completedSections.has(currentIndex);
+
+  const navText = CONTENTPAGE_TEXT.navigation;
+  const lockedReason = category?.kind === 'checkpoint'
+    ? navText.lockedCheckpointReason
+    : navText.lockedTasksReason;
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -92,19 +91,24 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
   };
 
   const goNext = () => {
-    if (!canGoNext || currentIndex >= categories.length - 1) return;
+    if (currentIndex >= categories.length - 1) return;
+    if (!canGoNext) {
+      toast.error(lockedReason);
+      return;
+    }
     void storage?.flush();
     setCurrentIndex(prev => prev + 1);
     scrollToTop();
   };
 
-  const showNavBar = categories.length > 1;
-  const category = categories[currentIndex];
+  const handleCompare = () => {
+    setTriggerCheck(prev => prev + 1);
+    markSectionCompleted(currentIndex);
+  };
 
-  const navText = CONTENTPAGE_TEXT.navigation;
-  const lockedReason = category?.kind === 'checkpoint'
-    ? navText.lockedCheckpointReason
-    : navText.lockedTasksReason;
+  const showNavBar = categories.length > 1;
+  const hasTaskSets = category?.items.some(item => item.kind === 'taskSet') ?? false;
+  const showCompareButton = hasTaskSets && !category?.isPdf;
 
   if (!category) return null;
 
@@ -122,17 +126,16 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
         />
       )}
 
+      {category.isPdf && (
+        <WorksheetPdfCard pdfUrl={category.pdfUrl} pdfFileName={category.pdfFileName} />
+      )}
+
       <CategorySection
         key={currentIndex}
         block={category}
         categoryIndex={currentIndex}
         taskNumbers={taskNumbers}
-        {...(category.kind !== 'checkpoint'
-          ? {
-              onTaskSetCompleted:
-                (itemIndex: number) => handleTaskSetCompleted(currentIndex, itemIndex),
-            }
-          : {})}
+        triggerCheck={triggerCheck}
       />
 
       {category.kind === 'checkpoint' && isActive && (
@@ -140,6 +143,14 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
           sectionIndex={currentIndex}
           onSubmitted={() => markSectionCompleted(currentIndex)}
         />
+      )}
+
+      {showCompareButton && (
+        <div className={styles.compareActions}>
+          <button type="button" onClick={handleCompare} className={styles.compareButton}>
+            {CONTENTPAGE_TEXT.buttons.checkSolution}
+          </button>
+        </div>
       )}
 
       {showNavBar && (

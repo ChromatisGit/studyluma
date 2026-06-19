@@ -1,0 +1,208 @@
+{
+  "version": 1,
+  "combinedHash": "50bd6de0aba3bcf88b9e20a43ed260c154f2ac2f1f92c5174ae97ecbed0ac85b",
+  "migration": "1.0.2__sync_sql_routines.sql",
+  "files": [
+    {
+      "kind": "view",
+      "path": "sql/views/v_course_dto.sql",
+      "hash": "638ec5dae81d35bb3909d588e5d7d403444c82e4346a1ac206fa2cd3b7d355cb",
+      "objects": [
+        {
+          "kind": "view",
+          "name": "v_course_dto"
+        }
+      ]
+    },
+    {
+      "kind": "view",
+      "path": "sql/views/v_user_dto.sql",
+      "hash": "514eeaa0bf17757859fcb714c20ec38f29fc9cc9c0ea8504a96eebe4e751e55e",
+      "objects": [
+        {
+          "kind": "view",
+          "name": "v_user_dto"
+        }
+      ]
+    },
+    {
+      "kind": "view",
+      "path": "sql/views/v_worksheets_by_chapter.sql",
+      "hash": "e84324d6f7033a7ce795dbcd0b0c708fddb5b3e78ecd976f25247087887a4d17",
+      "objects": [
+        {
+          "kind": "view",
+          "name": "v_worksheets_by_chapter"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/check_and_record_attempt.sql",
+      "hash": "607a84fec3e3b8c88676ea80315ef27f733314765155d4c974813b42d258ce4f",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "check_and_record_attempt",
+          "signature": "check_and_record_attempt(TEXT, BOOLEAN)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/create_user_account.sql",
+      "hash": "179ff891a4bfb7f30fe378a1c3b093b9588fd6093970a590fd6233c02a5b114f",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "create_user_account",
+          "signature": "create_user_account(TEXT, TEXT, TEXT, TEXT, TEXT[])"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/create_user_with_username.sql",
+      "hash": "70adde6f243c362ef8e69c1c9a98b2a0a7e6588de6404d09fa6dffb5cec5c205",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "create_user_with_username",
+          "signature": "create_user_with_username(TEXT, TEXT, TEXT)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/enroll_user_in_course.sql",
+      "hash": "a4754552f21c8873f43d4e4ff440924869d909a75396bb7650b203145beb83d5",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "enroll_user_in_course",
+          "signature": "enroll_user_in_course(TEXT, TEXT)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/generate_username.sql",
+      "hash": "d6fd4c3662300643c881184b287141535e4fb03d1504a46e2e4a1269cded7bd0",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "generate_username",
+          "signature": "generate_username()"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/get_course_access_groups.sql",
+      "hash": "cdf6bedbb52535063e1f01ed787405ceac5f24146852383a21ae51bf21581b73",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "get_course_access_groups",
+          "signature": "get_course_access_groups()"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/get_progress_dto.sql",
+      "hash": "8ba5655116380da05fcd2083726945c86cd38667a601a0fa65a514bd52cff9f9",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "get_progress_dto",
+          "signature": "get_progress_dto(TEXT)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/get_quiz_broadcast_data.sql",
+      "hash": "f2fd66d6a33ab03a5f7e54db11e8e9cb6b6e141dc0bd8b8fa8941f1927d34373",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "get_quiz_broadcast_data",
+          "signature": "get_quiz_broadcast_data(TEXT)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/get_session_user.sql",
+      "hash": "deef00b315764e1d0659dad881e6882c0d41681e1323d5ffa40f0570795a0b85",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "get_session_user",
+          "signature": "get_session_user(TEXT)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/get_user_for_login.sql",
+      "hash": "b1aaeabd7d1d184fc2c36f4f49d6e48f4775a8fe737e03909492a33651475b53",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "get_user_for_login",
+          "signature": "get_user_for_login(TEXT)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/get_user_username.sql",
+      "hash": "0ca9d81f99f87a25f04a05f372ea3a3b8b7f364441b6a3759bcf8bda4a157719",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "get_user_username",
+          "signature": "get_user_username(TEXT)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/set_registration_open_until.sql",
+      "hash": "1d6def1ca8a27463e36c16753584245988d0c54c4347c8218c7597e9661d3cc6",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "set_registration_open_until",
+          "signature": "set_registration_open_until(TEXT, TIMESTAMPTZ)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/try_advance_quiz_phase.sql",
+      "hash": "a477137ecad6f4950051cedd98781d4a9cdbe18b11b4453f17179dcc24ba2c52",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "try_advance_quiz_phase",
+          "signature": "try_advance_quiz_phase(TEXT, INTEGER)"
+        }
+      ]
+    },
+    {
+      "kind": "function",
+      "path": "sql/functions/update_course_progress.sql",
+      "hash": "1c266cc9f09b8e9d08dab148c17b222925ad55909ced1cdd619c75b251368dd3",
+      "objects": [
+        {
+          "kind": "function",
+          "name": "update_course_progress",
+          "signature": "update_course_progress(TEXT, TEXT, TEXT)"
+        }
+      ]
+    }
+  ]
+}

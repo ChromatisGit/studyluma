@@ -27,13 +27,16 @@ export type CategoryItem = InfoBlockType | TaskSet | DisplayMacroItem | Subheade
 export type Category = {
   kind: "checkpoint" | "core" | "challenge";
   items: CategoryItem[];
+  isPdf?: boolean | undefined;
+  pdfUrl?: string | undefined;
+  pdfFileName?: string | undefined;
 };
 
 interface CategorySectionProps {
   block: Category;
   categoryIndex: number;
   taskNumbers: Record<string, number>;
-  onTaskSetCompleted?: (itemIndex: number) => void;
+  triggerCheck: number;
 }
 
 const categoryConfig = {
@@ -51,7 +54,7 @@ const categoryConfig = {
   },
 } satisfies Record<Category["kind"], { label: string; icon: typeof Flag }>;
 
-export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCompleted }: CategorySectionProps) {
+export function CategorySection({ block, categoryIndex, taskNumbers, triggerCheck }: CategorySectionProps) {
   const config = categoryConfig[block.kind];
   const Icon = config.icon;
   const variantClass =
@@ -80,9 +83,9 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
               <TaskSetComponent
                 key={index}
                 taskSet={item}
-                categoryType={block.kind}
                 taskNumber={taskNumbers[`${categoryIndex}-${index}`]}
-                onTaskSetCompleted={onTaskSetCompleted ? () => onTaskSetCompleted(index) : undefined}
+                triggerCheck={triggerCheck}
+                isPdfSection={block.isPdf}
               />
             );
           }

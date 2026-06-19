@@ -42,6 +42,10 @@
       "description": "Übersicht aller Schüler, die in diesem Kurs eingeschrieben sind.",
       "comingSoon": "Teilnehmerliste folgt"
     },
+    "demoNotice": {
+      "message": "Demo-Modus: Alle Änderungen werden nur lokal in diesem Browser gespeichert und beeinflussen keine realen Daten.",
+      "resetButton": "Demo zurücksetzen"
+    },
     "worksheetManagement": {
       "title": "Arbeitsblatt-Verwaltung",
       "description": "Arbeitsblätter freischalten oder verstecken und Schülerfortschritt live einsehen.",

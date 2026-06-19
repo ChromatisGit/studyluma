@@ -1,0 +1,10 @@
+.math-inline {
+  display: inline-block;
+  vertical-align: -0.15em;
+}
+
+.math-block {
+  display: flex;
+  justify-content: center;
+  margin: 0.6em 0;
+}

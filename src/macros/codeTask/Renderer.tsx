@@ -50,7 +50,7 @@ export default function CodeTaskRenderer({ macro, context }: Props) {
 
   const instruction = getMarkdown(macro.instruction);
   const hint = getMarkdown(macro.hint);
-  const solution = getMarkdown(macro.solution);
+  const solution = getMarkdown(macro.answer);
 
   return (
     <Stack gap="md">
@@ -82,7 +82,7 @@ export default function CodeTaskRenderer({ macro, context }: Props) {
             )}
             {showSolution && (
               <CollapsibleSection
-                type="solution"
+                type="answer"
                 defaultOpen={testResult === "compiled"}
                 content={<MarkdownRenderer markdown={solution} />}
               />

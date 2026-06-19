@@ -6,6 +6,7 @@ import { RouteProvider } from "@ui/contexts/RouteContext";
 import { getSession } from "@core/index.server";
 import { getSidebarDTO } from "@services/courseService";
 import { useSidebarNav } from "@ui/layout/CourseNav/useSidebarNav";
+import { DemoOverrideProvider } from "@features/demo/DemoOverrideProvider";
 import type { SidebarDTO } from "@schema/courseTypes";
 
 type DemoRole = "student" | "teacher";
@@ -100,13 +101,15 @@ export default function DemoAppLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <RouteProvider>
-      <DemoAppLayoutInner
-        user={user}
-        sidebarData={sidebarData}
-        sidebarCollapsed={sidebarCollapsed}
-        setSidebarCollapsed={setSidebarCollapsed}
-      />
-    </RouteProvider>
+    <DemoOverrideProvider>
+      <RouteProvider>
+        <DemoAppLayoutInner
+          user={user}
+          sidebarData={sidebarData}
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+        />
+      </RouteProvider>
+    </DemoOverrideProvider>
   );
 }

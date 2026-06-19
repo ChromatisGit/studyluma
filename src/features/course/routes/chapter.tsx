@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useLoaderData } from "react-router";
 import { getSession } from "@core/index.server";
 import { assertCanAccessPage } from "@core/auth/guards";
@@ -10,6 +11,7 @@ import {
 } from "@services/courseService";
 import { getPage } from "@services/pageService";
 import { ContentPageRenderer } from "@ui/ContentPageRenderer";
+import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 
 export async function loader({
   request,
@@ -39,16 +41,30 @@ export async function loader({
     getPage({ subject: subject.id, topicId, chapterId }),
     getWorksheetRefs({ courseId, topicId, chapterId, user }),
   ]);
-  return { page, worksheets, progress };
+  return { page, worksheets, progress, courseId };
 }
 
 export default function Chapter() {
-  const { page, worksheets, progress } = useLoaderData<typeof loader>();
+  const { page, worksheets, progress, courseId } = useLoaderData<typeof loader>();
+  const { isDemoMode, getOverride } = useDemoOverrides();
+
+  // In demo mode, filter worksheets by local override state instead of server flags
+  const visibleWorksheets = useMemo(() => {
+    if (!worksheets || !isDemoMode) return worksheets ?? undefined;
+    const wsOverrides = getOverride(courseId).worksheets ?? {};
+    return worksheets.filter((ws) => {
+      const o = wsOverrides[ws.worksheetId];
+      if (o?.isHidden) return false;
+      if (o?.isSolutionHidden && ws.worksheetFormat === "pdfSolution") return false;
+      return true;
+    });
+  }, [worksheets, isDemoMode, getOverride, courseId]);
+
   return (
     <ContentPageRenderer
       title={page.title}
       content={page.content}
-      worksheets={worksheets ?? undefined}
+      worksheets={visibleWorksheets}
       progress={progress}
     />
   );

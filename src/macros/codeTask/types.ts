@@ -5,7 +5,7 @@ export type CodeTaskMacro = {
   type: "codeTask";
   instruction: Markdown;
   hint: Markdown;
-  solution: Markdown;
+  answer: Markdown;
   starter: string;
   validation?: string;
   language: CodeLanguage;

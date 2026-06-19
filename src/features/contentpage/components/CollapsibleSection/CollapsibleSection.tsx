@@ -2,13 +2,13 @@
 
 import clsx from "clsx";
 import { useState, useEffect } from 'react';
-import { BookOpen, ChevronDown, ChevronRight, Lightbulb } from 'lucide-react';
+import { BookOpen, ChevronDown, ChevronRight, Lightbulb, HelpCircle } from 'lucide-react';
 import styles from './CollapsibleSection.module.css';
 import CONTENTPAGE_TEXT from '@features/contentpage/contentpage.de.json';
 import sharedStyles from '@features/contentpage/contentpage.module.css';;
 
 interface CollapsibleSectionProps {
-  type: 'hint' | 'solution';
+  type: 'hint' | 'answer' | 'why';
   content: React.ReactNode;
   defaultOpen?: boolean;
 }
@@ -20,17 +20,24 @@ export function CollapsibleSection({ type, content, defaultOpen = false }: Colla
     if (defaultOpen) setIsOpen(true);
   }, [defaultOpen]);
 
-  const config = type === 'hint'
-    ? {
-      icon: Lightbulb,
-      label: CONTENTPAGE_TEXT.sections.hint,
-      variant: styles.collapsibleHint,
-    }
-    : {
-      icon: BookOpen,
-      label: CONTENTPAGE_TEXT.sections.solution,
-      variant: styles.collapsibleSolution,
-    };
+  const config =
+    type === 'hint'
+      ? {
+          icon: Lightbulb,
+          label: CONTENTPAGE_TEXT.sections.hint,
+          variant: styles.collapsibleHint,
+        }
+      : type === 'why'
+        ? {
+            icon: HelpCircle,
+            label: CONTENTPAGE_TEXT.sections.why,
+            variant: styles.collapsibleWhy,
+          }
+        : {
+            icon: BookOpen,
+            label: CONTENTPAGE_TEXT.sections.answer,
+            variant: styles.collapsibleAnswer,
+          };
 
   const Icon = config.icon;
 

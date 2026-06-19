@@ -5,9 +5,23 @@ export type Page = {
     content?: Section[] | undefined
 }
 
+export type SectionModifier =
+    | "checkpoint"
+    | "challenge"
+    | "pdf"
+    | "grid:squares"
+    | "grid:lines"
+    | "grid:free"
+    | "space:s"
+    | "space:m"
+    | "space:l"
+    | "space:page";
+
 export type Section = {
     header: string,
-    content: Node[]
+    content: Node[],
+    modifiers?: SectionModifier[],
+    pdfAssetKey?: string
 }
 
 export type Node = Macro | MacroGroup | Subheader | Markdown

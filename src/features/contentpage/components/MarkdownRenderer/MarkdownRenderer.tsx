@@ -6,7 +6,7 @@ import remarkRehype from "remark-rehype";
 import rehypeReact from "rehype-react";
 import * as prod from "react/jsx-runtime";
 import { remarkMarkdownTransforms, CodeBlock } from "./remarkTransforms";
-import { InlineMath, BlockMath } from "./KatexMath";
+import { InlineMath, BlockMath } from "./TypstMath";
 
 const processor = unified()
   .use(remarkParse)

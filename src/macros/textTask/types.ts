@@ -4,5 +4,6 @@ export type TextTaskMacro = {
   type: "textTask";
   instruction: Markdown;
   hint?: Markdown;
-  solution?: Markdown;
+  answer?: Markdown;
+  why?: Markdown;
 };
