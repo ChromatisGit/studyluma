@@ -8,6 +8,7 @@ export type MacroRenderContext = {
   projector?: boolean | undefined;
   onAttemptedChange?: ((taskKey: string, attempted: boolean) => void) | undefined;
   detailedFeedback?: boolean | undefined;
+  pdfSection?: boolean | undefined;
 };
 
 export type MacroComponentProps<TMacro> = {

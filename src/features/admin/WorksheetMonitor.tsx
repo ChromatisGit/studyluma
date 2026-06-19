@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { CourseId } from "@schema/courseTypes";
 import type { WorksheetMonitorData } from "@services/worksheetService";
+import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 import { postAdminAction } from "./routeActions";
 import styles from "./WorksheetMonitor.module.css";
 import ADMIN_TEXT from "./admin.de.json";
@@ -11,16 +12,46 @@ const TEXT = ADMIN_TEXT.courseDetail.worksheetManagement;
 
 const CAUSE_ORDER = ["topic", "task", "approach", "execution", "mistake", "other"] as const;
 
+// Stable mock data used in demo mode instead of real DB queries
+const DEMO_MONITOR_DATA: WorksheetMonitorData = {
+  presence: [
+    { sectionIndex: 0, count: 3 },
+    { sectionIndex: 1, count: 8 },
+    { sectionIndex: 2, count: 6 },
+    { sectionIndex: 3, count: 2 },
+  ],
+  checkpoints: {
+    total: 19,
+    green: 12,
+    yellow: 5,
+    red: 2,
+    causes: {
+      topic: 1,
+      task: 2,
+      approach: 1,
+      execution: 0,
+      mistake: 2,
+      other: 1,
+    },
+  },
+};
+
 interface WorksheetMonitorProps {
   courseId: CourseId;
   worksheetId: string;
 }
 
 export function WorksheetMonitor({ courseId, worksheetId }: WorksheetMonitorProps) {
+  const { isDemoMode } = useDemoOverrides();
   const [data, setData] = useState<WorksheetMonitorData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
+    if (isDemoMode) {
+      setLoading(false);
+      setData(DEMO_MONITOR_DATA);
+      return;
+    }
     setLoading(true);
     const result = await postAdminAction<WorksheetMonitorData>({
       intent: "worksheet-monitor",
@@ -29,7 +60,7 @@ export function WorksheetMonitor({ courseId, worksheetId }: WorksheetMonitorProp
     });
     setData(result.ok ? result.data ?? null : null);
     setLoading(false);
-  }, [courseId, worksheetId]);
+  }, [isDemoMode, courseId, worksheetId]);
 
   useEffect(() => {
     void fetchData();
@@ -46,7 +77,7 @@ export function WorksheetMonitor({ courseId, worksheetId }: WorksheetMonitorProp
           <button
             className={styles.refreshButton}
             onClick={() => void fetchData()}
-            disabled={loading}
+            disabled={loading || isDemoMode}
           >
             {loading ? TEXT.loading : TEXT.refreshButton}
           </button>
@@ -101,7 +132,7 @@ export function WorksheetMonitor({ courseId, worksheetId }: WorksheetMonitorProp
                 <div className={styles.causes}>
                   <p className={styles.causesTitle}>{TEXT.checkpointCauses}</p>
                   {CAUSE_ORDER.map((cause) => {
-                    const count = data.checkpoints?.causes[cause] ?? 0;
+                    const count = data.checkpoints?.causes[cause as keyof typeof TEXT.causeLabels] ?? 0;
                     if (count === 0) return null;
                     return (
                       <div key={cause} className={styles.causeRow}>

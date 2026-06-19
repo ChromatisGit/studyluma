@@ -37,6 +37,14 @@ export default function HandwrittenTaskRenderer({ macro, context, pdfUrl }: Prop
     ? `goodnotes://open?url=${encodeURIComponent(pdfUrl)}`
     : undefined;
 
+  if (context.pdfSection) {
+    return (
+      <Stack gap="md">
+        {instruction && <MarkdownRenderer markdown={instruction} />}
+      </Stack>
+    );
+  }
+
   return (
     <Stack gap="md">
       {instruction && <MarkdownRenderer markdown={instruction} />}
@@ -68,7 +76,7 @@ export default function HandwrittenTaskRenderer({ macro, context, pdfUrl }: Prop
           {isChecked && answer && (
             <CollapsibleSection
               type="answer"
-              defaultOpen
+              defaultOpen={false}
               content={<MarkdownRenderer markdown={answer} />}
             />
           )}

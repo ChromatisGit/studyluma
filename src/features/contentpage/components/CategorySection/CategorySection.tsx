@@ -1,7 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
-import { Flag, Target, Zap } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Flag, Target, Zap } from 'lucide-react';
+import MACROS_TEXT from '@macros/macros.de.json';
 import { InfoBlock } from '@features/contentpage/components/InfoBlock/InfoBlock';
 import { TaskSetComponent } from '@features/contentpage/components/Group/TaskSetComponent';
 import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
@@ -27,6 +29,8 @@ export type CategoryItem = InfoBlockType | TaskSet | DisplayMacroItem | Subheade
 export type Category = {
   kind: "checkpoint" | "core" | "challenge";
   items: CategoryItem[];
+  isPdf?: boolean | undefined;
+  pdfUrl?: string | undefined;
 };
 
 interface CategorySectionProps {
@@ -71,6 +75,9 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
       </div>
 
       <div className={styles.sectionSpacing}>
+        {block.isPdf && (
+          <PdfSectionButton pdfUrl={block.pdfUrl} />
+        )}
         {block.items.map((item, index) => {
           if (item.kind === "info") {
             return <InfoBlock key={index} info={item} />;
@@ -83,6 +90,7 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
                 categoryType={block.kind}
                 taskNumber={taskNumbers[`${categoryIndex}-${index}`]}
                 onTaskSetCompleted={onTaskSetCompleted ? () => onTaskSetCompleted(index) : undefined}
+                isPdfSection={block.isPdf}
               />
             );
           }
@@ -104,5 +112,36 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
         })}
       </div>
     </section>
+  );
+}
+
+function PdfSectionButton({ pdfUrl }: { pdfUrl?: string | undefined }) {
+  const [isIos, setIsIos] = useState(false);
+
+  useEffect(() => {
+    setIsIos(/iPad|iPhone/.test(navigator.userAgent));
+  }, []);
+
+  if (!pdfUrl) {
+    return (
+      <div className={styles.pdfSectionButton}>
+        <FileText className={styles.pdfSectionButtonIcon} aria-hidden />
+        {MACROS_TEXT.handwrittenTask.downloadPdf}
+      </div>
+    );
+  }
+
+  const goodnotesUrl = `goodnotes://open?url=${encodeURIComponent(pdfUrl)}`;
+
+  return isIos ? (
+    <a href={goodnotesUrl} className={styles.pdfSectionButtonActive}>
+      <FileText className={styles.pdfSectionButtonIcon} aria-hidden />
+      {MACROS_TEXT.handwrittenTask.openInGoodnotes}
+    </a>
+  ) : (
+    <a href={pdfUrl} download className={styles.pdfSectionButtonActive}>
+      <FileText className={styles.pdfSectionButtonIcon} aria-hidden />
+      {MACROS_TEXT.handwrittenTask.downloadPdf}
+    </a>
   );
 }

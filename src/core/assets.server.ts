@@ -10,6 +10,7 @@ const CONTENT_TYPE_BY_EXT: Record<string, string> = {
   jpeg: "image/jpeg",
   gif: "image/gif",
   webp: "image/webp",
+  pdf: "application/pdf",
 };
 
 /**
@@ -34,12 +35,14 @@ async function getAssetFromPostgres(key: string): Promise<AssetResult | null> {
 let s3Client: InstanceType<typeof Bun.S3Client> | null = null;
 
 function getS3Client(): InstanceType<typeof Bun.S3Client> {
+  const region = getRuntimeEnvVar("ASSET_S3_REGION");
+
   return (s3Client ??= new Bun.S3Client({
     endpoint: requireEnv("ASSET_S3_ENDPOINT"),
     bucket: requireEnv("ASSET_S3_BUCKET"),
-    region: getRuntimeEnvVar("ASSET_S3_REGION"),
     accessKeyId: requireEnv("ASSET_S3_ACCESS_KEY_ID"),
     secretAccessKey: requireEnv("ASSET_S3_SECRET_ACCESS_KEY"),
+    ...(region ? { region } : {}),
   }));
 }
 

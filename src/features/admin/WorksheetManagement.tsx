@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { AppLink } from "@components/AppLink";
 import type { CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
+import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 import { postAdminAction } from "./routeActions";
 import { WorksheetMonitor } from "./WorksheetMonitor";
 import styles from "./WorksheetManagement.module.css";
@@ -28,12 +29,26 @@ interface WorksheetRowProps {
 }
 
 function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggleMonitor }: WorksheetRowProps) {
+  const { isDemoMode, getOverride, setWorksheetHidden, setSolutionHidden } = useDemoOverrides();
+
   const [isHidden, setIsHidden] = useState(worksheet.isHidden);
   const [isSolutionHidden, setIsSolutionHidden] = useState(worksheet.isSolutionHidden);
+
+  // Sync state from demo override store after localStorage loads
+  useEffect(() => {
+    if (!isDemoMode) return;
+    const wsOverride = getOverride(courseId).worksheets?.[worksheet.worksheetId];
+    if (wsOverride?.isHidden !== undefined) setIsHidden(wsOverride.isHidden);
+    if (wsOverride?.isSolutionHidden !== undefined) setIsSolutionHidden(wsOverride.isSolutionHidden);
+  }, [isDemoMode, getOverride, courseId, worksheet.worksheetId]);
 
   const handleToggle = async () => {
     const newHidden = !isHidden;
     setIsHidden(newHidden);
+    if (isDemoMode) {
+      setWorksheetHidden(courseId, worksheet.worksheetId, newHidden);
+      return;
+    }
     const result = await postAdminAction({
       intent: "toggle-worksheet-visibility",
       courseId,
@@ -46,6 +61,10 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
   const handleSolutionToggle = async () => {
     const newHidden = !isSolutionHidden;
     setIsSolutionHidden(newHidden);
+    if (isDemoMode) {
+      setSolutionHidden(courseId, worksheet.worksheetId, newHidden);
+      return;
+    }
     const result = await postAdminAction({
       intent: "toggle-worksheet-solution-visibility",
       courseId,

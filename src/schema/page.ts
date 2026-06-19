@@ -20,7 +20,8 @@ export type SectionModifier =
 export type Section = {
     header: string,
     content: Node[],
-    modifiers?: SectionModifier[]
+    modifiers?: SectionModifier[],
+    pdfAssetKey?: string
 }
 
 export type Node = Macro | MacroGroup | Subheader | Markdown

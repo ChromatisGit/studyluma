@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type { ProgressTopicDTO, CourseId } from "@schema/courseTypes";
 import { Button } from "@components/Button";
 import { Roadmap } from "@components/Roadmap";
+import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 import { postAdminAction } from "./routeActions";
 import styles from "./ProgressControl.module.css";
 import ADMIN_TEXT from "./admin.de.json";
@@ -24,6 +25,8 @@ export function ProgressControl({
   topics,
   onProgressUpdate,
 }: ProgressControlProps) {
+  const { isDemoMode, setProgress: setDemoProgress } = useDemoOverrides();
+
   const [selectedTopicId, setSelectedTopicId] = useState(currentTopicId);
   const [selectedChapterId, setSelectedChapterId] = useState(currentChapterId);
   const [isPending, startTransition] = useTransition();
@@ -41,6 +44,13 @@ export function ProgressControl({
 
     if (!selectedTopicId || !selectedChapterId) {
       toast.error(ADMIN_TEXT.courseDetail.progressControl.selectChapter);
+      return;
+    }
+
+    if (isDemoMode) {
+      setDemoProgress(courseId, selectedTopicId, selectedChapterId);
+      onProgressUpdate?.(selectedTopicId, selectedChapterId);
+      toast.success(ADMIN_TEXT.courseDetail.progressControl.successMessage);
       return;
     }
 
@@ -97,4 +107,3 @@ export function ProgressControl({
     </form>
   );
 }
-

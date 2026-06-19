@@ -23,13 +23,14 @@ interface TaskSetComponentProps {
   categoryType: 'checkpoint' | 'core' | 'challenge';
   taskNumber?: number | undefined;
   onTaskSetCompleted?: (() => void) | undefined;
+  isPdfSection?: boolean | undefined;
 }
 
 function TaskNumberBadge({ number }: { number: string | number }) {
   return <span className={styles.taskBadge}>{number}</span>;
 }
 
-export function TaskSetComponent({ taskSet, categoryType, taskNumber, onTaskSetCompleted }: TaskSetComponentProps) {
+export function TaskSetComponent({ taskSet, categoryType, taskNumber, onTaskSetCompleted, isPdfSection }: TaskSetComponentProps) {
   const showNumbering = categoryType !== 'checkpoint' && typeof taskNumber === 'number';
   const hasMultipleTasks = taskSet.tasks.length > 1;
   const [triggerCheck, setTriggerCheck] = useState(0);
@@ -129,38 +130,43 @@ export function TaskSetComponent({ taskSet, categoryType, taskNumber, onTaskSetC
                   taskKey={taskKey}
                   taskNumber={currentTaskNumber}
                   onAttemptedChange={handleAttemptedChange}
+                  pdfSection={isPdfSection}
                 />
               </div>
             </div>
           );
         })}
 
-        <div className={styles.taskActions}>
-          <button
-            type="button"
-            onClick={handleCheckSolution}
-            className={styles.checkButton}
-          >
-            {CONTENTPAGE_TEXT.buttons.checkSolution}
-          </button>
-        </div>
+        {!isPdfSection && (
+          <div className={styles.taskActions}>
+            <button
+              type="button"
+              onClick={handleCheckSolution}
+              className={styles.checkButton}
+            >
+              {CONTENTPAGE_TEXT.buttons.checkSolution}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function TaskRenderer({ task, triggerCheck, taskKey, taskNumber, onAttemptedChange }: {
+function TaskRenderer({ task, triggerCheck, taskKey, taskNumber, onAttemptedChange, pdfSection }: {
   task: Macro;
   triggerCheck: number;
   taskKey: string;
-  taskNumber?: number;
-  onAttemptedChange?: (taskKey: string, attempted: boolean) => void;
+  taskNumber?: number | undefined;
+  onAttemptedChange?: ((taskKey: string, attempted: boolean) => void) | undefined;
+  pdfSection?: boolean | undefined;
 }) {
   const context: MacroRenderContext = {
     storageKey: taskKey,
     taskNumber,
     checkTrigger: triggerCheck,
     onAttemptedChange,
+    ...(pdfSection ? { pdfSection: true } : {}),
   };
 
   return renderMacro(task, context, taskKey);

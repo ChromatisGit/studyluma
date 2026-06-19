@@ -148,7 +148,6 @@ Recognised task types:
 
 | Heading | Task rendered |
 |---------|--------------|
-| `## text: Title` | Free-text response task |
 | `## code: Title` | Code editor task |
 | `## mcq: Title` | Multiple-choice (multiple correct answers allowed) |
 | `## single-choice: Title` | Single-choice (exactly one correct answer) |
@@ -174,25 +173,6 @@ Inside a task block, H3 headings (`###`) define optional subsections:
 | `### validation` | Validation code for `code` tasks (must return `true` to pass) |
 
 `### why` is especially useful for `mcq`, `single-choice`, `input`, `spot-error`, and `match` tasks where understanding the reasoning matters.
-
----
-
-### Text Task
-
-```markdown
-## text: Erläuterung
-
-Erkläre in eigenen Worten, was eine Sekante ist.
-
-### hint
-
-Eine Sekante verbindet zwei Punkte auf einem Funktionsgraphen.
-
-### answer
-
-Eine Sekante ist eine Gerade, die einen Graphen in zwei Punkten schneidet.
-Sie beschreibt die durchschnittliche Änderungsrate zwischen diesen Punkten.
-```
 
 ---
 
@@ -463,13 +443,13 @@ $x = \frac{8}{3},\quad y = \frac{5}{3}$
 Consecutive task blocks without a `---` between them form a **task group** and are displayed together. A horizontal rule (`---`) ends the current group and starts a new independent one.
 
 ```markdown
-## text: Erste Aufgabe
+## task: Erste Aufgabe
 
 Beantworte die erste Frage.
 
 ---
 
-## text: Zweite Aufgabe
+## task: Zweite Aufgabe
 
 Diese Aufgabe ist unabhängig von der ersten.
 ```
@@ -529,7 +509,7 @@ Tasks in a `@checkpoint` section must be digitally validatable. Valid task types
 
 ```markdown
 @checkpoint
-# Überprüfe dich selbst
+# Checkpoint
 
 ## input: Ergebnis
 
@@ -543,11 +523,11 @@ number: 17
 
 ### @challenge
 
-Open-ended, creative, or demanding extension tasks. Not automatically validatable. Prefer `task` for handwritten work or `text` with a model answer. Do not force Challenges into closed-answer formats.
+Open-ended, creative, or demanding extension tasks. Not automatically validatable. Prefer `task` for handwritten work. Do not force Challenges into closed-answer formats.
 
 ```markdown
 @challenge
-# Knobelaufgaben
+# Challengesn
 
 ## task: Beweis skizzieren
 
@@ -589,7 +569,7 @@ Skizziere $f(x) = x^2 - 2x + 1$.
 @challenge
 @pdf
 @grid free
-# Knobelaufgaben
+# Challenges
 ```
 
 ### PDF Work Area Modifiers

@@ -55,7 +55,9 @@ function convertPageToCategories(page: Page): Category[] {
       }
     }
 
-    categories.push({ kind: categoryType, items });
+    const isPdf = section.modifiers?.includes('pdf') ?? false;
+    const pdfUrl = section.pdfAssetKey ? `/content-assets/${section.pdfAssetKey}` : undefined;
+    categories.push({ kind: categoryType, items, ...(isPdf ? { isPdf, ...(pdfUrl ? { pdfUrl } : {}) } : {}) });
   }
 
   return categories;

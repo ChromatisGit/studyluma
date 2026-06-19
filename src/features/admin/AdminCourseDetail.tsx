@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, Shield } from "lucide-react";
 import { AppLink } from "@components/AppLink";
 import type { CourseDTO, ProgressDTO, CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
+import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 import { postAdminAction } from "./routeActions";
 import { ProgressControl } from "./ProgressControl";
 import { RegistrationControl } from "./RegistrationControl";
@@ -21,7 +22,28 @@ type AdminCourseDetailProps = {
   worksheets: AdminWorksheetRef[];
 };
 
+function DemoModeNotice({ courseId }: { courseId: CourseId }) {
+  const { isDemoMode, resetCourse } = useDemoOverrides();
+  if (!isDemoMode) return null;
+
+  return (
+    <div className={styles.demoNotice}>
+      <span className={styles.demoNoticeText}>
+        {ADMIN_TEXT.courseDetail.demoNotice.message}
+      </span>
+      <button
+        type="button"
+        className={styles.demoResetButton}
+        onClick={() => resetCourse(courseId)}
+      >
+        {ADMIN_TEXT.courseDetail.demoNotice.resetButton}
+      </button>
+    </div>
+  );
+}
+
 export function AdminCourseDetail({ course, progress, courseId, slideIds, worksheets }: AdminCourseDetailProps) {
+  const { isDemoMode, getOverride } = useDemoOverrides();
   const courseUrl = course.slug;
 
   const [viewTopicId, setViewTopicId] = useState(progress.currentTopicId);
@@ -30,6 +52,16 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
   const [isLoadingSlides, setIsLoadingSlides] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
+
+  // Apply demo progress override once localStorage is available (after mount)
+  useEffect(() => {
+    if (!isDemoMode) return;
+    const override = getOverride(courseId);
+    if (override.currentTopicId) setViewTopicId(override.currentTopicId);
+    if (override.currentChapterId) setViewChapterId(override.currentChapterId);
+    // Intentionally only run when override store re-loads (courseId stable per mount)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDemoMode, courseId]);
 
   useEffect(() => {
     if (!pickerOpen) return;
@@ -82,6 +114,9 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
           </li>
         </ol>
       </nav>
+
+      {/* Demo mode notice */}
+      <DemoModeNotice courseId={courseId} />
 
       {/* Header */}
       <header className={styles.header}>
@@ -177,8 +212,8 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
           </p>
           <ProgressControl
             courseId={courseId}
-            currentTopicId={progress.currentTopicId}
-            currentChapterId={progress.currentChapterId}
+            currentTopicId={viewTopicId}
+            currentChapterId={viewChapterId}
             topics={progress.topics}
             onProgressUpdate={(topicId, chapterId) => {
               setViewTopicId(topicId);

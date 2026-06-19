@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { CourseId } from "@schema/courseTypes";
 import { Button } from "@components/Button";
 import { Grid } from "@components/Grid";
+import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 import { postAdminAction } from "./routeActions";
 import styles from "./RegistrationControl.module.css";
 import ADMIN_TEXT from "./admin.de.json";
@@ -15,6 +16,8 @@ type RegistrationControlProps = {
 };
 
 export function RegistrationControl({ courseId }: RegistrationControlProps) {
+  const { isDemoMode, getOverride, setRegistrationOpen: setDemoRegistration } = useDemoOverrides();
+
   const [isOpen, setIsOpen] = useState(false);
   const [openUntil, setOpenUntil] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -22,6 +25,16 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
 
   // Load initial status
   useEffect(() => {
+    if (isDemoMode) {
+      // Read from demo override store (populated after localStorage loads)
+      const override = getOverride(courseId);
+      const open = override.registrationOpen ?? false;
+      setIsOpen(open);
+      if (open) {
+        setOpenUntil(new Date(Date.now() + 15 * 60 * 1000).toISOString());
+      }
+      return;
+    }
     startTransition(async () => {
       const result = await postAdminAction<{ isOpen: boolean; openUntil: string | null }>({
         intent: "registration-status",
@@ -34,7 +47,10 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
         toast.error(result.error);
       }
     });
-  }, [courseId]);
+    // isDemoMode is stable (never changes mid-session); getOverride intentionally excluded
+    // to avoid re-firing the status check on every unrelated store mutation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId, isDemoMode]);
 
   // Update countdown timer
   useEffect(() => {
@@ -66,6 +82,13 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
   }, [isOpen, openUntil]);
 
   const handleOpen = () => {
+    if (isDemoMode) {
+      setDemoRegistration(courseId, true);
+      setIsOpen(true);
+      setOpenUntil(new Date(Date.now() + 15 * 60 * 1000).toISOString());
+      toast.success(ADMIN_TEXT.courseDetail.registration.openSuccessMessage);
+      return;
+    }
     startTransition(async () => {
       const result = await postAdminAction<{ openUntil: string | null }>({
         intent: "open-registration",
@@ -84,6 +107,13 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
   };
 
   const handleClose = () => {
+    if (isDemoMode) {
+      setDemoRegistration(courseId, false);
+      setIsOpen(false);
+      setOpenUntil(null);
+      toast.success(ADMIN_TEXT.courseDetail.registration.closeSuccessMessage);
+      return;
+    }
     startTransition(async () => {
       const result = await postAdminAction<{ openUntil: string | null }>({
         intent: "close-registration",
@@ -152,4 +182,3 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
     </div>
   );
 }
-

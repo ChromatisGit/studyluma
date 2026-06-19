@@ -2,7 +2,7 @@ import type { CardMacro, CardKind } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
 import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
-import { Info, BookOpen, FlaskConical, Check, HelpCircle, CheckSquare, RefreshCw, Bookmark, AlertTriangle, CheckCircle } from "lucide-react";
+import { BookOpen, FlaskConical, Check, HelpCircle, CheckSquare, RefreshCw, Bookmark, AlertTriangle, CheckCircle } from "lucide-react";
 import clsx from "clsx";
 import styles from "./styles.module.css";
 import MACROS_TEXT from "@macros/macros.de.json";
