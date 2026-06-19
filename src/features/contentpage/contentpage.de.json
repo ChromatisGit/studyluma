@@ -2,13 +2,17 @@
   "worksheetsSection": {
     "title": "Aufgaben"
   },
+  "worksheetPdfCard": {
+    "title": "Arbeitsblatt",
+    "description": "Bearbeite die Aufgaben schriftlich in GoodNotes oder auf Papier. Hinweise und Lösungen findest du hier auf der Seite."
+  },
   "categories": {
     "checkpoint": "Checkpoint",
     "core": "Aufgaben",
     "challenge": "Challenges"
   },
   "buttons": {
-    "checkSolution": "Mit Lösung vergleichen"
+    "checkSolution": "Antworten prüfen"
   },
   "sections": {
     "hint": "Hinweis anzeigen",

@@ -58,7 +58,7 @@ export default function InputTaskRenderer({ macro, context }: Props) {
   const [checkState, setCheckState] = useState<CheckState>("none");
 
   const count = fieldCount(macro.answer);
-  const isAttempted = values.slice(0, count).every((v) => !isNaN(v));
+  const isAttempted = values.slice(0, count).every((v) => Number.isFinite(v));
 
   useMacroCheck(context, isAttempted, () => {
     setCheckState(isCorrect(macro.answer, values, macro.tolerance) ? "correct" : "wrong");
@@ -72,10 +72,6 @@ export default function InputTaskRenderer({ macro, context }: Props) {
       return next;
     });
     setCheckState("none");
-  };
-
-  const handleCheck = () => {
-    setCheckState(isCorrect(macro.answer, values, macro.tolerance) ? "correct" : "wrong");
   };
 
   const instruction = getMarkdown(macro.instruction);
@@ -94,22 +90,16 @@ export default function InputTaskRenderer({ macro, context }: Props) {
           onChange={handleChange}
         />
 
-        <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.checkButton}
-            onClick={handleCheck}
-            disabled={!isAttempted || checkState === "correct"}
-          >
-            {MACROS_TEXT.inputTask.checkButton}
-          </button>
-          {checkState === "correct" && (
-            <span className={styles.resultCorrect}>{MACROS_TEXT.inputTask.correct}</span>
-          )}
-          {checkState === "wrong" && (
-            <span className={styles.resultWrong}>{MACROS_TEXT.inputTask.wrong}</span>
-          )}
-        </div>
+        {checkState !== "none" && (
+          <div className={styles.actions}>
+            {checkState === "correct" && (
+              <span className={styles.resultCorrect}>{MACROS_TEXT.inputTask.correct}</span>
+            )}
+            {checkState === "wrong" && (
+              <span className={styles.resultWrong}>{MACROS_TEXT.inputTask.wrong}</span>
+            )}
+          </div>
+        )}
       </div>
 
       {(hint || (checkState !== "none" && why)) && (
@@ -192,7 +182,10 @@ interface FieldProps {
 
 function Field({ index, values, checkState, onChange, small }: FieldProps) {
   const value = values[index];
-  const displayValue = value === undefined || isNaN(value) ? "" : String(value);
+  // `value` can be `null` here, not just `undefined`/NaN - NaN round-trips through
+  // JSON (localStorage/server persistence) as `null`, and `isNaN(null)` is false
+  // (null coerces to 0), so that check alone let "null" leak into the <input> value.
+  const displayValue = Number.isFinite(value) ? String(value) : "";
 
   return (
     <div className={styles.field}>

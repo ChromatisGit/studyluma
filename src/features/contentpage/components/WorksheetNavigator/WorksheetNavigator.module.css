@@ -3,3 +3,34 @@
   flex-direction: column;
   gap: var(--space-4);
 }
+
+.compareActions {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-2);
+}
+
+.compareButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--text-base);
+  background: var(--primary);
+  color: var(--text-on-accent);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--primary);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.compareButton:hover {
+  background: var(--primary-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.compareButton:active {
+  transform: translateY(1px);
+}

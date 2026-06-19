@@ -1,9 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { useState, useEffect } from 'react';
-import { FileText, Flag, Target, Zap } from 'lucide-react';
-import MACROS_TEXT from '@macros/macros.de.json';
+import { Flag, Target, Zap } from 'lucide-react';
 import { InfoBlock } from '@features/contentpage/components/InfoBlock/InfoBlock';
 import { TaskSetComponent } from '@features/contentpage/components/Group/TaskSetComponent';
 import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
@@ -31,13 +29,14 @@ export type Category = {
   items: CategoryItem[];
   isPdf?: boolean | undefined;
   pdfUrl?: string | undefined;
+  pdfFileName?: string | undefined;
 };
 
 interface CategorySectionProps {
   block: Category;
   categoryIndex: number;
   taskNumbers: Record<string, number>;
-  onTaskSetCompleted?: (itemIndex: number) => void;
+  triggerCheck: number;
 }
 
 const categoryConfig = {
@@ -55,7 +54,7 @@ const categoryConfig = {
   },
 } satisfies Record<Category["kind"], { label: string; icon: typeof Flag }>;
 
-export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCompleted }: CategorySectionProps) {
+export function CategorySection({ block, categoryIndex, taskNumbers, triggerCheck }: CategorySectionProps) {
   const config = categoryConfig[block.kind];
   const Icon = config.icon;
   const variantClass =
@@ -75,9 +74,6 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
       </div>
 
       <div className={styles.sectionSpacing}>
-        {block.isPdf && (
-          <PdfSectionButton pdfUrl={block.pdfUrl} />
-        )}
         {block.items.map((item, index) => {
           if (item.kind === "info") {
             return <InfoBlock key={index} info={item} />;
@@ -87,9 +83,8 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
               <TaskSetComponent
                 key={index}
                 taskSet={item}
-                categoryType={block.kind}
                 taskNumber={taskNumbers[`${categoryIndex}-${index}`]}
-                onTaskSetCompleted={onTaskSetCompleted ? () => onTaskSetCompleted(index) : undefined}
+                triggerCheck={triggerCheck}
                 isPdfSection={block.isPdf}
               />
             );
@@ -112,36 +107,5 @@ export function CategorySection({ block, categoryIndex, taskNumbers, onTaskSetCo
         })}
       </div>
     </section>
-  );
-}
-
-function PdfSectionButton({ pdfUrl }: { pdfUrl?: string | undefined }) {
-  const [isIos, setIsIos] = useState(false);
-
-  useEffect(() => {
-    setIsIos(/iPad|iPhone/.test(navigator.userAgent));
-  }, []);
-
-  if (!pdfUrl) {
-    return (
-      <div className={styles.pdfSectionButton}>
-        <FileText className={styles.pdfSectionButtonIcon} aria-hidden />
-        {MACROS_TEXT.handwrittenTask.downloadPdf}
-      </div>
-    );
-  }
-
-  const goodnotesUrl = `goodnotes://open?url=${encodeURIComponent(pdfUrl)}`;
-
-  return isIos ? (
-    <a href={goodnotesUrl} className={styles.pdfSectionButtonActive}>
-      <FileText className={styles.pdfSectionButtonIcon} aria-hidden />
-      {MACROS_TEXT.handwrittenTask.openInGoodnotes}
-    </a>
-  ) : (
-    <a href={pdfUrl} download className={styles.pdfSectionButtonActive}>
-      <FileText className={styles.pdfSectionButtonIcon} aria-hidden />
-      {MACROS_TEXT.handwrittenTask.downloadPdf}
-    </a>
   );
 }

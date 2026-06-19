@@ -54,7 +54,8 @@ bun run publish
 5. **Write to database**:
    - `deployCourseStructure`: upserts rows in `groups`, `subjects`, `courses`, `topics`, `chapters`, `worksheets`, and junction tables
    - `deployContentPages`: upserts rows in `content_pages` (only re-writes rows whose `content_hash` has changed)
-6. **Generate PDFs** (`deployContentPdfs`): for each `@pdf` section in any content page, renders a PDF using `@react-pdf/renderer` + KaTeX SVG, uploads to AssetStore (content-addressed — unchanged PDFs are skipped), stores the asset key in the DB
+6. **Render math** (`flushPendingMathAssets`): every unique Typst math span found anywhere in the built content tree is compiled to SVG via the Typst CLI and uploaded to the AssetStore, content-addressed by hash of the (trimmed) math source. The website resolves the same hash independently at render time - no asset key needs to be stored in `content_json`.
+7. **Generate PDFs** (`deployContentPdfs`): for each `@pdf` section in any content page, generates Typst markup (`renderSectionToTypst`) and compiles it directly to PDF via the Typst CLI, uploads to AssetStore (content-addressed — unchanged PDFs are skipped), stores the asset key in the DB
 
 ---
 
@@ -62,7 +63,7 @@ bun run publish
 
 PDFs are generated for every `@pdf` section found in any content page. The pipeline step `deployContentPdfs` runs after `deployContentPages`.
 
-**Tooling:** `@react-pdf/renderer` for layout + `katex` for math (LaTeX → SVG). No Chrome or native binary dependency.
+**Tooling:** the Typst CLI compiles the whole worksheet directly to PDF — text, layout, and math are all native vector PDF content. No `@react-pdf/renderer`, no rasterized math, no Chrome or other browser dependency.
 
 **Storage:** PDFs are stored in the AssetStore (same mechanism as images — Postgres `content_assets` table by default, or S3-compatible storage). The asset key is the SHA-256 hash of the PDF bytes. If the content hash of a page has not changed, its PDF is not re-generated.
 

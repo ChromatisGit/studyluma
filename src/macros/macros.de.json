@@ -21,7 +21,6 @@
     "placeholder": "Schreibe deine Antwort hier..."
   },
   "inputTask": {
-    "checkButton": "Prüfen",
     "correct": "Richtig!",
     "wrong": "Nicht ganz — versuche es nochmal."
   },

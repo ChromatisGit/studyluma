@@ -68,9 +68,10 @@ export function PageNavBar({ onBack, onNext, canGoNext, currentIndex, totalSecti
       <button
         type="button"
         onClick={() => { setUnlockPulse(false); onNext(); }}
-        disabled={!canGoNext}
+        aria-disabled={!canGoNext}
         className={clsx(
           styles.navButton,
+          !canGoNext && styles.navButtonLocked,
           isLastPage && styles.hidden,
           unlockPulse && styles.unlockPulse,
         )}

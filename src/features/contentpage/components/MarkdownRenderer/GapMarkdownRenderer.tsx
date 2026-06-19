@@ -17,7 +17,7 @@ import {
   CodeBlock,
 } from "./remarkTransforms";
 import { codeTheme } from "./codeTheme";
-import { InlineMath, BlockMath } from "./KatexMath";
+import { InlineMath, BlockMath } from "./TypstMath";
 
 // ── Context ──────────────────────────────────────────────────────────
 
@@ -104,6 +104,50 @@ function CodeBlockWithGaps({
 
 const GAP_SENTINEL_REGEX = /\uFFFE(\d+)\uFFFE/;
 
+/** Splits a leaf node's text value around gap sentinels, replacing it in its
+ *  parent's children with alternating same-type segments and GapSlot placeholders.
+ *  Used for text/inlineCode/math/inlineMath - a `((...))` gap can land inside any
+ *  of these (e.g. a gap inside a `$$...$$` block written by the content author). */
+function splitNodeBySentinel(
+  node: MarkdownNode,
+  index: number | undefined,
+  parent: MarkdownNode | undefined,
+  segmentType: string
+): number | undefined {
+  const children = parent?.children;
+  if (!children || index == null || !node.value) return;
+  if (!GAP_SENTINEL_REGEX.test(node.value)) return;
+
+  const parts: MarkdownNode[] = [];
+  let remaining = node.value;
+
+  while (remaining) {
+    const match = GAP_SENTINEL_REGEX.exec(remaining);
+    if (!match) {
+      if (remaining) parts.push({ type: segmentType, value: remaining });
+      break;
+    }
+
+    const before = remaining.slice(0, match.index);
+    if (before) parts.push({ type: segmentType, value: before });
+
+    parts.push({
+      type: "gapPlaceholder",
+      data: {
+        hName: "GapSlot",
+        hProperties: { gapIndex: Number(match[1]) },
+      },
+    });
+
+    remaining = remaining.slice(match.index + match[0].length);
+  }
+
+  if (parts.length > 0) {
+    children.splice(index, 1, ...parts);
+    return index;
+  }
+}
+
 function remarkGapPlaceholders() {
   return (tree: MarkdownNode) => {
     // Handle gap sentinels inside code blocks (fenced code)
@@ -117,84 +161,24 @@ function remarkGapPlaceholders() {
       }
     });
 
-    // Handle gap sentinels in inline code nodes
-    visit(
-      tree,
-      "inlineCode",
-      (node: MarkdownNode, index: number | undefined, parent: MarkdownNode | undefined) => {
-        const children = parent?.children;
-        if (!children || index == null || !node.value) return;
-        if (!GAP_SENTINEL_REGEX.test(node.value)) return;
-
-        const parts: MarkdownNode[] = [];
-        let remaining = node.value;
-
-        while (remaining) {
-          const match = GAP_SENTINEL_REGEX.exec(remaining);
-          if (!match) {
-            if (remaining) parts.push({ type: "inlineCode", value: remaining });
-            break;
-          }
-
-          const before = remaining.slice(0, match.index);
-          if (before) parts.push({ type: "inlineCode", value: before });
-
-          parts.push({
-            type: "gapPlaceholder",
-            data: {
-              hName: "GapSlot",
-              hProperties: { gapIndex: Number(match[1]) },
-            },
-          });
-
-          remaining = remaining.slice(match.index + match[0].length);
-        }
-
-        if (parts.length > 0) {
-          children.splice(index, 1, ...parts);
-          return index;
-        }
-      }
+    // Handle gap sentinels in inline code, text, and math nodes - remarkMath has
+    // already run by this point, so a gap sentinel inside `$...$`/`$$...$$` shows
+    // up as the value of a "math"/"inlineMath" node, not a "text" node. A "math"
+    // (block) node that contains a gap must split into "inlineMath" fragments,
+    // not "math" ones - once a gap sits next to it, the fragment needs to flow
+    // inline on the same line as the gap field rather than render as its own
+    // full-width centered block row.
+    visit(tree, "inlineCode", (node, index, parent) =>
+      splitNodeBySentinel(node, index, parent, "inlineCode")
     );
-
-    // Handle gap sentinels in text nodes
-    visit(
-      tree,
-      "text",
-      (node: MarkdownNode, index: number | undefined, parent: MarkdownNode | undefined) => {
-        const children = parent?.children;
-        if (!children || index == null || !node.value) return;
-        if (!GAP_SENTINEL_REGEX.test(node.value)) return;
-
-        const parts: MarkdownNode[] = [];
-        let remaining = node.value;
-
-        while (remaining) {
-          const match = GAP_SENTINEL_REGEX.exec(remaining);
-          if (!match) {
-            if (remaining) parts.push({ type: "text", value: remaining });
-            break;
-          }
-
-          const before = remaining.slice(0, match.index);
-          if (before) parts.push({ type: "text", value: before });
-
-          parts.push({
-            type: "gapPlaceholder",
-            data: {
-              hName: "GapSlot",
-              hProperties: { gapIndex: Number(match[1]) },
-            },
-          });
-
-          remaining = remaining.slice(match.index + match[0].length);
-        }
-
-        if (parts.length > 0) {
-          children.splice(index, 1, ...parts);
-          return index;
-        }
-      }
+    visit(tree, "text", (node, index, parent) =>
+      splitNodeBySentinel(node, index, parent, "text")
+    );
+    visit(tree, "math", (node, index, parent) =>
+      splitNodeBySentinel(node, index, parent, "inlineMath")
+    );
+    visit(tree, "inlineMath", (node, index, parent) =>
+      splitNodeBySentinel(node, index, parent, "inlineMath")
     );
   };
 }

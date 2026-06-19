@@ -32,6 +32,9 @@ export default function HandwrittenTaskRenderer({ macro, context, pdfUrl }: Prop
   const instruction = getMarkdown(macro.instruction);
   const hint = getMarkdown(macro.hint);
   const answer = getMarkdown(macro.answer);
+  const why = getMarkdown(macro.why);
+  // No teacher-unlock feature yet - `solutionsUnlocked` defaults to unlocked.
+  const solutionsUnlocked = context.solutionsUnlocked !== false;
 
   const goodnotesUrl = pdfUrl
     ? `goodnotes://open?url=${encodeURIComponent(pdfUrl)}`
@@ -68,7 +71,7 @@ export default function HandwrittenTaskRenderer({ macro, context, pdfUrl }: Prop
         </div>
       )}
 
-      {(hint || (isChecked && answer)) && (
+      {(hint || (isChecked && answer) || (isChecked && why && solutionsUnlocked)) && (
         <Stack gap="sm">
           {hint && (
             <CollapsibleSection type="hint" content={<MarkdownRenderer markdown={hint} />} />
@@ -78,6 +81,13 @@ export default function HandwrittenTaskRenderer({ macro, context, pdfUrl }: Prop
               type="answer"
               defaultOpen={false}
               content={<MarkdownRenderer markdown={answer} />}
+            />
+          )}
+          {isChecked && why && solutionsUnlocked && (
+            <CollapsibleSection
+              type="why"
+              defaultOpen={false}
+              content={<MarkdownRenderer markdown={why} />}
             />
           )}
         </Stack>

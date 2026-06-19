@@ -57,10 +57,22 @@ function convertPageToCategories(page: Page): Category[] {
 
     const isPdf = section.modifiers?.includes('pdf') ?? false;
     const pdfUrl = section.pdfAssetKey ? `/content-assets/${section.pdfAssetKey}` : undefined;
-    categories.push({ kind: categoryType, items, ...(isPdf ? { isPdf, ...(pdfUrl ? { pdfUrl } : {}) } : {}) });
+    const pdfFileName = isPdf ? toPdfFileName(page.title) : undefined;
+    categories.push({
+      kind: categoryType,
+      items,
+      ...(isPdf ? { isPdf, pdfFileName, ...(pdfUrl ? { pdfUrl } : {}) } : {}),
+    });
   }
 
   return categories;
+}
+
+/** Sanitizes a worksheet title into a filesystem-safe download filename, replacing
+ *  characters that are illegal/problematic on Windows and most filesystems. */
+function toPdfFileName(title: string): string {
+  const sanitized = title.trim().replace(/[\\/:*?"<>|]/g, "").replace(/\s+/g, " ");
+  return `${sanitized}.pdf`;
 }
 
 /**

@@ -71,17 +71,30 @@ All standard Markdown syntax is supported:
 
 ## Math
 
-Inline math uses single dollar signs; block math uses double:
+Inline math uses single dollar signs; block math uses double. The content
+between the delimiters is **Typst math syntax** (not LaTeX) - see
+[typst.app/docs/reference/math](https://typst.app/docs/reference/math) for the
+full reference:
 
 ```markdown
 The derivative $f'(x)$ of a polynomial...
 
 $$
-f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}
+f'(x) = lim_(h -> 0) frac(f(x+h) - f(x), h)
 $$
 ```
 
-Math is rendered with KaTeX.
+Vectors and matrices use Typst's native `vec(...)` / `mat(...)` functions
+directly - no custom macros needed:
+
+```markdown
+$arrow(x) = vec(1, 2, 0) + t dot vec(2, -1, 3)$
+```
+
+Math is precompiled to SVG at publish-time (one Typst CLI compile per unique
+span, content-addressed by hash) and served as a static `/content-assets/*.svg`
+image - see `docs/CONTENT_PIPELINE.md`. There is no live KaTeX/MathJax
+rendering anymore.
 
 ---
 
