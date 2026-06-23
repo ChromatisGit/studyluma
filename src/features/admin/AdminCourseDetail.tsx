@@ -6,6 +6,7 @@ import { AppLink } from "@components/AppLink";
 import type { CourseDTO, ProgressDTO, CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
 import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
+import { useDemoTopics } from "@features/demo/useDemoProgress";
 import { postAdminAction } from "./routeActions";
 import { ProgressControl } from "./ProgressControl";
 import { RegistrationControl } from "./RegistrationControl";
@@ -45,6 +46,7 @@ function DemoModeNotice({ courseId }: { courseId: CourseId }) {
 export function AdminCourseDetail({ course, progress, courseId, slideIds, worksheets }: AdminCourseDetailProps) {
   const { isDemoMode, getOverride } = useDemoOverrides();
   const courseUrl = course.slug;
+  const topics = useDemoTopics(courseId, progress.topics);
 
   const [viewTopicId, setViewTopicId] = useState(progress.currentTopicId);
   const [viewChapterId, setViewChapterId] = useState(progress.currentChapterId);
@@ -53,15 +55,14 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
   const [pickerOpen, setPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement>(null);
 
-  // Apply demo progress override once localStorage is available (after mount)
+  // Track the demo override's current chapter — re-applies on every change
+  // (initial localStorage load, Progress Control update, reset), not just on mount.
+  const demoCurrentTopicId = isDemoMode ? getOverride(courseId).currentTopicId : undefined;
+  const demoCurrentChapterId = isDemoMode ? getOverride(courseId).currentChapterId : undefined;
   useEffect(() => {
-    if (!isDemoMode) return;
-    const override = getOverride(courseId);
-    if (override.currentTopicId) setViewTopicId(override.currentTopicId);
-    if (override.currentChapterId) setViewChapterId(override.currentChapterId);
-    // Intentionally only run when override store re-loads (courseId stable per mount)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDemoMode, courseId]);
+    if (demoCurrentTopicId) setViewTopicId(demoCurrentTopicId);
+    if (demoCurrentChapterId) setViewChapterId(demoCurrentChapterId);
+  }, [demoCurrentTopicId, demoCurrentChapterId]);
 
   useEffect(() => {
     if (!pickerOpen) return;
@@ -90,7 +91,7 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
     setIsLoadingSlides(false);
   };
 
-  const viewChapterLabel = progress.topics
+  const viewChapterLabel = topics
     .flatMap((t) => t.chapters)
     .find((c) => c.chapterId === viewChapterId)?.label ?? viewChapterId;
 
@@ -154,7 +155,7 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
 
               {pickerOpen && (
                 <div className={styles.chapterPickerDropdown}>
-                  {progress.topics.map((topic) => (
+                  {topics.map((topic) => (
                     <div key={topic.topicId} className={styles.dropdownTopic}>
                       <span className={styles.dropdownTopicLabel}>{topic.label}</span>
                       {topic.chapters.map((chapter) => (
@@ -214,7 +215,7 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
             courseId={courseId}
             currentTopicId={viewTopicId}
             currentChapterId={viewChapterId}
-            topics={progress.topics}
+            topics={topics}
             onProgressUpdate={(topicId, chapterId) => {
               setViewTopicId(topicId);
               setViewChapterId(chapterId);
@@ -229,17 +230,6 @@ export function AdminCourseDetail({ course, progress, courseId, slideIds, worksh
             {ADMIN_TEXT.courseDetail.registration.description}
           </p>
           <RegistrationControl courseId={courseId} />
-        </section>
-
-        {/* Enrolled Students Section */}
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>{ADMIN_TEXT.courseDetail.enrolledStudents.title}</h2>
-          <p className={styles.sectionDescription}>
-            {ADMIN_TEXT.courseDetail.enrolledStudents.description}
-          </p>
-          <div className={styles.placeholder}>
-            <p>{ADMIN_TEXT.courseDetail.enrolledStudents.comingSoon}</p>
-          </div>
         </section>
       </div>
     </div>

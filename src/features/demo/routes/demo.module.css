@@ -1,0 +1,45 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.copy {
+  color: var(--muted-foreground);
+}
+
+.error {
+  color: var(--danger, #c62828);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.actions > * {
+  min-width: 14rem;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    width: min(100%, 24rem);
+    flex-direction: column;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+}

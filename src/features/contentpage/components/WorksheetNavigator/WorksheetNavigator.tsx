@@ -76,8 +76,11 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
   const canGoBack = currentIndex > 0;
   const canGoNext = !isActive || completedSections.has(currentIndex);
 
+  const hasTaskSets = category?.items.some(item => item.kind === 'taskSet') ?? false;
+  const showCompareButton = hasTaskSets && !category?.isPdf;
+
   const navText = CONTENTPAGE_TEXT.navigation;
-  const lockedReason = category?.kind === 'checkpoint'
+  const lockedReason = category?.kind === 'checkpoint' && !(showCompareButton && triggerCheck === 0)
     ? navText.lockedCheckpointReason
     : navText.lockedTasksReason;
 
@@ -103,12 +106,12 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
 
   const handleCompare = () => {
     setTriggerCheck(prev => prev + 1);
-    markSectionCompleted(currentIndex);
+    if (category?.kind !== 'checkpoint') {
+      markSectionCompleted(currentIndex);
+    }
   };
 
   const showNavBar = categories.length > 1;
-  const hasTaskSets = category?.items.some(item => item.kind === 'taskSet') ?? false;
-  const showCompareButton = hasTaskSets && !category?.isPdf;
 
   if (!category) return null;
 
@@ -138,19 +141,19 @@ export function WorksheetNavigator({ categories, chapterStatus, taskNumbers, cou
         triggerCheck={triggerCheck}
       />
 
-      {category.kind === 'checkpoint' && isActive && (
-        <CheckpointOverlay
-          sectionIndex={currentIndex}
-          onSubmitted={() => markSectionCompleted(currentIndex)}
-        />
-      )}
-
       {showCompareButton && (
         <div className={styles.compareActions}>
           <button type="button" onClick={handleCompare} className={styles.compareButton}>
             {CONTENTPAGE_TEXT.buttons.checkSolution}
           </button>
         </div>
+      )}
+
+      {category.kind === 'checkpoint' && (triggerCheck > 0 || !showCompareButton || !isActive) && (
+        <CheckpointOverlay
+          sectionIndex={currentIndex}
+          onSubmitted={() => markSectionCompleted(currentIndex)}
+        />
       )}
 
       {showNavBar && (

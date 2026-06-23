@@ -3,6 +3,7 @@
 import { useMatches } from "react-router";
 import type { NavItem } from "@chromatis/base";
 import { useRouteContext } from "@ui/contexts/RouteContext";
+import { useDemoProgress } from "@features/demo/useDemoProgress";
 import type { ProgressDTO, SidebarDTO } from "@schema/courseTypes";
 import { CourseNavTree } from "./CourseNavTree";
 import { CourseList } from "./CourseList";
@@ -18,9 +19,10 @@ export function useSidebarNav(sidebarData: SidebarDTO, defaultMainNavItems: read
   const { hasTopicContext, topic, chapter, groupKey, subjectKey } = useRouteContext();
   const matches = useMatches();
 
-  const progress = matches
-    .map((m) => (m.data as { progress?: ProgressDTO } | null))
-    .find((d) => d?.progress != null)?.progress;
+  const matchWithProgress = matches
+    .map((m) => m.data as { progress?: ProgressDTO; courseId?: string } | null)
+    .find((d) => d?.progress != null);
+  const progress = useDemoProgress(matchWithProgress?.courseId ?? "", matchWithProgress?.progress);
 
   const courseHref = groupKey && subjectKey ? `/${groupKey}/${subjectKey}` : "/";
   const hasCourses = sidebarData.courses.length > 0;

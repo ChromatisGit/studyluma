@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { ProgressTopicDTO, CourseId } from "@schema/courseTypes";
 import { Button } from "@components/Button";
@@ -30,6 +30,12 @@ export function ProgressControl({
   const [selectedTopicId, setSelectedTopicId] = useState(currentTopicId);
   const [selectedChapterId, setSelectedChapterId] = useState(currentChapterId);
   const [isPending, startTransition] = useTransition();
+
+  // Re-sync when the incoming progress changes from outside this control.
+  useEffect(() => {
+    setSelectedTopicId(currentTopicId);
+    setSelectedChapterId(currentChapterId);
+  }, [currentTopicId, currentChapterId]);
 
   const hasChanges =
     selectedTopicId !== currentTopicId || selectedChapterId !== currentChapterId;
@@ -92,7 +98,8 @@ export function ProgressControl({
       <div className={styles.actions}>
         {hasChanges && selectedTopic && selectedChapter ? (
           <p className={styles.selectionInfo}>
-            Selected: <strong>{selectedTopic.label}</strong> → <strong>{selectedChapter.label}</strong>
+            Selected: <strong>{selectedTopic.label}</strong> {"->"}{" "}
+            <strong>{selectedChapter.label}</strong>
           </p>
         ) : null}
 
@@ -101,7 +108,9 @@ export function ProgressControl({
           disabled={isPending || !hasChanges}
           variant="primary"
         >
-          {isPending ? ADMIN_TEXT.courseDetail.progressControl.updating : ADMIN_TEXT.courseDetail.progressControl.updateButton}
+          {isPending
+            ? ADMIN_TEXT.courseDetail.progressControl.updating
+            : ADMIN_TEXT.courseDetail.progressControl.updateButton}
         </Button>
       </div>
     </form>

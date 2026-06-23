@@ -1,5 +1,5 @@
 import { redirect } from "react-router";
-import { GraduationCap, Map, FileText, Repeat, Sun, Moon } from "lucide-react";
+import { Map, FileText, Repeat, Sun, Moon } from "lucide-react";
 import type { ComponentType } from "react";
 import type { LucideProps } from "lucide-react";
 import { toggleTheme } from "@chromatis/base";
@@ -76,7 +76,7 @@ function Hero() {
           className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-6"
           style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
         >
-          <GraduationCap size={28} />
+          <span className="text-3xl font-bold leading-none" aria-hidden>S</span>
         </div>
         <h1 className="text-4xl font-bold tracking-tight mb-3">{TEXT.hero.claim}</h1>
         <p className="text-muted-foreground leading-relaxed" style={{ maxWidth: "500px", margin: "0 auto" }}>
@@ -93,7 +93,7 @@ function Hero() {
 
 function WhatIsAndFeatures() {
   return (
-    <section className={styles.section}>
+    <section className={`${styles.section} ${styles.sectionLead}`}>
       <div className={styles.sectionInner}>
         <div className={styles.whatIsGrid}>
           <div className={styles.leftCol}>
@@ -168,27 +168,31 @@ function About() {
   return (
     <section className={styles.section}>
       <div className={styles.aboutInner}>
-        {/* Replace with: <img src="/christian-holst.jpg" alt="Christian Holst" className={styles.photo} /> */}
-        <div className={styles.photoPlaceholder} aria-hidden>CH</div>
-        <div>
-          <h2 className="text-xl font-semibold mb-3">{TEXT.project.title}</h2>
-          <p className="text-foreground leading-relaxed">{TEXT.project.body}</p>
-          <div className="flex gap-3 mt-4">
-            <a
-              href="https://github.com/ChromatisGit/studyluma"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {TEXT.project.githubLabel}
-            </a>
-            <a
-              href={`mailto:${TEXT.project.email}`}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {TEXT.project.email}
-            </a>
-          </div>
+        {/* TODO: Move this portrait to the CDN once media hosting is set up. */}
+        <img
+          src="/demo/christian-holst.webp"
+          alt="Christian Holst"
+          className={styles.photo}
+          width={96}
+          height={96}
+        />
+        <h2 className={`${styles.aboutTitle} text-xl font-semibold`}>{TEXT.project.title}</h2>
+        <p className={`${styles.aboutBody} text-foreground leading-relaxed`}>{TEXT.project.body}</p>
+        <div className={`${styles.aboutLinks} flex gap-3 mt-4`}>
+          <a
+            href="https://github.com/ChromatisGit/studyluma"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {TEXT.project.githubLabel}
+          </a>
+          <a
+            href={`mailto:${TEXT.project.email}`}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {TEXT.project.email}
+          </a>
         </div>
       </div>
     </section>

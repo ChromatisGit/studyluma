@@ -1,6 +1,8 @@
 import { Form, redirect, useActionData } from "react-router";
 import { buildSessionCookie } from "@core/index.server";
+import { Button } from "@components/Button";
 import { getDemoUser, type DemoRole } from "@features/demo/demoSession.server";
+import styles from "./demo.module.css";
 
 export function meta() {
   return [{ title: "Demo — StudyLuma" }];
@@ -27,20 +29,21 @@ export async function action({ request }: { request: Request }) {
 
 export default function DemoEntryPage() {
   const actionData = useActionData<typeof action>();
+
   return (
-    <main style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100vh", gap: "2rem" }}>
-      <h1 style={{ fontSize: "1.5rem", fontWeight: 700 }}>StudyLuma Demo</h1>
-      <p style={{ color: "var(--muted-foreground)" }}>Wähle eine Perspektive, um die Demo zu starten.</p>
+    <main className={styles.page}>
+      <h1 className={styles.title}>StudyLuma Demo</h1>
+      <p className={styles.copy}>Wähle eine Perspektive, um die Demo zu starten.</p>
       {actionData?.error && (
-        <p style={{ color: "red" }}>{actionData.error}</p>
+        <p className={styles.error}>{actionData.error}</p>
       )}
-      <Form method="post" style={{ display: "flex", gap: "1rem" }}>
-        <button type="submit" name="role" value="student">
+      <Form method="post" className={styles.actions}>
+        <Button type="submit" name="role" value="student" variant="primary" size="lg">
           Als Schüler fortfahren
-        </button>
-        <button type="submit" name="role" value="teacher">
+        </Button>
+        <Button type="submit" name="role" value="teacher" variant="secondary" size="lg">
           Als Lehrer fortfahren
-        </button>
+        </Button>
       </Form>
     </main>
   );

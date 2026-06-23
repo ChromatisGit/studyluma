@@ -1,9 +1,12 @@
+"use client";
+
 import { ArrowRight } from "lucide-react";
 import { Button } from "@components/Button";
 import { Container } from "@components/Container";
 import { PageHeader } from "@components/PageHeader";
 import { Roadmap } from "@components/Roadmap";
 import { WorksheetCards } from "@components/WorksheetCards";
+import { useDemoTopics } from "@features/demo/useDemoProgress";
 import type { ProgressTopicDTO } from "@schema/courseTypes";
 import styles from "./Coursepage.module.css";
 import COURSE_TEXT from "./coursepage.de.json";
@@ -20,7 +23,8 @@ type CoursepagePageProps = {
 };
 
 export function CoursepagePage({ model }: CoursepagePageProps) {
-  const { label, description, roadmap } = model;
+  const { label, description, courseId } = model;
+  const roadmap = useDemoTopics(courseId, model.roadmap);
 
   // Find the current topic and chapter to show a prominent "continue" CTA
   const currentTopic = roadmap.find((t) => t.status === "current") ?? roadmap[0];

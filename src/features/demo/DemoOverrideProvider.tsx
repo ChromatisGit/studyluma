@@ -9,6 +9,13 @@ import {
 
 const STORAGE_KEY = "demo:overrides";
 
+// The DB seed unlocks demo-math through its last chapter so every chapter is
+// reachable in the demo, but the displayed "current" chapter should start at
+// the first one until the demo admin moves it via Progress Control.
+const DEFAULT_PROGRESS_OVERRIDES: Record<string, { currentTopicId: string; currentChapterId: string }> = {
+  "demo-math": { currentTopicId: "vektorgeometrie", currentChapterId: "geraden" },
+};
+
 function readStore(): DemoOverridesStore {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -55,7 +62,11 @@ export function DemoOverrideProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const getOverride = useCallback(
-    (courseId: string): DemoCourseOverride => store.courses[courseId] ?? {},
+    (courseId: string): DemoCourseOverride => {
+      const defaults = DEFAULT_PROGRESS_OVERRIDES[courseId];
+      const stored = store.courses[courseId];
+      return defaults ? { ...defaults, ...stored } : stored ?? {};
+    },
     [store],
   );
 

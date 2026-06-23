@@ -1,15 +1,15 @@
 {
   "meta": {
     "title": "StudyLuma",
-    "description": "Guter Unterricht hat eine Logik. StudyLuma macht sie sichtbar."
+    "description": "Strukturierte Inhalte, interaktive Aufgaben und direkte Rückmeldungen für den Unterricht."
   },
   "nav": {
     "demo": "Demo",
     "roadmap": "Roadmap"
   },
   "hero": {
-    "claim": "Guter Unterricht hat eine Logik. StudyLuma macht sie sichtbar.",
-    "lead": "Ein offenes Unterrichtssystem für Lernwege, Arbeitsblätter und Übung.",
+    "claim": "Digitale Lernwege für klareren Unterricht",
+    "lead": "Strukturierte Inhalte, interaktive Aufgaben und direkte Rückmeldungen für den Unterricht.",
     "ctaPrimary": "Demo starten",
     "ctaSecondary": "Fortschritt & Ausblick"
   },

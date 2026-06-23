@@ -605,7 +605,7 @@ Modifier lines start with `@` and apply to the next task block or display elemen
 
 | Modifier | Effect |
 |----------|--------|
-| `@wide` | Render the element in a wider layout |
+| `@compact` | Render an `mcq` task in a narrower, multi-column layout (wide is the default) |
 | `@no-shuffle` | Disable option/item shuffling for `mcq`, `match`, and `classify` tasks |
 | `@mcq` | Force MCQ rendering for a `gap` task |
 | `@list` | Render gap answers as a list |
@@ -614,11 +614,11 @@ Modifier lines start with `@` and apply to the next task block or display elemen
 Example:
 
 ```markdown
-@wide
+@compact
 @no-shuffle
 ## mcq: Reihenfolge beachten
 
-These options will not be shuffled and render in wide layout.
+These options will not be shuffled and render in a compact layout.
 
 - (x) First correct answer
 - ( ) Wrong
