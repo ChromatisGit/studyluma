@@ -2,24 +2,76 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  color: var(--primary);
-  opacity: 0.5;
+  overflow: hidden;
+  isolation: isolate;
+  --lf-core: color-mix(in srgb, var(--primary-strong) 84%, white);
+  --lf-halo: color-mix(in srgb, var(--primary) 72%, white);
+  --lf-ambient-center: color-mix(in srgb, var(--primary-selection) 34%, transparent);
+  --lf-ambient-side: color-mix(in srgb, var(--primary-light) 92%, var(--primary) 8%);
+  --lf-ambient-top: color-mix(in srgb, var(--primary) 7%, transparent);
 }
 
 :global(html.dark) .lightField {
-  opacity: 0.7;
+  --lf-core: color-mix(in srgb, var(--primary) 92%, white);
+  --lf-halo: color-mix(in srgb, var(--primary) 82%, white);
+  --lf-ambient-center: color-mix(in srgb, var(--primary) 24%, transparent);
+  --lf-ambient-side: color-mix(in srgb, var(--primary-light) 82%, var(--primary) 18%);
+  --lf-ambient-top: color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
-.lightField svg {
+.ambient {
+  position: absolute;
+  inset: 9% -12% 0;
+  background:
+    radial-gradient(ellipse 46% 30% at 50% 46%, var(--lf-ambient-center), transparent 72%),
+    radial-gradient(ellipse 22% 16% at 24% 42%, var(--lf-ambient-side), transparent 82%),
+    radial-gradient(ellipse 22% 16% at 76% 42%, var(--lf-ambient-side), transparent 84%),
+    radial-gradient(ellipse 74% 28% at 50% 18%, var(--lf-ambient-top), transparent 78%);
+  filter: blur(18px);
+  opacity: 0.82;
+}
+
+:global(html.dark) .ambient {
+  opacity: 0.62;
+}
+
+.fieldSvg {
+  position: relative;
   width: 100%;
   height: 100%;
+  z-index: 1;
+  -webkit-mask-image: radial-gradient(
+    ellipse 60% 46% at 50% 34%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.96) 40%,
+    rgba(0, 0, 0, 0.5) 72%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 60% 46% at 50% 34%,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.96) 40%,
+    rgba(0, 0, 0, 0.5) 72%,
+    transparent 100%
+  );
+}
+
+.haloLayer {
+  opacity: 1;
+}
+
+:global(html.dark) .haloLayer {
+  opacity: 0.95;
+}
+
+.coreLayer {
+  opacity: 0.88;
 }
 
 .halo {
-  fill: currentColor;
-  filter: url(#lf-glow);
+  fill: var(--lf-halo);
 }
 
 .core {
-  fill: currentColor;
+  fill: var(--lf-core);
 }

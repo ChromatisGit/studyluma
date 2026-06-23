@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback, useId } from 'react';
 import {
   generateParticles,
   getParticleCount,
@@ -12,7 +12,11 @@ import styles from './LightField.module.css';
 
 export function LightField() {
   const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const particles = useMemo(() => generateParticles(getParticleCount()), []);
+  const filterIdBase = useId().replace(/:/g, "");
+  const lightGlowFilterId = `${filterIdBase}-light`;
+  const darkGlowFilterId = `${filterIdBase}-dark`;
 
   const coreRefs = useRef<(SVGCircleElement | null)[]>([]);
   const haloRefs = useRef<(SVGCircleElement | null)[]>([]);
@@ -27,7 +31,18 @@ export function LightField() {
     haloRefs.current[i] = el;
   }, []);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+
+    const root = document.documentElement;
+    const syncTheme = () => setIsDark(root.classList.contains("dark"));
+    syncTheme();
+
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!mounted) return;
@@ -53,6 +68,8 @@ export function LightField() {
       CORE_MIN_OPACITY, CORE_MAX_OPACITY,
       HALO_MIN_OPACITY, HALO_MAX_OPACITY,
     } = ANIMATION_CONFIG;
+    const haloMinOpacity = isDark ? HALO_MIN_OPACITY : 0.2;
+    const haloMaxOpacity = isDark ? HALO_MAX_OPACITY : 0.62;
 
     const animate = () => {
       if (!isVisible) {
@@ -69,7 +86,7 @@ export function LightField() {
         const pos = calculateParticlePosition(p, i, elapsed);
         const t = calculateParticleOpacity(p, elapsed);
         const coreOpacity = CORE_MIN_OPACITY + (CORE_MAX_OPACITY - CORE_MIN_OPACITY) * t;
-        const haloOpacity = HALO_MIN_OPACITY + (HALO_MAX_OPACITY - HALO_MIN_OPACITY) * t;
+        const haloOpacity = haloMinOpacity + (haloMaxOpacity - haloMinOpacity) * t;
 
         const core = coreRefs.current[i];
         const halo = haloRefs.current[i];
@@ -96,32 +113,46 @@ export function LightField() {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [mounted, particles]);
+  }, [isDark, mounted, particles]);
 
-  if (!mounted) return <div className={styles.lightField} />;
+  if (!mounted) {
+    return (
+      <div className={styles.lightField} aria-hidden>
+        <div className={styles.ambient} />
+      </div>
+    );
+  }
 
   return (
-    <div className={styles.lightField}>
-      <svg viewBox="-10 0 120 100" preserveAspectRatio="xMidYMid slice">
+    <div className={styles.lightField} aria-hidden>
+      <div className={styles.ambient} />
+      <svg
+        className={styles.fieldSvg}
+        viewBox="-10 0 120 100"
+        preserveAspectRatio="xMidYMid slice"
+      >
         <defs>
-          <filter id="lf-glow" x="-150%" y="-150%" width="400%" height="400%">
-            <feGaussianBlur stdDeviation="2.5" />
+          <filter id={lightGlowFilterId} x="-220%" y="-220%" width="540%" height="540%">
+            <feGaussianBlur stdDeviation="3.8" />
+          </filter>
+          <filter id={darkGlowFilterId} x="-180%" y="-180%" width="460%" height="460%">
+            <feGaussianBlur stdDeviation="3.2" />
           </filter>
         </defs>
-        <g>
+        <g className={styles.haloLayer}>
           {particles.map((p, i) => (
             <circle
               key={`h-${p.id}`}
               ref={setHaloRef(i)}
               cx={p.baseX}
               cy={p.baseY}
-              r={p.haloR}
+              r={isDark ? p.haloR : p.haloR * 1.9}
               className={styles.halo}
-              style={{ opacity: 0 }}
+              style={{ opacity: 0, filter: `url(#${isDark ? darkGlowFilterId : lightGlowFilterId})` }}
             />
           ))}
         </g>
-        <g>
+        <g className={styles.coreLayer}>
           {particles.map((p, i) => (
             <circle
               key={`c-${p.id}`}

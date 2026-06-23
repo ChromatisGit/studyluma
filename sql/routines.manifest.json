@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "combinedHash": "50bd6de0aba3bcf88b9e20a43ed260c154f2ac2f1f92c5174ae97ecbed0ac85b",
-  "migration": "1.0.2__sync_sql_routines.sql",
+  "combinedHash": "5ba6a680dc5b7756b7be7882c4df8ba015a1d0536101c801e79b5b2ae13e8ddd",
+  "migration": "1.0.3__update_usernames.sql",
   "files": [
     {
       "kind": "view",
@@ -63,7 +63,7 @@
     {
       "kind": "function",
       "path": "sql/functions/create_user_with_username.sql",
-      "hash": "70adde6f243c362ef8e69c1c9a98b2a0a7e6588de6404d09fa6dffb5cec5c205",
+      "hash": "af6092add862e3a1a00bceb8cc540815eeb7096c9618fa44766f2ea710d74538",
       "objects": [
         {
           "kind": "function",
@@ -87,7 +87,7 @@
     {
       "kind": "function",
       "path": "sql/functions/generate_username.sql",
-      "hash": "d6fd4c3662300643c881184b287141535e4fb03d1504a46e2e4a1269cded7bd0",
+      "hash": "29dc1e3ed4027aceee603dccb2713063cc522d0d73899e566cd0ea02aa03586a",
       "objects": [
         {
           "kind": "function",

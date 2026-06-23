@@ -1,10 +1,22 @@
 .math-inline {
   display: inline-block;
-  vertical-align: -0.15em;
+  vertical-align: middle;
+  transform: translateY(-4px);
+}
+
+.math-inline > svg,
+.math-inline > img {
+  display: block;
 }
 
 .math-block {
   display: flex;
   justify-content: center;
   margin: 0.6em 0;
+}
+
+.math-block-svg > svg,
+.math-block-svg > img {
+  display: block;
+  max-width: 100%;
 }

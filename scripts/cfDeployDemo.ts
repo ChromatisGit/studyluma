@@ -45,7 +45,19 @@ run("bun", ["x", "react-router", "build"], {
 });
 
 console.info("\n[cf:deploy:demo] Deploying to Cloudflare Workers (env: demo)...");
-run("bun", ["x", "wrangler", "deploy", "--env", "demo", "--config", "build/server/wrangler.json"]);
+// react-router's generated build/server/wrangler.json drops [env.demo.vars] from wrangler.toml,
+// so DEMO_MODE must be passed explicitly here or the worker won't see it at runtime.
+run("bun", [
+  "x",
+  "wrangler",
+  "deploy",
+  "--env",
+  "demo",
+  "--config",
+  "build/server/wrangler.json",
+  "--var",
+  "DEMO_MODE:true",
+]);
 
 console.info("\n[cf:deploy:demo] Syncing secrets to demo environment...");
 for (const [key, value] of Object.entries(secrets)) {
