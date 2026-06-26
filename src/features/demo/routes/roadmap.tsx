@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { Container } from "@components/Container";
+import { buildMeta } from "@core/seo";
 import { LightField } from "../components/LightField/LightField";
 import { SiteFooter } from "./SiteFooter";
 import TEXT from "./roadmap.de.json";
@@ -49,10 +50,11 @@ const ROADMAP_ICONS: LucideIcon[] = [
 ];
 
 export function meta() {
-  return [
-    { title: TEXT.meta.title },
-    { name: "description", content: TEXT.meta.description },
-  ];
+  return buildMeta({
+    title: TEXT.meta.title,
+    description: TEXT.meta.description,
+    path: "/roadmap",
+  });
 }
 
 export default function RoadmapPage() {

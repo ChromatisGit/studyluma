@@ -1,10 +1,13 @@
 import { Container } from "@components/Container";
+import { buildMeta } from "@core/seo";
 import { SiteFooter } from "./SiteFooter";
 
 export function meta() {
-  return [
-    { title: "Impressum — StudyLuma" },
-  ];
+  return buildMeta({
+    title: "Impressum — StudyLuma",
+    description: "Impressum und Kontaktangaben von StudyLuma.",
+    path: "/impressum",
+  });
 }
 
 export default function ImpressumPage() {

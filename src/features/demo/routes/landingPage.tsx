@@ -6,6 +6,7 @@ import { toggleTheme } from "@chromatis/base";
 import { getSession } from "@core/auth/session.server";
 import { isAdmin } from "@core/auth/guards";
 import { getSidebarDTO } from "@services/courseService";
+import { buildMeta } from "@core/seo";
 
 import { Button } from "@components/Button";
 import { Box } from "@components/Box";
@@ -16,29 +17,19 @@ import TEXT from "./landingPage.de.json";
 import styles from "./landingPage.module.css";
 
 export function meta() {
-  return [
-    { title: TEXT.meta.title },
-    { name: "description", content: TEXT.meta.description },
-    { tagName: "link", rel: "canonical", href: "https://studyluma.org/" },
-    { property: "og:site_name", content: "StudyLuma" },
-    { property: "og:type", content: "website" },
-    { property: "og:title", content: TEXT.meta.title },
-    { property: "og:description", content: TEXT.meta.description },
-    { property: "og:url", content: "https://studyluma.org/" },
-    { name: "twitter:card", content: "summary" },
-    { name: "twitter:title", content: TEXT.meta.title },
-    { name: "twitter:description", content: TEXT.meta.description },
-    {
-      "script:ld+json": {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "StudyLuma",
-        url: "https://studyluma.org/",
-        description: TEXT.meta.description,
-        inLanguage: "de",
-      },
+  return buildMeta({
+    title: TEXT.meta.title,
+    description: TEXT.meta.description,
+    path: "/",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "StudyLuma",
+      url: "https://studyluma.org/",
+      description: TEXT.meta.description,
+      inLanguage: "de",
     },
-  ];
+  });
 }
 
 export async function loader({ request }: { request: Request }) {
