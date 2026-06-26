@@ -1,5 +1,5 @@
 import type { ExampleSlide } from "@schema/slideTypes";
-import { SlideHeader } from "./SlideHeader";
+import { SlideHeader } from "@components/SlideHeader";
 import { BulletList } from "./BulletList";
 import { ResultBox } from "./ResultBox";
 import { MaterialRenderer } from "./MaterialRenderer";

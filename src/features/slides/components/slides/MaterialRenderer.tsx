@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from "@ui/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { SlideCodeRunner } from "./SlideCodeRunner";
 import type { SlideContentItem } from "@schema/slideTypes";
 import styles from "./slide.module.css";

@@ -1,12 +1,10 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { AppLink } from "@components/AppLink";
 import type { CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
 import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
-import { postAdminAction } from "./routeActions";
+import { useAdminAction } from "./useAdminAction";
 import { WorksheetMonitor } from "./WorksheetMonitor";
 import styles from "./WorksheetManagement.module.css";
 import ADMIN_TEXT from "./admin.de.json";
@@ -29,7 +27,8 @@ interface WorksheetRowProps {
 }
 
 function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggleMonitor }: WorksheetRowProps) {
-  const { isDemoMode, getOverride, setWorksheetHidden, setSolutionHidden } = useDemoOverrides();
+  const { getOverride, setWorksheetHidden, setSolutionHidden } = useDemoOverrides();
+  const { isDemoMode, runAdminAction } = useAdminAction();
 
   const [isHidden, setIsHidden] = useState(worksheet.isHidden);
   const [isSolutionHidden, setIsSolutionHidden] = useState(worksheet.isSolutionHidden);
@@ -42,36 +41,38 @@ function WorksheetRow({ courseId, courseSlug, worksheet, isMonitorOpen, onToggle
     if (wsOverride?.isSolutionHidden !== undefined) setIsSolutionHidden(wsOverride.isSolutionHidden);
   }, [isDemoMode, getOverride, courseId, worksheet.worksheetId]);
 
-  const handleToggle = async () => {
+  const handleToggle = () => {
     const newHidden = !isHidden;
     setIsHidden(newHidden);
-    if (isDemoMode) {
-      setWorksheetHidden(courseId, worksheet.worksheetId, newHidden);
-      return;
-    }
-    const result = await postAdminAction({
-      intent: "toggle-worksheet-visibility",
-      courseId,
-      worksheetId: worksheet.worksheetId,
-      isHidden: newHidden,
+
+    runAdminAction({
+      payload: {
+        intent: "toggle-worksheet-visibility",
+        courseId,
+        worksheetId: worksheet.worksheetId,
+        isHidden: newHidden,
+      },
+      demo: () => setWorksheetHidden(courseId, worksheet.worksheetId, newHidden),
+      onError: () => setIsHidden(!newHidden),
+      toastErrors: false,
     });
-    if (!result.ok) setIsHidden(!newHidden);
   };
 
-  const handleSolutionToggle = async () => {
+  const handleSolutionToggle = () => {
     const newHidden = !isSolutionHidden;
     setIsSolutionHidden(newHidden);
-    if (isDemoMode) {
-      setSolutionHidden(courseId, worksheet.worksheetId, newHidden);
-      return;
-    }
-    const result = await postAdminAction({
-      intent: "toggle-worksheet-solution-visibility",
-      courseId,
-      worksheetId: worksheet.worksheetId,
-      isSolutionHidden: newHidden,
+
+    runAdminAction({
+      payload: {
+        intent: "toggle-worksheet-solution-visibility",
+        courseId,
+        worksheetId: worksheet.worksheetId,
+        isSolutionHidden: newHidden,
+      },
+      demo: () => setSolutionHidden(courseId, worksheet.worksheetId, newHidden),
+      onError: () => setIsSolutionHidden(!newHidden),
+      toastErrors: false,
     });
-    if (!result.ok) setIsSolutionHidden(!newHidden);
   };
 
   const isPdfCourse = worksheet.worksheetFormat === "pdfSolution";

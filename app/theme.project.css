@@ -87,8 +87,8 @@
   --surface-deep: #27234a;
   --popover: #161328;
   --popover-foreground: #edeaff;
-  --primary: #975be6;
-  --primary-strong: #8f3fe6;
+  --primary: #8f3fe6;
+  --primary-strong: #7c35c8;
   --primary-light: #24163b;
   --primary-border: #aa76dd;
   --primary-selection: #3b275d;
@@ -109,7 +109,7 @@
   --ring: #4b2f75;
   --sidebar: #161328;
   --sidebar-foreground: #edeaff;
-  --sidebar-primary: #975be6;
+  --sidebar-primary: #8f3fe6;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #24163b;
   --sidebar-accent-foreground: #edeaff;

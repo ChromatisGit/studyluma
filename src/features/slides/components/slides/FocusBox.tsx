@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from "@ui/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import styles from "./slide.module.css";
 
 type FocusBoxProps = {

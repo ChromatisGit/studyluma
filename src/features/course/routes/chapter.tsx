@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useLoaderData } from "react-router";
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { assertCanAccessPage } from "@core/auth/guards";
 import {
   coursePublic,
@@ -10,7 +10,7 @@ import {
   getWorksheetRefs,
 } from "@services/courseService";
 import { getPage } from "@services/pageService";
-import { ContentPageRenderer } from "@ui/ContentPageRenderer";
+import { ContentPageRenderer } from "@components/ContentPageRenderer";
 import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 
 export async function loader({

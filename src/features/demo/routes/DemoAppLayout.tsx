@@ -3,7 +3,7 @@ import { Form, Outlet, useLoaderData } from "react-router";
 import { Layout, Sidebar } from "@chromatis/base";
 import { mainNavItems } from "@core/nav";
 import { RouteProvider } from "@ui/contexts/RouteContext";
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { getSidebarDTO } from "@services/courseService";
 import { useSidebarNav } from "@ui/layout/CourseNav/useSidebarNav";
 import { DemoOverrideProvider } from "@features/demo/DemoOverrideProvider";

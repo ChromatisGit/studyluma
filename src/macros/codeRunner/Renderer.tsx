@@ -1,10 +1,7 @@
-"use client";
-
 import { useEffect } from "react";
 import type { CodeRunnerMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { CodeRunner } from "@features/contentpage/components/CodeRunner/CodeRunner";
-import { useTsRunner } from "@features/contentpage/components/CodeRunner/useTsRunner";
+import { CodeRunner, useTsRunner } from "@components/CodeRunner";
 import { useMacroValue } from "@macros/state/useMacroValue";
 import { useMacroState } from "@macros/state/MacroStateContext";
 

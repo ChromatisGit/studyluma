@@ -1,9 +1,7 @@
-"use client";
-
 import { useMatches } from "react-router";
 import type { NavItem } from "@chromatis/base";
 import { useRouteContext } from "@ui/contexts/RouteContext";
-import { useDemoProgress } from "@features/demo/useDemoProgress";
+import { useDemoProgress } from "@ui/demo/useDemoProgress";
 import type { ProgressDTO, SidebarDTO } from "@schema/courseTypes";
 import { CourseNavTree } from "./CourseNavTree";
 import { CourseList } from "./CourseList";

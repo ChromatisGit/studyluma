@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router";
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { getCourseDTO, getCourseId, getProgressDTO } from "@services/courseService";
 import { CoursepagePage } from "@features/course/Coursepage";
 

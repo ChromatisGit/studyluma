@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { BookOpen, type LucideIcon, type LucideProps } from "lucide-react";
 

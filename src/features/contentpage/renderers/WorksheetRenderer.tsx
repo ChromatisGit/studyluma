@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from "clsx";
 import type { Page } from "@schema/page";
 import type { ProgressStatus } from "@schema/courseTypes";

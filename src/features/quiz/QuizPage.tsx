@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { ClipboardList } from "lucide-react";
@@ -8,7 +6,7 @@ import { postQuizAction } from "./routeActions";
 import type { QuizStateDTO } from "@schema/quizTypes";
 import type { StudentStreamEvent, StudentSnapshot } from "@schema/streamTypes";
 import { useQuizStream } from "./hooks/useQuizStream";
-import { QuizView } from "./QuizView";
+import { QuizView } from "@components/QuizView";
 import styles from "./QuizPage.module.css";
 
 type QuizPageProps = {

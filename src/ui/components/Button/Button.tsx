@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from "clsx";
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 import { AppLink } from "@components/AppLink";
@@ -47,14 +45,6 @@ export function Button({
   );
 
   if (href) {
-    // Use regular anchor for hash links, Next.js Link for routes
-    if (href.startsWith("#")) {
-      return (
-        <a href={href} className={buttonClass}>
-          {children}
-        </a>
-      );
-    }
     return (
       <AppLink href={href} className={buttonClass}>
         {children}

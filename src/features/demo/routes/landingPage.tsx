@@ -3,7 +3,7 @@ import { Map, FileText, Repeat, Sun, Moon } from "lucide-react";
 import type { ComponentType } from "react";
 import type { LucideProps } from "lucide-react";
 import { toggleTheme } from "@chromatis/base";
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { isAdmin } from "@core/auth/guards";
 import { getSidebarDTO } from "@services/courseService";
 
@@ -19,6 +19,25 @@ export function meta() {
   return [
     { title: TEXT.meta.title },
     { name: "description", content: TEXT.meta.description },
+    { tagName: "link", rel: "canonical", href: "https://studyluma.org/" },
+    { property: "og:site_name", content: "StudyLuma" },
+    { property: "og:type", content: "website" },
+    { property: "og:title", content: TEXT.meta.title },
+    { property: "og:description", content: TEXT.meta.description },
+    { property: "og:url", content: "https://studyluma.org/" },
+    { name: "twitter:card", content: "summary" },
+    { name: "twitter:title", content: TEXT.meta.title },
+    { name: "twitter:description", content: TEXT.meta.description },
+    {
+      "script:ld+json": {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "StudyLuma",
+        url: "https://studyluma.org/",
+        description: TEXT.meta.description,
+        inLanguage: "de",
+      },
+    },
   ];
 }
 
@@ -39,10 +58,12 @@ export default function LandingPage() {
   return (
     <div className={styles.page}>
       <Nav />
-      <Hero />
-      <WhatIsAndFeatures />
-      <DemoHint />
-      <About />
+      <main>
+        <Hero />
+        <WhatIsAndFeatures />
+        <DemoHint />
+        <About />
+      </main>
       <SiteFooter />
     </div>
   );
@@ -198,4 +219,3 @@ function About() {
     </section>
   );
 }
-

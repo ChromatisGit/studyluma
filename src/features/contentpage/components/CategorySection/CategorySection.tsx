@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { Flag, Target, Zap } from 'lucide-react';
 import { InfoBlock } from '@features/contentpage/components/InfoBlock/InfoBlock';
 import { TaskSetComponent } from '@features/contentpage/components/Group/TaskSetComponent';
-import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { type Macro, renderMacro } from '@macros/registry';
 
 import styles from './CategorySection.module.css';

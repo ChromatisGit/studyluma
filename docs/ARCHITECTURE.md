@@ -36,7 +36,6 @@ src/
 ├── core/           Route handlers (thin loaders/actions calling services)
 ├── features/       UI feature modules (one folder per feature)
 ├── macros/         Content macro definitions and renderers
-├── platform/       Application-level infrastructure (DB, auth, sessions)
 ├── schema/         Shared TypeScript types (no runtime code)
 ├── server/         Server-only business logic (services, DB layer)
 └── ui/             Shared UI components and layout
@@ -44,28 +43,27 @@ src/
 
 ### Layer Rules
 
-The architecture is enforced by `scripts/checkArchitectureBoundaries.ts` and ESLint's `eslint-plugin-boundaries`:
+The architecture is enforced by `node_modules/@chromatis/base/infra/scripts/checkArchitectureBoundaries.ts` and ESLint's `eslint-plugin-boundaries`:
 
 - `features/` modules are **isolated** — no cross-feature imports
 - `features/` may import from `ui/`, `macros/`, `schema/`
 - `server/` code is **never** imported by `features/` or `ui/`
-- `platform/` is only imported from route files in `src/core/` and `app/`
-- `macros/` may import `features/` for rendering but not `server/` or `platform/`
+- `core/` owns route-level infrastructure such as sessions, auth guards, content access, and DB access
+- `macros/` may import `features/` for rendering but not `server/` or `core/`
 
-### Platform Layer (`src/platform/`)
+### Core Layer (`src/core/`)
 
 Thin wrappers around framework primitives:
 
 - **`db.server.ts`** — Postgres singleton; exports `anonSQL` (no RLS context) and `userSQL(user)` (sets RLS session vars before each query)
 - **`auth/`** — Session cookie management, PIN-based login, route guards (`assertLoggedIn`, `assertAdminAccess`)
 - **`content.server.ts`** — Typed accessors for `content_pages` rows (`getContentPage`, `getWorksheetContent`, `getSlideDeckContent`, …)
-- **`index.server.ts`** — Re-exports the above for consumption by route files
 
 ### Authentication
 
 Users authenticate with a username + PIN. The PIN is hashed with **PBKDF2** via the Web Crypto API (`hashPin`/`verifyPin` from `@chromatis/base/auth`) — no native modules, works on both Node.js and Cloudflare Workers.
 
-On successful login, a signed session cookie is issued. The cookie stores only a `user_id`; the platform layer resolves the full `UserDTO` on every request.
+On successful login, a signed session cookie is issued. The cookie stores only a `user_id`; the core auth layer resolves the full `UserDTO` on every request.
 
 ### Database
 
@@ -87,7 +85,7 @@ Row-Level Security policies on each table use these parameters to enforce access
 
 ### Content
 
-Content pages are stored as parsed JSONB in the `content_pages` table. The website only reads the pre-parsed JSON produced by the pipeline. At request time, `platform/content.server.ts` fetches the relevant row and the React Router loader passes it to the renderer.
+Content pages are stored as parsed JSONB in the `content_pages` table. The website only reads the pre-parsed JSON produced by the pipeline. At request time, `core/content.server.ts` fetches the relevant row and the React Router loader passes it to the renderer.
 
 Images referenced from Markdown are content-addressed (`<sha256-of-bytes>.<ext>`) and served via `GET /content-assets/:key`, which resolves the key through `core/assets.server.ts` (Postgres `content_assets` table by default, or S3-compatible storage — see [CONTENT_PIPELINE.md](CONTENT_PIPELINE.md#images--binary-assets)). There is no per-asset access control beyond the key being unguessable, matching `content_pages`.
 

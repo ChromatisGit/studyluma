@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router";
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { assertAdminAccess } from "@core/auth/guards";
 import { getSubject } from "@services/courseService";
 import { getSlideDeck } from "@services/slideService";

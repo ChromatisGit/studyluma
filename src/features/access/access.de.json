@@ -36,5 +36,12 @@
     "usernameLabel": "Dein Benutzername",
     "checkboxLabel": "Ich habe meinen Benutzername gespeichert",
     "continueButton": "Weiter"
+  },
+  "errors": {
+    "missingCredentials": "Bitte gib deine Zugangsdaten ein.",
+    "invalidCredentials": "Ungültige Zugangsdaten.",
+    "invalidCourseLink": "Ungültiger Kurslink.",
+    "registrationClosed": "Das Registrierungsfenster ist nicht geöffnet.",
+    "enrollmentFailed": "Der Kursbeitritt ist fehlgeschlagen."
   }
 }

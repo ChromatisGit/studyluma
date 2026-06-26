@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { MarkdownRenderer } from '@features/contentpage/components/MarkdownRenderer/MarkdownRenderer';
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { type Macro, type MacroRenderContext, renderMacro, buildTaskKey } from '@macros/registry';
 import type { Markdown } from '@schema/page';
 

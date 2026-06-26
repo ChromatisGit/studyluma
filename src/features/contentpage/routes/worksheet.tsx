@@ -1,5 +1,5 @@
 import { useLoaderData } from "react-router";
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { assertCanAccessPage, assertLoggedIn } from "@core/auth/guards";
 import { coursePublic, getCourseId, getProgressDTO, getSubject } from "@services/courseService";
 import { getPage } from "@services/pageService";

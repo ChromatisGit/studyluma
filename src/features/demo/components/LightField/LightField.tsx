@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useRef, useState, useCallback, useId } from 'react';
 import {
   generateParticles,

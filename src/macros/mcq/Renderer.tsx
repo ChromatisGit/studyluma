@@ -1,12 +1,10 @@
-"use client";
-
 import clsx from "clsx";
 import { useState } from "react";
 import type { CSSProperties } from "react";
 import { Check, X, AlertCircle } from "lucide-react";
 import type { McqMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
 import { getMarkdown } from "@macros/markdownParser";
 import { useMacroValue } from "@macros/state/useMacroValue";

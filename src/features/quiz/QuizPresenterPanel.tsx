@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useCallback } from "react";
 import { CheckCircle2 } from "lucide-react";
 import type { QuizResultsDTO, StoredQuestion } from "@schema/quizTypes";

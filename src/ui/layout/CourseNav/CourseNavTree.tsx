@@ -1,5 +1,3 @@
-"use client";
-
 import { Link, useLocation } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import clsx from "clsx";

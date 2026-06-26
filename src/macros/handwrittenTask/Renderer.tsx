@@ -3,10 +3,10 @@
 import { useState } from "react";
 import type { HandwrittenTaskMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
-import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
 import { useMacroCheck } from "@macros/state/useMacroCheck";
+import { TaskFeedback } from "@macros/TaskFeedback";
 import { Stack } from "@components/Stack";
 
 export default function HandwrittenTaskRenderer({ macro, context }: MacroComponentProps<HandwrittenTaskMacro>) {
@@ -21,16 +21,23 @@ export default function HandwrittenTaskRenderer({ macro, context }: MacroCompone
   const why = getMarkdown(macro.why);
   // No teacher-unlock feature yet - `solutionsUnlocked` defaults to unlocked.
   const solutionsUnlocked = context.solutionsUnlocked !== false;
+  const feedback = (
+    <TaskFeedback
+      hint={hint}
+      answer={answer}
+      why={why}
+      showAnswer={isChecked}
+      showWhy={isChecked && solutionsUnlocked}
+      answerDefaultOpen={false}
+      whyDefaultOpen={false}
+    />
+  );
 
   if (context.pdfSection) {
     return (
       <Stack gap="md">
         {instruction && <MarkdownRenderer markdown={instruction} />}
-        {hint && (
-          <Stack gap="sm">
-            <CollapsibleSection type="hint" content={<MarkdownRenderer markdown={hint} />} />
-          </Stack>
-        )}
+        {hint && <TaskFeedback hint={hint} />}
       </Stack>
     );
   }
@@ -38,27 +45,7 @@ export default function HandwrittenTaskRenderer({ macro, context }: MacroCompone
   return (
     <Stack gap="md">
       {instruction && <MarkdownRenderer markdown={instruction} />}
-      {(hint || (isChecked && answer) || (isChecked && why && solutionsUnlocked)) && (
-        <Stack gap="sm">
-          {hint && (
-            <CollapsibleSection type="hint" content={<MarkdownRenderer markdown={hint} />} />
-          )}
-          {isChecked && answer && (
-            <CollapsibleSection
-              type="answer"
-              defaultOpen={false}
-              content={<MarkdownRenderer markdown={answer} />}
-            />
-          )}
-          {isChecked && why && solutionsUnlocked && (
-            <CollapsibleSection
-              type="why"
-              defaultOpen={false}
-              content={<MarkdownRenderer markdown={why} />}
-            />
-          )}
-        </Stack>
-      )}
+      {feedback}
     </Stack>
   );
 }

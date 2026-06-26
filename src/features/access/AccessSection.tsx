@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState, type FormEvent } from "react";
 import { useFetcher, useNavigate } from "react-router";
 import { BookOpen } from "lucide-react";

@@ -4,9 +4,9 @@ import {
   buildLogoutCookie,
   buildNewUserUsernameCookie,
   buildSessionCookie,
-  getAuthenticatedUser,
   getSession,
-} from "@core/index.server";
+} from "@core/auth/session.server";
+import { getAuthenticatedUser } from "@core/auth/login.server";
 import { isAdmin } from "@core/auth/guards";
 import { getClientIp } from "@server-lib/getClientIp";
 import {
@@ -25,6 +25,7 @@ import {
 import { getActiveQuizForUser } from "@services/quizService";
 import AccessSection from "@features/access/AccessSection";
 import { CoursePicker } from "@features/access/CoursePicker";
+import copy from "../access.de.json";
 
 function getParam(url: URL, key: string): string | null {
   return url.searchParams.get(key);
@@ -159,13 +160,13 @@ export async function action({ request }: { request: Request }) {
 
   const hasUsername = username.trim().length > 0;
   const hasPin = pin.trim().length > 0;
-  if (!hasUsername && !hasPin) return fail("Please enter your credentials.");
+  if (!hasUsername && !hasPin) return fail(copy.errors.missingCredentials);
 
   const courseCtx =
     ctx.isCourseJoin && ctx.groupKey && ctx.courseId && ctx.courseRoute
       ? { groupKey: ctx.groupKey, courseId: ctx.courseId, courseRoute: ctx.courseRoute }
       : null;
-  if (ctx.isCourseJoin && !courseCtx) return fail("Invalid course link.");
+  if (ctx.isCourseJoin && !courseCtx) return fail(copy.errors.invalidCourseLink);
 
   const ip = getClientIp(request);
   const mode: "normal" | "course-auth" | "course-pin" =
@@ -176,9 +177,9 @@ export async function action({ request }: { request: Request }) {
   const headers = new Headers();
 
   if (mode === "normal") {
-    if (!hasUsername || !hasPin) return fail("Invalid credentials.");
+    if (!hasUsername || !hasPin) return fail(copy.errors.invalidCredentials);
     user = await getAuthenticatedUser(username, pin, ip);
-    if (!user) return fail("Invalid credentials.");
+    if (!user) return fail(copy.errors.invalidCredentials);
     const primaryCourseId = user.courseIds[0];
     const [activeQuiz, primaryCourseSlug] = await Promise.all([
       getActiveQuizForUser(user),
@@ -187,7 +188,7 @@ export async function action({ request }: { request: Request }) {
     redirectTo = activeQuiz ? "/quiz" : ctx.from ?? primaryCourseSlug ?? "/";
     headers.append("Set-Cookie", buildSessionCookie(user.id));
   } else {
-    if (!courseCtx) return fail("Invalid course link.");
+    if (!courseCtx) return fail(copy.errors.invalidCourseLink);
     const { groupKey, courseId, courseRoute } = courseCtx;
     const registrationOpen = await isRegistrationOpen(courseId);
     const session = await getSession(request);
@@ -198,21 +199,21 @@ export async function action({ request }: { request: Request }) {
       redirectTo = ctx.from ?? courseRoute;
       headers.append("Set-Cookie", buildSessionCookie(user.id));
     } else if (mode === "course-auth") {
-      if (!hasPin) return fail("Invalid credentials.");
+      if (!hasPin) return fail(copy.errors.invalidCredentials);
       const authenticated = await getAuthenticatedUser(username, pin, ip);
-      if (!authenticated) return fail("Invalid credentials.");
+      if (!authenticated) return fail(copy.errors.invalidCredentials);
       if (!registrationOpen && !hasCourseAccess(authenticated, groupKey, courseId)) {
-        return fail("Registration window not open.", "/");
+        return fail(copy.errors.registrationClosed, "/");
       }
       user = await ensureCourseAccess(authenticated, groupKey, courseId, ip);
-      if (!user) return fail("Failed to enroll in course.", "/");
+      if (!user) return fail(copy.errors.enrollmentFailed, "/");
       redirectTo = ctx.from ?? courseRoute;
       headers.append("Set-Cookie", buildSessionCookie(user.id));
     } else {
-      if (!registrationOpen) return fail("Registration window not open.", "/");
+      if (!registrationOpen) return fail(copy.errors.registrationClosed, "/");
       const created = await createUser(pin, groupKey, ip);
       user = await ensureCourseAccess(created.user, groupKey, courseId, ip);
-      if (!user) return fail("Failed to enroll in course.", "/");
+      if (!user) return fail(copy.errors.enrollmentFailed, "/");
       redirectTo = ctx.from ?? courseRoute;
       headers.append("Set-Cookie", buildSessionCookie(user.id));
       headers.append("Set-Cookie", buildNewUserUsernameCookie(created.username));
