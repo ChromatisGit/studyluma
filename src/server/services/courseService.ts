@@ -4,23 +4,10 @@ import { getUserUsernameById } from "@services/userService";
 import type { UserDTO } from "@services/userService";
 import type { WorksheetRef, WorksheetFormat } from "@schema/courseContent";
 
-export type {
-  CourseId,
-  CourseDTO,
-  ProgressStatus,
-  ProgressChapterDTO,
-  ProgressTopicDTO,
-  ProgressDTO,
-  SidebarCourseDTO,
-  SidebarDTO,
-  CourseAccessGroups,
-} from "@schema/courseTypes";
-
 import type {
   CourseId,
   CourseDTO,
   ProgressDTO,
-  ProgressTopicDTO,
   SidebarCourseDTO,
   SidebarDTO,
   CourseAccessGroups,
@@ -80,15 +67,6 @@ export async function getCourseDTO(courseId: string): Promise<CourseDTO> {
   return rowToCourseDTO(row);
 }
 
-// TODO: wire to route
-export async function getCourseDTOs(courseIds: string[]): Promise<CourseDTO[]> {
-  if (courseIds.length === 0) return [];
-  const rows = await anonSQL<CourseRow[]>`
-    SELECT * FROM v_course_dto WHERE id = ANY(${courseIds as unknown as never})
-  `;
-  return rows.map(rowToCourseDTO);
-}
-
 export async function getCourseId(groupKey: string, subjectKey: string): Promise<CourseId> {
   const slug = `/${groupKey}/${subjectKey}`;
   const rows = await anonSQL<{ id: string }[]>`
@@ -100,33 +78,9 @@ export async function getCourseId(groupKey: string, subjectKey: string): Promise
   return rows[0].id;
 }
 
-/**
- * Look up courseId by subject_id (the directory key used in slides).
- * Prefers non-public (enrolled) courses over public demo courses so that
- * quiz sessions are associated with the class students are actually enrolled in.
- */
-// TODO: wire to route
-export async function getCourseIdBySubjectId(subjectId: string): Promise<CourseId | null> {
-  const rows = await anonSQL<{ id: string }[]>`
-    SELECT c.course_id AS id
-    FROM courses c
-    JOIN subjects s ON s.subject_id = c.subject_id
-    WHERE s.subject_id = ${subjectId}
-    ORDER BY c.is_public ASC
-    LIMIT 1
-  `;
-  return (rows[0]?.id ?? null) as CourseId | null;
-}
-
 export async function coursePublic(courseId: CourseId): Promise<boolean> {
   const row = await fetchCourseRow(courseId);
   return row.is_public;
-}
-
-// TODO: wire to route
-export async function courseListed(courseId: CourseId): Promise<boolean> {
-  const row = await fetchCourseRow(courseId);
-  return row.is_listed;
 }
 
 export async function getCourseSlug(courseId: CourseId): Promise<string> {
@@ -257,26 +211,6 @@ export async function getProgressDTO(
     SELECT get_progress_dto(${courseId})
   `;
   return rows[0]?.get_progress_dto ?? EMPTY_PROGRESS;
-}
-
-// TODO: wire to route
-export async function getTopicDTO({
-  courseId,
-  topicId,
-  user,
-}: {
-  courseId: CourseId;
-  topicId: string;
-  user: UserDTO | null;
-}): Promise<ProgressTopicDTO> {
-  const progressDTO = await getProgressDTO(courseId, user);
-  const topic = progressDTO.topics.find((t) => t.topicId === topicId);
-
-  if (!topic || topic.status === "locked") {
-    throw new Response("Not found", { status: 404 });
-  }
-
-  return topic;
 }
 
 // ==========================================================================

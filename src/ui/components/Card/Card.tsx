@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from "clsx";
 import { ArrowRight } from "lucide-react";
 import { AppLink } from "@components/AppLink";

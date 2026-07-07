@@ -1,11 +1,9 @@
-"use client";
-
 import { useState, useCallback, useMemo } from "react";
 import type { TypedSlideDeck } from "@schema/slideTypes";
 import type { AdminStreamEvent, LiveSlideState, AdminSnapshot } from "@schema/streamTypes";
 import type { QuizResultsDTO } from "@schema/quizTypes";
 import { MacroStateProvider } from "@macros/state/MacroStateContext";
-import { QuizProjectorOverlay } from "@ui/QuizProjectorOverlay";
+import { QuizProjectorOverlay } from "@components/QuizProjectorOverlay";
 import { SlideRenderer } from "./components/SlideRenderer";
 import { useSlideStream } from "./hooks/useSlideStream";
 import styles from "./SlideProjector.module.css";

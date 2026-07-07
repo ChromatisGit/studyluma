@@ -1,4 +1,4 @@
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { assertAdminAccess } from "@core/auth/guards";
 import { upsertSlideState } from "@services/slideService";
 

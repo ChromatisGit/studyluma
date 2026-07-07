@@ -1,12 +1,10 @@
-"use client";
-
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { ProgressTopicDTO, CourseId } from "@schema/courseTypes";
 import { Button } from "@components/Button";
 import { Roadmap } from "@components/Roadmap";
 import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
-import { postAdminAction } from "./routeActions";
+import { useAdminAction } from "./useAdminAction";
 import styles from "./ProgressControl.module.css";
 import ADMIN_TEXT from "./admin.de.json";
 
@@ -25,13 +23,12 @@ export function ProgressControl({
   topics,
   onProgressUpdate,
 }: ProgressControlProps) {
-  const { isDemoMode, setProgress: setDemoProgress } = useDemoOverrides();
+  const { setProgress: setDemoProgress } = useDemoOverrides();
+  const { isPending, runAdminAction } = useAdminAction();
 
   const [selectedTopicId, setSelectedTopicId] = useState(currentTopicId);
   const [selectedChapterId, setSelectedChapterId] = useState(currentChapterId);
-  const [isPending, startTransition] = useTransition();
 
-  // Re-sync when the incoming progress changes from outside this control.
   useEffect(() => {
     setSelectedTopicId(currentTopicId);
     setSelectedChapterId(currentChapterId);
@@ -53,28 +50,19 @@ export function ProgressControl({
       return;
     }
 
-    if (isDemoMode) {
-      setDemoProgress(courseId, selectedTopicId, selectedChapterId);
-      onProgressUpdate?.(selectedTopicId, selectedChapterId);
-      toast.success(ADMIN_TEXT.courseDetail.progressControl.successMessage);
-      return;
-    }
-
-    startTransition(async () => {
-      const result = await postAdminAction({
+    runAdminAction({
+      payload: {
         intent: "set-progress",
         courseId,
         topicId: selectedTopicId,
         chapterId: selectedChapterId,
-      });
-
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
-      }
-
-      toast.success(ADMIN_TEXT.courseDetail.progressControl.successMessage);
-      onProgressUpdate?.(selectedTopicId, selectedChapterId);
+      },
+      demo: () => {
+        setDemoProgress(courseId, selectedTopicId, selectedChapterId);
+        onProgressUpdate?.(selectedTopicId, selectedChapterId);
+      },
+      onSuccess: () => onProgressUpdate?.(selectedTopicId, selectedChapterId),
+      successMessage: ADMIN_TEXT.courseDetail.progressControl.successMessage,
     });
   };
 

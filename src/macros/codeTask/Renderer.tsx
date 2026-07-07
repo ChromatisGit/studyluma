@@ -1,15 +1,12 @@
-"use client";
-
 import { useState } from "react";
 import type { CodeTaskMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
-import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
 import { useMacroValue } from "@macros/state/useMacroValue";
 import { useMacroCheck } from "@macros/state/useMacroCheck";
-import { CodeRunner, type CodeRunnerResult } from "@features/contentpage/components/CodeRunner/CodeRunner";
-import { useTsRunner } from "@features/contentpage/components/CodeRunner/useTsRunner";
+import { TaskFeedback } from "@macros/TaskFeedback";
+import { CodeRunner, type CodeRunnerResult, useTsRunner } from "@components/CodeRunner";
 import { Stack } from "@components/Stack";
 
 type Props = MacroComponentProps<CodeTaskMacro>;
@@ -70,26 +67,12 @@ export default function CodeTaskRenderer({ macro, context }: Props) {
         hasValidation={Boolean(macro.validation)}
       />
 
-      {(() => {
-        const showSolution = isChecked && solution;
-
-        if (!hint && !showSolution) return null;
-
-        return (
-          <Stack gap="sm">
-            {hint && (
-              <CollapsibleSection type="hint" content={<MarkdownRenderer markdown={hint} />} />
-            )}
-            {showSolution && (
-              <CollapsibleSection
-                type="answer"
-                defaultOpen={testResult === "compiled"}
-                content={<MarkdownRenderer markdown={solution} />}
-              />
-            )}
-          </Stack>
-        );
-      })()}
+      <TaskFeedback
+        hint={hint}
+        answer={solution}
+        showAnswer={isChecked}
+        answerDefaultOpen={testResult === "compiled"}
+      />
     </Stack>
   );
 }

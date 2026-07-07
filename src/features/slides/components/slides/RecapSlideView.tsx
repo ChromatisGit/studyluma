@@ -1,6 +1,6 @@
-import { MarkdownRenderer } from "@ui/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import type { RecapSlide } from "@schema/slideTypes";
-import { SlideHeader } from "./SlideHeader";
+import { SlideHeader } from "@components/SlideHeader";
 import styles from "./slide.module.css";
 
 type Props = { slide: RecapSlide };

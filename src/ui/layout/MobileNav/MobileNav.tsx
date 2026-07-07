@@ -1,5 +1,3 @@
-"use client";
-
 import { useLocation } from "react-router";
 import { BookOpen, GraduationCap, ArrowLeftRight, User, ShieldCheck } from "lucide-react";
 import clsx from "clsx";

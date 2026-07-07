@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useCallback, useEffect } from "react";
 import type { TypedSlide } from "@schema/slideTypes";
 

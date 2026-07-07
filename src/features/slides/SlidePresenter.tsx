@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TypedSlideDeck } from "@schema/slideTypes";
 import type { MacroStateAdapter } from "@macros/state/MacroStateAdapter";

@@ -1,8 +1,6 @@
-"use client";
-
 import { FancyGrid } from "@components/FancyGrid";
 import { Stack } from "@components/Stack";
-import { CourseCard } from "./CourseCard";
+import { CourseCard } from "@components/CourseCard";
 import styles from "@homepage/sections/CourseSection/CourseGroup.module.css";
 import type { CourseDTO } from "@schema/courseTypes";
 
@@ -45,4 +43,3 @@ export function CourseGroup({ title, courses, accessable, actionLabel }: CourseG
         </section>
     );
 }
-

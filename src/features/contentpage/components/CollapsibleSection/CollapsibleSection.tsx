@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from "clsx";
 import { useState, useEffect } from 'react';
 import { BookOpen, ChevronDown, ChevronRight, Lightbulb, HelpCircle } from 'lucide-react';

@@ -1,6 +1,4 @@
-"use client";
-
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import type { Markdown } from "@schema/page";
 
 import sharedStyles from '@features/contentpage/contentpage.module.css';

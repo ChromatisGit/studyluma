@@ -28,7 +28,6 @@ import type { McqMacro } from "./mcq/types";
 import type { QuizMacro } from "./quiz/types";
 import type { CodeTaskMacro } from "./codeTask/types";
 import type { TextTaskMacro } from "./textTask/types";
-import type { PresenterNoteMacro } from "./pn/types";
 import type { LayoutMacro } from "./layout/types";
 import type { FormulaMacro } from "./formula/types";
 import type { CalloutMacro } from "./callout/types";
@@ -70,7 +69,6 @@ export type Macro =
   | McqMacro
   | CodeTaskMacro
   | TextTaskMacro
-  | PresenterNoteMacro
   | LayoutMacro
   | QuizMacro
   | FormulaMacro

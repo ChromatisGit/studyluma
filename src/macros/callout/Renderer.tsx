@@ -1,6 +1,6 @@
 import type { CalloutMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
 import styles from "./styles.module.css";
 

@@ -1,13 +1,11 @@
-"use client";
-
 import { useState, useEffect, useRef, useCallback } from "react";
 import type { TextTaskMacro } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
-import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
 import { useMacroValue } from "@macros/state/useMacroValue";
 import { useMacroCheck } from "@macros/state/useMacroCheck";
+import { TaskFeedback } from "@macros/TaskFeedback";
 import { Stack } from "@components/Stack";
 import styles from "./styles.module.css";
 import MACROS_TEXT from "@macros/macros.de.json";
@@ -51,27 +49,7 @@ export default function TextTaskRenderer({ macro, context }: Props) {
         placeholder={MACROS_TEXT.textTask.placeholder}
       />
 
-      {(hint || (isChecked && answerMd) || (isChecked && why)) && (
-        <Stack gap="sm">
-          {hint && (
-            <CollapsibleSection type="hint" content={<MarkdownRenderer markdown={hint} />} />
-          )}
-          {isChecked && answerMd && (
-            <CollapsibleSection
-              type="answer"
-              defaultOpen
-              content={<MarkdownRenderer markdown={answerMd} />}
-            />
-          )}
-          {isChecked && why && (
-            <CollapsibleSection
-              type="why"
-              defaultOpen
-              content={<MarkdownRenderer markdown={why} />}
-            />
-          )}
-        </Stack>
-      )}
+      <TaskFeedback hint={hint} answer={answerMd} why={why} showAnswer={isChecked} showWhy={isChecked} />
     </Stack>
   );
 }

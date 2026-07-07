@@ -1,5 +1,3 @@
-"use client";
-
 type SlideListItem = { header: string };
 import styles from "./SlideOverviewGrid.module.css";
 

@@ -1,8 +1,5 @@
-"use client";
-
 import { useEffect } from "react";
-import { CodeRunner } from "@ui/CodeRunner";
-import { useTsRunner } from "@ui/useTsRunner";
+import { CodeRunner, useTsRunner } from "@components/CodeRunner";
 import { useMacroValue } from "@macros/state/useMacroValue";
 import { useMacroState } from "@macros/state/MacroStateContext";
 

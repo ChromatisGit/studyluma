@@ -1,5 +1,6 @@
 import { createRequestHandler, type ServerBuild } from "react-router";
 import { runWithRuntimeEnv } from "@chromatis/base/runtime";
+import { withSecurityHeaders } from "@server-lib/securityHeaders";
 
 type WorkerEnv = Record<string, string | undefined>;
 
@@ -19,6 +20,7 @@ const requestHandler = createRequestHandler(
 
 export default {
 	async fetch(request: Request, env: WorkerEnv, _ctx: WorkerExecutionContext) {
-		return runWithRuntimeEnv(env, () => requestHandler(request));
+		const response = await runWithRuntimeEnv(env, () => requestHandler(request));
+		return withSecurityHeaders(response);
 	},
 } satisfies WorkerHandler;

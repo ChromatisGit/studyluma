@@ -1,25 +1,31 @@
 import { redirect } from "react-router";
 import { Map, FileText, Repeat, Sun, Moon } from "lucide-react";
-import type { ComponentType } from "react";
-import type { LucideProps } from "lucide-react";
-import { toggleTheme } from "@chromatis/base";
-import { getSession } from "@core/index.server";
+import type { LucideIcon } from "lucide-react";
+import { getSession } from "@core/auth/session.server";
 import { isAdmin } from "@core/auth/guards";
 import { getSidebarDTO } from "@services/courseService";
+import { buildMeta } from "@core/seo";
 
-import { Button } from "@components/Button";
-import { Box } from "@components/Box";
-import { IconBox } from "@components/IconBox";
-import { LightField } from "../components/LightField/LightField";
-import { SiteFooter } from "./SiteFooter";
+import { createLightFieldClasses, LightFieldBase } from "../components/LightField/LightFieldBase";
 import TEXT from "./landingPage.de.json";
 import styles from "./landingPage.module.css";
 
+const LIGHT_FIELD_CLASSES = createLightFieldClasses(styles);
+
 export function meta() {
-  return [
-    { title: TEXT.meta.title },
-    { name: "description", content: TEXT.meta.description },
-  ];
+  return buildMeta({
+    title: TEXT.meta.title,
+    description: TEXT.meta.description,
+    path: "/",
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "StudyLuma",
+      url: "https://studyluma.org/",
+      description: TEXT.meta.description,
+      inLanguage: "de",
+    },
+  });
 }
 
 export async function loader({ request }: { request: Request }) {
@@ -39,11 +45,13 @@ export default function LandingPage() {
   return (
     <div className={styles.page}>
       <Nav />
-      <Hero />
-      <WhatIsAndFeatures />
-      <DemoHint />
-      <About />
-      <SiteFooter />
+      <main>
+        <Hero />
+        <WhatIsAndFeatures />
+        <DemoHint />
+        <About />
+      </main>
+      <LandingFooter />
     </div>
   );
 }
@@ -56,7 +64,7 @@ function Nav() {
         <div className={styles.navLinks}>
           <a href="/demo" className="text-muted-foreground hover:text-foreground transition-colors">{TEXT.nav.demo}</a>
           <a href="/roadmap" className="text-muted-foreground hover:text-foreground transition-colors">{TEXT.nav.roadmap}</a>
-          <button onClick={toggleTheme} className={styles.themeToggle} aria-label="Design-Modus wechseln">
+          <button onClick={toggleLandingTheme} className={styles.themeToggle} aria-label="Design-Modus wechseln">
             <Sun size={17} className={styles.iconSun} aria-hidden />
             <Moon size={17} className={styles.iconMoon} aria-hidden />
           </button>
@@ -69,7 +77,7 @@ function Nav() {
 function Hero() {
   return (
     <section className={styles.hero}>
-      <LightField />
+      <LightFieldBase classes={LIGHT_FIELD_CLASSES} />
       <div className={styles.heroGlow} aria-hidden />
       <div className={styles.heroContent}>
         <div
@@ -83,8 +91,8 @@ function Hero() {
           {TEXT.hero.lead}
         </p>
         <div className={styles.heroActions}>
-          <Button href="/demo" variant="primary" size="lg">{TEXT.hero.ctaPrimary}</Button>
-          <Button href="/roadmap" variant="secondary" size="lg">{TEXT.hero.ctaSecondary}</Button>
+          <LandingButton href="/demo" variant="primary" size="lg">{TEXT.hero.ctaPrimary}</LandingButton>
+          <LandingButton href="/roadmap" variant="secondary" size="lg">{TEXT.hero.ctaSecondary}</LandingButton>
         </div>
       </div>
     </section>
@@ -103,7 +111,7 @@ function WhatIsAndFeatures() {
             <div className={styles.storyBlock}>
               <h2 className="text-xl font-semibold mb-3">{TEXT.story.title}</h2>
               <p className="text-foreground leading-relaxed mb-4">{TEXT.story.body}</p>
-              <Button href="/roadmap" variant="secondary">{TEXT.story.cta}</Button>
+              <LandingButton href="/roadmap" variant="secondary">{TEXT.story.cta}</LandingButton>
             </div>
           </div>
           <div className={styles.featureStack}>
@@ -126,11 +134,11 @@ function DemoHint() {
   return (
     <section className={styles.section}>
       <div className={styles.sectionInner}>
-        <Box padding="lg" className={styles.centeredBox}>
+        <div className={`${styles.surface} ${styles.surfaceLg} ${styles.centeredBox}`}>
           <h2 className="text-xl font-semibold mb-3">{TEXT.demo.title}</h2>
           <p className="text-foreground leading-relaxed mb-5">{TEXT.demo.body}</p>
-          <Button href="/demo" variant="primary">{TEXT.demo.cta}</Button>
-        </Box>
+          <LandingButton href="/demo" variant="primary">{TEXT.demo.cta}</LandingButton>
+        </div>
       </div>
     </section>
   );
@@ -142,15 +150,19 @@ function FeatureCard({
   description,
   cta,
 }: {
-  icon: ComponentType<LucideProps>;
+  icon: LucideIcon;
   title: string;
   description: string;
   cta?: { label: string; href: string };
 }) {
+  const Icon = icon;
+
   return (
-    <Box padding="md">
+    <div className={`${styles.surface} ${styles.surfaceMd}`}>
       <div className="flex items-center gap-2.5 mb-2">
-        <IconBox icon={icon} size="sm" variant="circle" />
+        <span className={styles.featureIcon}>
+          <Icon size={18} aria-hidden />
+        </span>
         <h3 className="font-semibold">{title}</h3>
       </div>
       <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
@@ -159,10 +171,9 @@ function FeatureCard({
           {cta.label} →
         </a>
       )}
-    </Box>
+    </div>
   );
 }
-
 
 function About() {
   return (
@@ -199,3 +210,51 @@ function About() {
   );
 }
 
+function LandingButton({
+  href,
+  variant,
+  size = "md",
+  children,
+}: {
+  href: string;
+  variant: "primary" | "secondary";
+  size?: "md" | "lg";
+  children: string;
+}) {
+  return (
+    <a href={href} className={`${styles.button} ${styles[`button${capitalize(variant)}`]} ${styles[`button${capitalize(size)}`]}`}>
+      {children}
+    </a>
+  );
+}
+
+function LandingFooter() {
+  const year = new Date().getFullYear();
+
+  return (
+    <footer className={styles.footer}>
+      <div className={styles.footerInner}>
+        <span>{TEXT.footer.copyright.replace("{year}", String(year))}</span>
+        <span>{TEXT.footer.tagline}</span>
+        <a href="/impressum" className={styles.footerLink}>{TEXT.footer.impressum}</a>
+      </div>
+    </footer>
+  );
+}
+
+function toggleLandingTheme() {
+  const root = document.documentElement;
+  const nextTheme = root.classList.contains("dark") ? "light" : "dark";
+
+  root.classList.toggle("dark", nextTheme === "dark");
+
+  try {
+    localStorage.setItem("theme", nextTheme);
+  } catch {
+    // Ignore blocked storage; the class change still updates the current page.
+  }
+}
+
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}

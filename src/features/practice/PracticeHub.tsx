@@ -1,5 +1,3 @@
-"use client";
-
 import { Play, Clock, Target, Zap } from "lucide-react";
 import { Button } from "@components/Button";
 import { Container } from "@components/Container";

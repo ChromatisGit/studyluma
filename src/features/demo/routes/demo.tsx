@@ -1,11 +1,14 @@
 import { Form, redirect, useActionData } from "react-router";
-import { buildSessionCookie } from "@core/index.server";
+import { buildSessionCookie } from "@core/auth/session.server";
 import { Button } from "@components/Button";
 import { getDemoUser, type DemoRole } from "@features/demo/demoSession.server";
 import styles from "./demo.module.css";
 
 export function meta() {
-  return [{ title: "Demo — StudyLuma" }];
+  return [
+    { title: "Demo — StudyLuma" },
+    { name: "robots", content: "noindex,follow" },
+  ];
 }
 
 export async function action({ request }: { request: Request }) {

@@ -1,6 +1,6 @@
 /**
  * Minimal inline markdown renderer for UI components that cannot import
- * MarkdownRenderer from features/contentpage.
+ * MarkdownRenderer.
  *
  * Handles the subset of markdown used in quiz/practice task options:
  * - Inline code:  `code`

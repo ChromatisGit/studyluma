@@ -4,7 +4,7 @@ import {
   getSlideDeckContent,
   listSlideDeckContent,
 } from "@core/content.server";
-import { anonSQL } from "@core/db.server";
+import { anonSQL, sqlParam } from "@core/db.server";
 
 // ---------------------------------------------------------------------------
 // Slide decks (content)
@@ -36,7 +36,7 @@ export async function listSlideDecks(
 export async function upsertSlideState(courseId: string, state: LiveSlideState): Promise<void> {
   await anonSQL`
     INSERT INTO slide_state (course_id, slide_index, blackout, macro_state)
-    VALUES (${courseId}, ${state.slideIndex}, ${state.blackout}, ${state.macroState as never})
+    VALUES (${courseId}, ${state.slideIndex}, ${state.blackout}, ${sqlParam(state.macroState)})
     ON CONFLICT (course_id) DO UPDATE
     SET slide_index = EXCLUDED.slide_index,
         blackout    = EXCLUDED.blackout,

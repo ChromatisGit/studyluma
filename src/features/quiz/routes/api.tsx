@@ -1,4 +1,4 @@
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { assertAdminAccess, assertLoggedIn } from "@core/auth/guards";
 import {
   closeActiveQuizForCourse,

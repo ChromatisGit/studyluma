@@ -1,5 +1,5 @@
 import { Outlet, useLoaderData } from "react-router";
-import { getSession } from "@core/index.server";
+import { getSession } from "@core/auth/session.server";
 import { assertCanAccessPage } from "@core/auth/guards";
 import { coursePublic, getCourseDTO, getCourseId, getProgressDTO } from "@services/courseService";
 

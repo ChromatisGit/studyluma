@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from "clsx";
 import { useState, useCallback } from "react";
 import { ChevronDown } from "lucide-react";
@@ -11,7 +9,7 @@ import { getMarkdown } from "@macros/markdownParser";
 import {
   GapMarkdownRenderer,
   GapRenderProvider,
-} from "@features/contentpage/components/MarkdownRenderer/GapMarkdownRenderer";
+} from "@components/MarkdownRenderer";
 import styles from "./styles.module.css";
 import MACROS_TEXT from "@macros/macros.de.json";
 

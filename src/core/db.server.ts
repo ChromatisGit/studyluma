@@ -15,3 +15,11 @@ export const anonSQL: DbSql = wrapSql(makeAnonSql(getDb()));
 export function userSQL(user: UserCtx): DbSql {
   return wrapSql(makeUserSql(getDb(), user));
 }
+
+/**
+ * postgres.js supports arrays and JSON values at runtime, but the wrapped SQL
+ * tag type is narrower than the values some schema columns require.
+ */
+export function sqlParam<T>(value: T): never {
+  return value as never;
+}

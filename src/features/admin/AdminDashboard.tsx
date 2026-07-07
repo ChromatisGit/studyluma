@@ -1,5 +1,3 @@
-"use client";
-
 import type { CourseDTO } from "@schema/courseTypes";
 import { Box } from "@components/Box";
 import { Card } from "@components/Card";

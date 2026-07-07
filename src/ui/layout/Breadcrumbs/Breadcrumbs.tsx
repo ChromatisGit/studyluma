@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import clsx from "clsx";
 import { ChevronRight, House, List, CheckCircle, CircleDot } from "lucide-react";

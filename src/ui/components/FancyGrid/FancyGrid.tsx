@@ -1,5 +1,3 @@
-"use client";
-
 import { useMemo, type ReactNode } from "react";
 
 import { chunkBySizes, fancyRows } from "@ui/lib/fancyGrid";

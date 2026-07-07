@@ -6,7 +6,7 @@ import { Container } from "@components/Container";
 import { PageHeader } from "@components/PageHeader";
 import { Roadmap } from "@components/Roadmap";
 import { WorksheetCards } from "@components/WorksheetCards";
-import { useDemoTopics } from "@features/demo/useDemoProgress";
+import { useDemoTopics } from "@ui/demo/useDemoProgress";
 import type { ProgressTopicDTO } from "@schema/courseTypes";
 import styles from "./Coursepage.module.css";
 import COURSE_TEXT from "./coursepage.de.json";

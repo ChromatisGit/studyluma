@@ -13,6 +13,7 @@ export default tseslint.config(
       "node_modules/**",
       "build/**",
       ".react-router/**",
+      "eslint-boundaries-resolver.cjs",
     ],
   },
 
@@ -77,9 +78,18 @@ export default tseslint.config(
   {
     plugins: { boundaries },
     settings: {
+      "boundaries/root-path": __dirname,
+      "boundaries/include": ["src/**/*.{ts,tsx}"],
+      "boundaries/dependency-nodes": ["import", "export"],
+      "import/resolver": {
+        [path.join(__dirname, "eslint-boundaries-resolver.cjs")]: {},
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+      },
       "boundaries/elements": [
         { type: "app",              pattern: "src/app/**" },
-        { type: "features",         pattern: "src/features/:feature/**" },
+        { type: "features",         pattern: "src/features/*/**", capture: ["feature"] },
         { type: "ui",               pattern: "src/ui/**" },
         { type: "macros",           pattern: "src/macros/**" },
         { type: "schema",           pattern: "src/schema/**" },
@@ -110,12 +120,12 @@ export default tseslint.config(
             },
             {
               from: "features",
-              allow: ["ui", "macros", "schema", "types"],
+              allow: ["features", "ui", "macros", "schema", "types", "server-services", "server-lib"],
               disallow: [["features", { feature: "!${from.feature}" }]],
             },
             {
               from: "ui",
-              allow: ["ui", "schema", "types"],
+              allow: ["ui", "macros", "schema", "types"],
               disallow: ["app", "features", "server", "server-actions"],
             },
             {

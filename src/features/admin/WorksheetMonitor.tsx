@@ -1,10 +1,7 @@
-"use client";
-
 import { useState, useEffect, useCallback } from "react";
 import type { CourseId } from "@schema/courseTypes";
 import type { WorksheetMonitorData } from "@services/worksheetService";
-import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
-import { postAdminAction } from "./routeActions";
+import { useAdminAction } from "./useAdminAction";
 import styles from "./WorksheetMonitor.module.css";
 import ADMIN_TEXT from "./admin.de.json";
 
@@ -42,25 +39,34 @@ interface WorksheetMonitorProps {
 }
 
 export function WorksheetMonitor({ courseId, worksheetId }: WorksheetMonitorProps) {
-  const { isDemoMode } = useDemoOverrides();
+  const { isDemoMode, runAdminAction } = useAdminAction();
   const [data, setData] = useState<WorksheetMonitorData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
-    if (isDemoMode) {
-      setLoading(false);
-      setData(DEMO_MONITOR_DATA);
-      return;
-    }
     setLoading(true);
-    const result = await postAdminAction<WorksheetMonitorData>({
-      intent: "worksheet-monitor",
-      courseId,
-      worksheetId,
+
+    runAdminAction<WorksheetMonitorData>({
+      payload: {
+        intent: "worksheet-monitor",
+        courseId,
+        worksheetId,
+      },
+      demo: () => {
+        setData(DEMO_MONITOR_DATA);
+        setLoading(false);
+      },
+      onSuccess: (nextData) => {
+        setData(nextData ?? null);
+        setLoading(false);
+      },
+      onError: () => {
+        setData(null);
+        setLoading(false);
+      },
+      toastErrors: false,
     });
-    setData(result.ok ? result.data ?? null : null);
-    setLoading(false);
-  }, [isDemoMode, courseId, worksheetId]);
+  }, [courseId, worksheetId, runAdminAction]);
 
   useEffect(() => {
     void fetchData();

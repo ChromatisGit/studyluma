@@ -1,4 +1,4 @@
-import { userSQL } from "@core/db.server";
+import { sqlParam, userSQL } from "@core/db.server";
 import type { CheckpointResponse, UnderstandingLevel, DifficultyCause } from "@schema/checkpointTypes";
 import type { UserDTO } from "@services/userService";
 
@@ -197,7 +197,7 @@ export async function saveCheckpointResponseService(
       ${worksheetId},
       ${sectionIndex},
       ${response.understanding as UnderstandingLevel},
-      ${causes as DifficultyCause[] | null},
+      ${sqlParam(causes)},
       to_timestamp(${response.submittedAt} / 1000.0)
     )
     ON CONFLICT (user_id, worksheet_id, section_index)

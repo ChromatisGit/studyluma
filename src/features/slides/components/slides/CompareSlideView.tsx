@@ -1,6 +1,6 @@
-import { MarkdownRenderer } from "@ui/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import type { CompareSlide } from "@schema/slideTypes";
-import { SlideHeader } from "./SlideHeader";
+import { SlideHeader } from "@components/SlideHeader";
 import { FocusBox } from "./FocusBox";
 import { ResultBox } from "./ResultBox";
 import styles from "./slide.module.css";

@@ -1,5 +1,5 @@
 import type { HookSlide } from "@schema/slideTypes";
-import { SlideHeader } from "./SlideHeader";
+import { SlideHeader } from "@components/SlideHeader";
 import { FocusBox } from "./FocusBox";
 import { BulletList } from "./BulletList";
 import { MaterialRenderer } from "./MaterialRenderer";

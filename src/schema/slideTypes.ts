@@ -1,17 +1,3 @@
-import type { Node, Markdown } from "./page";
-
-export type Slide = {
-  header: string;
-  content: Node[];
-  presenterNotes: Markdown[];
-};
-
-export type SlideDeck = {
-  title: string;
-  slides: Slide[];
-};
-
-
 // ─── Typed Slide Deck (new slide format using slides-style-new.typ) ────────────
 
 export type SlideContentItem =
@@ -113,18 +99,3 @@ export type TypedSlideDeck = {
   title: string;
   content: TypedSlide[];
 };
-
-export type SlideState = {
-  slideIndex: number;
-  blackout: boolean;
-  interactiveState: Record<string, string>;
-  pointer?: { x: number; y: number; visible: boolean };
-};
-
-export type SlideMessage =
-  | { type: "SLIDE_CHANGE"; slideIndex: number }
-  | { type: "STATE_UPDATE"; state: SlideState }
-  | { type: "BLACKOUT"; blackout: boolean }
-  | { type: "SYNC_REQUEST" }
-  | { type: "SYNC_RESPONSE"; state: SlideState }
-  | { type: "FULLSCREEN_REQUEST" };

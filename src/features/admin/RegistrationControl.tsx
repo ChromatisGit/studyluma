@@ -1,5 +1,3 @@
-"use client";
-
 import clsx from "clsx";
 import { useState, useTransition, useEffect } from "react";
 import { toast } from "sonner";
@@ -8,6 +6,7 @@ import { Button } from "@components/Button";
 import { Grid } from "@components/Grid";
 import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
 import { postAdminAction } from "./routeActions";
+import { useAdminAction } from "./useAdminAction";
 import styles from "./RegistrationControl.module.css";
 import ADMIN_TEXT from "./admin.de.json";
 
@@ -16,11 +15,12 @@ type RegistrationControlProps = {
 };
 
 export function RegistrationControl({ courseId }: RegistrationControlProps) {
-  const { isDemoMode, getOverride, setRegistrationOpen: setDemoRegistration } = useDemoOverrides();
+  const { getOverride, setRegistrationOpen: setDemoRegistration } = useDemoOverrides();
+  const { isDemoMode, isPending, runAdminAction } = useAdminAction();
 
   const [isOpen, setIsOpen] = useState(false);
   const [openUntil, setOpenUntil] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const [timeRemaining, setTimeRemaining] = useState<string>("");
 
   // Load initial status
@@ -82,52 +82,40 @@ export function RegistrationControl({ courseId }: RegistrationControlProps) {
   }, [isOpen, openUntil]);
 
   const handleOpen = () => {
-    if (isDemoMode) {
-      setDemoRegistration(courseId, true);
-      setIsOpen(true);
-      setOpenUntil(new Date(Date.now() + 15 * 60 * 1000).toISOString());
-      toast.success(ADMIN_TEXT.courseDetail.registration.openSuccessMessage);
-      return;
-    }
-    startTransition(async () => {
-      const result = await postAdminAction<{ openUntil: string | null }>({
+    runAdminAction<{ openUntil: string | null }>({
+      payload: {
         intent: "open-registration",
         courseId,
-      });
-
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
-      }
-
-      setIsOpen(true);
-      setOpenUntil(result.data?.openUntil ?? null);
-      toast.success(ADMIN_TEXT.courseDetail.registration.openSuccessMessage);
+      },
+      demo: () => {
+        setDemoRegistration(courseId, true);
+        setIsOpen(true);
+        setOpenUntil(new Date(Date.now() + 15 * 60 * 1000).toISOString());
+      },
+      onSuccess: (data) => {
+        setIsOpen(true);
+        setOpenUntil(data?.openUntil ?? null);
+      },
+      successMessage: ADMIN_TEXT.courseDetail.registration.openSuccessMessage,
     });
   };
 
   const handleClose = () => {
-    if (isDemoMode) {
-      setDemoRegistration(courseId, false);
-      setIsOpen(false);
-      setOpenUntil(null);
-      toast.success(ADMIN_TEXT.courseDetail.registration.closeSuccessMessage);
-      return;
-    }
-    startTransition(async () => {
-      const result = await postAdminAction<{ openUntil: string | null }>({
+    runAdminAction<{ openUntil: string | null }>({
+      payload: {
         intent: "close-registration",
         courseId,
-      });
-
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
-      }
-
-      setIsOpen(false);
-      setOpenUntil(null);
-      toast.success(ADMIN_TEXT.courseDetail.registration.closeSuccessMessage);
+      },
+      demo: () => {
+        setDemoRegistration(courseId, false);
+        setIsOpen(false);
+        setOpenUntil(null);
+      },
+      onSuccess: () => {
+        setIsOpen(false);
+        setOpenUntil(null);
+      },
+      successMessage: ADMIN_TEXT.courseDetail.registration.closeSuccessMessage,
     });
   };
 

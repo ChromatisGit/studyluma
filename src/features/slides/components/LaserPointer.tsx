@@ -1,5 +1,3 @@
-"use client";
-
 import styles from "./LaserPointer.module.css";
 
 type LaserPointerProps = {

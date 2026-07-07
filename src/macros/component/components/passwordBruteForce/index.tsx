@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { estimateBruteForceTime, formatBigInt, formatDuration } from "./logic";
 import styles from "./styles.module.css";

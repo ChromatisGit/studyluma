@@ -1,6 +1,6 @@
 import type { CardMacro, CardKind } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
 import { BookOpen, FlaskConical, Check, HelpCircle, CheckSquare, RefreshCw, Bookmark, AlertTriangle, CheckCircle } from "lucide-react";
 import clsx from "clsx";

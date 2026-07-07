@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import type { Connection, RandomnessState } from '@features/homepage/sections/Background/nodeNetworkHelpers';
 import {

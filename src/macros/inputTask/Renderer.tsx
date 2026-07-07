@@ -1,14 +1,12 @@
-"use client";
-
 import clsx from "clsx";
 import { useState } from "react";
 import type { InputTaskMacro, InputAnswer } from "./types";
 import type { MacroComponentProps } from "@macros/componentTypes";
-import { MarkdownRenderer } from "@features/contentpage/components/MarkdownRenderer/MarkdownRenderer";
-import { CollapsibleSection } from "@features/contentpage/components/CollapsibleSection/CollapsibleSection";
+import { MarkdownRenderer } from "@components/MarkdownRenderer";
 import { getMarkdown } from "@macros/markdownParser";
 import { useMacroValue } from "@macros/state/useMacroValue";
 import { useMacroCheck } from "@macros/state/useMacroCheck";
+import { TaskFeedback } from "@macros/TaskFeedback";
 import { Stack } from "@components/Stack";
 import styles from "./styles.module.css";
 import MACROS_TEXT from "@macros/macros.de.json";
@@ -102,20 +100,7 @@ export default function InputTaskRenderer({ macro, context }: Props) {
         )}
       </div>
 
-      {(hint || (checkState !== "none" && why)) && (
-        <Stack gap="sm">
-          {hint && (
-            <CollapsibleSection type="hint" content={<MarkdownRenderer markdown={hint} />} />
-          )}
-          {checkState !== "none" && why && (
-            <CollapsibleSection
-              type="why"
-              defaultOpen
-              content={<MarkdownRenderer markdown={why} />}
-            />
-          )}
-        </Stack>
-      )}
+      <TaskFeedback hint={hint} why={why} showWhy={checkState !== "none"} />
     </Stack>
   );
 }

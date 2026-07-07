@@ -1,19 +1,17 @@
-"use client";
-
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, ChevronRight, Shield } from "lucide-react";
 import { AppLink } from "@components/AppLink";
 import type { CourseDTO, ProgressDTO, CourseId } from "@schema/courseTypes";
 import type { AdminWorksheetRef } from "@services/courseService";
 import { useDemoOverrides } from "@ui/demo/DemoOverrideContext";
-import { useDemoTopics } from "@features/demo/useDemoProgress";
+import { useDemoTopics } from "@ui/demo/useDemoProgress";
 import { postAdminAction } from "./routeActions";
 import { ProgressControl } from "./ProgressControl";
 import { RegistrationControl } from "./RegistrationControl";
 import { WorksheetManagement } from "./WorksheetManagement";
 import styles from "./AdminCourseDetail.module.css";
 import ADMIN_TEXT from "./admin.de.json";
-import { SlideSelection } from "@ui/SlideSelection";
+import { SlideSelection } from "@components/SlideSelection";
 
 type AdminCourseDetailProps = {
   course: CourseDTO;
