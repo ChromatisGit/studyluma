@@ -1,12 +1,5 @@
 .math-inline {
-  display: inline-block;
-  vertical-align: middle;
-  transform: translateY(-4px);
-}
-
-.math-inline > svg,
-.math-inline > img {
-  display: block;
+  display: inline;
 }
 
 .math-block {
@@ -15,8 +8,7 @@
   margin: 0.6em 0;
 }
 
-.math-block-svg > svg,
-.math-block-svg > img {
-  display: block;
-  max-width: 100%;
+.math-fallback {
+  font-style: italic;
+  opacity: 0.7;
 }

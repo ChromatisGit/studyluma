@@ -96,12 +96,6 @@ function computeTaskNumbers(categories: Category[]): Record<string, number> {
 /**
  * WorksheetRenderer - renders worksheets one section at a time with Prev / Next navigation.
  * Automatically converts Page structure to Category structure based on section headers.
- *
- * Header matching (case-insensitive):
- * - "Checkpoint" → checkpoint category
- * - "Challenges" / "Challenge" → challenge category
- * - Anything else (incl. "Aufgaben" / "Tasks") → core category
- *
  * All sections are numbered independently starting at 1.
  * When chapterStatus is 'current': forward navigation is gated on task/checkpoint completion.
  * Otherwise (default 'finished'): free navigation with no restrictions.

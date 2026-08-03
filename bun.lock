@@ -10,6 +10,7 @@
         "@tailwindcss/vite": "^4.3.0",
         "clsx": "^2.1.1",
         "image-size": "^2.0.2",
+        "kern-typ": "^0.2.0",
         "lucide-react": "^0.462.0",
         "motion": "^12.39.0",
         "postgres": "^3.4.8",
@@ -712,6 +713,8 @@
     "json5": ["json5@2.2.3", "", { "bin": { "json5": "lib/cli.js" } }, "sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg=="],
 
     "katex": ["katex@0.16.27", "", { "dependencies": { "commander": "^8.3.0" }, "bin": { "katex": "cli.js" } }, "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw=="],
+
+    "kern-typ": ["kern-typ@0.2.0", "", {}, "sha512-EOQHa7eN+ahfjWBcnxOZ3RcOGLCsPijYTRv9TWQS74uWmy9KN6EEcOaPisBFKBQDp5gw1a7A5NUICQEf3lXmiQ=="],
 
     "keyv": ["keyv@4.5.4", "", { "dependencies": { "json-buffer": "3.0.1" } }, "sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw=="],
 

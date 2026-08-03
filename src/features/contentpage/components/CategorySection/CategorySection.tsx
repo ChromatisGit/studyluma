@@ -66,8 +66,6 @@ export function CategorySection({ block, categoryIndex, taskNumbers, triggerChec
 
   return (
     <section className={clsx(styles.category, variantClass)}>
-      <div className={styles.categoryStripe} aria-hidden />
-
       <div className={styles.categoryBanner}>
         <Icon className={styles.categoryBannerIcon} />
         <span className={styles.categoryBannerTitle}>{config.label}</span>

@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "bun test",
     "dev": "bun run node_modules/@chromatis/base/infra/scripts/devServer.ts",
     "build": "react-router build",
     "start": "node build/server/index.js",
@@ -26,6 +27,7 @@
     "@tailwindcss/vite": "^4.3.0",
     "clsx": "^2.1.1",
     "image-size": "^2.0.2",
+    "kern-typ": "^0.2.0",
     "lucide-react": "^0.462.0",
     "motion": "^12.39.0",
     "postgres": "^3.4.8",
