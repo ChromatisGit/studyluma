@@ -1,9 +1,18 @@
-@import "tailwindcss";
-
-@source "../app/**/*.{ts,tsx}";
-@source "../src/**/*.{ts,tsx}";
-@source "../node_modules/@chromatis/base/src/**/*.{ts,tsx}";
-
-@import "@chromatis/base/styles";
-@import "./theme.project.css";
-@import "../src/ui/styles/globals.css";
+:root { font-family: system-ui, sans-serif; color: #18232f; background: #f5f7fa; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #1754a5; }
+button, input, textarea { font: inherit; }
+button { cursor: pointer; background: #1754a5; color: white; border: 0; border-radius: 8px; padding: .65rem 1rem; }
+button:disabled { opacity: .6; cursor: default; }
+input, textarea { width: 100%; padding: .65rem; border: 1px solid #aab8c8; border-radius: 8px; }
+label { display: block; margin: 1rem 0; }
+label span { display: block; margin-bottom: .35rem; }
+main { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+header { background: #fff; border-bottom: 1px solid #dce3eb; padding: 1rem max(1rem, calc((100vw - 800px) / 2)); display: flex; justify-content: space-between; align-items: center; }
+header a { font-weight: 700; text-decoration: none; }
+.card { background: #fff; border: 1px solid #dce3eb; border-radius: 12px; padding: 1.25rem; margin: 1rem 0; }
+.error { color: #a52626; }
+.success { color: #176d3d; }
+.content-markdown { line-height: 1.65; }
+.content-markdown pre { overflow: auto; }

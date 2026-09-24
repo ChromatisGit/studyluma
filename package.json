@@ -6,23 +6,18 @@
   "type": "module",
   "scripts": {
     "test": "bun test",
-    "dev": "bun run node_modules/@chromatis/base/infra/scripts/devServer.ts",
+    "dev": "react-router dev",
     "build": "react-router build",
     "start": "node build/server/index.js",
-    "check": "react-router typegen && tsc --noEmit && eslint . && bun run node_modules/@chromatis/base/infra/scripts/checkArchitectureBoundaries.ts",
+    "check": "react-router typegen && tsc --noEmit",
     "db": "bun run node_modules/@chromatis/base/infra/scripts/db.ts",
-    "db:generate": "bun run node_modules/@chromatis/base/infra/scripts/dbGenerate.ts",
-    "db:reset": "bun run node_modules/@chromatis/base/infra/scripts/dbReset.ts",
-    "db:deploy": "bun run node_modules/@chromatis/base/infra/scripts/dbDeploy.ts",
-    "db:deploy:demo": "bun run scripts/dbDeployDemo.ts",
-    "db:seed-demo": "bun run scripts/seedDemo.ts",
-    "db:seed-demo:local": "bun run scripts/seedDemo.ts --local",
-    "cf:dev": "bun run node_modules/@chromatis/base/infra/scripts/cfDev.ts",
-    "cf:deploy": "bun run node_modules/@chromatis/base/infra/scripts/cfDeploy.ts",
-    "cf:deploy:demo": "bun run scripts/cfDeployDemo.ts"
+    "db:provision": "bun run scripts/milestone/provisionRoles.ts",
+    "db:apply": "bun run node_modules/@chromatis/base/infra/scripts/db.ts apply",
+    "seed:milestone": "bun run scripts/milestone/seed.ts"
   },
   "dependencies": {
-    "@chromatis/base": "git+https://github.com/ChromatisGit/personal-base-framework.git",
+    "@chromatis/base": "file:../../framework-planning/chromatis-base-framework",
+    "@neondatabase/serverless": "^1.0.2",
     "@react-router/node": "^7.0.0",
     "@tailwindcss/vite": "^4.3.0",
     "clsx": "^2.1.1",
@@ -41,7 +36,8 @@
     "remark-rehype": "^11.1.2",
     "sonner": "^2.0.7",
     "unified": "^11.0.5",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.1.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.37.1",
@@ -58,7 +54,6 @@
     "typescript": "^5.9.3",
     "vite": "^7.0.0",
     "vite-tsconfig-paths": "^5.0.0",
-    "wrangler": "^4.92.0",
-    "zod": "^4.3.6"
+    "wrangler": "^4.92.0"
   }
 }

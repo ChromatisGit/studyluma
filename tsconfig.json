@@ -15,18 +15,7 @@
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "rootDirs": [".", "./.react-router/types"],
-    "paths": {
-      "@features/*": ["./src/features/*"],
-      "@homepage/*": ["./src/features/homepage/*"],
-      "@core/*": ["./src/core/*"],
-      "@macros/*": ["./src/macros/*"],
-      "@schema/*": ["./src/schema/*"],
-      "@ui/*": ["./src/ui/*"],
-      "@components/*": ["./src/ui/components/*"],
-      "@services/*": ["./src/server/services/*"],
-      "@server-lib/*": ["./src/server/lib/*"]
-    }
+    "rootDirs": [".", "./.react-router/types"]
   },
-  "include": ["src", "app", "scripts", "workers", "bun-env.d.ts", ".react-router/types/**/*"]
+  "include": ["app", "src/milestone", "src/modules", "scripts/milestone", "workers", "bun-env.d.ts", ".react-router/types/**/*"]
 }
