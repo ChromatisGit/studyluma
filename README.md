@@ -14,10 +14,9 @@ consumes this Website package and owns demo-specific data and deployment setup.
 Website exposes its React Router route handlers, browser views, app root,
 entry points, and local setup helpers through explicit `package.json` exports.
 Demo imports those subpaths only; module internals remain private to Website.
-During this local rewrite Demo depends on `file:../studyluma-website` so it uses
-the current Website source. Before installing Demo outside this workspace,
-publish the Website revision and replace that local dependency with an immutable
-Git revision.
+During local development, Demo intentionally depends on
+`file:../studyluma-website` so it uses the current Website checkout. Website's
+`dev` branch is local; `chromacli commit` synchronizes work through Planning.
 
 ## Configuration
 
