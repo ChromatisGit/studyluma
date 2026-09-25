@@ -14,8 +14,10 @@ consumes this Website package and owns demo-specific data and deployment setup.
 Website exposes its React Router route handlers, browser views, app root,
 entry points, and local setup helpers through explicit `package.json` exports.
 Demo imports those subpaths only; module internals remain private to Website.
-Demo pins a published Website Git revision so it can install independently of
-the sibling checkout.
+During this local rewrite Demo depends on `file:../studyluma-website` so it uses
+the current Website source. Before installing Demo outside this workspace,
+publish the Website revision and replace that local dependency with an immutable
+Git revision.
 
 ## Configuration
 
