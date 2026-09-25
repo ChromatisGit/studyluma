@@ -16,7 +16,9 @@ describe("Website configuration", () => {
   });
 
   test("rejects unknown values", () => {
-    expect(() => parseWebsiteConfig(`${source}\n[local]\nextra = true`, "local")).toThrow(ValidationError);
+    expect(() =>
+      parseWebsiteConfig(`${source}\n[local]\nextra = true`, "local"),
+    ).toThrow(ValidationError);
   });
 
   test("maps Vite development mode to the framework local environment", () => {

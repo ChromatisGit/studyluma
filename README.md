@@ -1,12 +1,23 @@
-# StudyLuma Website — first reviewable slice
+# StudyLuma Website
 
 This checkout runs the new StudyLuma route set on a fresh PostgreSQL database:
 framework username/PIN login and database sessions, course enrollment, topic and
 chapter navigation, content publishing, and one saved worksheet response.
 
 The Website pins a Framework revision that provides database-backed sessions.
+The active app is a modular monolith: `src/app` composes requests and runtime
+services, while `src/modules/courses`, `content`, and `worksheets` own the
+current product capabilities and their database migrations. Other modules use
+only each module's root `index.ts` API.
 The [private Demo repository](https://github.com/ChromatisGit/studyluma-demo)
 consumes this Website package and owns demo-specific data and deployment setup.
+Website exposes its React Router route handlers, browser views, app root,
+entry points, and local setup helpers through explicit `package.json` exports.
+Demo imports those subpaths only; module internals remain private to Website.
+During this local rewrite Demo depends on `file:../studyluma-website` so it uses
+the current uncommitted Website source. Before installing Demo outside this
+workspace, publish the Website revision and replace that local dependency with
+an immutable Git revision.
 
 ## Configuration
 
@@ -21,7 +32,12 @@ the framework secrets API in `src/app/config/secrets.ts`. Supply their values
 through process environment injection (for example from a local credential
 manager or CI secrets) or Cloudflare Worker bindings. No `.env` file is needed.
 The framework validates and reads injected values; it does not store them.
-`bun run config:check` validates the checked-in TOML for every environment.
+`bun run check` validates config, TypeScript, lint, formatting, migrations, and
+tests. Website uses the framework's standard command names. Its `config`,
+`secret`, `db`, `doctor`, and `deploy` commands invoke framework tools from the
+Website working directory. Build, lint, formatting, and tests run on Website
+source. Local seed and verification helpers are internal scripts, not package
+commands.
 
 ## Local setup
 
@@ -49,8 +65,8 @@ Run from the Website directory:
 
 ```sh
 bun install
-bun run db:provision
-bun run db:apply
+bun run scripts/milestone/provisionRoles.ts
+bun run db apply
 bun run dev
 ```
 
@@ -64,12 +80,12 @@ STUDYLUMA_URL=http://localhost:5173 PUBLISH_TOKEN=<same-token> bun run publish:m
 Then from the Website directory:
 
 ```sh
-bun run seed:milestone
-bun run verify:milestone
-bun run verify:milestone:rls
+bun run scripts/milestone/seed.ts
+bun run scripts/milestone/verify.ts
+bun run scripts/milestone/verifyRls.ts
 ```
 
-Set `STUDYLUMA_URL` to the local Website URL for `verify:milestone`, and set
+Set `STUDYLUMA_URL` to the local Website URL for `scripts/milestone/verify.ts`, and set
 all three `SEED_*_USER`/`SEED_*_PIN` pairs. The HTTP check signs in as each
 user, verifies course and worksheet access, then saves and reloads a student
 answer. The RLS check uses `DATABASE_URL`, `DATABASE_MIGRATION_URL`,
@@ -85,8 +101,10 @@ Sign in as `outsider` and confirm the course URL returns 404. The first user
 created by the seed is the framework admin; the outsider is required for the
 verification commands.
 
-`bun run check` and `bun run build` provide static verification. The old
-application files remain outside the active route set and TypeScript build.
-Demo-specific source and data have moved to the Demo repository. This slice does not yet
+`bun run check` and `bun run build` provide static verification. The obsolete
+Website source and SQL trees have been removed. The database schema is a clean
+break; use a fresh database when switching from the earlier `classroom`
+migration layout. Demo-specific source and data have moved to the Demo
+repository. This slice does not yet
 implement the full worksheet task renderer, Entra login, lesson frames, or
 deterministic content deletion; those are subsequent milestones.

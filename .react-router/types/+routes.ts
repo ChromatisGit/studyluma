@@ -47,43 +47,43 @@ type RouteFiles = {
     id: "root";
     page: "/" | "/login" | "/logout" | "/courses/:courseId" | "/courses/:courseId/topics/:topicId/chapters/:chapterId" | "/w/:publicKey" | "/api/publish";
   };
-  "../src/milestone/routes/home.tsx": {
-    id: "../src/milestone/routes/home";
+  "../src/app/routes/home.tsx": {
+    id: "../src/app/routes/home";
     page: "/";
   };
-  "../src/milestone/routes/login.tsx": {
-    id: "../src/milestone/routes/login";
+  "../src/app/routes/login.tsx": {
+    id: "../src/app/routes/login";
     page: "/login";
   };
-  "../src/milestone/routes/logout.tsx": {
-    id: "../src/milestone/routes/logout";
+  "../src/app/routes/logout.tsx": {
+    id: "../src/app/routes/logout";
     page: "/logout";
   };
-  "../src/milestone/routes/course.tsx": {
-    id: "../src/milestone/routes/course";
+  "../src/app/routes/course.tsx": {
+    id: "../src/app/routes/course";
     page: "/courses/:courseId";
   };
-  "../src/milestone/routes/chapter.tsx": {
-    id: "../src/milestone/routes/chapter";
+  "../src/app/routes/chapter.tsx": {
+    id: "../src/app/routes/chapter";
     page: "/courses/:courseId/topics/:topicId/chapters/:chapterId";
   };
-  "../src/milestone/routes/worksheet.tsx": {
-    id: "../src/milestone/routes/worksheet";
+  "../src/app/routes/worksheet.tsx": {
+    id: "../src/app/routes/worksheet";
     page: "/w/:publicKey";
   };
-  "../src/milestone/routes/publish.ts": {
-    id: "../src/milestone/routes/publish";
+  "../src/app/routes/publish.ts": {
+    id: "../src/app/routes/publish";
     page: "/api/publish";
   };
 };
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
-  "../src/milestone/routes/home": unknown;
-  "../src/milestone/routes/login": unknown;
-  "../src/milestone/routes/logout": unknown;
-  "../src/milestone/routes/course": unknown;
-  "../src/milestone/routes/chapter": unknown;
-  "../src/milestone/routes/worksheet": unknown;
-  "../src/milestone/routes/publish": unknown;
+  "../src/app/routes/home": unknown;
+  "../src/app/routes/login": unknown;
+  "../src/app/routes/logout": unknown;
+  "../src/app/routes/course": unknown;
+  "../src/app/routes/chapter": unknown;
+  "../src/app/routes/worksheet": unknown;
+  "../src/app/routes/publish": unknown;
 };

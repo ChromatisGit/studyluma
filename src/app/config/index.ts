@@ -2,7 +2,10 @@ import source from "./config.toml?raw";
 import { parseWebsiteConfig } from "./config";
 import type { ConfigEnvironment } from "@chromatis/base/config";
 
-const configurations = new Map<ConfigEnvironment, ReturnType<typeof parseWebsiteConfig>>();
+const configurations = new Map<
+  ConfigEnvironment,
+  ReturnType<typeof parseWebsiteConfig>
+>();
 
 export function getWebsiteConfig(environment: ConfigEnvironment) {
   let configuration = configurations.get(environment);

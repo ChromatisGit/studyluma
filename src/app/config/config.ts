@@ -10,10 +10,15 @@ const schema = z
 
 export type WebsiteConfig = Readonly<z.infer<typeof schema>>;
 
-export function websiteEnvironment(value: string | undefined): ConfigEnvironment {
+export function websiteEnvironment(
+  value: string | undefined,
+): ConfigEnvironment {
   return resolveEnvironment(value === "development" ? "local" : value);
 }
 
-export function parseWebsiteConfig(source: string, environment: ConfigEnvironment): WebsiteConfig {
+export function parseWebsiteConfig(
+  source: string,
+  environment: ConfigEnvironment,
+): WebsiteConfig {
   return parseConfig(source, environment, schema);
 }

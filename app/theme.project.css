@@ -61,7 +61,8 @@
   --code-background: #0f172a;
   --code-border: #232c41;
   --code-foreground: #e6edf5;
-  --font-body: var(--font-dm-sans, "DM Sans"), system-ui, -apple-system, sans-serif;
+  --font-body:
+    var(--font-dm-sans, "DM Sans"), system-ui, -apple-system, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
@@ -75,7 +76,8 @@
   --radius-xxs: 6px;
   --radius: 12px;
   --shadow-sm: 0 4px 12px color-mix(in srgb, var(--foreground) 8%, transparent);
-  --shadow-md: 0 10px 30px color-mix(in srgb, var(--foreground) 12%, transparent);
+  --shadow-md: 0 10px 30px
+    color-mix(in srgb, var(--foreground) 12%, transparent);
 }
 
 .dark {

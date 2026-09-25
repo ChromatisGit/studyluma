@@ -61,7 +61,10 @@ export const outsiderPinSecret = {
   schema: nonempty,
 } satisfies SecretDefinition;
 
-export function requireWebsiteSecret(definition: SecretDefinition, source: SecretSource): string {
+export function requireWebsiteSecret(
+  definition: SecretDefinition,
+  source: SecretSource,
+): string {
   const value = readSecret(definition, source);
   if (value === undefined) {
     throw new Error(`${definition.name} is required`);

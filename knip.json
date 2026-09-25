@@ -1,7 +1,5 @@
 {
-  "entry": [
-    "workers/**/*.ts"
-  ],
+  "entry": ["app/routes.ts", "workers/**/*.ts", "scripts/**/*.ts"],
   "project": [
     "app/**/*.{ts,tsx}",
     "src/**/*.{ts,tsx}",
