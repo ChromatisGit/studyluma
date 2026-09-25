@@ -1,11 +1,11 @@
 import { getCourse, listCourseChapters } from "../domain";
-import { notFound, requireSignedIn } from "../server";
+import { notFound, requireSignedIn, type WebsiteLoadContext } from "../server";
 
-export async function loader({ request, params }: { request: Request; params: { courseId?: string } }) {
-  const user = await requireSignedIn(request);
+export async function loader({ request, params, context }: { request: Request; params: { courseId?: string }; context: WebsiteLoadContext }) {
+  const user = await requireSignedIn(request, context);
   const courseId = params.courseId ?? notFound();
-  const course = await getCourse(user, courseId);
-  const chapters = await listCourseChapters(user, courseId);
+  const course = await getCourse(user, courseId, context);
+  const chapters = await listCourseChapters(user, courseId, context);
   return { course, chapters };
 }
 

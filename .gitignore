@@ -14,7 +14,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# project config (contains secrets — never commit)
+# block legacy credential files
 CONFIG.yaml
 .dev.vars
 

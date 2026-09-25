@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getDatabase } from "./server";
+import type { WebsiteLoadContext } from "./server";
 
 export const bundleSchema = z.object({
   schemaVersion: z.literal(1),
@@ -10,8 +11,8 @@ export const bundleSchema = z.object({
 
 export type Bundle = z.infer<typeof bundleSchema>;
 
-export async function publishBundle(bundle: Bundle): Promise<void> {
-  await getDatabase().anonTransaction(async sql => {
+export async function publishBundle(bundle: Bundle, context: WebsiteLoadContext): Promise<void> {
+  await getDatabase(context).anonTransaction(async sql => {
     await sql`INSERT INTO topics (id, title) VALUES (${bundle.topic.id}, ${bundle.topic.title}) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title`;
     await sql`
       INSERT INTO chapters (id, topic_id, title, body)

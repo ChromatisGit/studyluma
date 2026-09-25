@@ -17,5 +17,5 @@
     "exactOptionalPropertyTypes": true,
     "rootDirs": [".", "./.react-router/types"]
   },
-  "include": ["app", "src/milestone", "src/modules", "scripts/milestone", "workers", "bun-env.d.ts", ".react-router/types/**/*"]
+  "include": ["app", "src/app/config", "src/milestone", "src/modules", "scripts/milestone", "workers", "bun-env.d.ts", ".react-router/types/**/*"]
 }

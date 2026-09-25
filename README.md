@@ -8,10 +8,25 @@ The Website pins a Framework revision that provides database-backed sessions.
 The [private Demo repository](https://github.com/ChromatisGit/studyluma-demo)
 consumes this Website package and owns demo-specific data and deployment setup.
 
+## Configuration
+
+Non-secret Website settings live in `src/app/config/config.toml`. The
+`[default]` table applies everywhere; `[local]`, `[test]`, and `[production]`
+may override its values. The framework's `parseConfig` validates the merged
+values against the strict schema in `src/app/config/config.ts`. `NODE_ENV`
+selects the environment; Vite's `development` mode maps to `local`.
+
+Database URLs, `PUBLISH_TOKEN`, and seed PINs are defined and validated with
+the framework secrets API in `src/app/config/secrets.ts`. Supply their values
+through process environment injection (for example from a local credential
+manager or CI secrets) or Cloudflare Worker bindings. No `.env` file is needed.
+The framework validates and reads injected values; it does not store them.
+`bun run config:check` validates the checked-in TOML for every environment.
+
 ## Local setup
 
-Create an **empty** local PostgreSQL database and set these environment
-variables (for example in an ignored `.env` file in this directory):
+Create an **empty** local PostgreSQL database and inject these values into the
+commands' process environments through your credential manager or shell:
 
 ```sh
 DATABASE_ADMIN_URL=postgres://postgres:<admin-password>@localhost:5432/studyluma_dev

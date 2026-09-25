@@ -1,9 +1,11 @@
 import postgres from "postgres";
+import { createBunRuntime } from "@chromatis/base/runtime";
+import { adminUrlSecret, databaseUrlSecret, migrationUrlSecret, requireWebsiteSecret } from "../../src/app/config/secrets";
 
-const adminUrl = process.env.DATABASE_ADMIN_URL;
-const runtimeUrl = process.env.DATABASE_URL;
-const migrationUrl = process.env.DATABASE_MIGRATION_URL;
-if (!adminUrl || !runtimeUrl || !migrationUrl) throw new Error("DATABASE_ADMIN_URL, DATABASE_URL and DATABASE_MIGRATION_URL are required");
+const secrets = createBunRuntime({ ...process.env, NODE_ENV: "local" }).secrets;
+const adminUrl = requireWebsiteSecret(adminUrlSecret, secrets);
+const runtimeUrl = requireWebsiteSecret(databaseUrlSecret, secrets);
+const migrationUrl = requireWebsiteSecret(migrationUrlSecret, secrets);
 
 const admin = new URL(adminUrl);
 const runtime = new URL(runtimeUrl);

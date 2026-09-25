@@ -1,9 +1,9 @@
 import { listCourses } from "../domain";
-import { requireSignedIn } from "../server";
+import { requireSignedIn, type WebsiteLoadContext } from "../server";
 
-export async function loader({ request }: { request: Request }) {
-  const user = await requireSignedIn(request);
-  return { courses: await listCourses(user) };
+export async function loader({ request, context }: { request: Request; context: WebsiteLoadContext }) {
+  const user = await requireSignedIn(request, context);
+  return { courses: await listCourses(user, context) };
 }
 
 export { default } from "../views/home";

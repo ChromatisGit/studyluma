@@ -1,12 +1,15 @@
 import { strict as assert } from "node:assert";
 import postgres from "postgres";
+import { createBunRuntime } from "@chromatis/base/runtime";
+import { databaseUrlSecret, migrationUrlSecret, requireWebsiteSecret } from "../../src/app/config/secrets";
 
-const runtimeUrl = process.env.DATABASE_URL;
-const migrationUrl = process.env.DATABASE_MIGRATION_URL;
+const secrets = createBunRuntime({ ...process.env, NODE_ENV: "local" }).secrets;
+const runtimeUrl = requireWebsiteSecret(databaseUrlSecret, secrets);
+const migrationUrl = requireWebsiteSecret(migrationUrlSecret, secrets);
 const studentName = process.env.SEED_STUDENT_USER;
 const outsiderName = process.env.SEED_OUTSIDER_USER;
-if (!runtimeUrl || !migrationUrl || !studentName || !outsiderName) {
-  throw new Error("DATABASE_URL, DATABASE_MIGRATION_URL, SEED_STUDENT_USER and SEED_OUTSIDER_USER are required");
+if (!studentName || !outsiderName) {
+  throw new Error("SEED_STUDENT_USER and SEED_OUTSIDER_USER are required");
 }
 if (![runtimeUrl, migrationUrl].every(url => ["localhost", "127.0.0.1", "::1"].includes(new URL(url).hostname))) {
   throw new Error("RLS verification is restricted to a local database");

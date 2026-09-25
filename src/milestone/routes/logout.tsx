@@ -1,9 +1,9 @@
 import { redirect } from "react-router";
-import { getSessionManager } from "../server";
+import { getSessionManager, type WebsiteLoadContext } from "../server";
 
-export async function action({ request }: { request: Request }) {
-  const session = await getSessionManager().resolve(request);
-  const cookie = await getSessionManager().logout(session);
+export async function action({ request, context }: { request: Request; context: WebsiteLoadContext }) {
+  const session = await getSessionManager(context).resolve(request);
+  const cookie = await getSessionManager(context).logout(session);
   throw redirect("/login", { headers: { "Set-Cookie": cookie } });
 }
 

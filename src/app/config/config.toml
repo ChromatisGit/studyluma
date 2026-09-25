@@ -1,0 +1,6 @@
+[default]
+sessionCookieName = "studyluma-session"
+secureCookies = false
+
+[production]
+secureCookies = true

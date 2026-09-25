@@ -1,23 +1,31 @@
 import postgres from "postgres";
 import { loginUser, registerUser, setUserEnabled } from "@chromatis/base/auth";
 import { createDatabase } from "@chromatis/base/database";
+import { createBunRuntime } from "@chromatis/base/runtime";
+import { readSecret } from "@chromatis/base/secrets";
+import { adminPinSecret, databaseUrlSecret, migrationUrlSecret, outsiderPinSecret, requireWebsiteSecret, studentPinSecret } from "../../src/app/config/secrets";
 
-const runtimeUrl = process.env.DATABASE_URL;
-const migrationUrl = process.env.DATABASE_MIGRATION_URL;
+const secrets = createBunRuntime({ ...process.env, NODE_ENV: "local" }).secrets;
+const runtimeUrl = requireWebsiteSecret(databaseUrlSecret, secrets);
+const migrationUrl = requireWebsiteSecret(migrationUrlSecret, secrets);
 const adminName = process.env.SEED_ADMIN_USER;
-const adminPin = process.env.SEED_ADMIN_PIN;
+const adminPin = requireWebsiteSecret(adminPinSecret, secrets);
 const studentName = process.env.SEED_STUDENT_USER;
-const studentPin = process.env.SEED_STUDENT_PIN;
+const studentPin = requireWebsiteSecret(studentPinSecret, secrets);
 const outsiderName = process.env.SEED_OUTSIDER_USER;
-const outsiderPin = process.env.SEED_OUTSIDER_PIN;
-if (!runtimeUrl || !migrationUrl || !adminName || !adminPin || !studentName || !studentPin) {
-  throw new Error("DATABASE_URL, DATABASE_MIGRATION_URL, SEED_ADMIN_USER, SEED_ADMIN_PIN, SEED_STUDENT_USER and SEED_STUDENT_PIN are required");
+const outsiderPin = readSecret(outsiderPinSecret, secrets);
+if (!adminName || !studentName) {
+  throw new Error("SEED_ADMIN_USER and SEED_STUDENT_USER are required");
 }
 if (!new Set(["localhost", "127.0.0.1", "::1"]).has(new URL(runtimeUrl).hostname)) {
   throw new Error("The milestone seed is restricted to a local database");
 }
 
-const db = createDatabase(runtimeUrl, { runtime: "bun", environment: "production" });
+const db = createDatabase(runtimeUrl, {
+  runtime: "bun",
+  environment: "local",
+  migrationConnectionString: migrationUrl,
+});
 async function ensureUser(username: string, pin: string) {
   const result = await registerUser(db.anonSQL, { username, pin });
   if (result.status === "registered") return result.user;

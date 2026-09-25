@@ -5,8 +5,7 @@ main = "./workers/app.ts"
 
 [vars]
 NODE_ENV = "production"
-DB_DRIVER = "worker"
 
 # Set secrets via wrangler:
 # wrangler secret put DATABASE_URL
-# wrangler secret put SESSION_SECRET
+# wrangler secret put PUBLISH_TOKEN

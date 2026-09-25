@@ -1,4 +1,6 @@
 import { createRequestHandler, type ServerBuild } from "react-router";
+import { createCloudflareRuntime } from "@chromatis/base/runtime";
+import { websiteEnvironment } from "../src/app/config/config";
 
 type WorkerEnv = Record<string, string | undefined>;
 
@@ -17,7 +19,8 @@ const requestHandler = createRequestHandler(
 );
 
 export default {
-	async fetch(request: Request, _env: WorkerEnv, _ctx: WorkerExecutionContext) {
-		return requestHandler(request);
+	async fetch(request: Request, env: WorkerEnv, _ctx: WorkerExecutionContext) {
+		const runtime = createCloudflareRuntime(env, websiteEnvironment(env.NODE_ENV ?? "production"));
+		return requestHandler(request, { runtime });
 	},
 } satisfies WorkerHandler;

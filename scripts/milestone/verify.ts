@@ -1,10 +1,15 @@
 import { strict as assert } from "node:assert";
+import { createBunRuntime } from "@chromatis/base/runtime";
+import { readSecret } from "@chromatis/base/secrets";
+import { adminPinSecret, outsiderPinSecret, studentPinSecret } from "../../src/app/config/secrets";
+import { getWebsiteConfig } from "../../src/app/config";
 
 const baseUrl = process.env.STUDYLUMA_URL;
+const secrets = createBunRuntime({ ...process.env, NODE_ENV: "local" }).secrets;
 const users = [
-  { name: process.env.SEED_ADMIN_USER, pin: process.env.SEED_ADMIN_PIN },
-  { name: process.env.SEED_STUDENT_USER, pin: process.env.SEED_STUDENT_PIN },
-  { name: process.env.SEED_OUTSIDER_USER, pin: process.env.SEED_OUTSIDER_PIN },
+  { name: process.env.SEED_ADMIN_USER, pin: readSecret(adminPinSecret, secrets) },
+  { name: process.env.SEED_STUDENT_USER, pin: readSecret(studentPinSecret, secrets) },
+  { name: process.env.SEED_OUTSIDER_USER, pin: readSecret(outsiderPinSecret, secrets) },
 ];
 if (!baseUrl || users.some(user => !user.name || !user.pin)) {
   throw new Error("STUDYLUMA_URL and all three SEED_*_USER/SEED_*_PIN pairs are required");
@@ -27,7 +32,7 @@ async function login(name: string, pin: string): Promise<string> {
   });
   assert.equal(response.status, 302, `${name} login must redirect`);
   const cookie = response.headers.get("set-cookie")?.split(";")[0];
-  assert.ok(cookie?.startsWith("studyluma-session="), `${name} must receive a session`);
+  assert.ok(cookie?.startsWith(`${getWebsiteConfig("local").sessionCookieName}=`), `${name} must receive a session`);
   return cookie!;
 }
 

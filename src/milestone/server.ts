@@ -1,33 +1,68 @@
 import { createSessionManager, type User } from "@chromatis/base/auth";
 import { createDatabase, type Database } from "@chromatis/base/database";
+import { createBunRuntime, type Runtime } from "@chromatis/base/runtime";
 import { redirect } from "react-router";
+import type { AppLoadContext } from "react-router";
+import { getWebsiteConfig } from "../app/config";
+import { websiteEnvironment } from "../app/config/config";
+import { databaseUrlSecret, migrationUrlSecret, requireWebsiteSecret } from "../app/config/secrets";
 
-let database: Database | undefined;
+export type WebsiteLoadContext = AppLoadContext & { runtime?: Runtime };
 
-export function getDatabase(): Database {
-  if (database) return database;
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL is required");
-  database = createDatabase(url, {
-    runtime: process.env.DB_RUNTIME === "cloudflare" ? "cloudflare" : "bun",
-    environment: "production",
+export function getRuntime(context: WebsiteLoadContext = {}): Runtime {
+  if (context.runtime) {
+    return context.runtime;
+  }
+  return createBunRuntime({
+    ...process.env,
+    NODE_ENV: websiteEnvironment(process.env.NODE_ENV),
   });
-  return database;
 }
 
-let sessionManager: ReturnType<typeof createSessionManager> | undefined;
-export function getSessionManager() {
-  sessionManager ??= createSessionManager({
-    database: getDatabase(),
-    cookieName: "studyluma-session",
-    secure: process.env.NODE_ENV === "production",
+let cachedServices: {
+  key: string;
+  database: Database;
+  sessionManager: ReturnType<typeof createSessionManager>;
+} | undefined;
+
+function getServices(context: WebsiteLoadContext = {}) {
+  const runtime = getRuntime(context);
+  const config = getWebsiteConfig(runtime.environment);
+  const url = requireWebsiteSecret(databaseUrlSecret, runtime.secrets);
+  const migrationUrl = runtime.environment === "production"
+    ? undefined
+    : requireWebsiteSecret(migrationUrlSecret, runtime.secrets);
+  const key = JSON.stringify([runtime.target, runtime.environment, url, migrationUrl, config.sessionCookieName, config.secureCookies]);
+  if (cachedServices?.key === key) {
+    return cachedServices;
+  }
+  const database = createDatabase(url, {
+    runtime: runtime.target,
+    environment: runtime.environment,
+    ...(migrationUrl ? { migrationConnectionString: migrationUrl } : {}),
   });
-  return sessionManager;
+  const sessionManager = createSessionManager({
+    database,
+    cookieName: config.sessionCookieName,
+    secure: config.secureCookies,
+  });
+  cachedServices = { key, database, sessionManager };
+  return cachedServices;
 }
 
-export async function requireSignedIn(request: Request): Promise<User> {
-  const session = await getSessionManager().resolve(request);
-  if (!session) throw redirect(`/login?from=${encodeURIComponent(new URL(request.url).pathname)}`);
+export function getDatabase(context: WebsiteLoadContext = {}): Database {
+  return getServices(context).database;
+}
+
+export function getSessionManager(context: WebsiteLoadContext = {}) {
+  return getServices(context).sessionManager;
+}
+
+export async function requireSignedIn(request: Request, context: WebsiteLoadContext = {}): Promise<User> {
+  const session = await getSessionManager(context).resolve(request);
+  if (!session) {
+    throw redirect(`/login?from=${encodeURIComponent(new URL(request.url).pathname)}`);
+  }
   return session.user;
 }
 
