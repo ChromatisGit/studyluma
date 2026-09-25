@@ -13,10 +13,12 @@
     "db": "bun run node_modules/@chromatis/base/infra/scripts/db.ts",
     "db:provision": "bun run scripts/milestone/provisionRoles.ts",
     "db:apply": "bun run node_modules/@chromatis/base/infra/scripts/db.ts apply",
-    "seed:milestone": "bun run scripts/milestone/seed.ts"
+    "seed:milestone": "bun run scripts/milestone/seed.ts",
+    "verify:milestone": "bun run scripts/milestone/verify.ts",
+    "verify:milestone:rls": "bun run scripts/milestone/verifyRls.ts"
   },
   "dependencies": {
-    "@chromatis/base": "file:../../framework-planning/chromatis-base-framework",
+    "@chromatis/base": "git+https://github.com/ChromatisGit/chromatis-base-framework.git#80ca0af",
     "@neondatabase/serverless": "^1.0.2",
     "@react-router/node": "^7.0.0",
     "@tailwindcss/vite": "^4.3.0",

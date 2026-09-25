@@ -4,10 +4,9 @@ This checkout runs the new StudyLuma route set on a fresh PostgreSQL database:
 framework username/PIN login and database sessions, course enrollment, topic and
 chapter navigation, content publishing, and one saved worksheet response.
 
-The Website currently depends on the sibling local checkout at
-`../../framework-planning/chromatis-base-framework`. Its current API has not yet
-been published to the framework's GitHub repository. Keep that checkout in
-place for installation and builds.
+The Website pins a Framework revision that provides database-backed sessions.
+The [private Demo repository](https://github.com/ChromatisGit/studyluma-demo)
+consumes this Website package and owns demo-specific data and deployment setup.
 
 ## Local setup
 
@@ -51,16 +50,28 @@ Then from the Website directory:
 
 ```sh
 bun run seed:milestone
+bun run verify:milestone
+bun run verify:milestone:rls
 ```
+
+Set `STUDYLUMA_URL` to the local Website URL for `verify:milestone`, and set
+all three `SEED_*_USER`/`SEED_*_PIN` pairs. The HTTP check signs in as each
+user, verifies course and worksheet access, then saves and reloads a student
+answer. The RLS check uses `DATABASE_URL`, `DATABASE_MIGRATION_URL`,
+`SEED_STUDENT_USER`, and `SEED_OUTSIDER_USER`. It temporarily removes the
+student enrollment, verifies that the saved answer becomes invisible, and
+restores the enrollment before exiting. Both checks are restricted to local
+hosts.
 
 Sign in as `student` at `http://localhost:5173/login`. Open Mathematics →
 Binomial Formulas → worksheet, save an answer, reload, and confirm it remains.
 The worksheet's `/w/:publicKey` link is stable independently of its course path.
 Sign in as `outsider` and confirm the course URL returns 404. The first user
-created by the seed is the framework admin; the outsider is optional.
+created by the seed is the framework admin; the outsider is required for the
+verification commands.
 
 `bun run check` and `bun run build` provide static verification. The old
-application files remain in the checkout for later extraction/removal, but are
-excluded from this route set and TypeScript build. This slice does not yet
+application files remain outside the active route set and TypeScript build.
+Demo-specific source and data have moved to the Demo repository. This slice does not yet
 implement the full worksheet task renderer, Entra login, lesson frames, or
 deterministic content deletion; those are subsequent milestones.

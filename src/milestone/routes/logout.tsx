@@ -1,4 +1,4 @@
-import { Form, redirect } from "react-router";
+import { redirect } from "react-router";
 import { getSessionManager } from "../server";
 
 export async function action({ request }: { request: Request }) {
@@ -7,4 +7,4 @@ export async function action({ request }: { request: Request }) {
   throw redirect("/login", { headers: { "Set-Cookie": cookie } });
 }
 
-export default function Logout() { return <main><Form method="post"><button type="submit">Abmelden</button></Form></main>; }
+export { default } from "../views/logout";

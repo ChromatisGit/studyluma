@@ -31,7 +31,7 @@ try {
   const credentials: Array<[string, string]> = [["chromatis_app", decodeURIComponent(runtime.password)], ["chromatis_migrator", decodeURIComponent(migration.password)]];
   for (const [role, password] of credentials) {
     if (!password) throw new Error(`Password missing for ${role}`);
-    const [row] = await sql<Array<{ statement: string }>>`SELECT format('ALTER ROLE %I PASSWORD %L', ${role}, ${password}) AS statement`;
+    const [row] = await sql<Array<{ statement: string }>>`SELECT format('ALTER ROLE %I PASSWORD %L', ${role}::text, ${password}::text) AS statement`;
     if (!row) throw new Error(`Unable to configure ${role}`);
     await sql.unsafe(row.statement);
   }

@@ -1,4 +1,4 @@
-import { Form, redirect, useActionData, useSearchParams } from "react-router";
+import { redirect } from "react-router";
 import { loginUser } from "@chromatis/base/auth";
 import { getDatabase, getSessionManager } from "../server";
 
@@ -23,8 +23,4 @@ export async function action({ request }: { request: Request }) {
   throw redirect(from, { headers: { "Set-Cookie": cookie } });
 }
 
-export default function Login() {
-  const result = useActionData<typeof action>();
-  const [search] = useSearchParams();
-  return <main><h1>Anmelden</h1><div className="card"><Form method="post" action={`/login?from=${encodeURIComponent(safePath(search.get("from")))}`}><label><span>Benutzername</span><input name="username" autoComplete="username" required /></label><label><span>PIN</span><input name="pin" type="password" autoComplete="current-password" required /></label>{result?.error && <p className="error" role="alert">{result.error}</p>}<button type="submit">Anmelden</button></Form></div></main>;
-}
+export { default } from "../views/login";

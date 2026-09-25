@@ -1,7 +1,5 @@
-import { Form, useActionData, useLoaderData } from "react-router";
 import { getResponse, getWorksheetForUser, saveResponse } from "../domain";
 import { notFound, requireSignedIn } from "../server";
-import { MarkdownRenderer } from "../../ui/components/MarkdownRenderer/MarkdownRenderer";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -26,8 +24,4 @@ export async function action({ request, params }: { request: Request; params: { 
   return { ok: true as const };
 }
 
-export default function WorksheetPage() {
-  const { worksheet, answer } = useLoaderData<typeof loader>();
-  const result = useActionData<typeof action>();
-  return <main><h1>{worksheet.title}</h1><div className="card"><MarkdownRenderer markdown={worksheet.body} /></div><div className="card"><Form method="post"><label><span>Meine Antwort</span><textarea name="answer" rows={8} defaultValue={answer} key={answer} /></label>{result?.ok && <p className="success" role="status">Antwort gespeichert.</p>}{result && !result.ok && <p className="error" role="alert">{result.error}</p>}<button type="submit">Speichern</button></Form></div></main>;
-}
+export { default } from "../views/worksheet";

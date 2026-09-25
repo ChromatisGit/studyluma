@@ -53,3 +53,4 @@ try {
   await sql.end();
 }
 console.log(`Milestone ready: sign in as ${studentName} and open /courses/math-demo`);
+process.exit(0);
