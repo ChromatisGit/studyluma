@@ -83,5 +83,8 @@
     "vite-tsconfig-paths": "^5.0.0",
     "wrangler": "^4.92.0",
     "prettier": "^3.6.2"
+  },
+  "patchedDependencies": {
+    "@chromatis/base@github:ChromatisGit/chromatis-base-framework#80ca0af": "patches/@chromatis%2Fbase@github%3AChromatisGit%2Fchromatis-base-framework#80ca0af.patch"
   }
 }

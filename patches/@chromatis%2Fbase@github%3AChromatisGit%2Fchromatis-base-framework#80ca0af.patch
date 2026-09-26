@@ -1,0 +1,35 @@
+diff --git a/infra/scripts/dbGeneratedMigrations.ts b/infra/scripts/dbGeneratedMigrations.ts
+index dad3a94575dacfff4b77161396536a28c0b22a57..367946d78faa20401cb7891dfcf3fc05a95b9c98 100644
+--- a/infra/scripts/dbGeneratedMigrations.ts
++++ b/infra/scripts/dbGeneratedMigrations.ts
+@@ -378,7 +378,7 @@ function parseVersion(version: string): [number, number, number] {
+ }
+ 
+ function nextPatchVersion(rootDir = process.cwd()): string {
+-  const migrationsDir = path.join(rootDir, "migrations");
++  const migrationsDir = path.join(rootDir, "sql", "migrations");
+   const latest = existsSync(migrationsDir)
+     ? readdirSync(migrationsDir, { withFileTypes: true })
+         .filter((entry) => entry.isFile())
+@@ -482,7 +482,7 @@ export function generateRoutineMigration(
+ 
+   const version = nextPatchVersion(rootDir);
+   const filename = `${version}__${slug}.sql`;
+-  const migrationPath = path.join(rootDir, "migrations", filename);
++  const migrationPath = path.join(rootDir, "sql", "migrations", filename);
+   const sql = buildRoutineMigrationSql(state, manifest);
+ 
+   mkdirSync(path.dirname(migrationPath), { recursive: true });
+diff --git a/infra/scripts/dbMigrations.ts b/infra/scripts/dbMigrations.ts
+index ed8f76fa212c781351d07205988119e1a5486069..d96cdc93c00b338ea3885f8ce483652ec0dca441 100644
+--- a/infra/scripts/dbMigrations.ts
++++ b/infra/scripts/dbMigrations.ts
+@@ -71,7 +71,7 @@ export function loadMigrationFiles(
+     .flatMap((entry) =>
+       loadModuleMigrations(
+         entry.name,
+-        path.join(modulesDirectory, entry.name, "migrations"),
++        path.join(modulesDirectory, entry.name, "sql", "migrations"),
+       ),
+     );
+   const migrations = [...framework, ...application];

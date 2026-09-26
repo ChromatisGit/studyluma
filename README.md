@@ -7,8 +7,11 @@ chapter navigation, content publishing, and one saved worksheet response.
 The Website pins a Framework revision that provides database-backed sessions.
 The active app is a modular monolith: `src/app` composes requests and runtime
 services, while `src/modules/courses`, `content`, and `worksheets` own the
-current product capabilities and their database migrations. Other modules use
-only each module's root `index.ts` API.
+current product capabilities and their database SQL. Each module keeps
+migrations in `sql/migrations`, function sources in `sql/functions`, and view
+sources in `sql/views`. A tracked patch to the pinned framework dependency
+points migration discovery and routine generation at `sql/migrations`. Other
+modules use only each module's root `index.ts` API.
 The [private Demo repository](https://github.com/ChromatisGit/studyluma-demo)
 consumes this Website package and owns demo-specific data and deployment setup.
 Website exposes its React Router route handlers, browser views, app root,
