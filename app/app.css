@@ -14,7 +14,8 @@ a {
 }
 button,
 input,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 button {
@@ -30,7 +31,8 @@ button:disabled {
   cursor: default;
 }
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 0.65rem;
   border: 1px solid #aab8c8;
@@ -79,4 +81,21 @@ header a {
 }
 .content-markdown pre {
   overflow: auto;
+}
+.worksheet-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.worksheet-option input {
+  width: auto;
+  margin-top: 0.4rem;
+}
+.worksheet-option .content-markdown p {
+  margin: 0 0 0.5rem;
+}
+.worksheet-exercise select {
+  width: auto;
+  min-width: 7rem;
+  margin: 0 0.25rem;
 }

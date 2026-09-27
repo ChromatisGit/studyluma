@@ -22,6 +22,7 @@
     "./views/login": "./src/app/views/login.tsx",
     "./views/logout": "./src/app/views/logout.tsx",
     "./views/worksheet": "./src/modules/worksheets/ui/worksheet.tsx",
+    "./worksheet-interactions": "./src/modules/worksheets/index.ts",
     "./setup/provision-roles": "./scripts/milestone/provisionRoles.ts",
     "./setup/seed": "./scripts/milestone/seed.ts"
   },

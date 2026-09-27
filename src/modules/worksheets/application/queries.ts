@@ -7,6 +7,8 @@ export type Worksheet = {
   body: string;
   public_key: string;
   chapter_id: string;
+  course_id?: string;
+  topic_id?: string;
 };
 
 export async function listChapterWorksheets(
@@ -24,8 +26,10 @@ export async function getWorksheetForUser(
   database: Database,
 ): Promise<Worksheet | undefined> {
   const [worksheet] = await database.userSQL(user)<Worksheet[]>`
-    SELECT w.id, w.title, w.body, w.public_key::text, w.chapter_id
+    SELECT w.id, w.title, w.body, w.public_key::text, w.chapter_id,
+           cc.course_id, ch.topic_id
     FROM worksheets w JOIN course_chapters cc ON cc.chapter_id = w.chapter_id
+    JOIN chapters ch ON ch.id = w.chapter_id
     WHERE w.public_key = ${publicKey}::uuid
     LIMIT 1
   `;

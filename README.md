@@ -1,8 +1,8 @@
 # StudyLuma Website
 
-This checkout runs the new StudyLuma route set on a fresh PostgreSQL database:
+This checkout runs the StudyLuma route set on a fresh PostgreSQL database:
 framework username/PIN login and database sessions, course enrollment, topic and
-chapter navigation, content publishing, and one saved worksheet response.
+chapter navigation, content publishing, and student worksheet responses.
 
 The Website pins a Framework revision that provides database-backed sessions.
 The active app is a modular monolith: `src/app` composes requests and runtime
@@ -17,6 +17,11 @@ consumes this Website package and owns demo-specific data and deployment setup.
 Website exposes its React Router route handlers, browser views, app root,
 entry points, and local setup helpers through explicit `package.json` exports.
 Demo imports those subpaths only; module internals remain private to Website.
+The reusable `studyluma/worksheet-interactions` export parses legacy worksheet
+exercises and prepares answer submissions. A host can supply its own
+visitor-scoped `answer` string and storage through the worksheet view and use
+this helper for the same completion rules; Website's default route stores answers
+per signed-in user, not in course or teacher settings.
 During local development, Demo intentionally depends on
 `file:../studyluma-website` so it uses the current Website checkout. Website's
 `dev` branch is local; `chromacli commit` synchronizes work through Planning.
@@ -107,6 +112,6 @@ verification commands.
 Website source and SQL trees have been removed. The database schema is a clean
 break; use a fresh database when switching from the earlier `classroom`
 migration layout. Demo-specific source and data have moved to the Demo
-repository. This slice does not yet
-implement the full worksheet task renderer, Entra login, lesson frames, or
-deterministic content deletion; those are subsequent milestones.
+repository. This slice does not yet implement a full renderer for print-only
+worksheet layout, Entra login, lesson frames, or deterministic content
+deletion; those are subsequent milestones.

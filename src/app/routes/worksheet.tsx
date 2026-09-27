@@ -1,6 +1,7 @@
 import {
   getResponse,
   getWorksheetForUser,
+  prepareWorksheetAnswer,
   saveResponse,
 } from "../../modules/worksheets";
 import {
@@ -64,11 +65,19 @@ export async function action({
   );
   const form = await request.formData();
   const answer = form.get("answer");
-  if (typeof answer !== "string" || answer.length > 10000) {
+  if (typeof answer !== "string") {
     return { ok: false as const, error: "Antwort ist zu lang." };
   }
-  await saveResponse(user, worksheet.id, answer, getDatabase(context));
-  return { ok: true as const };
+  const prepared = prepareWorksheetAnswer(
+    worksheet.body,
+    answer,
+    form.get("intent") === "complete",
+  );
+  if (!prepared.ok) {
+    return { ok: false as const, error: prepared.error };
+  }
+  await saveResponse(user, worksheet.id, prepared.answer, getDatabase(context));
+  return { ok: true as const, completed: prepared.completed };
 }
 
 export { WorksheetView as default } from "../../modules/worksheets";

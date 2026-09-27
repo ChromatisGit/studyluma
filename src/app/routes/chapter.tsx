@@ -1,5 +1,5 @@
 import { getCourse } from "../../modules/courses";
-import { getCourseChapter } from "../../modules/content";
+import { getCourseChapter, listCourseChapters } from "../../modules/content";
 import { listChapterWorksheets } from "../../modules/worksheets";
 import {
   getDatabase,
@@ -34,6 +34,7 @@ export async function loader({
   return {
     course,
     chapter,
+    chapters: await listCourseChapters(user, courseId, getDatabase(context)),
     worksheets: await listChapterWorksheets(chapterId, getDatabase(context)),
   };
 }

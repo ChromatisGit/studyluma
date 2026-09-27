@@ -1,6 +1,7 @@
 import type { Course } from "../application/queries";
 import type { Chapter } from "../../content";
 import { Link, useLoaderData } from "react-router";
+import { chapterPath, groupChapters } from "../application/navigation";
 
 export default function CoursePage() {
   const { course, chapters } = useLoaderData<{
@@ -13,15 +14,21 @@ export default function CoursePage() {
         <Link to="/">← Meine Kurse</Link>
       </p>
       <h1>{course.title}</h1>
-      {chapters.map((chapter) => (
-        <div className="card" key={chapter.id}>
-          <p>{chapter.topic_title}</p>
-          <Link
-            to={`/courses/${encodeURIComponent(course.id)}/topics/${encodeURIComponent(chapter.topic_id)}/chapters/${encodeURIComponent(chapter.id)}`}
-          >
-            {chapter.title}
-          </Link>
-        </div>
+      {groupChapters(chapters).map((topic) => (
+        <section
+          className="card"
+          key={topic.id}
+          aria-labelledby={`topic-${topic.id}`}
+        >
+          <h2 id={`topic-${topic.id}`}>{topic.title}</h2>
+          <ul>
+            {topic.chapters.map((chapter) => (
+              <li key={chapter.id}>
+                <Link to={chapterPath(course.id, chapter)}>{chapter.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       ))}
     </main>
   );
