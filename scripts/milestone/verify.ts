@@ -37,6 +37,10 @@ if (!["localhost", "127.0.0.1", "::1"].includes(origin.hostname)) {
 
 const coursePath = "/courses/math-demo";
 const worksheetPath = "/w/7fb7f81d-96b9-4d2b-b614-b7402ece81a3";
+const teacherPath = `${coursePath}/teacher`;
+const chapterPath =
+  `${coursePath}/topics/binomische-formeln/chapters/binomische-formeln-einstieg`;
+const worksheetId = "binomische-formeln-erste-uebung";
 
 async function login(name: string, pin: string): Promise<string> {
   const form = new URLSearchParams({ username: name, pin });
@@ -98,6 +102,75 @@ assert.equal(
   404,
   "outsider worksheet denial",
 );
+assert.equal(
+  (await fetch(new URL(coursePath, origin), { redirect: "manual" })).status,
+  302,
+  "normal Website course access requires login",
+);
+assert.equal(
+  (await fetch(new URL(teacherPath, origin), { redirect: "manual" })).status,
+  302,
+  "teacher dashboard requires login",
+);
+assert.equal(
+  (await request(teacherPath, student)).status,
+  403,
+  "student cannot open teacher dashboard",
+);
+assert.equal(
+  (await request(teacherPath, student, {
+    method: "POST",
+    body: new URLSearchParams({ chapterId: "binomische-formeln-einstieg" }),
+  })).status,
+  403,
+  "student cannot change current chapter",
+);
+assert.equal(
+  (await fetch(new URL("/api/publish", origin), {
+    method: "POST",
+    body: "{}",
+  })).status,
+  401,
+  "publishing requires its token",
+);
+
+const setChapter = await request(teacherPath, admin, {
+  method: "POST",
+  body: new URLSearchParams({ chapterId: "binomische-formeln-einstieg" }),
+});
+assert.equal(setChapter.status, 303, "teacher can set current chapter");
+assert.ok(
+  (await (await request(coursePath, student)).text()).includes(
+    "Aktuelles Kapitel",
+  ),
+  "student course shows persisted current chapter",
+);
+assert.ok(
+  (await (await request(chapterPath, student)).text()).includes(
+    "Aktuelles Kapitel",
+  ),
+  "student chapter shows persisted current chapter",
+);
+assert.ok(
+  (await (await request(teacherPath, admin)).text()).includes("Aktuell"),
+  "teacher dashboard reload shows current chapter",
+);
+assert.equal(
+  (await request(teacherPath, admin, {
+    method: "POST",
+    body: new URLSearchParams({ chapterId: "not-in-course" }),
+  })).status,
+  400,
+  "teacher cannot select a chapter outside the course",
+);
+assert.equal(
+  (await request(teacherPath, admin, {
+    method: "POST",
+    body: new URLSearchParams({ worksheetId, locked: "false" }),
+  })).status,
+  303,
+  "worksheet starts unlocked for response check",
+);
 
 const worksheet = await request(worksheetPath, student);
 assert.equal(worksheet.status, 200, "student worksheet access");
@@ -114,6 +187,53 @@ assert.ok(
   "saved answer must survive a new request",
 );
 
+try {
+  const locked = await request(teacherPath, admin, {
+    method: "POST",
+    body: new URLSearchParams({ worksheetId, locked: "true" }),
+  });
+  assert.equal(locked.status, 303, "teacher can lock worksheet");
+  assert.ok(
+    (await (await request(teacherPath, admin)).text()).includes("Gesperrt"),
+    "lock survives teacher navigation and reload",
+  );
+  assert.ok(
+    (await (await request(chapterPath, student)).text()).includes("Gesperrt"),
+    "student chapter shows lock",
+  );
+  assert.ok(
+    (await (await request(worksheetPath, student)).text()).includes(
+      "Dieses Arbeitsblatt ist gesperrt",
+    ),
+    "student worksheet cannot be worked on while locked",
+  );
+  assert.equal(
+    (await request(worksheetPath, student, {
+      method: "POST",
+      body: new URLSearchParams({ answer: "blocked" }),
+    })).status,
+    403,
+    "direct student save is blocked while locked",
+  );
+} finally {
+  assert.equal(
+    (await request(teacherPath, admin, {
+      method: "POST",
+      body: new URLSearchParams({ worksheetId, locked: "false" }),
+    })).status,
+    303,
+    "teacher can unlock worksheet",
+  );
+}
+assert.ok(
+  (await (await request(teacherPath, admin)).text()).includes("Freigegeben"),
+  "unlock survives teacher reload",
+);
+assert.ok(
+  (await (await request(worksheetPath, student)).text()).includes(answer),
+  "student can work on worksheet again after unlock",
+);
+
 console.log(
-  "Milestone verified: admin and student access, outsider denial, response persistence",
+  "Milestone verified: teacher controls, student effects, authentication, publishing protection, response persistence",
 );

@@ -172,7 +172,9 @@ function WorksheetContent({
         </p>
       )}
       <h1>{worksheet.title}</h1>
-      {exercises.length ? (
+      {worksheet.is_locked ? (
+        <p role="status">Dieses Arbeitsblatt ist gesperrt.</p>
+      ) : exercises.length ? (
         <Form method="post">
           {exercises.map((exercise, index) => (
             <div key={exercise.id}>

@@ -7,6 +7,7 @@ export type Worksheet = {
   body: string;
   public_key: string;
   chapter_id: string;
+  is_locked: boolean;
   course_id?: string;
   topic_id?: string;
 };
@@ -17,7 +18,10 @@ export async function listChapterWorksheets(
 ): Promise<Worksheet[]> {
   return database.anonSQL<
     Worksheet[]
-  >`SELECT id, title, body, public_key::text, chapter_id FROM worksheets WHERE chapter_id = ${chapterId} ORDER BY title`;
+  >`SELECT w.id, w.title, w.body, w.public_key::text, w.chapter_id,
+           COALESCE(wl.is_locked, false) AS is_locked
+     FROM worksheets w LEFT JOIN worksheet_locks wl ON wl.worksheet_id = w.id
+     WHERE w.chapter_id = ${chapterId} ORDER BY w.title`;
 }
 
 export async function getWorksheetForUser(
@@ -27,9 +31,10 @@ export async function getWorksheetForUser(
 ): Promise<Worksheet | undefined> {
   const [worksheet] = await database.userSQL(user)<Worksheet[]>`
     SELECT w.id, w.title, w.body, w.public_key::text, w.chapter_id,
-           cc.course_id, ch.topic_id
+           cc.course_id, ch.topic_id, COALESCE(wl.is_locked, false) AS is_locked
     FROM worksheets w JOIN course_chapters cc ON cc.chapter_id = w.chapter_id
     JOIN chapters ch ON ch.id = w.chapter_id
+    LEFT JOIN worksheet_locks wl ON wl.worksheet_id = w.id
     WHERE w.public_key = ${publicKey}::uuid
     LIMIT 1
   `;

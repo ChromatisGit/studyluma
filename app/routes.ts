@@ -5,6 +5,7 @@ export default [
   route("login", "../src/app/routes/login.tsx"),
   route("logout", "../src/app/routes/logout.tsx"),
   route("courses/:courseId", "../src/app/routes/course.tsx"),
+  route("courses/:courseId/teacher", "../src/app/routes/teacher.tsx"),
   route(
     "courses/:courseId/topics/:topicId/chapters/:chapterId",
     "../src/app/routes/chapter.tsx",

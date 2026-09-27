@@ -22,6 +22,13 @@ exercises and prepares answer submissions. A host can supply its own
 visitor-scoped `answer` string and storage through the worksheet view and use
 this helper for the same completion rules; Website's default route stores answers
 per signed-in user, not in course or teacher settings.
+Teachers with the `courses.manage` permission use
+`/courses/:courseId/teacher` to select the current chapter and lock or unlock
+worksheets. These settings are stored in PostgreSQL and appear in enrolled
+students' course, chapter, and worksheet views. Locked worksheets cannot accept
+responses, including direct POST requests. The `studyluma/teacher-controls`
+export is the same dashboard form component with an injectable action URL and
+data, so Demo can back it with visitor-scoped state without duplicating the UI.
 During local development, Demo intentionally depends on
 `file:../studyluma-website` so it uses the current Website checkout. Website's
 `dev` branch is local; `chromacli commit` synchronizes work through Planning.
@@ -95,7 +102,9 @@ bun run scripts/milestone/verifyRls.ts
 Set `STUDYLUMA_URL` to the local Website URL for `scripts/milestone/verify.ts`, and set
 all three `SEED_*_USER`/`SEED_*_PIN` pairs. The HTTP check signs in as each
 user, verifies course and worksheet access, then saves and reloads a student
-answer. The RLS check uses `DATABASE_URL`, `DATABASE_MIGRATION_URL`,
+answer. It also exercises teacher chapter and lock changes, student effects,
+authentication boundaries, and publishing protection. The RLS check uses
+`DATABASE_URL`, `DATABASE_MIGRATION_URL`,
 `SEED_STUDENT_USER`, and `SEED_OUTSIDER_USER`. It temporarily removes the
 student enrollment, verifies that the saved answer becomes invisible, and
 restores the enrollment before exiting. Both checks are restricted to local

@@ -2,7 +2,10 @@ import type { Course } from "../application/queries";
 import { Form, Link, useLoaderData } from "react-router";
 
 export default function Home() {
-  const { courses } = useLoaderData<{ courses: Course[] }>();
+  const { courses, isTeacher } = useLoaderData<{
+    courses: Course[];
+    isTeacher: boolean;
+  }>();
   return (
     <main>
       <h1>Meine Kurse</h1>
@@ -12,6 +15,13 @@ export default function Home() {
             <Link to={`/courses/${encodeURIComponent(course.id)}`}>
               {course.title}
             </Link>
+            {isTeacher && (
+              <p>
+                <Link to={`/courses/${encodeURIComponent(course.id)}/teacher`}>
+                  Lehrkraft-Dashboard
+                </Link>
+              </p>
+            )}
           </div>
         ))
       ) : (

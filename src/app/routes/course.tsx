@@ -1,4 +1,4 @@
-import { getCourse } from "../../modules/courses";
+import { canManageCourses, getCourse } from "../../modules/courses";
 import { listCourseChapters } from "../../modules/content";
 import {
   getDatabase,
@@ -25,7 +25,11 @@ export async function loader({
     courseId,
     getDatabase(context),
   );
-  return { course, chapters };
+  return {
+    course,
+    chapters,
+    isTeacher: await canManageCourses(user, getDatabase(context)),
+  };
 }
 
 export { CourseView as default } from "../../modules/courses";

@@ -1,4 +1,4 @@
-import { listCourses } from "../../modules/courses";
+import { canManageCourses, listCourses } from "../../modules/courses";
 import {
   getDatabase,
   requireSignedIn,
@@ -13,7 +13,11 @@ export async function loader({
   context: WebsiteLoadContext;
 }) {
   const user = await requireSignedIn(request, context);
-  return { courses: await listCourses(user, getDatabase(context)) };
+  const database = getDatabase(context);
+  return {
+    courses: await listCourses(user, database),
+    isTeacher: await canManageCourses(user, database),
+  };
 }
 
 export { HomeView as default } from "../../modules/courses";

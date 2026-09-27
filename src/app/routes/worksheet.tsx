@@ -43,6 +43,9 @@ export async function loader({
     context,
     params.publicKey,
   );
+  if (worksheet.is_locked) {
+    return { worksheet, answer: "" };
+  }
   return {
     worksheet,
     answer: await getResponse(user, worksheet.id, getDatabase(context)),
@@ -63,6 +66,9 @@ export async function action({
     context,
     params.publicKey,
   );
+  if (worksheet.is_locked) {
+    return new Response("Arbeitsblatt gesperrt", { status: 403 });
+  }
   const form = await request.formData();
   const answer = form.get("answer");
   if (typeof answer !== "string") {

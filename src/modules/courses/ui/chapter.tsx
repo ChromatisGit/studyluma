@@ -24,6 +24,9 @@ export default function ChapterPage() {
       </p>
       <p>{chapter.topic_title}</p>
       <h1>{chapter.title}</h1>
+      {course.current_chapter_id === chapter.id && (
+        <p>Aktuelles Kapitel</p>
+      )}
       <nav aria-label="Kursnavigation" className="card">
         {groupChapters(chapters).map((topic) => (
           <div key={topic.id}>
@@ -49,7 +52,11 @@ export default function ChapterPage() {
       <h2>Arbeitsblätter</h2>
       {worksheets.map((worksheet) => (
         <div className="card" key={worksheet.id}>
-          <Link to={`/w/${worksheet.public_key}`}>{worksheet.title}</Link>
+          {worksheet.is_locked ? (
+            <span>{worksheet.title} – Gesperrt</span>
+          ) : (
+            <Link to={`/w/${worksheet.public_key}`}>{worksheet.title}</Link>
+          )}
         </div>
       ))}
       <nav aria-label="Kapitel wechseln">
