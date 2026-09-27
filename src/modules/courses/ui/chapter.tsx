@@ -24,9 +24,7 @@ export default function ChapterPage() {
       </p>
       <p>{chapter.topic_title}</p>
       <h1>{chapter.title}</h1>
-      {course.current_chapter_id === chapter.id && (
-        <p>Aktuelles Kapitel</p>
-      )}
+      {course.current_chapter_id === chapter.id && <p>Aktuelles Kapitel</p>}
       <nav aria-label="Kursnavigation" className="card">
         {groupChapters(chapters).map((topic) => (
           <div key={topic.id}>
@@ -66,9 +64,7 @@ export default function ChapterPage() {
           </Link>
         )}
         {next && (
-          <Link to={chapterPath(course.id, next)}>
-            Nächstes Kapitel →
-          </Link>
+          <Link to={chapterPath(course.id, next)}>Nächstes Kapitel →</Link>
         )}
       </nav>
     </main>

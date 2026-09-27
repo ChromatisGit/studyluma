@@ -32,8 +32,11 @@ export default function CoursePage() {
           <ul>
             {topic.chapters.map((chapter) => (
               <li key={chapter.id}>
-                <Link to={chapterPath(course.id, chapter)}>{chapter.title}</Link>
-                {course.current_chapter_id === chapter.id && " – Aktuelles Kapitel"}
+                <Link to={chapterPath(course.id, chapter)}>
+                  {chapter.title}
+                </Link>
+                {course.current_chapter_id === chapter.id &&
+                  " – Aktuelles Kapitel"}
               </li>
             ))}
           </ul>

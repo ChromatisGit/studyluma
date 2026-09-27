@@ -39,7 +39,12 @@ export function TeacherControls({
       <section aria-labelledby="worksheet-locks-heading">
         <h2 id="worksheet-locks-heading">Arbeitsblätter</h2>
         {worksheets.map((worksheet) => (
-          <Form method="post" action={action} key={worksheet.id} className="card">
+          <Form
+            method="post"
+            action={action}
+            key={worksheet.id}
+            className="card"
+          >
             <span>
               {worksheet.chapter_title}: {worksheet.title} –{" "}
               {worksheet.is_locked ? "Gesperrt" : "Freigegeben"}

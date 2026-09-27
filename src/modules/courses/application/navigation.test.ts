@@ -9,10 +9,7 @@ describe("complete Demo-shaped course navigation", () => {
         "terme-gleichungen",
         ["terme-umformen", "binomische-formeln", "bruchrechnung"],
       ],
-      [
-        "vektorgeometrie",
-        ["geraden", "lineare-abhaengigkeit", "lage-geraden"],
-      ],
+      ["vektorgeometrie", ["geraden", "lineare-abhaengigkeit", "lage-geraden"]],
     ] as const;
     const chapters: Chapter[] = topics.flatMap(([topic, ids]) =>
       ids.map((id) => ({
@@ -26,11 +23,14 @@ describe("complete Demo-shaped course navigation", () => {
     const groups = groupChapters(chapters);
     expect(groups.map((group) => group.chapters.length)).toEqual([3, 3]);
     expect(
-      new Set(chapters.map((chapter) => chapterPath("demo-math", chapter))).size,
+      new Set(chapters.map((chapter) => chapterPath("demo-math", chapter)))
+        .size,
     ).toBe(6);
     const last = chapters.at(-1);
     expect(last).toBeDefined();
-    if (!last) return;
+    if (!last) {
+      return;
+    }
     expect(chapterPath("demo-math", last)).toContain(
       "/topics/vektorgeometrie/chapters/lage-geraden",
     );

@@ -22,10 +22,13 @@ export function parseWorksheet(body: string): Exercise[] {
   let buffer: string[] = [];
 
   function flushField() {
-    if (!current) return;
+    if (!current) {
+      return;
+    }
     const value = buffer.join("\n").trim();
     if (field === "answer") {
-      current.inputType = value.match(/^(number|fraction|vector):/)?.[1] ?? "text";
+      current.inputType =
+        value.match(/^(number|fraction|vector):/)?.[1] ?? "text";
     } else {
       current[field] = value;
     }
@@ -34,11 +37,13 @@ export function parseWorksheet(body: string): Exercise[] {
 
   function flushExercise() {
     flushField();
-    if (!current) return;
+    if (!current) {
+      return;
+    }
     if (current.kind === "single-choice" || current.kind === "mcq") {
-      current.options = [...current.prompt.matchAll(/^- \([ xX]\) (.+)$/gm)].map(
-        (match) => match[1] ?? "",
-      );
+      current.options = [
+        ...current.prompt.matchAll(/^- \([ xX]\) (.+)$/gm),
+      ].map((match) => match[1] ?? "");
       current.prompt = current.prompt
         .replace(/^- \([ xX]\) .+$(\n)?/gm, "")
         .trim();
@@ -48,8 +53,9 @@ export function parseWorksheet(body: string): Exercise[] {
         (match) => (match[1] ?? "").split("|").map((option) => option.trim()),
       );
       let index = 0;
-      current.prompt = current.prompt.replace(/\(\(([\s\S]*?)\)\)/g, () =>
-        `\uFFFE${index++}\uFFFE`,
+      current.prompt = current.prompt.replace(
+        /\(\(([\s\S]*?)\)\)/g,
+        () => `\uFFFE${index++}\uFFFE`,
       );
     }
     exercises.push(current);

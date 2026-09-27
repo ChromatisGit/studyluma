@@ -38,8 +38,7 @@ if (!["localhost", "127.0.0.1", "::1"].includes(origin.hostname)) {
 const coursePath = "/courses/math-demo";
 const worksheetPath = "/w/7fb7f81d-96b9-4d2b-b614-b7402ece81a3";
 const teacherPath = `${coursePath}/teacher`;
-const chapterPath =
-  `${coursePath}/topics/binomische-formeln/chapters/binomische-formeln-einstieg`;
+const chapterPath = `${coursePath}/topics/binomische-formeln/chapters/binomische-formeln-einstieg`;
 const worksheetId = "binomische-formeln-erste-uebung";
 
 async function login(name: string, pin: string): Promise<string> {
@@ -118,18 +117,22 @@ assert.equal(
   "student cannot open teacher dashboard",
 );
 assert.equal(
-  (await request(teacherPath, student, {
-    method: "POST",
-    body: new URLSearchParams({ chapterId: "binomische-formeln-einstieg" }),
-  })).status,
+  (
+    await request(teacherPath, student, {
+      method: "POST",
+      body: new URLSearchParams({ chapterId: "binomische-formeln-einstieg" }),
+    })
+  ).status,
   403,
   "student cannot change current chapter",
 );
 assert.equal(
-  (await fetch(new URL("/api/publish", origin), {
-    method: "POST",
-    body: "{}",
-  })).status,
+  (
+    await fetch(new URL("/api/publish", origin), {
+      method: "POST",
+      body: "{}",
+    })
+  ).status,
   401,
   "publishing requires its token",
 );
@@ -156,18 +159,22 @@ assert.ok(
   "teacher dashboard reload shows current chapter",
 );
 assert.equal(
-  (await request(teacherPath, admin, {
-    method: "POST",
-    body: new URLSearchParams({ chapterId: "not-in-course" }),
-  })).status,
+  (
+    await request(teacherPath, admin, {
+      method: "POST",
+      body: new URLSearchParams({ chapterId: "not-in-course" }),
+    })
+  ).status,
   400,
   "teacher cannot select a chapter outside the course",
 );
 assert.equal(
-  (await request(teacherPath, admin, {
-    method: "POST",
-    body: new URLSearchParams({ worksheetId, locked: "false" }),
-  })).status,
+  (
+    await request(teacherPath, admin, {
+      method: "POST",
+      body: new URLSearchParams({ worksheetId, locked: "false" }),
+    })
+  ).status,
   303,
   "worksheet starts unlocked for response check",
 );
@@ -208,19 +215,23 @@ try {
     "student worksheet cannot be worked on while locked",
   );
   assert.equal(
-    (await request(worksheetPath, student, {
-      method: "POST",
-      body: new URLSearchParams({ answer: "blocked" }),
-    })).status,
+    (
+      await request(worksheetPath, student, {
+        method: "POST",
+        body: new URLSearchParams({ answer: "blocked" }),
+      })
+    ).status,
     403,
     "direct student save is blocked while locked",
   );
 } finally {
   assert.equal(
-    (await request(teacherPath, admin, {
-      method: "POST",
-      body: new URLSearchParams({ worksheetId, locked: "false" }),
-    })).status,
+    (
+      await request(teacherPath, admin, {
+        method: "POST",
+        body: new URLSearchParams({ worksheetId, locked: "false" }),
+      })
+    ).status,
     303,
     "teacher can unlock worksheet",
   );

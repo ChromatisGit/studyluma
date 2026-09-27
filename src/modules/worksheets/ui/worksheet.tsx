@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Worksheet } from "../application/queries";
 import { parseWorksheet, type Exercise } from "../application/parseWorksheet";
 import { readAnswers } from "../application/answers";
@@ -99,6 +99,20 @@ function ExerciseView({
           />
         </label>
       )}
+      <ExerciseHelp exercise={exercise} completed={completed} />
+    </div>
+  );
+}
+
+function ExerciseHelp({
+  exercise,
+  completed,
+}: {
+  exercise: Exercise;
+  completed: boolean;
+}) {
+  return (
+    <>
       {exercise.hint && (
         <details>
           <summary>Hinweis</summary>
@@ -111,7 +125,7 @@ function ExerciseView({
           <MarkdownRenderer markdown={exercise.why} />
         </details>
       )}
-    </div>
+    </>
   );
 }
 
@@ -145,11 +159,6 @@ function WorksheetContent({
   result: { ok: boolean; completed?: boolean; error?: string } | undefined;
 }) {
   const [state, setState] = useState(() => readAnswers(answer));
-  useEffect(() => {
-    if (result?.ok && result.completed) {
-      setState((current) => ({ ...current, completed: true }));
-    }
-  }, [result]);
   const exercises = parseWorksheet(worksheet.body);
   const chapterUrl =
     worksheet.course_id && worksheet.topic_id

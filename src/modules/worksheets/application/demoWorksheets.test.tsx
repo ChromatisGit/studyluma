@@ -43,7 +43,7 @@ describe("the five legacy Demo worksheets", () => {
           "utf8",
         );
         const exercises = parseWorksheet(body);
-        expect(exercises.length).toBe([6, 9, 8, 8, 8][index]);
+        expect(exercises.length).toBe([6, 9, 8, 8, 8][index] ?? -1);
         const answers: Answers = { responses: {}, completed: false };
         for (const exercise of exercises) {
           if (exercise.kind === "gap") {
