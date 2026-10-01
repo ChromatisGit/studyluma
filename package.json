@@ -7,6 +7,7 @@
   "exports": {
     "./package.json": "./package.json",
     "./root": "./app/root.tsx",
+    "./study-shell": "./app/StudyShell.tsx",
     "./entry.client": "./app/entry.client.tsx",
     "./entry.server": "./app/entry.server.tsx",
     "./routes/home": "./src/app/routes/home.tsx",
@@ -48,10 +49,10 @@
     "db:check": "bun run node_modules/@chromatis/base/infra/scripts/dbCheckGeneratedMigrations.ts"
   },
   "dependencies": {
-    "@chromatis/base": "git+https://github.com/ChromatisGit/chromatis-base-framework.git#80ca0af",
+    "@chromatis/base": "file:../../framework-planning/chromatis-base-framework",
+    "@fontsource/dm-sans": "^5.3.0",
     "@neondatabase/serverless": "^1.0.2",
     "@react-router/node": "^7.0.0",
-    "@tailwindcss/vite": "^4.3.0",
     "clsx": "^2.1.1",
     "image-size": "^2.0.2",
     "kern-typ": "^0.2.0",
@@ -80,15 +81,11 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.2",
     "knip": "^6.14.2",
-    "tailwindcss": "^4.3.0",
     "typescript-eslint": "^8.0.0",
     "typescript": "^5.9.3",
     "vite": "^7.0.0",
     "vite-tsconfig-paths": "^5.0.0",
     "wrangler": "^4.92.0",
     "prettier": "^3.6.2"
-  },
-  "patchedDependencies": {
-    "@chromatis/base@github:ChromatisGit/chromatis-base-framework#80ca0af": "patches/@chromatis%2Fbase@github%3AChromatisGit%2Fchromatis-base-framework#80ca0af.patch"
   }
 }

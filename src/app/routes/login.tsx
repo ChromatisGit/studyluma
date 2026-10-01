@@ -3,6 +3,7 @@ import { loginUser } from "@chromatis/base/auth";
 import {
   getDatabase,
   getSessionManager,
+  hasSessionCookie,
   type WebsiteLoadContext,
 } from "../services";
 
@@ -17,7 +18,10 @@ export async function loader({
   request: Request;
   context: WebsiteLoadContext;
 }) {
-  if (await getSessionManager(context).resolve(request)) {
+  if (
+    hasSessionCookie(request, context) &&
+    (await getSessionManager(context).resolve(request))
+  ) {
     throw redirect("/");
   }
   return null;
@@ -26,9 +30,11 @@ export async function loader({
 export async function action({
   request,
   context,
+  url,
 }: {
   request: Request;
   context: WebsiteLoadContext;
+  url: URL;
 }) {
   const form = await request.formData();
   const username = String(form.get("username") ?? "").trim();
@@ -41,7 +47,7 @@ export async function action({
     return { error: "Anmeldung fehlgeschlagen." };
   }
   const { cookie } = await getSessionManager(context).create(result.user);
-  const from = safePath(new URL(request.url).searchParams.get("from"));
+  const from = safePath(url.searchParams.get("from"));
   throw redirect(from, { headers: { "Set-Cookie": cookie } });
 }
 

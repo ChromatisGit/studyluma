@@ -1,7 +1,7 @@
 import { createSessionManager, type User } from "@chromatis/base/auth";
 import { createDatabase, type Database } from "@chromatis/base/database";
 import { createBunRuntime, type Runtime } from "@chromatis/base/runtime";
-import { redirect } from "react-router";
+import { createContext, redirect, RouterContextProvider } from "react-router";
 import type { AppLoadContext } from "react-router";
 import { getWebsiteConfig } from "./config";
 import { websiteEnvironment } from "./config/config";
@@ -11,11 +11,19 @@ import {
   requireWebsiteSecret,
 } from "./config/secrets";
 
-export type WebsiteLoadContext = AppLoadContext & { runtime?: Runtime };
+export const runtimeContext = createContext<Runtime | null>(null);
+
+export type WebsiteLoadContext =
+  | RouterContextProvider
+  | (AppLoadContext & { runtime?: Runtime });
 
 export function getRuntime(context: WebsiteLoadContext = {}): Runtime {
-  if (context.runtime) {
-    return context.runtime;
+  const runtime =
+    context instanceof RouterContextProvider
+      ? context.get(runtimeContext)
+      : context.runtime;
+  if (runtime) {
+    return runtime;
   }
   return createBunRuntime({
     ...process.env,
@@ -72,15 +80,28 @@ export function getSessionManager(context: WebsiteLoadContext = {}) {
   return getServices(context).sessionManager;
 }
 
-export async function requireSignedIn(
+export function hasSessionCookie(
   request: Request,
   context: WebsiteLoadContext = {},
+): boolean {
+  const cookieName = getWebsiteConfig(
+    getRuntime(context).environment,
+  ).sessionCookieName;
+  return (request.headers.get("cookie") ?? "")
+    .split(";")
+    .some((part) => part.trimStart().startsWith(`${cookieName}=`));
+}
+
+export async function requireSignedIn(
+  request: Request,
+  context: WebsiteLoadContext,
+  url: URL,
 ): Promise<User> {
-  const session = await getSessionManager(context).resolve(request);
+  const session = hasSessionCookie(request, context)
+    ? await getSessionManager(context).resolve(request)
+    : null;
   if (!session) {
-    throw redirect(
-      `/login?from=${encodeURIComponent(new URL(request.url).pathname)}`,
-    );
+    throw redirect(`/login?from=${encodeURIComponent(url.pathname)}`);
   }
   return session.user;
 }

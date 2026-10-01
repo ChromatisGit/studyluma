@@ -17,10 +17,11 @@ type Args = {
   request: Request;
   params: { courseId?: string };
   context: WebsiteLoadContext;
+  url: URL;
 };
 
-async function teacherContext({ request, params, context }: Args) {
-  const user = await requireSignedIn(request, context);
+async function teacherContext({ request, params, context, url }: Args) {
+  const user = await requireSignedIn(request, context, url);
   const database = getDatabase(context);
   if (!(await canManageCourses(user, database))) {
     throw new Response("Forbidden", { status: 403 });
@@ -65,7 +66,7 @@ export async function action(args: Args) {
   if (!changed) {
     return new Response("Invalid teacher control", { status: 400 });
   }
-  return Response.redirect(args.request.url, 303);
+  return Response.redirect(args.url, 303);
 }
 
 export { default } from "../../modules/courses/ui/teacher";

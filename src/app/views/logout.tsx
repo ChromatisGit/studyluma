@@ -1,11 +1,13 @@
 import { Form } from "react-router";
+import { Button, Page, PageHeader } from "@chromatis/base/ui";
 
 export default function Logout() {
   return (
-    <main>
+    <Page title="Abmelden" className="auth-page">
+      <PageHeader title="Abmelden" />
       <Form method="post">
-        <button type="submit">Abmelden</button>
+        <Button type="submit">Abmelden</Button>
       </Form>
-    </main>
+    </Page>
   );
 }

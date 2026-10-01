@@ -2,7 +2,19 @@ import { useState } from "react";
 import type { Worksheet } from "../application/queries";
 import { parseWorksheet, type Exercise } from "../application/parseWorksheet";
 import { readAnswers } from "../application/answers";
-import { Form, Link, useActionData, useLoaderData } from "react-router";
+import { Form, useActionData, useLoaderData } from "react-router";
+import {
+  Alert,
+  Breadcrumbs,
+  Button,
+  Card,
+  CardBody,
+  Input,
+  Page,
+  PageHeader,
+  Select,
+  TextAreaField,
+} from "@chromatis/base/ui";
 import {
   GapMarkdownRenderer,
   GapRenderProvider,
@@ -22,85 +34,83 @@ function ExerciseView({
 }) {
   const selected = Array.isArray(value) ? value : [];
   return (
-    <div className="card worksheet-exercise">
-      {exercise.kind === "gap" ? (
-        <GapRenderProvider
-          renderGap={(index) => (
-            <select
-              aria-label={`Lücke ${index + 1}`}
-              value={selected[index] ?? ""}
-              onChange={(event) => {
-                const next = [...selected];
-                next[index] = event.target.value;
-                onChange(next);
-              }}
-            >
-              <option value="">Bitte wählen</option>
-              {exercise.gaps[index]?.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          )}
-        >
-          <GapMarkdownRenderer markdown={exercise.prompt} />
-        </GapRenderProvider>
-      ) : (
-        <MarkdownRenderer markdown={exercise.prompt} />
-      )}
-      {(exercise.kind === "single-choice" || exercise.kind === "mcq") && (
-        <fieldset>
-          <legend>Antwort auswählen</legend>
-          {exercise.options.map((option, index) => (
-            <label className="worksheet-option" key={index}>
-              <input
-                type={exercise.kind === "mcq" ? "checkbox" : "radio"}
-                name={`exercise-${exercise.id}`}
-                checked={
-                  exercise.kind === "mcq"
-                    ? selected.includes(String(index))
-                    : value === String(index)
-                }
+    <Card className="worksheet-exercise">
+      <CardBody>
+        {exercise.kind === "gap" ? (
+          <GapRenderProvider
+            renderGap={(index) => (
+              <Select
+                label={`Lücke ${index + 1}`}
+                options={[
+                  { value: "", label: "Bitte wählen" },
+                  ...(exercise.gaps[index] ?? []).map((option) => ({
+                    value: option,
+                    label: option,
+                  })),
+                ]}
+                value={selected[index] ?? ""}
                 onChange={(event) => {
-                  if (exercise.kind === "mcq") {
-                    onChange(
-                      event.target.checked
-                        ? [...selected, String(index)]
-                        : selected.filter((item) => item !== String(index)),
-                    );
-                  } else {
-                    onChange(String(index));
-                  }
+                  const next = [...selected];
+                  next[index] = event.target.value;
+                  onChange(next);
                 }}
               />
-              <MarkdownRenderer markdown={option} />
-            </label>
-          ))}
-        </fieldset>
-      )}
-      {exercise.kind === "input" && (
-        <label>
-          <span>Meine Antwort</span>
-          <input
+            )}
+          >
+            <GapMarkdownRenderer markdown={exercise.prompt} />
+          </GapRenderProvider>
+        ) : (
+          <MarkdownRenderer markdown={exercise.prompt} />
+        )}
+        {(exercise.kind === "single-choice" || exercise.kind === "mcq") && (
+          <fieldset>
+            <legend>Antwort auswählen</legend>
+            {exercise.options.map((option, index) => (
+              <label className="worksheet-option" key={index}>
+                <input
+                  type={exercise.kind === "mcq" ? "checkbox" : "radio"}
+                  name={`exercise-${exercise.id}`}
+                  checked={
+                    exercise.kind === "mcq"
+                      ? selected.includes(String(index))
+                      : value === String(index)
+                  }
+                  onChange={(event) => {
+                    if (exercise.kind === "mcq") {
+                      onChange(
+                        event.target.checked
+                          ? [...selected, String(index)]
+                          : selected.filter((item) => item !== String(index)),
+                      );
+                    } else {
+                      onChange(String(index));
+                    }
+                  }}
+                />
+                <MarkdownRenderer markdown={option} />
+              </label>
+            ))}
+          </fieldset>
+        )}
+        {exercise.kind === "input" && (
+          <Input
+            label="Meine Antwort"
             aria-label={`Antwort ${Number(exercise.id) + 1}`}
             value={typeof value === "string" ? value : ""}
             onChange={(event) => onChange(event.target.value)}
           />
-        </label>
-      )}
-      {exercise.kind === "task" && (
-        <label>
-          <span>Meine Lösung</span>
-          <textarea
+        )}
+        {exercise.kind === "task" && (
+          <TextAreaField
+            label="Meine Lösung"
             rows={5}
             value={typeof value === "string" ? value : ""}
             onChange={(event) => onChange(event.target.value)}
           />
-        </label>
-      )}
-      <ExerciseHelp exercise={exercise} completed={completed} />
-    </div>
+        )}
+        <ExerciseHelp exercise={exercise} completed={completed} />
+      </CardBody>
+    </Card>
   );
 }
 
@@ -174,22 +184,32 @@ function WorksheetContent({
   }
 
   return (
-    <main>
-      {chapterUrl && (
-        <p>
-          <Link to={chapterUrl}>← Zurück zum Kapitel</Link>
-        </p>
-      )}
-      <h1>{worksheet.title}</h1>
+    <Page title={worksheet.title} className="worksheet-page">
+      <PageHeader
+        title={worksheet.title}
+        breadcrumbs={
+          chapterUrl && (
+            <Breadcrumbs
+              label="Brotkrumennavigation"
+              items={[
+                { label: "Kapitel", to: chapterUrl },
+                { label: worksheet.title },
+              ]}
+            />
+          )
+        }
+      />
       {worksheet.is_locked ? (
-        <p role="status">Dieses Arbeitsblatt ist gesperrt.</p>
+        <Alert status="warning">Dieses Arbeitsblatt ist gesperrt.</Alert>
       ) : exercises.length ? (
-        <Form method="post">
+        <Form method="post" className="stack stack-600 worksheet-form">
           {exercises.map((exercise, index) => (
-            <div key={exercise.id}>
+            <div className="worksheet-section" key={exercise.id}>
               {(index === 0 ||
                 exercises[index - 1]?.section !== exercise.section) && (
-                <h2>{exercise.section}</h2>
+                <h2 className="worksheet-section__heading">
+                  {exercise.section}
+                </h2>
               )}
               <ExerciseView
                 exercise={exercise}
@@ -200,50 +220,51 @@ function WorksheetContent({
             </div>
           ))}
           <input type="hidden" name="answer" value={JSON.stringify(state)} />
-          {result?.ok && (
-            <p className="success" role="status">
-              Antworten gespeichert.
-            </p>
-          )}
-          {result && !result.ok && (
-            <p className="error" role="alert">
-              {result.error}
-            </p>
-          )}
+          {result?.ok && <Alert status="success">Antworten gespeichert.</Alert>}
+          {result && !result.ok && <Alert status="error">{result.error}</Alert>}
           {state.completed && (
-            <p className="success" role="status">
-              Arbeitsblatt abgeschlossen.
-            </p>
+            <Alert status="success">Arbeitsblatt abgeschlossen.</Alert>
           )}
-          <button type="submit">Speichern</button>{" "}
-          <button type="submit" name="intent" value="complete">
-            Abschließen
-          </button>
+          <div className="btn-group worksheet-actions">
+            <Button type="submit">Speichern</Button>
+            <Button
+              type="submit"
+              role="secondary"
+              name="intent"
+              value="complete"
+            >
+              Abschließen
+            </Button>
+          </div>
         </Form>
       ) : (
         <>
-          <div className="card">
-            <MarkdownRenderer markdown={worksheet.body} />
-          </div>
-          <Form method="post" className="card">
-            <label>
-              <span>Meine Antwort</span>
-              <textarea name="answer" rows={8} defaultValue={answer} />
-            </label>
-            {result?.ok && (
-              <p className="success" role="status">
-                Antwort gespeichert.
-              </p>
-            )}
-            {result && !result.ok && (
-              <p className="error" role="alert">
-                {result.error}
-              </p>
-            )}
-            <button type="submit">Speichern</button>
-          </Form>
+          <Card>
+            <CardBody>
+              <MarkdownRenderer markdown={worksheet.body} />
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody>
+              <Form method="post" className="stack stack-600">
+                <TextAreaField
+                  label="Meine Antwort"
+                  name="answer"
+                  rows={8}
+                  defaultValue={answer}
+                />
+                {result?.ok && (
+                  <Alert status="success">Antwort gespeichert.</Alert>
+                )}
+                {result && !result.ok && (
+                  <Alert status="error">{result.error}</Alert>
+                )}
+                <Button type="submit">Speichern</Button>
+              </Form>
+            </CardBody>
+          </Card>
         </>
       )}
-    </main>
+    </Page>
   );
 }

@@ -8,11 +8,13 @@ import {
 export async function loader({
   request,
   context,
+  url,
 }: {
   request: Request;
   context: WebsiteLoadContext;
+  url: URL;
 }) {
-  const user = await requireSignedIn(request, context);
+  const user = await requireSignedIn(request, context, url);
   const database = getDatabase(context);
   return {
     courses: await listCourses(user, database),

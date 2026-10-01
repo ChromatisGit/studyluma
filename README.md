@@ -4,13 +4,18 @@ This checkout runs the StudyLuma route set on a fresh PostgreSQL database:
 framework username/PIN login and database sessions, course enrollment, topic and
 chapter navigation, content publishing, and student worksheet responses.
 
-The Website pins a Framework revision that provides database-backed sessions.
+The Website currently uses the sibling Framework checkout through a local
+`file:` dependency. A deployable release must pin a published Framework commit
+containing these changes. `app/styles.css` imports the shared style
+entry, the Website-owned purple light/dark theme in `app/theme.css`, and the
+course/worksheet content rules in `app/content.css`. The shell, forms, cards,
+navigation, and feedback use `@chromatis/base/ui`. The mode control supports
+system, light, and dark, with the saved application choice applied before paint.
 The active app is a modular monolith: `src/app` composes requests and runtime
 services, while `src/modules/courses`, `content`, and `worksheets` own the
 current product capabilities and their database SQL. Each module keeps
-migrations in `sql/migrations`, function sources in `sql/functions`, and view
-sources in `sql/views`. A tracked patch to the pinned framework dependency
-points migration discovery and routine generation at `sql/migrations`. Other
+migrations in `migrations`, function sources in `sql/functions`, and view
+sources in `sql/views`. Other
 modules use only each module's root `index.ts` API.
 The [private Demo repository](https://github.com/ChromatisGit/studyluma-demo)
 consumes this Website package and owns demo-specific data and deployment setup.

@@ -25,6 +25,11 @@ type Pages = {
       "courseId": string;
     };
   };
+  "/courses/:courseId/teacher": {
+    params: {
+      "courseId": string;
+    };
+  };
   "/courses/:courseId/topics/:topicId/chapters/:chapterId": {
     params: {
       "courseId": string;
@@ -45,7 +50,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/login" | "/logout" | "/courses/:courseId" | "/courses/:courseId/topics/:topicId/chapters/:chapterId" | "/w/:publicKey" | "/api/publish";
+    page: "/" | "/login" | "/logout" | "/courses/:courseId" | "/courses/:courseId/teacher" | "/courses/:courseId/topics/:topicId/chapters/:chapterId" | "/w/:publicKey" | "/api/publish";
   };
   "../src/app/routes/home.tsx": {
     id: "../src/app/routes/home";
@@ -62,6 +67,10 @@ type RouteFiles = {
   "../src/app/routes/course.tsx": {
     id: "../src/app/routes/course";
     page: "/courses/:courseId";
+  };
+  "../src/app/routes/teacher.tsx": {
+    id: "../src/app/routes/teacher";
+    page: "/courses/:courseId/teacher";
   };
   "../src/app/routes/chapter.tsx": {
     id: "../src/app/routes/chapter";
@@ -83,6 +92,7 @@ type RouteModules = {
   "../src/app/routes/login": unknown;
   "../src/app/routes/logout": unknown;
   "../src/app/routes/course": unknown;
+  "../src/app/routes/teacher": unknown;
   "../src/app/routes/chapter": unknown;
   "../src/app/routes/worksheet": unknown;
   "../src/app/routes/publish": unknown;

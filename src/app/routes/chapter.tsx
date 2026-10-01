@@ -12,12 +12,14 @@ export async function loader({
   request,
   params,
   context,
+  url,
 }: {
   request: Request;
   params: { courseId?: string; topicId?: string; chapterId?: string };
   context: WebsiteLoadContext;
+  url: URL;
 }) {
-  const user = await requireSignedIn(request, context);
+  const user = await requireSignedIn(request, context, url);
   const courseId = params.courseId ?? notFound();
   const topicId = params.topicId ?? notFound();
   const chapterId = params.chapterId ?? notFound();

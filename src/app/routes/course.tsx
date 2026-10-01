@@ -11,12 +11,14 @@ export async function loader({
   request,
   params,
   context,
+  url,
 }: {
   request: Request;
   params: { courseId?: string };
   context: WebsiteLoadContext;
+  url: URL;
 }) {
-  const user = await requireSignedIn(request, context);
+  const user = await requireSignedIn(request, context, url);
   const courseId = params.courseId ?? notFound();
   const course =
     (await getCourse(user, courseId, getDatabase(context))) ?? notFound();

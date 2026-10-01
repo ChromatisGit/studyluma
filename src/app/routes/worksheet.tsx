@@ -17,9 +17,10 @@ const UUID =
 async function worksheetContext(
   request: Request,
   context: WebsiteLoadContext,
+  url: URL,
   publicKey?: string,
 ) {
-  const user = await requireSignedIn(request, context);
+  const user = await requireSignedIn(request, context, url);
   if (!publicKey || !UUID.test(publicKey)) {
     return notFound();
   }
@@ -33,14 +34,17 @@ export async function loader({
   request,
   params,
   context,
+  url,
 }: {
   request: Request;
   params: { publicKey?: string };
   context: WebsiteLoadContext;
+  url: URL;
 }) {
   const { user, worksheet } = await worksheetContext(
     request,
     context,
+    url,
     params.publicKey,
   );
   if (worksheet.is_locked) {
@@ -56,14 +60,17 @@ export async function action({
   request,
   params,
   context,
+  url,
 }: {
   request: Request;
   params: { publicKey?: string };
   context: WebsiteLoadContext;
+  url: URL;
 }) {
   const { user, worksheet } = await worksheetContext(
     request,
     context,
+    url,
     params.publicKey,
   );
   if (worksheet.is_locked) {
