@@ -18,5 +18,5 @@ export default [
   ]),
   route(`${chapter}/lesson`, "routes/lesson.tsx"),
   route(`${chapter}/lesson/projector`, "routes/projector.tsx"),
-  route("viewer", "routes/viewer.ts"),
+  route("viewer", "routes/viewer.tsx"),
 ] satisfies RouteConfig;
