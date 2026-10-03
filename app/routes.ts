@@ -8,8 +8,9 @@ import {
 const chapter = "courses/:courseId/chapters/:chapterId";
 
 export default [
+  index("routes/index.ts"),
   layout("routes/shell.tsx", [
-    index("routes/home.tsx"),
+    route("courses", "routes/home.tsx"),
     route("courses/:courseId", "routes/course.tsx"),
     route(chapter, "routes/chapter.tsx"),
     route(`${chapter}/sheets/:sheetId`, "routes/sheet.tsx"),

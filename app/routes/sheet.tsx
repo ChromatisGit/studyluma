@@ -1,3 +1,4 @@
+import type { LoaderFunctionArgs, MetaArgs } from "react-router";
 import { useLoaderData, useParams } from "react-router";
 import { findChapter, getCourse } from "../../src/modules/courses";
 import { readViewer } from "../../src/modules/viewer";
@@ -6,22 +7,22 @@ import {
   WorksheetChapter,
 } from "../../src/modules/worksheets";
 import { worksheetLinks } from "../worksheetLinks";
-import type { Route } from "./+types/sheet";
 
-export function loader({ params, request }: Route.LoaderArgs) {
-  const course = getCourse(params.courseId);
+export function loader({ params, request }: LoaderFunctionArgs) {
+  const { chapterId = "", courseId = "", sheetId = "" } = params;
+  const course = getCourse(courseId);
   const viewer = readViewer(request);
-  const chapter = getWorksheetChapter(params.chapterId, viewer);
-  if (!course || !findChapter(course, params.chapterId) || !chapter) {
+  const chapter = getWorksheetChapter(chapterId, viewer);
+  if (!course || !findChapter(course, chapterId) || !chapter) {
     throw new Response(null, { status: 404 });
   }
-  if (!chapter.sheets.some((sheet) => sheet.id === params.sheetId)) {
+  if (!chapter.sheets.some((sheet) => sheet.id === sheetId)) {
     throw new Response(null, { status: 404 });
   }
   return { chapter, viewer, title: `${chapter.number} ${chapter.title}` };
 }
 
-export function meta({ data }: Route.MetaArgs) {
+export function meta({ data }: MetaArgs<typeof loader>) {
   return data ? [{ title: data.title }] : [];
 }
 

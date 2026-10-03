@@ -47,6 +47,13 @@ Modules import each other only through their `index.ts`
 | `…/lesson/projector`                     | projector window              |
 | `/viewer`                                | POST: switch the stubbed role |
 
+## Use as a package
+
+The demo app (`studyluma-demo`) installs this repository as the `studyluma`
+package and mounts its route modules (`studyluma/app/routes/*`) next to its
+own landing page. Route modules therefore use React Router's generic types
+instead of generated `+types`, and all links are absolute.
+
 ## Development
 
 ```sh

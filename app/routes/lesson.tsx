@@ -1,3 +1,4 @@
+import type { LoaderFunctionArgs, MetaArgs } from "react-router";
 import { useLoaderData, useParams } from "react-router";
 import { chapterPath, findChapter, getCourse } from "../../src/modules/courses";
 import {
@@ -6,15 +7,15 @@ import {
   TeacherView,
 } from "../../src/modules/lessons";
 import { readViewer } from "../../src/modules/viewer";
-import type { Route } from "./+types/lesson";
 
-export function loader({ params, request }: Route.LoaderArgs) {
-  const course = getCourse(params.courseId);
-  const lesson = getLesson(params.chapterId);
+export function loader({ params, request }: LoaderFunctionArgs) {
+  const { chapterId = "", courseId = "" } = params;
+  const course = getCourse(courseId);
+  const lesson = getLesson(chapterId);
   // Lesson frames are the teacher's workspace; students don't get them.
   if (
     !course ||
-    !findChapter(course, params.chapterId) ||
+    !findChapter(course, chapterId) ||
     !lesson ||
     readViewer(request) !== "teacher"
   ) {
@@ -23,7 +24,7 @@ export function loader({ params, request }: Route.LoaderArgs) {
   return { lesson, periods: schoolPeriods() };
 }
 
-export function meta({ data }: Route.MetaArgs) {
+export function meta({ data }: MetaArgs<typeof loader>) {
   return data ? [{ title: data.lesson.title }] : [];
 }
 

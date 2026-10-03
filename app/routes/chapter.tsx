@@ -1,3 +1,4 @@
+import type { LoaderFunctionArgs } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import { Presentation } from "lucide-react";
 import { buttonClassName } from "@chromatis/base/ui";
@@ -13,24 +14,22 @@ import { readViewer } from "../../src/modules/viewer";
 import { getWorksheetChapter, SheetCards } from "../../src/modules/worksheets";
 import { worksheetLinks } from "../worksheetLinks";
 import TEXT from "../app.de.json";
-import type { Route } from "./+types/chapter";
 
-export function loader({ params, request }: Route.LoaderArgs) {
-  const course = getCourse(params.courseId);
+export function loader({ params, request }: LoaderFunctionArgs) {
+  const { chapterId = "", courseId = "" } = params;
+  const course = getCourse(courseId);
   const viewer = readViewer(request);
-  if (!course || !findChapter(course, params.chapterId)) {
+  if (!course || !findChapter(course, chapterId)) {
     throw new Response(null, { status: 404 });
   }
   return {
     course,
-    chapterId: params.chapterId,
-    summary: getSummary(params.chapterId),
+    chapterId: chapterId,
+    summary: getSummary(chapterId),
     viewer,
-    worksheets: getWorksheetChapter(params.chapterId, viewer) ?? null,
+    worksheets: getWorksheetChapter(chapterId, viewer) ?? null,
     lessonFrames:
-      viewer === "teacher"
-        ? (getLesson(params.chapterId)?.frames.length ?? 0)
-        : 0,
+      viewer === "teacher" ? (getLesson(chapterId)?.frames.length ?? 0) : 0,
   };
 }
 
@@ -65,7 +64,7 @@ export default function Chapter() {
         )
       }
       homeLabel={TEXT.navigation.courses}
-      homePath="/"
+      homePath="/courses"
     />
   );
 }

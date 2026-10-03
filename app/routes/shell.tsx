@@ -1,11 +1,11 @@
+import type { LoaderFunctionArgs } from "react-router";
 import { Outlet, useLoaderData, useParams } from "react-router";
 import { listCourses, coursePath } from "../../src/modules/courses";
 import { readViewer, ViewerSwitch } from "../../src/modules/viewer";
 import { StudyShell, courseIcon } from "../StudyShell";
 import TEXT from "../app.de.json";
-import type { Route } from "./+types/shell";
 
-export function loader({ request }: Route.LoaderArgs) {
+export function loader({ request }: LoaderFunctionArgs) {
   return {
     viewer: readViewer(request),
     courses: listCourses().map(({ id, title }) => ({ id, title })),
@@ -20,7 +20,7 @@ export default function ShellLayout() {
     {
       id: "courses",
       label: TEXT.navigation.courses,
-      to: "/",
+      to: "/courses",
       icon: courseIcon,
       children: courses.map((course) => ({
         id: course.id,

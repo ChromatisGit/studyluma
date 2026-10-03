@@ -1,10 +1,11 @@
+import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import { CoursePage, getCourse } from "../../src/modules/courses";
 import TEXT from "../app.de.json";
-import type { Route } from "./+types/course";
 
-export function loader({ params }: Route.LoaderArgs) {
-  const course = getCourse(params.courseId);
+export function loader({ params }: LoaderFunctionArgs) {
+  const { courseId = "" } = params;
+  const course = getCourse(courseId);
   if (!course) {
     throw new Response(null, { status: 404 });
   }
@@ -17,7 +18,7 @@ export default function Course() {
     <CoursePage
       course={course}
       homeLabel={TEXT.navigation.courses}
-      homePath="/"
+      homePath="/courses"
     />
   );
 }

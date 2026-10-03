@@ -1,3 +1,4 @@
+import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
 import {
   getLesson,
@@ -5,10 +6,10 @@ import {
   ProjectorView,
 } from "../../src/modules/lessons";
 import { readViewer } from "../../src/modules/viewer";
-import type { Route } from "./+types/projector";
 
-export function loader({ params, request }: Route.LoaderArgs) {
-  const lesson = getLesson(params.chapterId);
+export function loader({ params, request }: LoaderFunctionArgs) {
+  const { chapterId = "" } = params;
+  const lesson = getLesson(chapterId);
   if (!lesson || readViewer(request) !== "teacher") {
     throw new Response(null, { status: 404 });
   }
