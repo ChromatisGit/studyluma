@@ -10,3 +10,4 @@ export type { WorksheetChapterProps } from "./ui/WorksheetChapter";
 export type { CurrentView } from "./ui/ChapterNav";
 export type { WorksheetLinks } from "./ui/useWorksheetController";
 export { SheetCards } from "./ui/SheetCards";
+export { TaskSample } from "./ui/TaskSample";

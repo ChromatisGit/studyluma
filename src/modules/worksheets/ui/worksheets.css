@@ -2505,3 +2505,16 @@ body.has-keypad .mfield {
   scroll-margin-bottom: 23rem;
   scroll-margin-top: 8rem;
 }
+/* A single task outside its sheet (landing page) */
+.task-sample .ws {
+  padding-block: 0;
+}
+.task-sample .ws::after {
+  display: none;
+}
+.task-sample .aufgabe {
+  padding-block: 0;
+}
+body.has-keypad .task-sample {
+  padding-bottom: 0;
+}
