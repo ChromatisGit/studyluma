@@ -1,0 +1,14 @@
+{
+  "potenzregel": {
+    "answered": 18,
+    "total": 24,
+    "levels": { "green": 9, "yellow": 7, "red": 2 },
+    "causes": { "approach": 5, "execution": 3, "mistake": 2 }
+  },
+  "faktorregel": {
+    "answered": 11,
+    "total": 24,
+    "levels": { "green": 4, "yellow": 5, "red": 2 },
+    "causes": { "topic": 3, "approach": 4 }
+  }
+}

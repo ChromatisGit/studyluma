@@ -39,6 +39,12 @@ describe("Markdown", () => {
     expect(html).toContain('data-gap="1"');
   });
 
+  test("a formula may end in a relation, like a label", () => {
+    const html = renderToStaticMarkup(<Markdown inline markdown="$f'(x) =$" />);
+    expect(html).not.toContain("math--fallback");
+    expect(html).toContain("<mo>=</mo></math>");
+  });
+
   test("inline mode drops the paragraph", () => {
     const html = renderToStaticMarkup(<Markdown inline markdown="$5x^4$" />);
     expect(

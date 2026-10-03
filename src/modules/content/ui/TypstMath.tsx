@@ -9,17 +9,38 @@ function germanDecimals(mathml: string): string {
   );
 }
 
+const TRAILING = /\s*(=|<=|>=|<|>|≤|≥|≈)\s*$/;
+const RELATION: Record<string, string> = {
+  "<=": "≤",
+  ">=": "≥",
+  "<": "&lt;",
+  ">": "&gt;",
+};
+
+function render(source: string, displayMode: boolean): string {
+  return renderToString(prepareTypstMath(source), {
+    output: "mathml",
+    displayMode,
+  });
+}
+
+/**
+ * Typst math as MathML. A formula may end in a relation, as labels do
+ * ("f'(x) ="); kern-typ rejects that, so the relation is added afterwards.
+ */
 export function renderMathML(
   source: string,
   displayMode: boolean,
 ): string | null {
   try {
-    return germanDecimals(
-      renderToString(prepareTypstMath(source), {
-        output: "mathml",
-        displayMode,
-      }),
-    );
+    const trailing = TRAILING.exec(source);
+    if (!trailing) {
+      return germanDecimals(render(source, displayMode));
+    }
+    const relation = trailing[1] ?? "=";
+    const head = render(source.slice(0, trailing.index), displayMode);
+    const mo = `<mo>${RELATION[relation] ?? relation}</mo>`;
+    return germanDecimals(head.replace(/<\/math>$/, `${mo}</math>`));
   } catch {
     return null;
   }

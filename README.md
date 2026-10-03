@@ -22,13 +22,13 @@ src/modules/<module>/  one module per area; only index.ts at its root
   ui/                  React components, *.de.json texts, module CSS
 ```
 
-| Module | Owns |
-| --- | --- |
-| `viewer` | the stubbed viewer role and the view switch |
-| `content` | Markdown with Typst math, Merkkarten, summaries, code blocks |
-| `courses` | course list, Lernweg, chapter page, course fixtures |
-| `worksheets` | worksheet renderer, math editor, checking, teacher tools |
-| `lessons` | lesson frames, teacher view, projector window |
+| Module       | Owns                                                         |
+| ------------ | ------------------------------------------------------------ |
+| `viewer`     | the stubbed viewer role and the view switch                  |
+| `content`    | Markdown with Typst math, Merkkarten, summaries, code blocks |
+| `courses`    | course list, Lernweg, chapter page, course fixtures          |
+| `worksheets` | worksheet renderer, math editor, checking, teacher tools     |
+| `lessons`    | lesson frames, teacher view, projector window                |
 
 Modules import each other only through their `index.ts`
 (`chromatis/dependencies` lint rule). All user-visible text lives in a
@@ -36,16 +36,16 @@ Modules import each other only through their `index.ts`
 
 ## Routes
 
-| Path | Page |
-| --- | --- |
-| `/` | my courses |
-| `/courses/:courseId` | Lernweg |
-| `/courses/:courseId/chapters/:chapterId` | chapter page |
-| `…/sheets/:sheetId` | worksheet |
-| `…/challenges` | challenges of a chapter |
-| `…/lesson` | lesson frames, teacher view |
-| `…/lesson/projector` | projector window |
-| `/viewer` | POST: switch the stubbed role |
+| Path                                     | Page                          |
+| ---------------------------------------- | ----------------------------- |
+| `/`                                      | my courses                    |
+| `/courses/:courseId`                     | Lernweg                       |
+| `/courses/:courseId/chapters/:chapterId` | chapter page                  |
+| `…/sheets/:sheetId`                      | worksheet                     |
+| `…/challenges`                           | challenges of a chapter       |
+| `…/lesson`                               | lesson frames, teacher view   |
+| `…/lesson/projector`                     | projector window              |
+| `/viewer`                                | POST: switch the stubbed role |
 
 ## Development
 
