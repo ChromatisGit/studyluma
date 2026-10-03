@@ -20,7 +20,7 @@
   font-size: 1.05em;
 }
 .math-block {
-  overflow-x: auto;
+  overflow: visible;
   text-align: center;
 }
 .math-block math {
