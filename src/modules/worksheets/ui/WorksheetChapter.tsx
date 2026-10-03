@@ -1,7 +1,7 @@
 import type { ViewerRole } from "../../viewer";
 import type { Chapter } from "../domain/contract";
 import { ChallengesPage } from "./ChallengesPage";
-import { ChapterDrawer, ChapterNav, type CurrentView } from "./ChapterNav";
+import type { CurrentView } from "./ChapterNav";
 import { Keypad } from "./Keypad";
 import { Pult } from "./Pult";
 import { SheetPage } from "./SheetPage";
@@ -21,8 +21,7 @@ export interface WorksheetChapterProps {
 }
 
 /**
- * A chapter's worksheet pages: the chapter sidebar (a drawer when narrow),
- * a sheet or the challenges, and the docked keypad.
+ * A chapter's worksheet page or challenges, with its docked keypad.
  */
 export function WorksheetChapter({
   chapter,
@@ -38,22 +37,16 @@ export function WorksheetChapter({
   return (
     <WorksheetContext.Provider value={controller}>
       <div className="kapitel-app">
-        <div className="kapitel-layout">
-          <aside className="kapitel-side">
-            <ChapterNav current={view} />
-          </aside>
-          <main className="kapitel-main" id="blatt">
-            {view.kind === "challenges" ? (
-              <ChallengesPage />
-            ) : sheet ? (
-              <SheetPage key={sheet.id} sheet={sheet} />
-            ) : (
-              <p className="ws">{TEXT.sheet.notFound}</p>
-            )}
-          </main>
+        <div className="kapitel-main" id="blatt">
+          {view.kind === "challenges" ? (
+            <ChallengesPage />
+          ) : sheet ? (
+            <SheetPage key={sheet.id} sheet={sheet} />
+          ) : (
+            <p className="ws">{TEXT.sheet.notFound}</p>
+          )}
         </div>
         <Keypad />
-        <ChapterDrawer current={view} />
         <Pult current={view} />
       </div>
     </WorksheetContext.Provider>

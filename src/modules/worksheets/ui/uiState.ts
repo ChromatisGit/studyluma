@@ -18,7 +18,6 @@ export type UiState = {
   pickMode: Record<string, boolean>;
   ampelEdit: Record<string, boolean>;
   ampelDraft: Record<string, AmpelResponse | { level: null; causes: [] }>;
-  drawer: boolean;
   pult: number | null;
 };
 
@@ -32,6 +31,5 @@ export const initialUi = (): UiState => ({
   pickMode: {},
   ampelEdit: {},
   ampelDraft: {},
-  drawer: false,
   pult: null,
 });

@@ -1,14 +1,7 @@
 @import "@chromatis/base/styles";
 @import "./theme.css" layer(theme);
+@import "./study-shell.css";
 
-/* StudyLuma masthead: light, on paper, with a hairline instead of a bar */
-.site-header__brand {
-  border-bottom: var(--border-1) solid var(--color-border-subtle);
-}
-.brand__logo {
-  width: 1.75rem;
-  height: 1.75rem;
-}
 .brand__name {
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
