@@ -28,6 +28,7 @@
     "@chromatis/base": "git+https://github.com/ChromatisGit/chromatis-base-framework.git#claude/adoring-babbage-21pa67",
     "@fontsource-variable/fraunces": "^5.2.0",
     "@fontsource/dm-sans": "^5.2.0",
+    "@fontsource/stix-two-math": "^5.2.0",
     "@react-router/node": "^7.9.0",
     "@react-router/serve": "^7.9.0",
     "isbot": "^5.1.0",

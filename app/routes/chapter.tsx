@@ -1,4 +1,8 @@
-import { useLoaderData } from "react-router";
+import { Link, useLoaderData } from "react-router";
+import { Presentation } from "lucide-react";
+import { buttonClassName } from "@chromatis/base/ui";
+import { fill } from "../../src/helper/text";
+import { getLesson, lessonText } from "../../src/modules/lessons";
 import {
   ChapterPage,
   getCourse,
@@ -23,11 +27,15 @@ export function loader({ params, request }: Route.LoaderArgs) {
     summary: getSummary(params.chapterId),
     viewer,
     worksheets: getWorksheetChapter(params.chapterId, viewer) ?? null,
+    lessonFrames:
+      viewer === "teacher"
+        ? (getLesson(params.chapterId)?.frames.length ?? 0)
+        : 0,
   };
 }
 
 export default function Chapter() {
-  const { course, chapterId, summary, viewer, worksheets } =
+  const { course, chapterId, summary, viewer, worksheets, lessonFrames } =
     useLoaderData<typeof loader>();
   return (
     <ChapterPage
@@ -41,6 +49,19 @@ export default function Chapter() {
             viewer={viewer}
             links={worksheetLinks(course.id, chapterId)}
           />
+        )
+      }
+      teacherActions={
+        lessonFrames > 0 && (
+          <>
+            <Link className={buttonClassName({})} to="lesson">
+              <Presentation className="icon" aria-hidden="true" />
+              {lessonText.start.open}
+            </Link>
+            <span className="muted">
+              {fill(lessonText.start.description, { count: lessonFrames })}
+            </span>
+          </>
         )
       }
       homeLabel={TEXT.navigation.courses}

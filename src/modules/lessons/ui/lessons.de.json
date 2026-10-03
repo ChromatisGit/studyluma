@@ -1,0 +1,84 @@
+{
+  "frame": {
+    "blank": "Freie Fläche",
+    "merkkarteHint": "Steht in deiner Zusammenfassung",
+    "sheet": "Arbeitsblatt",
+    "sheetWaiting": "Gleich geht es auf deinem Gerät weiter.",
+    "sheetSent": "Das Blatt ist auf deinem Gerät geöffnet.",
+    "question": "Frage {number}"
+  },
+  "header": {
+    "position": "Stunde {lesson}, Frame {number} von {total}",
+    "branch": "Stunde {lesson}, Abzweig {label}",
+    "clock": "Unterricht",
+    "clockTitle": "Unterrichtszeit und Abweichung vom Plan",
+    "projector": "Projektor",
+    "projectorShows": "zeigt {number}",
+    "projectorHidden": "Ausgeblendet",
+    "projectorHiddenSub": "leere Fläche",
+    "projectorAria": "Projektor zeigt Frame {number}. Ausblenden (B)",
+    "projectorShowAria": "Projektor wieder einblenden (B)",
+    "noProjector": "Kein Projektor",
+    "openProjector": "Öffnen",
+    "overview": "Übersicht aller Frames (G)",
+    "menu": "Weitere Einstellungen"
+  },
+  "menu": {
+    "period": "{number}. Stunde, {start} bis {end} Uhr",
+    "noPeriod": "Außerhalb der Stundenzeiten, Zeit ab Öffnen",
+    "single": "Einzelstunde, 45 Minuten",
+    "double": "Als Doppelstunde planen (später)",
+    "openProjector": "Projektorfenster öffnen",
+    "closeProjector": "Projektorfenster schließen",
+    "end": "Unterricht beenden",
+    "endConfirm": "Unterricht beenden? Tinte und Abzweige dieser Stunde werden archiviert, die nächste Stunde beginnt leer.",
+    "back": "Zum Kapitel"
+  },
+  "notes": {
+    "heading": "Notiz {number}",
+    "collapsed": "Notizen eingeklappt",
+    "protected": "Ohne Projektorfenster könnte der Beamer diesen Bildschirm spiegeln.",
+    "showAnyway": "Trotzdem zeigen",
+    "none": "Keine Notiz",
+    "next": "Nächster:",
+    "nextAria": "Nächster Frame: {title}",
+    "back": "Zurück zu {number}",
+    "send": "Klasse zum Blatt schicken",
+    "sent": "Klasse ist auf dem Blatt"
+  },
+  "stage": {
+    "previous": "Vorheriger Frame",
+    "next": "Nächster Frame",
+    "hidden": "Projektor ausgeblendet",
+    "hiddenHint": "Die Klasse sieht eine leere Fläche. B blendet wieder ein."
+  },
+  "overview": {
+    "title": "Übersicht",
+    "private": "nur für dich sichtbar",
+    "close": "Schließen",
+    "lesson": "Stunde {number}",
+    "until": "bis {time}",
+    "frame": "Frame {number}: {title}"
+  },
+  "tools": {
+    "label": "Werkzeuge",
+    "cursor": "Zeigen und bedienen",
+    "laser": "Laserpointer",
+    "graphit": "Stift Graphit",
+    "violett": "Stift Violett",
+    "signal": "Stift Signalfarbe",
+    "eraser": "Radierer",
+    "undo": "Rückgängig",
+    "undoBlank": "Rückgängig: freie Fläche entfernen",
+    "blank": "Freie Fläche einfügen (N)"
+  },
+  "projector": {
+    "title": "Projektor",
+    "waiting": "Warte auf die Lehrkraft-Ansicht …"
+  },
+  "start": {
+    "teacher": "Unterricht",
+    "open": "Lesson Frames öffnen",
+    "description": "{count} Frames für die Plenumsphasen dieses Kapitels"
+  }
+}
