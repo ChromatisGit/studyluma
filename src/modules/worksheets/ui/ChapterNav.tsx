@@ -129,12 +129,17 @@ export function ChapterNav({
                       className={className}
                       to={links.sheet(sheet.id)}
                       aria-current={isCurrent ? "page" : undefined}
+                      title={sheet.title}
                       onClick={onNavigate}
                     >
                       {content}
                     </Link>
                   ) : (
-                    <span className={className} aria-disabled="true">
+                    <span
+                      className={className}
+                      aria-disabled="true"
+                      title={sheet.title}
+                    >
                       {content}
                     </span>
                   )}

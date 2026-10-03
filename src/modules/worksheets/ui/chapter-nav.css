@@ -13,14 +13,15 @@
   padding: var(--space-200) var(--space-300);
   border-radius: var(--radius-control);
   background: transparent;
-  color: var(--color-text);
+  color: var(--color-text-muted);
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
   text-align: left;
   cursor: pointer;
 }
 .kap-nav__group-button:hover {
-  background: var(--color-bg-accent);
+  background: var(--color-bg-hover);
+  color: var(--color-text);
 }
 .kap-nav__group-button svg {
   width: 1rem;
@@ -48,6 +49,9 @@
 .kap-nav__sheets-inner {
   min-height: 0;
   overflow: hidden;
+  margin-left: var(--space-300);
+  padding-left: var(--space-200);
+  border-left: var(--border-1) solid var(--color-border-subtle);
 }
 .kap-nav__list {
   list-style: none;
@@ -83,7 +87,6 @@
 }
 /* the framework's menu indicator: a bar left of the current item */
 .kap-nav__item.is-current {
-  background: var(--color-bg-subtle);
   font-weight: var(--weight-bold);
 }
 .kap-nav__item.is-current::before {
@@ -125,6 +128,9 @@ button.kap-nav__item.is-locked {
   flex: 1;
   min-width: 0;
   line-height: var(--leading-label);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .kap-nav__state {
   flex: none;

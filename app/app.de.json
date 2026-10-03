@@ -17,9 +17,10 @@
   },
   "colorMode": {
     "label": "Darstellung",
-    "system": "Wie das Gerät",
     "light": "Hell",
-    "dark": "Tafel (dunkel)"
+    "dark": "Dunkel",
+    "toLight": "Helles Design einschalten",
+    "toDark": "Dunkles Design einschalten"
   },
   "errors": {
     "notFoundTitle": "Seite nicht gefunden",

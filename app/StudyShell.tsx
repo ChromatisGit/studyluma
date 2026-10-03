@@ -14,10 +14,8 @@ import {
   X,
 } from "lucide-react";
 import {
-  Select,
   SiteShell,
   useColorMode,
-  type ColorMode,
   type NavigationItem,
   type ShellActionSlot,
 } from "@chromatis/base/ui";
@@ -35,23 +33,7 @@ const sidebarStorageKey = "studyluma:sidebar";
 
 export const studyColorModeKey = colorModeKey;
 
-function ColorModeControl() {
-  const [mode, setMode] = useColorMode(colorModeKey);
-  return (
-    <Select
-      label={TEXT.colorMode.label}
-      visuallyHiddenLabel
-      value={mode}
-      onChange={(event) => setMode(event.target.value as ColorMode)}
-      options={(["system", "light", "dark"] as const).map((value) => ({
-        value,
-        label: TEXT.colorMode[value],
-      }))}
-    />
-  );
-}
-
-function CompactColorModeControl() {
+function ColorModeControl({ compact = false }: { compact?: boolean }) {
   const [mode, setMode] = useColorMode(colorModeKey);
   const [systemDark, setSystemDark] = useState(false);
   useEffect(() => {
@@ -62,12 +44,41 @@ function CompactColorModeControl() {
     return () => preference.removeEventListener("change", update);
   }, []);
   const dark = mode === "dark" || (mode === "system" && systemDark);
+  if (!compact) {
+    return (
+      <div className="study-sidebar__appearance">
+        <span className="study-sidebar__appearance-label">
+          {TEXT.colorMode.label}
+        </span>
+        <div
+          className="study-sidebar__appearance-options"
+          role="group"
+          aria-label={TEXT.colorMode.label}
+        >
+          <button
+            type="button"
+            aria-pressed={!dark}
+            onClick={() => setMode("light")}
+          >
+            {TEXT.colorMode.light}
+          </button>
+          <button
+            type="button"
+            aria-pressed={dark}
+            onClick={() => setMode("dark")}
+          >
+            {TEXT.colorMode.dark}
+          </button>
+        </div>
+      </div>
+    );
+  }
   return (
     <button
       type="button"
       className="study-sidebar__theme-button"
-      aria-label={TEXT.colorMode.label}
-      title={TEXT.colorMode.label}
+      aria-label={dark ? TEXT.colorMode.toLight : TEXT.colorMode.toDark}
+      title={dark ? TEXT.colorMode.toLight : TEXT.colorMode.toDark}
       onClick={() => setMode(dark ? "light" : "dark")}
     >
       {dark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
@@ -79,13 +90,13 @@ function DesktopChapterSection({
   section,
   collapsed,
   flyout,
-  setFlyout,
+  toggleFlyout,
   panelId,
 }: {
   section: ChapterSection;
   collapsed: boolean;
   flyout: string | null;
-  setFlyout: (value: string | null) => void;
+  toggleFlyout: (id: string, trigger: HTMLButtonElement) => void;
   panelId: string;
 }) {
   const [open, setOpen] = useState(true);
@@ -99,7 +110,8 @@ function DesktopChapterSection({
           aria-label={section.label}
           aria-expanded={flyout === "chapter"}
           aria-controls={`${panelId}-flyout`}
-          onClick={() => setFlyout(flyout === "chapter" ? null : "chapter")}
+          data-active="true"
+          onClick={(event) => toggleFlyout("chapter", event.currentTarget)}
         >
           <span aria-hidden="true">
             <BookOpen />
@@ -162,8 +174,20 @@ function DesktopSidebar({
   const activeSectionId = activeSection?.id;
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [flyout, setFlyout] = useState<string | null>(null);
+  const [flyoutTop, setFlyoutTop] = useState(0);
   const sidebarRef = useRef<HTMLElement>(null);
   const navigationId = useId();
+
+  function toggleFlyout(id: string, trigger: HTMLButtonElement) {
+    if (flyout === id) {
+      setFlyout(null);
+      return;
+    }
+    setFlyoutTop(
+      Math.min(trigger.getBoundingClientRect().top, window.innerHeight * 0.4),
+    );
+    setFlyout(id);
+  }
 
   useEffect(() => {
     setExpanded(activeSectionId ? { [activeSectionId]: true } : {});
@@ -246,8 +270,9 @@ function DesktopSidebar({
                     })}
                     aria-expanded={flyout === item.id}
                     aria-controls={`${navigationId}-flyout`}
-                    onClick={() =>
-                      setFlyout(flyout === item.id ? null : item.id)
+                    data-active={sectionActive || undefined}
+                    onClick={(event) =>
+                      toggleFlyout(item.id, event.currentTarget)
                     }
                   >
                     <span aria-hidden="true">
@@ -318,26 +343,33 @@ function DesktopSidebar({
             section={chapterSection}
             collapsed={collapsed}
             flyout={flyout}
-            setFlyout={setFlyout}
+            toggleFlyout={toggleFlyout}
             panelId={navigationId}
           />
         )}
       </nav>
       <div className="study-sidebar__footer">
+        <div className="study-sidebar__settings">
+          <ColorModeControl />
+        </div>
+        <div className="study-sidebar__settings-compact">
+          <ColorModeControl compact />
+        </div>
         {sidebarFooter && (
           <div className="study-sidebar__footer-action">
             {collapsed ? sidebarFooter.compact : sidebarFooter.full}
           </div>
         )}
-        <div className="study-sidebar__settings">
-          <ColorModeControl />
-        </div>
-        <div className="study-sidebar__settings-compact">
-          <CompactColorModeControl />
-        </div>
       </div>
       {collapsed && flyout && (
-        <div className="study-sidebar__flyout" id={`${navigationId}-flyout`}>
+        <div
+          className="study-sidebar__flyout"
+          id={`${navigationId}-flyout`}
+          style={{
+            top: flyoutTop,
+            maxHeight: `calc(100dvh - ${flyoutTop}px - 0.5rem)`,
+          }}
+        >
           {flyout === "chapter" && chapterSection && (
             <div>
               <Link
@@ -384,6 +416,7 @@ export interface StudyShellProps {
   sidebarFooter?: ShellActionSlot | undefined;
   quickActions?: ReactNode;
   currentParentTo?: string | undefined;
+  footer?: ReactNode;
 }
 
 /** The StudyLuma frame around every page except the lesson views. */
@@ -394,6 +427,7 @@ export function StudyShell({
   sidebarFooter,
   quickActions,
   currentParentTo,
+  footer,
 }: StudyShellProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -430,6 +464,7 @@ export function StudyShell({
         chapterSection={chapterSection}
         quickActions={quickActions}
         settings={<ColorModeControl />}
+        accountControl={sidebarFooter?.full}
       />
       <SiteShell
         brand={
@@ -455,6 +490,7 @@ export function StudyShell({
           sidebarClosed: <PanelLeftOpen aria-hidden="true" />,
         }}
         sidebarStorageKey={sidebarStorageKey}
+        footer={footer}
       >
         {children}
       </SiteShell>

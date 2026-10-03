@@ -17,11 +17,13 @@ export function StudyMobileHeader({
   chapterSection,
   quickActions,
   settings,
+  accountControl,
 }: {
   navigation: readonly NavigationItem[];
   chapterSection?: ChapterSection | undefined;
   quickActions?: ReactNode;
   settings: ReactNode;
+  accountControl?: ReactNode;
 }) {
   const path = useLocation().pathname;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -89,6 +91,7 @@ export function StudyMobileHeader({
                   <Link
                     className="study-mobile-header__section-link"
                     to={item.to}
+                    aria-current={path === item.to ? "page" : undefined}
                     onClick={() => setMenuOpen(false)}
                   >
                     {item.label}
@@ -134,6 +137,7 @@ export function StudyMobileHeader({
                 <Link
                   className="study-mobile-header__section-link"
                   to={chapterSection.to}
+                  aria-current={path === chapterSection.to ? "page" : undefined}
                   onClick={() => setMenuOpen(false)}
                 >
                   {chapterSection.label}
@@ -143,6 +147,9 @@ export function StudyMobileHeader({
             )}
           </nav>
           <div className="study-mobile-header__settings">{settings}</div>
+          {accountControl && (
+            <div className="study-mobile-header__account">{accountControl}</div>
+          )}
         </div>
       )}
     </header>
