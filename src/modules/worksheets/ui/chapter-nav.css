@@ -16,9 +16,11 @@
   background: transparent;
   color: var(--color-text);
   font: inherit;
-  font-weight: var(--weight-bold);
   text-align: left;
   cursor: pointer;
+}
+.kap-nav__group-button[data-active] {
+  font-weight: var(--weight-bold);
 }
 .kap-nav__group-button:hover {
   background: var(--color-bg-hover);

@@ -96,6 +96,7 @@ export function ChapterNav({
         className="kap-nav__group-button"
         aria-expanded={sheetsOpen}
         aria-controls={sheetsId}
+        data-active={current.kind === "sheet" || undefined}
         onClick={() => setSheetsOpen((previous) => !previous)}
       >
         <span>{TEXT.nav.worksheets}</span>
