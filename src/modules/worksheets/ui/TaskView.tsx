@@ -1,4 +1,3 @@
-import { Choice } from "@chromatis/base/ui";
 import { Markdown } from "../../content";
 import { fill } from "../../../helper/text";
 import type {
@@ -8,11 +7,10 @@ import type {
   Part,
 } from "../domain/contract";
 import { Answer } from "./Answer";
+import { AuswahlOptions } from "./AuswahlOptions";
 import { GapInput } from "./GapInput";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
-
-const LETTERS = "ABCDEFGH";
 
 function LueckentextView({
   part,
@@ -61,53 +59,25 @@ function AuswahlView({
     ? (current.value as string[])
     : [];
   const check = current.lastCheck;
-  const short = task.options.every(
-    (option) => option.label.replace(/\$/g, "").length <= 14,
-  );
-  const toggle = (id: string, on: boolean) => {
-    const next = task.multiple
-      ? on
-        ? [...selected, id]
-        : selected.filter((other) => other !== id)
-      : [id];
-    setInput({ partId: part.id }, next);
-  };
+  // Auswahl only says "Noch nicht" for the whole choice, not per option.
+  const tinted = check && (!task.multiple || check.state === "richtig");
+  const states = tinted
+    ? Object.fromEntries(selected.map((id) => [id, check.state]))
+    : undefined;
   return (
     <div className="task">
       <Markdown markdown={task.prompt} />
-      <fieldset className={`auswahl${short ? " auswahl--grid" : ""}`}>
-        <legend className="visually-hidden">
-          {fill(TEXT.aufgabe.chooseFor, {
-            ref: `${refText}${part.letter ?? ""}`,
-          })}
-        </legend>
-        {task.options.map((option, i) => {
-          const chosen = selected.includes(option.id);
-          // Auswahl only says "Noch nicht" for the whole choice, not per option.
-          const state =
-            chosen && check && (!task.multiple || check.state === "richtig")
-              ? check.state
-              : undefined;
-          return (
-            <Choice
-              key={option.id}
-              type={task.multiple ? "checkbox" : "radio"}
-              name={`opt-${part.id}`}
-              value={option.id}
-              checked={chosen}
-              onChange={(event) => toggle(option.id, event.target.checked)}
-              className="option"
-              data-state={state}
-              label={
-                <>
-                  <span className="option__letter">{LETTERS[i]}</span>
-                  <Markdown inline markdown={option.label} />
-                </>
-              }
-            />
-          );
+      <AuswahlOptions
+        name={`opt-${part.id}`}
+        legend={fill(TEXT.aufgabe.chooseFor, {
+          ref: `${refText}${part.letter ?? ""}`,
         })}
-      </fieldset>
+        options={task.options}
+        multiple={task.multiple}
+        selected={selected}
+        onChange={(next) => setInput({ partId: part.id }, next)}
+        {...(states ? { states } : {})}
+      />
     </div>
   );
 }

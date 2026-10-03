@@ -123,10 +123,19 @@ $ x^4 - 16 = 0 $
 - ( ) pq-Formel
 - (x) Potenz isolieren
 
+### Auswahl
+
+Welche Gleichungen löst du durch Ausklammern?
+
+- (x) $x^3 - 9x = 0$
+- ( ) $x^4 - 16 = 0$
+- (x) $x^2 + 5x = 0$
+
 ::notiz
 
 - Frage 2 prüft, ob „Potenz isolieren“ erkannt wird
 - viele A: kurz zurück zum Überblick (Frame 4)
+- Frage 3 hat zwei richtige Antworten
 
 ## Anwendung: Zurück zur Solarzelle
 

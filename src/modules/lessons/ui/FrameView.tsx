@@ -75,13 +75,23 @@ function Columns({ frame, sent }: { frame: LessonFrame; sent: boolean }) {
       >
         <div className="lf__bleed-image">
           {image?.map((block, i) => (
-            <FrameBlockView key={i} block={block} sent={sent} />
+            <FrameBlockView
+              key={i}
+              block={block}
+              sent={sent}
+              frameId={frame.id}
+            />
           ))}
         </div>
         <div className="lf__bleed-text" ref={fit}>
           <h1 className="lf__title lf__title--small">{frame.title}</h1>
           {rest.flat().map((block, i) => (
-            <FrameBlockView key={i} block={block} sent={sent} />
+            <FrameBlockView
+              key={i}
+              block={block}
+              sent={sent}
+              frameId={frame.id}
+            />
           ))}
           <WritingZone />
         </div>
@@ -98,7 +108,12 @@ function Columns({ frame, sent }: { frame: LessonFrame; sent: boolean }) {
         {columns.map((column, c) => (
           <div key={c} className="lf__column">
             {column.map((block, i) => (
-              <FrameBlockView key={i} block={block} sent={sent} />
+              <FrameBlockView
+                key={i}
+                block={block}
+                sent={sent}
+                frameId={frame.id}
+              />
             ))}
             {!column.some((block) => block.type === "image") && <WritingZone />}
           </div>
@@ -119,7 +134,12 @@ function Body({ frame, sent }: { frame: LessonFrame; sent: boolean }) {
     return (
       <div className="lf__center">
         {blocks.map((block, i) => (
-          <FrameBlockView key={i} block={block} sent={sent} />
+          <FrameBlockView
+            key={i}
+            block={block}
+            sent={sent}
+            frameId={frame.id}
+          />
         ))}
       </div>
     );
@@ -129,7 +149,12 @@ function Body({ frame, sent }: { frame: LessonFrame; sent: boolean }) {
       <h1 className="lf__title">{frame.title}</h1>
       <div className="lf__blocks">
         {blocks.map((block, i) => (
-          <FrameBlockView key={i} block={block} sent={sent} />
+          <FrameBlockView
+            key={i}
+            block={block}
+            sent={sent}
+            frameId={frame.id}
+          />
         ))}
         {hasWritingSpace(frame) && <WritingZone />}
       </div>

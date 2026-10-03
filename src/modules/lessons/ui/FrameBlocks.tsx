@@ -1,10 +1,8 @@
 import { Check, FileText, Smartphone, Bookmark } from "lucide-react";
 import { Markdown } from "../../content";
-import { fill } from "../../../helper/text";
 import type { FrameBlock } from "../domain/lesson";
+import { QuizBlock } from "./FrameQuiz";
 import TEXT from "./lessons.de.json";
-
-const LETTERS = "ABCDEFGH";
 
 /** A squared writing surface; a label shows as a small sign on top. */
 export function WritingZone({ label }: { label?: string | undefined }) {
@@ -64,9 +62,11 @@ function SheetCard({
 export function FrameBlockView({
   block,
   sent,
+  frameId,
 }: {
   block: FrameBlock;
   sent: boolean;
+  frameId: string;
 }) {
   switch (block.type) {
     case "markdown":
@@ -107,25 +107,6 @@ export function FrameBlockView({
     case "sheet":
       return <SheetCard block={block} sent={sent} />;
     case "quiz":
-      return (
-        <div className="lf-quiz">
-          {block.questions.map((question, i) => (
-            <section key={i} className="lf-quiz__question">
-              <p className="lf-quiz__number">
-                {fill(TEXT.frame.question, { number: i + 1 })}
-              </p>
-              <Markdown markdown={question.prompt} className="lf-md" />
-              <ol className="lf-quiz__options">
-                {question.options.map((option, k) => (
-                  <li key={k}>
-                    <span className="lf-quiz__letter">{LETTERS[k]}</span>
-                    <Markdown inline markdown={option.label} />
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ))}
-        </div>
-      );
+      return <QuizBlock block={block} frameId={frameId} />;
   }
 }

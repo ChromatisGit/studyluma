@@ -4,7 +4,9 @@
    gaps, math field, marks, keypad, mode choice, Ampel, Musterlösung,
    Pult, chapter sidebar. Ported from the approved prototype.
    ===================================================================== */
-.kapitel-app {
+/* .auswahl also stands alone (live quiz) and needs the result tints. */
+.kapitel-app,
+.auswahl {
   --font-math:
     math, "STIX Two Math", "Cambria Math", "Latin Modern Math", "STIX Two Text",
     serif;
@@ -346,8 +348,12 @@ td) {
 }
 .auswahl--grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
   column-gap: var(--space-400);
+}
+/* short options: letter and label stay on one line */
+.auswahl--grid .choice__text {
+  white-space: nowrap;
 }
 .option {
   align-items: center;
@@ -363,6 +369,11 @@ td) {
 }
 .option:has(:checked) .option__letter {
   color: var(--color-text);
+}
+/* Closed for answers (live quiz): the choice stays readable. */
+.auswahl--locked .option {
+  color: var(--color-text);
+  cursor: default;
 }
 
 /* ---- Math field -------------------------------------------------------- */

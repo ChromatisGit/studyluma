@@ -4,6 +4,7 @@ export {
   hasLesson,
   schoolPeriods,
 } from "./infrastructure/lessonRepository";
+export { quizQuestions } from "./domain/quizFrame";
 export { TeacherView } from "./ui/TeacherView";
 export type { TeacherViewProps } from "./ui/TeacherView";
 export { ProjectorView } from "./ui/ProjectorView";

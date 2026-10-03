@@ -34,6 +34,7 @@ export default function LessonRoute() {
   const chapter = chapterPath(courseId, chapterId);
   return (
     <TeacherView
+      courseId={courseId}
       lesson={lesson}
       periods={periods}
       projectorPath={`${chapter}/lesson/projector`}

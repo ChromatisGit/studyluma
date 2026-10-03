@@ -1,9 +1,12 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { Outlet, useLoaderData, useParams } from "react-router";
 import { listCourses, coursePath } from "../../src/modules/courses";
+import { LiveQuizProvider } from "../../src/modules/quiz";
 import { readViewer, ViewerSwitch } from "../../src/modules/viewer";
 import { StudyShell, courseIcon } from "../StudyShell";
 import TEXT from "../app.de.json";
+
+const quizPath = (courseId: string) => `${coursePath(courseId)}/quiz`;
 
 export function loader({ request }: LoaderFunctionArgs) {
   return {
@@ -42,7 +45,9 @@ export default function ShellLayout() {
       }}
       quickActions={switchControl(true)}
     >
-      <Outlet />
+      <LiveQuizProvider enabled={viewer === "student"} quizPath={quizPath}>
+        <Outlet />
+      </LiveQuizProvider>
     </StudyShell>
   );
 }

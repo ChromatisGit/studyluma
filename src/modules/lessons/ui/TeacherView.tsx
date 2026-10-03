@@ -12,7 +12,10 @@ import { InkInput, InkStrokes, type InkTool } from "./InkLayer";
 import { LessonHeader } from "./LessonHeader";
 import { NotesStrip } from "./NotesStrip";
 import { Overview } from "./Overview";
+import { LiveQuizContext } from "./FrameQuiz";
+import type { QuizActionsProps } from "./QuizActions";
 import { Toolbar } from "./Toolbar";
+import { useFrameQuiz } from "./useFrameQuiz";
 import { useTeacherKeys, type TeacherKey } from "./useTeacherKeys";
 import TEXT from "./lessons.de.json";
 import "./lessons.css";
@@ -44,6 +47,7 @@ function TeacherStage({
   overview,
   onCloseOverview,
   dispatch,
+  onStep,
   sendLaser,
 }: {
   lesson: Lesson;
@@ -55,6 +59,7 @@ function TeacherStage({
   overview: boolean;
   onCloseOverview: () => void;
   dispatch: ReturnType<typeof useLessonSession>["dispatch"];
+  onStep: (by: 1 | -1) => void;
   sendLaser: (point: [number, number] | null) => void;
 }) {
   const id = entryId(entry);
@@ -83,7 +88,7 @@ function TeacherStage({
           type="button"
           className="lt-arrow lt-arrow--prev"
           aria-label={TEXT.stage.previous}
-          onClick={() => dispatch({ type: "step", by: -1 })}
+          onClick={() => onStep(-1)}
         >
           <ChevronLeft aria-hidden="true" />
         </button>
@@ -93,7 +98,7 @@ function TeacherStage({
           type="button"
           className="lt-arrow lt-arrow--next"
           aria-label={TEXT.stage.next}
-          onClick={() => dispatch({ type: "step", by: 1 })}
+          onClick={() => onStep(1)}
         >
           <ChevronRight aria-hidden="true" />
         </button>
@@ -125,6 +130,7 @@ function TeacherStage({
 /** Tool, overview and menu state, and what each key does. */
 function useTeacherControls(
   dispatch: ReturnType<typeof useLessonSession>["dispatch"],
+  onStep: (by: 1 | -1) => void,
 ) {
   const [tool, setTool] = useState<InkTool>("cursor");
   const [overview, setOverview] = useState(false);
@@ -136,7 +142,7 @@ function useTeacherControls(
         setOverview(false);
         setMenu(false);
       } else if (key === "next" || key === "previous") {
-        dispatch({ type: "step", by: key === "next" ? 1 : -1 });
+        onStep(key === "next" ? 1 : -1);
       } else if (key === "hide") {
         dispatch({ type: "toggleHidden" });
       } else if (key === "overview") {
@@ -150,7 +156,7 @@ function useTeacherControls(
         );
       }
     },
-    [dispatch],
+    [dispatch, onStep],
   );
   useTeacherKeys(onKey);
 
@@ -165,6 +171,7 @@ function FrameNotes({
   visible,
   onShowAnyway,
   dispatch,
+  quiz,
 }: {
   entry: OrderEntry;
   next: OrderEntry | undefined;
@@ -172,6 +179,7 @@ function FrameNotes({
   visible: boolean;
   onShowAnyway: () => void;
   dispatch: ReturnType<typeof useLessonSession>["dispatch"];
+  quiz: QuizActionsProps | undefined;
 }) {
   const frame = entry.kind === "frame" ? entry.frame : entry.parent;
   const number = entry.kind === "frame" ? frame.number : entry.label;
@@ -193,6 +201,7 @@ function FrameNotes({
       onBack={() => dispatch({ type: "go", frameId: frame.id })}
       sheet={sheet ? { sent: session.sent.includes(frame.id) } : undefined}
       onSend={() => dispatch({ type: "send", frameId: frame.id })}
+      quiz={quiz}
     />
   );
 }
@@ -212,6 +221,8 @@ function positionText(lesson: Lesson, entry: OrderEntry): string {
 }
 
 export interface TeacherViewProps {
+  /** The course whose students take part in the quiz. */
+  courseId: string;
   lesson: Lesson;
   periods: Period[];
   projectorPath: string;
@@ -223,6 +234,7 @@ export interface TeacherViewProps {
  * as large as possible and a narrow toolbar. No footer.
  */
 export function TeacherView({
+  courseId,
   lesson,
   periods,
   projectorPath,
@@ -231,8 +243,10 @@ export function TeacherView({
   useTafelTheme();
   const { session, dispatch, sendLaser, endLesson, clock, projectorConnected } =
     useLessonSession(lesson, periods);
+  const quiz = useFrameQuiz(courseId, lesson, session, dispatch);
+  const { onStep } = quiz;
   const { tool, setTool, overview, setOverview, menu, setMenu, onKey } =
-    useTeacherControls(dispatch);
+    useTeacherControls(dispatch, onStep);
   const [notesForced, setNotesForced] = useState(false);
 
   if (!session) {
@@ -291,20 +305,24 @@ export function TeacherView({
         visible={projectorConnected || notesForced}
         onShowAnyway={() => setNotesForced(true)}
         dispatch={dispatch}
+        quiz={quiz.actions}
       />
       <main className="lt-main">
-        <TeacherStage
-          lesson={lesson}
-          session={session}
-          entry={entry}
-          tool={tool}
-          hasPrevious={index > 0}
-          hasNext={!!next}
-          overview={overview}
-          onCloseOverview={() => setOverview(false)}
-          dispatch={dispatch}
-          sendLaser={sendLaser}
-        />
+        <LiveQuizContext.Provider value={quiz.live}>
+          <TeacherStage
+            lesson={lesson}
+            session={session}
+            entry={entry}
+            tool={tool}
+            hasPrevious={index > 0}
+            hasNext={!!next}
+            overview={overview}
+            onCloseOverview={() => setOverview(false)}
+            dispatch={dispatch}
+            onStep={onStep}
+            sendLaser={sendLaser}
+          />
+        </LiveQuizContext.Provider>
         <Toolbar
           tool={tool}
           onTool={setTool}

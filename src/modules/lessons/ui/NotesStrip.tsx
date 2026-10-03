@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Check, ChevronDown, ChevronRight, EyeOff, Undo2 } from "lucide-react";
 import { Markdown } from "../../content";
 import { fill } from "../../../helper/text";
+import { QuizActions, type QuizActionsProps } from "./QuizActions";
 import TEXT from "./lessons.de.json";
 
 export interface NotesStripProps {
@@ -16,6 +17,8 @@ export interface NotesStripProps {
   onBack: () => void;
   sheet?: { sent: boolean } | undefined;
   onSend: () => void;
+  /** On a quiz frame: start it and move it on. */
+  quiz?: QuizActionsProps | undefined;
 }
 
 /**
@@ -71,6 +74,7 @@ export function NotesStrip(props: NotesStripProps) {
             {TEXT.notes.showAnyway}
           </button>
         )}
+        {props.quiz && <QuizActions {...props.quiz} />}
         {props.sheet &&
           (props.sheet.sent ? (
             <span className="lt-notes__sent">

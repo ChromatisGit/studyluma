@@ -12,7 +12,9 @@
     "./modules/viewer": "./src/modules/viewer/index.ts",
     "./modules/content": "./src/modules/content/index.ts",
     "./modules/courses": "./src/modules/courses/index.ts",
-    "./modules/worksheets": "./src/modules/worksheets/index.ts"
+    "./modules/worksheets": "./src/modules/worksheets/index.ts",
+    "./modules/quiz": "./src/modules/quiz/index.ts",
+    "./modules/lessons": "./src/modules/lessons/index.ts"
   },
   "scripts": {
     "dev": "react-router dev",

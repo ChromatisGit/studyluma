@@ -169,7 +169,7 @@
       "marking": "Quiz",
       "family": "quiz",
       "planUntil": 1800,
-      "notes": "- Frage 2 prüft, ob „Potenz isolieren“ erkannt wird\n- viele A: kurz zurück zum Überblick (Frame 4)",
+      "notes": "- Frage 2 prüft, ob „Potenz isolieren“ erkannt wird\n- viele A: kurz zurück zum Überblick (Frame 4)\n- Frage 3 hat zwei richtige Antworten",
       "blocks": [
         {
           "type": "quiz",
@@ -204,6 +204,23 @@
                 },
                 {
                   "label": "Potenz isolieren",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Welche Gleichungen löst du durch Ausklammern?",
+              "options": [
+                {
+                  "label": "$x^3 - 9x = 0$",
+                  "correct": true
+                },
+                {
+                  "label": "$x^4 - 16 = 0$",
+                  "correct": false
+                },
+                {
+                  "label": "$x^2 + 5x = 0$",
                   "correct": true
                 }
               ]

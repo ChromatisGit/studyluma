@@ -15,8 +15,10 @@ export default [
     route(chapter, "routes/chapter.tsx"),
     route(`${chapter}/sheets/:sheetId`, "routes/sheet.tsx"),
     route(`${chapter}/challenges`, "routes/challenges.tsx"),
+    route("courses/:courseId/quiz", "routes/quiz.tsx"),
   ]),
   route(`${chapter}/lesson`, "routes/lesson.tsx"),
   route(`${chapter}/lesson/projector`, "routes/projector.tsx"),
   route("viewer", "routes/viewer.tsx"),
+  route("live", "routes/live.tsx"),
 ] satisfies RouteConfig;

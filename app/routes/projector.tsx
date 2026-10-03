@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
+import { useLoaderData, useParams } from "react-router";
 import {
   getLesson,
   lessonText,
@@ -22,5 +22,6 @@ export function meta() {
 
 export default function ProjectorRoute() {
   const { lesson } = useLoaderData<typeof loader>();
-  return <ProjectorView lesson={lesson} />;
+  const { courseId = "" } = useParams();
+  return <ProjectorView courseId={courseId} lesson={lesson} />;
 }

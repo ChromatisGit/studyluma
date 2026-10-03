@@ -80,5 +80,19 @@
     "teacher": "Unterricht",
     "open": "Lesson Frames öffnen",
     "description": "{count} Frames für die Plenumsphasen dieses Kapitels"
+  },
+  "quiz": {
+    "position": "Frage {number} von {total}",
+    "multiple": "Mehrere Antworten möglich",
+    "count": "{count} / {participants} · {percent} %",
+    "answerNow": "Antworte jetzt auf deinem Gerät.",
+    "answered": "{answered} / {participants} beantwortet",
+    "start": "Quiz starten",
+    "showDistribution": "Verteilung zeigen",
+    "reveal": "Antwort aufdecken",
+    "nextQuestion": "Nächste Frage",
+    "finish": "Quiz beenden",
+    "allAnswered": "alle haben geantwortet",
+    "failed": "Keine Verbindung zum Server"
   }
 }
