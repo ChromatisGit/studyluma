@@ -1,0 +1,31 @@
+{
+  "brand": "StudyLuma",
+  "brandLabel": "StudyLuma Startseite",
+  "description": "StudyLuma: Kurse, Arbeitsblätter und Unterricht an einem Ort.",
+  "navigation": {
+    "courses": "Meine Kurse"
+  },
+  "shell": {
+    "skipToContent": "Zum Inhalt springen",
+    "navigation": "Hauptnavigation",
+    "bottomNavigation": "Schnellzugriff",
+    "menu": "Menü",
+    "closeMenu": "Menü schließen",
+    "showSidebar": "Seitenleiste einblenden",
+    "hideSidebar": "Seitenleiste ausblenden",
+    "pagesIn": "Seiten in {section}"
+  },
+  "colorMode": {
+    "label": "Darstellung",
+    "system": "Wie das Gerät",
+    "light": "Hell",
+    "dark": "Tafel (dunkel)"
+  },
+  "errors": {
+    "notFoundTitle": "Seite nicht gefunden",
+    "notFound": "Diese Seite gibt es nicht oder nicht mehr.",
+    "title": "Fehler",
+    "generic": "Ein unerwarteter Fehler ist aufgetreten.",
+    "home": "Zur Startseite"
+  }
+}
