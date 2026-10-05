@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   isRouteErrorResponse,
   Links,
@@ -6,24 +7,39 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
+import { colorModeInitScript, EmptyState, Page } from "@chromatis/base/ui";
+import "@fontsource/dm-sans/400.css";
+import "@fontsource/dm-sans/700.css";
+import "@fontsource-variable/fraunces/wght.css";
+import "@fontsource-variable/fraunces/wght-italic.css";
 import "./app.css";
+import { studyColorModeKey } from "./StudyShell";
+import TEXT from "./app.de.json";
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function meta() {
+  return [
+    { title: TEXT.brand },
+    { name: "description", content: TEXT.description },
+  ];
+}
+
+export function Layout({ children }: { children: ReactNode }) {
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang="de" data-brand="studyluma" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <Meta />
-        <Links />
         <script
           dangerouslySetInnerHTML={{
-            __html:
-              "(function(){var t=localStorage.getItem('theme');if(t==='dark'){document.documentElement.classList.add('dark');}else if(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.classList.add('dark');}})();",
+            __html: colorModeInitScript(studyColorModeKey),
           }}
         />
+        <Meta />
+        <Links />
       </head>
       <body>
         {children}
@@ -39,30 +55,18 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: { error: unknown }) {
-  let message = "Fehler";
-  let details = "Ein unerwarteter Fehler ist aufgetreten.";
-  let stack: string | undefined;
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Fehler";
-    details =
-      error.status === 404
-        ? "Die angeforderte Seite wurde nicht gefunden."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
+  const notFound = isRouteErrorResponse(error) && error.status === 404;
+  const details =
+    import.meta.env.DEV && error instanceof Error ? error.message : undefined;
   return (
-    <main style={{ padding: "2rem", maxWidth: "600px", margin: "0 auto" }}>
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack ? (
-        <pre style={{ overflow: "auto", background: "#f5f5f5", padding: "1rem" }}>
-          <code>{stack}</code>
-        </pre>
-      ) : null}
-    </main>
+    <Page className="error-page">
+      <EmptyState
+        title={notFound ? TEXT.errors.notFoundTitle : TEXT.errors.title}
+        description={
+          details ?? (notFound ? TEXT.errors.notFound : TEXT.errors.generic)
+        }
+        actions={<a href="/">{TEXT.errors.home}</a>}
+      />
+    </Page>
   );
 }

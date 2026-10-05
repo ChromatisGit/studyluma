@@ -1,0 +1,175 @@
+/* StudyLuma theme: warm paper, Fraunces for headings, lavender as the
+   brand and the highlighter as its "light". Dark mode is the "Tafel".
+   Layered as "theme" by app.css, so the framework derives the rest. */
+
+:root[data-brand="studyluma"] {
+  --theme-color-modes: light dark;
+  color-scheme: light;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-display: "Fraunces Variable", Georgia, serif;
+  --font-mono: "SFMono-Regular", Consolas, monospace;
+  --color-text: #1d1830;
+  --color-text-inverse: #fff;
+  --color-bg: #fcfaf6; /* warm paper */
+  --color-bg-subtle: #f5f0f6;
+  --color-bg-accent: #e9d8ff;
+  --color-bg-emphasis: #2a1947;
+  --color-text-on-emphasis: #fff;
+  --color-text-on-accent: #1d1830;
+  --color-border-focus: #6b2fa0;
+  --color-border-focus-on-emphasis: #d9baff;
+  --color-border-focus-on-accent: #2a1947;
+  --color-action-primary-bg: #7131a8;
+  --color-action-primary-fg: #fff;
+  --color-action-primary-bg-hover: #592388;
+  --color-action-primary-fg-hover: #fff;
+  --color-action-primary-border-hover: #592388;
+  --color-action-accent-bg: #e9d8ff;
+  --color-action-accent-fg: #1d1830;
+  --color-action-accent-border-hover: #1d1830;
+  --color-action-destructive-bg: #af1b3f;
+  --color-action-destructive-fg: #fff;
+  --color-action-destructive-bg-hover: #8c1533;
+  --color-link: #672897;
+  --color-link-hover-bg: #e9d8ff;
+  --color-link-hover-fg: #1d1830;
+  --color-on-emphasis-primary-bg: #d9baff;
+  --color-on-emphasis-primary-fg: #1d1830;
+  --color-on-emphasis-primary-bg-hover: #fff;
+  --color-on-emphasis-primary-fg-hover: #1d1830;
+  --color-on-accent-primary-bg: #2a1947;
+  --color-on-accent-primary-fg: #fff;
+  --color-on-accent-primary-bg-hover: #512d78;
+  --color-on-accent-primary-fg-hover: #fff;
+  --color-status-info: #315ba8;
+  --color-status-success: #276c46;
+  --color-status-warning: #875014;
+  --color-status-error: #af1b3f;
+  /* Light masthead on paper; the hairline lives in content.css. */
+  --color-brand-bar-bg: #fcfaf6;
+  --color-brand-bar-fg: #1d1830;
+  --color-brand-bar-focus: #6b2fa0;
+  --color-backdrop: rgb(29 24 48 / 0.6);
+  --shadow-overlay: 0 10px 30px rgb(29 24 48 / 0.25);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-brand="studyluma"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-text: #edeaff;
+    --color-text-inverse: #0e0c1a;
+    --color-bg: #17122a;
+    --color-bg-subtle: #211a38;
+    --color-bg-accent: #4d3471;
+    --color-bg-emphasis: #24163b;
+    --color-text-on-emphasis: #edeaff;
+    --color-text-on-accent: #fff;
+    --color-border-focus: #d6aeff;
+    --color-border-focus-on-emphasis: #d6aeff;
+    --color-border-focus-on-accent: #fff;
+    --color-action-primary-bg: #c18cff;
+    --color-action-primary-fg: #1a0c2b;
+    --color-action-primary-bg-hover: #dbb8ff;
+    --color-action-primary-fg-hover: #1a0c2b;
+    --color-action-primary-border-hover: #dbb8ff;
+    --color-action-accent-bg: #4d3471;
+    --color-action-accent-fg: #fff;
+    --color-action-accent-border-hover: #d6aeff;
+    --color-action-destructive-bg: #ff91a8;
+    --color-action-destructive-fg: #2a0711;
+    --color-action-destructive-bg-hover: #ffb4c3;
+    --color-link: #d6aeff;
+    --color-link-hover-bg: #4d3471;
+    --color-link-hover-fg: #fff;
+    --color-on-emphasis-primary-bg: #d6aeff;
+    --color-on-emphasis-primary-fg: #1a0c2b;
+    --color-on-emphasis-primary-bg-hover: #fff;
+    --color-on-emphasis-primary-fg-hover: #1a0c2b;
+    --color-on-accent-primary-bg: #d6aeff;
+    --color-on-accent-primary-fg: #1a0c2b;
+    --color-on-accent-primary-bg-hover: #fff;
+    --color-on-accent-primary-fg-hover: #1a0c2b;
+    --color-status-info: #9db9ff;
+    --color-status-success: #7fd4a4;
+    --color-status-warning: #ffbf70;
+    --color-status-error: #ff91a8;
+    --color-brand-bar-bg: #17122a;
+    --color-brand-bar-fg: #edeaff;
+    --color-brand-bar-focus: #d6aeff;
+    --color-backdrop: rgb(0 0 0 / 0.7);
+    --shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.5);
+  }
+}
+
+:root[data-brand="studyluma"][data-theme="dark"] {
+  color-scheme: dark;
+  --color-text: #edeaff;
+  --color-text-inverse: #0e0c1a;
+  --color-bg: #17122a;
+  --color-bg-subtle: #211a38;
+  --color-bg-accent: #4d3471;
+  --color-bg-emphasis: #24163b;
+  --color-text-on-emphasis: #edeaff;
+  --color-text-on-accent: #fff;
+  --color-border-focus: #d6aeff;
+  --color-border-focus-on-emphasis: #d6aeff;
+  --color-border-focus-on-accent: #fff;
+  --color-action-primary-bg: #c18cff;
+  --color-action-primary-fg: #1a0c2b;
+  --color-action-primary-bg-hover: #dbb8ff;
+  --color-action-primary-fg-hover: #1a0c2b;
+  --color-action-primary-border-hover: #dbb8ff;
+  --color-action-accent-bg: #4d3471;
+  --color-action-accent-fg: #fff;
+  --color-action-accent-border-hover: #d6aeff;
+  --color-action-destructive-bg: #ff91a8;
+  --color-action-destructive-fg: #2a0711;
+  --color-action-destructive-bg-hover: #ffb4c3;
+  --color-link: #d6aeff;
+  --color-link-hover-bg: #4d3471;
+  --color-link-hover-fg: #fff;
+  --color-on-emphasis-primary-bg: #d6aeff;
+  --color-on-emphasis-primary-fg: #1a0c2b;
+  --color-on-emphasis-primary-bg-hover: #fff;
+  --color-on-emphasis-primary-fg-hover: #1a0c2b;
+  --color-on-accent-primary-bg: #d6aeff;
+  --color-on-accent-primary-fg: #1a0c2b;
+  --color-on-accent-primary-bg-hover: #fff;
+  --color-on-accent-primary-fg-hover: #1a0c2b;
+  --color-status-info: #9db9ff;
+  --color-status-success: #7fd4a4;
+  --color-status-warning: #ffbf70;
+  --color-status-error: #ff91a8;
+  --color-brand-bar-bg: #17122a;
+  --color-brand-bar-fg: #edeaff;
+  --color-brand-bar-focus: #d6aeff;
+  --color-backdrop: rgb(0 0 0 / 0.7);
+  --shadow-overlay: 0 10px 30px rgb(0 0 0 / 0.5);
+}
+
+/* Lesson frames: the families' tab colors and the writing surfaces.
+   Frames are paper in both color modes; the projector has no dark mode. */
+:root[data-brand="studyluma"] {
+  --frame-family-einstieg: #e6a23c;
+  --frame-family-einstieg-fg: #2b1d05;
+  --frame-family-erarbeitung: #3159a6;
+  --frame-family-uebung: #23764d;
+  --frame-family-sicherung: #7131a8;
+  --frame-family-quiz: #a3346a;
+  --frame-quiz-track: #efe8f5;
+  --frame-quiz-bar: #c4b2dc;
+  --frame-quiz-correct: #7131a8;
+  --frame-family-fg: #fff;
+  --frame-paper: #fcfaf6;
+  --frame-ink: #1d1830;
+  --frame-muted: #6b6280;
+  --frame-sicherung-bg: #f6f0fb;
+  --frame-highlight: #e9d8ff;
+  --frame-zone-bg: #fff;
+  --frame-grid: #ddd3ea;
+  --frame-zone-border: #d3c7e0;
+  --frame-ink-graphit: #2b2838;
+  --frame-ink-violett: #7131a8;
+  --frame-ink-signal: #d9480f;
+  --frame-laser: #e8253c;
+}

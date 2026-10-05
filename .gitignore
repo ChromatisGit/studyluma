@@ -1,30 +1,6 @@
-# dependencies
 /node_modules
-
-# production build
 /build
-
-# misc
+/.react-router
 .DS_Store
-*.pem
-
-# debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# project config (contains secrets — never commit)
-CONFIG.yaml
-.dev.vars
-
-# env files
 .env*
-
-# typescript
 *.tsbuildinfo
-
-# generated
-/.generated
-sql/.generated
-public/.generated/images

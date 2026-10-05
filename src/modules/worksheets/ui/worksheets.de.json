@@ -1,0 +1,285 @@
+{
+  "states": {
+    "richtig": "Richtig",
+    "fast": "Fast",
+    "nochNicht": "Noch nicht"
+  },
+  "check": {
+    "simplify": "Vereinfache dein Ergebnis noch.",
+    "preferFraction": "Noch schöner als Bruch.",
+    "exact": "Das ist gerundet. Gib das Ergebnis exakt an.",
+    "exactWith": {
+      "pi": "Das ist gerundet. Gib das Ergebnis exakt an, mit π.",
+      "root": "Das ist gerundet. Gib das Ergebnis exakt an, mit Wurzel.",
+      "fraction": "Das ist gerundet. Gib das Ergebnis exakt an, als Bruch."
+    },
+    "places": {
+      "one": "Gib das Ergebnis auf eine Nachkommastelle an.",
+      "other": "Gib das Ergebnis auf {count} Nachkommastellen an."
+    },
+    "rounding": "Das sieht nach einem Rundungsfehler aus. Hast du Zwischenergebnisse gerundet?",
+    "incomplete": "Die Eingabe ist noch nicht vollständig.",
+    "missingSolution": "Es fehlt noch eine Lösung.",
+    "freeGaps": {
+      "one": "Eine Lücke ist noch frei.",
+      "other": "{count} Lücken sind noch frei."
+    },
+    "inCell": "{row} bei {column}: {message}",
+    "emptyFirst": "Trag zuerst eine Antwort ein."
+  },
+  "refs": {
+    "aufgabe": "Aufgabe {number}",
+    "checkpoint": "Checkpoint {number}",
+    "challenge": "Challenge {number}"
+  },
+  "aufgabe": {
+    "check": "Prüfen",
+    "saved": "Gespeichert",
+    "optional": "Optional",
+    "result": "Ergebnis",
+    "resultFor": "Ergebnis zu {ref}",
+    "setFor": "Lösungsmenge zu {ref}",
+    "gap": "Lücke {number}",
+    "cell": "{row} bei {column}",
+    "chooseFor": "Antwort zu {ref} auswählen",
+    "yourAnswer": "Deine Antwort",
+    "lockedAfter": "Nach {sheets}",
+    "lockedSheet": "Blatt {number}",
+    "and": " und "
+  },
+  "set": {
+    "none": "keine Lösung",
+    "separate": "Mehrere Lösungen trennst du mit",
+    "noSolution": "Keine Lösung",
+    "enterSolutions": "Doch Lösungen eintragen",
+    "defaultLabel": "L"
+  },
+  "help": {
+    "tip": "Tipp",
+    "rule": "Merkkarte anzeigen",
+    "example": "Beispiel anzeigen",
+    "plan": "Plan zeigen",
+    "rechenweg": "Rechenweg zeigen",
+    "tipLabel": "Tipp",
+    "merkkarteFrom": "Merkkarte aus {origin}",
+    "exampleLabel": "Beispiel",
+    "toSummary": "In der Zusammenfassung ansehen"
+  },
+  "steps": {
+    "plan": "Plan",
+    "rechenweg": "Rechenweg",
+    "step": "Schritt {number}"
+  },
+  "solution": {
+    "show": "Musterlösung anzeigen",
+    "hide": "Musterlösung ausblenden",
+    "release": "Freigeben",
+    "released": "Freigegeben",
+    "gate": "Prüfe zuerst deine eigene Antwort.",
+    "label": "Musterlösung"
+  },
+  "modes": {
+    "unterstuetzung": {
+      "name": "Mehr Unterstützung",
+      "description": "Die ersten Aufgaben zeigen dir den Rechenweg, dann den Plan. Danach rechnest du allein."
+    },
+    "uebung": {
+      "name": "Mehr Übung",
+      "description": "Die ersten Aufgaben geben dir einen Plan. Danach rechnest du allein."
+    },
+    "challenges": {
+      "name": "Mehr Challenges",
+      "description": "Du rechnest von Anfang an allein. Einige Aufgaben sind eingeklappt, du kommst schneller zum Check."
+    },
+    "question": "Wie willst du dieses Blatt bearbeiten?",
+    "start": "Los geht's",
+    "change": "ändern",
+    "preview": "Vorschau: {mode}"
+  },
+  "sheet": {
+    "meta": "Kapitel {chapter}, Arbeitsblatt {number}",
+    "sections": "Abschnitte",
+    "done": "erledigt",
+    "doneTitle": "Erledigt",
+    "locked": "Dieses Blatt hat deine Lehrkraft noch nicht freigeschaltet.",
+    "lockedTitle": "Noch nicht freigeschaltet",
+    "notFound": "Dieses Blatt gibt es nicht."
+  },
+  "checkpoint": {
+    "kicker": "Checkpoint",
+    "title": "Kannst du es allein?",
+    "lead": "Ohne Plan, Rechenweg und Tipps. In dein Heft darfst du schauen, und korrigieren darfst du auch."
+  },
+  "ampel": {
+    "question": "Wie gut kamst du mit den Aufgaben zurecht?",
+    "levels": {
+      "green": "Alles selbstständig gelöst bekommen.",
+      "yellow": "Nur teilweise gelöst oder noch unsicher.",
+      "red": "Kam gar nicht zurecht."
+    },
+    "causeQuestion": "Woran hat es gelegen? (mehrere Antworten möglich)",
+    "causes": {
+      "topic": "Ich habe das Thema noch nicht ganz verstanden.",
+      "task": "Ich habe eine oder mehrere Aufgaben nicht verstanden.",
+      "approach": "Ich wusste nicht, wie ich anfangen oder vorgehen soll.",
+      "execution": "Ich muss es noch mehr üben.",
+      "mistake": "Ich verstehe nicht, was ich falsch gemacht habe.",
+      "other": "Anderes"
+    },
+    "submitButton": "Abschicken",
+    "wait": "Nach dem Checkpoint fragt dich die Ampel, wie sicher du dich fühlst.",
+    "change": "ändern"
+  },
+  "next": {
+    "label": "Weiter",
+    "recommendation": "Empfehlung",
+    "recommended": "Empfohlen als Nächstes",
+    "challenges": "Challenges",
+    "openChallenges": {
+      "one": "1 Challenge passt zu dem, was du schon erledigt hast.",
+      "other": "{count} Challenges passen zu dem, was du schon erledigt hast."
+    },
+    "noChallenges": "Öffnen sich, wenn du die passenden Blätter erledigt hast."
+  },
+  "challenges": {
+    "meta": "Kapitel {chapter}",
+    "title": "Challenges",
+    "lead": "Freiwillig. Eine Challenge öffnet sich, sobald du die Blätter erledigt hast, die sie braucht.",
+    "count": "{open} von {total} offen"
+  },
+  "nav": {
+    "chapter": "Kapitel {number}",
+    "label": "Kapitel {number}",
+    "summary": "Zusammenfassung",
+    "worksheets": "Arbeitsblätter",
+    "fast": "Für Schnelle",
+    "challenges": "Challenges",
+    "new": "Neu",
+    "done": "erledigt",
+    "locked": "noch nicht freigegeben",
+    "unlock": "Freigeben",
+    "unlocked": "Freigegeben",
+    "unlockLabel": "{title} freigeben",
+    "open": "Kapitel",
+    "close": "Schließen"
+  },
+  "teacher": {
+    "lead": "Lehrkraft-Ansicht.",
+    "text": "Freigaben der Blätter in der Kapitel-Leiste. Du siehst alle Musterlösungen.",
+    "releaseAll": "Alle Lösungen freigeben",
+    "lockAll": "Lösungen sperren",
+    "pult": "Pult-Ansicht",
+    "classAmpel": "Ampel der Klasse",
+    "sample": "Beispieldaten",
+    "open": "offen",
+    "answered": "{answered} von {total} haben die Ampel beantwortet.",
+    "topCauses": "Häufigste Gründe: {causes}.",
+    "causes": {
+      "topic": "Thema nicht verstanden",
+      "task": "Aufgabenstellung nicht verstanden",
+      "approach": "Wusste nicht, wie anfangen",
+      "execution": "Muss mehr üben",
+      "mistake": "Fehler nicht verstanden",
+      "other": "Anderes"
+    }
+  },
+  "released": {
+    "text": "Deine Lehrkraft hat Musterlösungen freigegeben:"
+  },
+  "pult": {
+    "label": "Pult-Ansicht",
+    "tasks": "Aufgaben",
+    "close": "Schließen",
+    "previous": "Vorherige",
+    "next": "Nächste",
+    "solution": "Musterlösung",
+    "challenges": "Challenges"
+  },
+  "keypad": {
+    "keys": "Tastenfeld",
+    "close": "Schließen",
+    "check": "Prüfen",
+    "later": {
+      "sin": "Sinus",
+      "cos": "Kosinus",
+      "tan": "Tangens",
+      "ln": "natürlicher Logarithmus",
+      "log": "Logarithmus zur Basis",
+      "exp": "e hoch",
+      "asin": "Arkussinus",
+      "acos": "Arkuskosinus",
+      "atan": "Arkustangens",
+      "nroot": "n-te Wurzel",
+      "abs": "Betrag",
+      "deg": "Grad",
+      "fact": "Fakultät",
+      "binom": "Binomialkoeffizient",
+      "index": "Index",
+      "inf": "unendlich",
+      "reals": "alle reellen Zahlen",
+      "vector": "Vektor",
+      "eq": "gleich",
+      "lt": "kleiner",
+      "gt": "größer",
+      "le": "kleiner gleich",
+      "ge": "größer gleich"
+    },
+    "semicolon": "Mit ; trennst du Lösungen in einer Lösungsmenge.",
+    "aria": {
+      "frac": "Bruch",
+      "sqrt": "Wurzel",
+      "sq": "Quadrat",
+      "pow": "Hochzahl",
+      "left": "Cursor nach links",
+      "right": "Cursor nach rechts",
+      "var": "Variable",
+      "pi": "Pi",
+      "e": "Eulersche Zahl e",
+      "open": "Klammer auf",
+      "close": "Klammer zu",
+      "back": "Löschen",
+      "times": "mal",
+      "minus": "minus",
+      "plus": "plus",
+      "comma": "Komma",
+      "semicolon": "Semikolon: nächste Lösung",
+      "percent": "Prozent",
+      "letters": "Buchstaben",
+      "functions": "Funktionen",
+      "digits": "Zahlen",
+      "collapse": "Tasten einklappen"
+    },
+    "step": "{ref} · Schritt {number}",
+    "at": "{row} bei {column}",
+    "laterMessage": "Kommt in einer späteren Version: {key}"
+  },
+  "speech": {
+    "empty": "leer",
+    "symbols": {
+      "+": "plus",
+      "−": "minus",
+      "·": "mal",
+      "÷": "geteilt durch",
+      "(": "Klammer auf",
+      ")": "Klammer zu",
+      "π": "Pi",
+      "e": "e",
+      ";": "Semikolon",
+      "%": "Prozent"
+    },
+    "fraction": "Bruch, {numerator} durch {denominator}, Ende Bruch",
+    "root": "Wurzel aus {radicand}, Ende Wurzel",
+    "squared": "Quadrat",
+    "power": "hoch {exponent}"
+  },
+  "cards": {
+    "locked": "Gesperrt",
+    "started": "Begonnen",
+    "done": "Erledigt",
+    "new": "Neu",
+    "challenges": "Challenges",
+    "challengesMeta": "Für Schnelle",
+    "openOf": "{open} von {total} offen"
+  },
+  "reset": "Antworten in diesem Browser zurücksetzen"
+}

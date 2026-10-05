@@ -1,0 +1,13 @@
+{
+  "_comment": "Bell times of the school, minutes after midnight. Comes from the school's configuration later.",
+  "periods": [
+    { "number": 1, "start": 480, "end": 525 },
+    { "number": 2, "start": 530, "end": 575 },
+    { "number": 3, "start": 590, "end": 635 },
+    { "number": 4, "start": 640, "end": 685 },
+    { "number": 5, "start": 700, "end": 745 },
+    { "number": 6, "start": 750, "end": 795 },
+    { "number": 7, "start": 820, "end": 865 },
+    { "number": 8, "start": 865, "end": 910 }
+  ]
+}

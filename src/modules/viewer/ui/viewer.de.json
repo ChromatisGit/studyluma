@@ -1,0 +1,11 @@
+{
+  "roles": {
+    "student": "Schülersicht",
+    "teacher": "Lehrkraftsicht"
+  },
+  "switchTo": {
+    "student": "Zur Schülersicht wechseln",
+    "teacher": "Zur Lehrkraftsicht wechseln"
+  },
+  "current": "Ansicht: {role}"
+}

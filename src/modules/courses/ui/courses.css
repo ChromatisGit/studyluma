@@ -1,0 +1,445 @@
+/* Courses: course list, Lernweg (on the shared Linie primitive) and the
+   chapter page. Framework cards, tabs and badges do the rest. */
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  gap: var(--grid-gutter);
+}
+.course-card__current {
+  display: flex;
+  align-items: center;
+  gap: var(--space-300);
+  margin-top: var(--space-300);
+  color: var(--color-text-muted);
+}
+
+/* ---------------------------------------------------------------------
+   Linie: the shared "one line" primitive behind the Lernweg and the
+   roadmap. Every row draws its own two track halves (above and below its
+   station), so the line stays continuous whatever is open.
+   --------------------------------------------------------------------- */
+.linie {
+  --lw-line: var(--color-action-primary-bg);
+  --lw-line-ahead: color-mix(
+    in srgb,
+    var(--color-action-primary-bg) 28%,
+    var(--color-bg)
+  );
+  --lw-track: 2.25rem;
+  --lw-width: 0.375rem;
+}
+.linie__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.linie__badge-row {
+  display: grid;
+  grid-template-columns: var(--lw-track) minmax(0, 1fr);
+  column-gap: var(--space-300);
+  align-items: center;
+  margin-bottom: var(--space-100);
+}
+.linie__badge {
+  justify-self: center;
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.5rem;
+  height: 1.625rem;
+  padding-inline: var(--space-200);
+  border-radius: var(--radius-sm);
+  background: var(--lw-line);
+  color: var(--color-action-primary-fg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+}
+.linie__badge-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.linie__row {
+  --lw-y: 1.75rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--lw-track) minmax(0, 1fr);
+  column-gap: var(--space-300);
+}
+.linie__row--topic.linie__row--current {
+  --lw-y: 2rem;
+}
+.linie__row--chapter,
+.linie__row--stub {
+  --lw-y: 1.375rem;
+}
+.linie__row--step {
+  --lw-y: 1.25rem;
+}
+.linie__row--step.linie__row--current {
+  --lw-y: 1.5rem;
+}
+.linie__content {
+  min-width: 0;
+}
+.linie__track {
+  position: relative;
+}
+.linie__track::before,
+.linie__track::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: var(--lw-width);
+  transform: translateX(-50%);
+}
+.linie__track::before {
+  top: 0;
+  height: var(--lw-y);
+}
+.linie__track::after {
+  top: var(--lw-y);
+  bottom: 0;
+}
+.lw-up-done::before,
+.lw-down-done::after {
+  background: var(--lw-line);
+}
+.lw-up-ahead::before,
+.lw-down-ahead::after {
+  background: var(--lw-line-ahead);
+}
+/* Dashed: the line continues off-screen (other school year, open future) */
+.lw-stub.lw-up-done::before,
+.lw-stub.lw-down-done::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--lw-line) 0 0.375rem,
+    transparent 0.375rem 0.75rem
+  );
+}
+.lw-stub.lw-up-ahead::before,
+.lw-stub.lw-down-ahead::after,
+.lw-down-trail::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--lw-line-ahead) 0 0.375rem,
+    transparent 0.375rem 0.75rem
+  );
+}
+.linie__station {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: var(--lw-y);
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-round);
+}
+.linie__station--done,
+.linie__station--ahead {
+  width: 1rem;
+  height: 1rem;
+  background: var(--color-bg);
+  border: 3px solid var(--lw-line);
+}
+.linie__station--ahead {
+  border-color: var(--lw-line-ahead);
+}
+.linie__station--current {
+  width: 1.375rem;
+  height: 1.375rem;
+  background: var(--lw-line);
+  border: 3px solid var(--color-bg);
+  outline: 3px solid var(--lw-line);
+}
+/* Chapters are minor stops: a tick on the line */
+.linie__station--tick,
+.linie__station--tick-ahead {
+  width: 0.875rem;
+  height: var(--lw-width);
+  border-radius: 0;
+  transform: translate(0, -50%);
+  background: var(--lw-line);
+}
+.linie__station--tick-ahead {
+  background: var(--lw-line-ahead);
+}
+.linie__station--here {
+  width: 1rem;
+  height: 1rem;
+  background: var(--color-bg);
+  border: 4px solid var(--lw-line);
+}
+
+/* Pictogram tile (gallery standard: 28-unit grid, one accent element) */
+.linie__tile {
+  --lw-line: var(--color-action-primary-bg);
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: var(--border-1) solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+}
+.linie__tile svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+.linie__tile-initial {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+}
+.linie__row--current .linie__tile {
+  width: 3rem;
+  height: 3rem;
+  border-color: var(--lw-line);
+}
+.linie__row--current .linie__tile svg {
+  width: 2.125rem;
+  height: 2.125rem;
+}
+.pictogram__accent {
+  stroke: var(--lw-line);
+}
+.pictogram__fill {
+  fill: var(--lw-line);
+  stroke: none;
+}
+.pictogram__area {
+  fill: var(--lw-line);
+  stroke: none;
+  opacity: 0.35;
+}
+
+/* ---------------------------------------------------------------------
+   Lernweg (course view)
+   --------------------------------------------------------------------- */
+.lernweg__tabs .tabs__panel {
+  padding-top: var(--space-500);
+}
+.lernweg__heading {
+  margin: 0;
+  font-size: var(--text-md);
+}
+.lernweg__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-300);
+  width: 100%;
+  min-height: 3.5rem;
+  padding: var(--space-200) var(--space-300) var(--space-200) 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lernweg__trigger:hover {
+  background: var(--color-bg-hover);
+}
+.lernweg__trigger:hover .lernweg__title-text {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.lernweg__trigger--static {
+  cursor: default;
+}
+.lernweg__trigger--static:hover {
+  background: none;
+}
+.lernweg__trigger--static:hover .lernweg__title-text {
+  text-decoration: none;
+}
+.lernweg__title {
+  flex: 1;
+  min-width: 0;
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-label);
+}
+.lernweg__num {
+  display: inline-block;
+  min-width: 1.75rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.linie__row--ahead .lernweg__title-text {
+  color: var(--color-text-muted);
+}
+.lernweg__chevron {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+  color: var(--color-text-muted);
+  transition: transform var(--motion-default) var(--ease-standard);
+}
+[aria-expanded="true"] > .lernweg__chevron {
+  transform: rotate(180deg);
+}
+.lernweg__chapter {
+  display: flex;
+  align-items: center;
+  gap: var(--space-300);
+  min-height: 2.75rem;
+  padding: var(--space-100) var(--space-300) var(--space-100)
+    calc(2.5rem + var(--space-300));
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  text-decoration: none;
+}
+a.lernweg__chapter:hover {
+  background: var(--color-bg-hover);
+}
+a.lernweg__chapter:hover .lernweg__chapter-title {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.lernweg__chapter-num {
+  flex: none;
+  min-width: 2.25rem;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lernweg__chapter--current .lernweg__chapter-title {
+  font-weight: var(--weight-bold);
+}
+.lernweg__chapter--ahead {
+  color: var(--color-text-muted);
+}
+.lernweg__stub {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-link);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+/* Course page board: current and previous chapter */
+.lernweg-board .card__body {
+  display: grid;
+  gap: var(--space-500);
+}
+@container (min-width: 36rem) {
+  .lernweg-board .card__body {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+}
+.lernweg-board__stop {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-100);
+}
+.lernweg-board__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-muted);
+}
+.lernweg-board__title {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-label);
+}
+.lernweg-board__sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---------------------------------------------------------------------
+   Chapter page (Kapitel) with Zusammenfassung and Merkkarten
+   --------------------------------------------------------------------- */
+.kapitel-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-500);
+}
+.kapitel-head .linie__tile {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-color: var(--lw-line);
+}
+.kapitel-head .linie__tile svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.kapitel-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+  min-width: 0;
+}
+.kapitel-head__title {
+  margin: 0;
+  text-wrap: pretty;
+}
+.kapitel-head__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-300);
+  margin: 0;
+  color: var(--color-text-muted);
+  font-weight: var(--weight-bold);
+}
+.kapitel .content-section + .content-section {
+  margin-top: var(--space-700);
+}
+.kapitel-blaetter {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-400);
+}
+.kapitel-blatt__status {
+  margin-top: var(--space-200);
+}
+.kapitel-nav {
+  display: grid;
+  gap: var(--space-400);
+  margin-top: var(--space-700);
+}
+@container (min-width: 40rem) {
+  .kapitel-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.kapitel-nav__next {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-100);
+  padding: var(--space-500);
+  border: var(--border-1) dashed var(--color-border-subtle);
+  border-radius: var(--radius-surface);
+  color: var(--color-text-muted);
+}
+.kapitel-nav__label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+}
+
+.kapitel-teacher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-300);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lernweg__chevron {
+    transition: none;
+  }
+}

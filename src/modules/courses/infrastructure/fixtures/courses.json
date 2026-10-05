@@ -1,0 +1,281 @@
+[
+  {
+    "id": "mathematik-11",
+    "title": "Mathematik 11",
+    "subject": "Mathematik",
+    "badge": "MA",
+    "currentChapterId": "9-2",
+    "phases": [
+      {
+        "id": "klasse-10",
+        "label": "Klasse 10",
+        "topicIds": [
+          "terme-gleichungen",
+          "lineare-funktionen",
+          "mengen-funktionen",
+          "quadratische-funktionen",
+          "exponentialfunktionen"
+        ]
+      },
+      {
+        "id": "klasse-11",
+        "label": "Klasse 11",
+        "topicIds": [
+          "transformationen",
+          "polynomfunktionen",
+          "trigonometrie",
+          "differenzialrechnung",
+          "funktionsuntersuchung"
+        ]
+      },
+      {
+        "id": "klasse-12",
+        "label": "Klasse 12",
+        "topicIds": ["integralrechnung", "vektorgeometrie"]
+      }
+    ],
+    "topics": [
+      {
+        "id": "terme-gleichungen",
+        "number": "1",
+        "title": "Terme und Gleichungen",
+        "icon": "terme",
+        "chapters": [
+          {
+            "id": "1-1",
+            "number": "1.1",
+            "title": "Terme umformen"
+          },
+          {
+            "id": "1-2",
+            "number": "1.2",
+            "title": "Binomische Formeln"
+          },
+          {
+            "id": "1-3",
+            "number": "1.3",
+            "title": "Lineare Gleichungen"
+          }
+        ]
+      },
+      {
+        "id": "lineare-funktionen",
+        "number": "2",
+        "title": "Lineare Funktionen",
+        "icon": "gerade",
+        "chapters": [
+          {
+            "id": "2-1",
+            "number": "2.1",
+            "title": "Steigung und Achsenabschnitt"
+          },
+          {
+            "id": "2-2",
+            "number": "2.2",
+            "title": "Geraden durch zwei Punkte"
+          }
+        ]
+      },
+      {
+        "id": "mengen-funktionen",
+        "number": "3",
+        "title": "Mengen und Funktionen",
+        "icon": "mengen",
+        "chapters": [
+          {
+            "id": "3-1",
+            "number": "3.1",
+            "title": "Intervalle"
+          },
+          {
+            "id": "3-2",
+            "number": "3.2",
+            "title": "Definitions- und Wertemenge"
+          }
+        ]
+      },
+      {
+        "id": "quadratische-funktionen",
+        "number": "4",
+        "title": "Quadratische Funktionen",
+        "icon": "polynom",
+        "chapters": [
+          {
+            "id": "4-1",
+            "number": "4.1",
+            "title": "Parabeln"
+          },
+          {
+            "id": "4-2",
+            "number": "4.2",
+            "title": "Scheitelpunktform"
+          },
+          {
+            "id": "4-3",
+            "number": "4.3",
+            "title": "Quadratische Gleichungen"
+          }
+        ]
+      },
+      {
+        "id": "exponentialfunktionen",
+        "number": "5",
+        "title": "Exponentialfunktionen",
+        "icon": "exp",
+        "chapters": [
+          {
+            "id": "5-1",
+            "number": "5.1",
+            "title": "Wachstum und Zerfall"
+          },
+          {
+            "id": "5-2",
+            "number": "5.2",
+            "title": "Exponentialgleichungen"
+          }
+        ]
+      },
+      {
+        "id": "transformationen",
+        "number": "6",
+        "title": "Funktionsgraphen transformieren",
+        "icon": "trafo",
+        "chapters": [
+          {
+            "id": "6-1",
+            "number": "6.1",
+            "title": "Verschieben"
+          },
+          {
+            "id": "6-2",
+            "number": "6.2",
+            "title": "Strecken und Spiegeln"
+          }
+        ]
+      },
+      {
+        "id": "polynomfunktionen",
+        "number": "7",
+        "title": "Polynomfunktionen",
+        "icon": "kurve",
+        "chapters": [
+          {
+            "id": "7-1",
+            "number": "7.1",
+            "title": "Potenzfunktionen"
+          },
+          {
+            "id": "7-2",
+            "number": "7.2",
+            "title": "Nullstellen ermitteln"
+          },
+          {
+            "id": "7-3",
+            "number": "7.3",
+            "title": "Symmetrie"
+          }
+        ]
+      },
+      {
+        "id": "trigonometrie",
+        "number": "8",
+        "title": "Trigonometrie",
+        "icon": "trig",
+        "chapters": [
+          {
+            "id": "8-1",
+            "number": "8.1",
+            "title": "Sinus und Kosinus"
+          },
+          {
+            "id": "8-2",
+            "number": "8.2",
+            "title": "Trigonometrische Gleichungen"
+          }
+        ]
+      },
+      {
+        "id": "differenzialrechnung",
+        "number": "9",
+        "title": "Differenzialrechnung",
+        "icon": "diff",
+        "chapters": [
+          {
+            "id": "9-1",
+            "number": "9.1",
+            "title": "Die Ableitung"
+          },
+          {
+            "id": "9-2",
+            "number": "9.2",
+            "title": "Die Ableitungsregeln"
+          },
+          {
+            "id": "9-3",
+            "number": "9.3",
+            "title": "Zusammengesetzte Funktionen"
+          }
+        ]
+      },
+      {
+        "id": "funktionsuntersuchung",
+        "number": "10",
+        "title": "Funktionsuntersuchung",
+        "icon": "steckbrief",
+        "chapters": [
+          {
+            "id": "10-1",
+            "number": "10.1",
+            "title": "Monotonie"
+          },
+          {
+            "id": "10-2",
+            "number": "10.2",
+            "title": "Extrempunkte"
+          },
+          {
+            "id": "10-3",
+            "number": "10.3",
+            "title": "Wendepunkte"
+          }
+        ]
+      },
+      {
+        "id": "integralrechnung",
+        "number": "11",
+        "title": "Integralrechnung",
+        "icon": "integral",
+        "chapters": [
+          {
+            "id": "11-1",
+            "number": "11.1",
+            "title": "Flächen unter Graphen"
+          },
+          {
+            "id": "11-2",
+            "number": "11.2",
+            "title": "Stammfunktionen"
+          }
+        ]
+      },
+      {
+        "id": "vektorgeometrie",
+        "number": "12",
+        "title": "Vektorgeometrie",
+        "icon": "vektor",
+        "chapters": [
+          {
+            "id": "12-1",
+            "number": "12.1",
+            "title": "Vektoren im Raum"
+          },
+          {
+            "id": "12-2",
+            "number": "12.2",
+            "title": "Geraden im Raum"
+          }
+        ]
+      }
+    ]
+  }
+]
