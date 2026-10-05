@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="742" height="720" viewBox="0 0 742 720" role="img" aria-label="Solarmodule auf einem Hausdach in der Sonne">
+<title>Solarmodule auf einem Hausdach in der Sonne</title>
+<rect width="742" height="720" fill="#dce8f5"></rect>
+<circle cx="150" cy="128" r="58" fill="#f4c54d"></circle>
+<ellipse cx="452" cy="104" rx="84" ry="22" fill="#ffffff"></ellipse>
+<ellipse cx="500" cy="86" rx="52" ry="26" fill="#ffffff"></ellipse>
+<polygon points="0,380 742,180 742,720 0,720" fill="#5b4a6b"></polygon>
+<path d="M0 380 L742 180" stroke="#7d6b8e" stroke-width="10"></path>
+<g fill="#2d4178" stroke="#a9bbe4" stroke-width="2.5" stroke-linejoin="round">
+<polygon points="78,393 190,363 190,439 78,469"></polygon>
+<polygon points="200,360 312,330 312,406 200,436"></polygon>
+<polygon points="322,327 434,297 434,373 322,403"></polygon>
+<polygon points="444,294 556,264 556,340 444,370"></polygon>
+<polygon points="566,261 678,231 678,307 566,337"></polygon>
+<polygon points="78,477 190,447 190,523 78,553"></polygon>
+<polygon points="200,444 312,414 312,490 200,520"></polygon>
+<polygon points="322,411 434,381 434,457 322,487"></polygon>
+<polygon points="444,378 556,348 556,424 444,454"></polygon>
+<polygon points="566,345 678,315 678,391 566,421"></polygon>
+<polygon points="78,561 190,531 190,607 78,637"></polygon>
+<polygon points="200,528 312,498 312,574 200,604"></polygon>
+<polygon points="322,495 434,465 434,541 322,571"></polygon>
+<polygon points="444,462 556,432 556,508 444,538"></polygon>
+<polygon points="566,429 678,399 678,475 566,505"></polygon>
+</g>
+</svg>

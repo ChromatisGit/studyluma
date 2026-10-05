@@ -1,0 +1,12 @@
+{
+  "merkkarte": {
+    "showExample": "Beispiel zeigen",
+    "hideExample": "Beispiel ausblenden",
+    "showExamples": "Beispiele zeigen",
+    "hideExamples": "Beispiele ausblenden"
+  },
+  "code": {
+    "copy": "Kopieren",
+    "copied": "Kopiert"
+  }
+}

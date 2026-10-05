@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 530" width="800" height="530" role="img" aria-label="Graph der Leistung der Solarzelle über den Tag, positiv zwischen 7,5 und 17,5 Uhr">
+<rect width="800" height="530" fill="#ffffff"></rect>
+<path d="M105 40V480M140 40V480M175 40V480M210 40V480M245 40V480M280 40V480M315 40V480M350 40V480M385 40V480M420 40V480M455 40V480M490 40V480M525 40V480M560 40V480M595 40V480M630 40V480M665 40V480M700 40V480M735 40V480M770 40V480M70 480H770M70 406.7H770M70 260H770M70 186.7H770M70 113.3H770M70 40H770" fill="none" stroke="#ece5f3" stroke-width="1.5"></path>
+<path d="M60 333.3H782M772 326L782 333.3L772 340.6M70 492V28M63 38L70 28L77 38" fill="none" stroke="#4b4263" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
+<g font-family="DM Sans, Arial, sans-serif" font-size="17" fill="#4b4263" text-anchor="middle">
+<text x="140" y="356">2</text><text x="210" y="356">4</text><text x="280" y="356">6</text><text x="350" y="356">8</text><text x="420" y="356">10</text><text x="490" y="356">12</text><text x="560" y="356">14</text><text x="630" y="356">16</text><text x="700" y="356">18</text>
+</g>
+<g font-family="DM Sans, Arial, sans-serif" font-size="17" fill="#4b4263" text-anchor="end">
+<text x="60" y="46">2</text><text x="60" y="193">1</text><text x="60" y="486">−1</text>
+</g>
+<text x="780" y="316" font-family="DM Sans, Arial, sans-serif" font-size="17" fill="#4b4263" text-anchor="end">Uhrzeit in h</text>
+<text x="82" y="30" font-family="DM Sans, Arial, sans-serif" font-size="17" fill="#4b4263">Leistung</text>
+<path d="M70 333 L79 334 L88 335 L96 337 L105 340 L114 343 L122 346 L131 350 L140 353 L149 357 L158 361 L166 364 L175 368 L184 371 L192 374 L201 376 L210 378 L219 379 L228 380 L236 380 L245 379 L254 378 L262 376 L271 373 L280 370 L289 366 L298 361 L306 355 L315 348 L324 341 L332 333 L341 325 L350 315 L359 306 L368 295 L376 284 L385 273 L394 261 L402 249 L411 236 L420 223 L429 210 L438 198 L446 185 L455 172 L464 159 L472 147 L481 135 L490 124 L499 114 L508 104 L516 96 L525 88 L534 82 L542 77 L551 73 L560 72 L569 72 L578 74 L586 79 L595 86 L604 95 L612 108 L621 123 L630 142 L639 164 L648 190 L656 219 L665 253 L674 291 L682 333 L691 381 L700 433 L707 479" fill="none" stroke="#1d1830" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>

@@ -1,9 +1,17 @@
-@import "tailwindcss";
-
-@source "../app/**/*.{ts,tsx}";
-@source "../src/**/*.{ts,tsx}";
-@source "../node_modules/@chromatis/base/src/**/*.{ts,tsx}";
-
 @import "@chromatis/base/styles";
-@import "./theme.project.css";
-@import "../src/ui/styles/globals.css";
+@import "./theme.css" layer(theme);
+@import "./study-shell.css";
+
+.brand__name {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+}
+.viewer-switch {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-200);
+}
+.error-page {
+  padding-block: var(--space-900);
+}

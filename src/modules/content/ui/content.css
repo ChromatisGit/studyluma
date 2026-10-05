@@ -1,0 +1,195 @@
+/* Content: Markdown with Typst math, code, Merkkarten and the highlighter.
+   Everything else comes from the framework (.prose, .table, .card). */
+
+.md > :first-child {
+  margin-top: 0;
+}
+.md > :last-child {
+  margin-bottom: 0;
+}
+.md-heading {
+  font-weight: var(--weight-bold);
+}
+.md img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Math (MathML from kern-typ) */
+.math math {
+  font-size: 1.05em;
+}
+.math-block {
+  overflow: visible;
+  text-align: center;
+}
+.math-block math {
+  font-size: 1.25em;
+}
+.math--fallback {
+  font-family: var(--font-mono);
+}
+
+/* Highlighter: ==Text== in Markdown */
+mark {
+  padding: 0 0.12em;
+  margin: 0 -0.12em;
+  border-radius: 0.3em 0.15em 0.35em 0.2em;
+  background: linear-gradient(var(--color-bg-accent), var(--color-bg-accent)) 0
+    88% / 100% 62% no-repeat;
+  color: inherit;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Tables keep their first row and column as heads */
+.md-table .table td:first-child {
+  font-weight: var(--weight-bold);
+}
+
+/* Code */
+.code-block {
+  position: relative;
+}
+.code-block__pre {
+  margin: 0;
+  padding: var(--space-400);
+  overflow-x: auto;
+  border-radius: var(--radius-surface);
+  background: #1e1e2e;
+  color: #e6e1f0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+.code-block__copy {
+  position: absolute;
+  top: var(--space-200);
+  right: var(--space-200);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-100);
+  padding: var(--space-100) var(--space-200);
+  border: var(--border-1) solid rgb(255 255 255 / 0.25);
+  border-radius: var(--radius-control);
+  background: rgb(255 255 255 / 0.08);
+  color: #e6e1f0;
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+/* Summary text: headings arrive one level down (## → h3) */
+.zusammenfassung {
+  max-width: none;
+}
+.zusammenfassung > :is(p, ul, ol) {
+  max-width: var(--measure);
+}
+.zusammenfassung > h3 {
+  margin-top: var(--space-800);
+}
+.zusammenfassung > h3:first-child {
+  margin-top: 0;
+}
+
+/* Two or more Merkkarten in a row become a grid (added by the renderer) */
+.merkkarten-gruppe {
+  display: grid;
+  gap: var(--space-500);
+  align-items: start;
+}
+@container (min-width: 34rem) {
+  .merkkarten-gruppe {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Merkkarte: framework Card with one violet rule under the title */
+.card.merkkarte {
+  --card-pad: 0;
+  --card-gap: 0;
+  scroll-margin-top: calc(var(--header-height-sticky) + var(--space-600));
+}
+.merkkarte__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-100);
+  padding: var(--space-400) var(--space-500) var(--space-300);
+  border-bottom: var(--border-2) solid var(--color-action-primary-bg);
+}
+.merkkarte__origin {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.merkkarte__title {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-label);
+}
+.merkkarte__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-300);
+  padding: var(--space-400) var(--space-500);
+}
+.merkkarte__body > * {
+  margin: 0;
+}
+.merkkarte__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-200);
+  min-height: var(--target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-link);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+.merkkarte__toggle:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.merkkarte__toggle .icon {
+  transition: transform var(--motion-default) var(--ease-standard);
+}
+.merkkarte__toggle[aria-expanded="true"] .icon {
+  transform: rotate(180deg);
+}
+.merkkarte__example {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+  padding: var(--space-300) var(--space-400);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+}
+.merkkarte__example[hidden] {
+  display: none;
+}
+.merkkarte__example > * {
+  margin: 0;
+}
+@media print {
+  .merkkarte {
+    break-inside: avoid;
+  }
+  .merkkarte__toggle {
+    display: none;
+  }
+  .merkkarte__example[hidden] {
+    display: flex;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .merkkarte__toggle .icon {
+    transition: none;
+  }
+}

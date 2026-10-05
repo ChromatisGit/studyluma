@@ -1,51 +1,84 @@
 # StudyLuma Website
 
-React Router v7 SSR web application for the StudyLuma learning platform.
+React Router (SSR) app for StudyLuma: course views, worksheets and lesson
+frames. It is a modular monolith on top of
+[`@chromatis/base`](https://github.com/ChromatisGit/chromatis-base-framework),
+whose UI components and CSS provide almost all styling; StudyLuma adds a
+theme (`app/theme.css`) and CSS only for its own elements.
 
-## Quick Start
+This stage renders the UI from JSON fixtures. There is no database, login
+or content pipeline yet; the viewer role (student or teacher) is a cookie
+set by the view switch at the bottom of the sidebar.
+
+## Layout
+
+```
+app/                   composition root: root, shell, routes, theme
+src/helper/            tiny shared helpers (text templates)
+src/modules/<module>/  one module per area; only index.ts at its root
+  domain/              types and pure rules
+  application/         use cases on top of the domain
+  infrastructure/      fixtures, local storage, browser channels
+  ui/                  React components, *.de.json texts, module CSS
+```
+
+| Module       | Owns                                                         |
+| ------------ | ------------------------------------------------------------ |
+| `viewer`     | the stubbed viewer role and the view switch                  |
+| `content`    | Markdown with Typst math, Merkkarten, summaries, code blocks |
+| `courses`    | course list, Lernweg, chapter page, course fixtures          |
+| `worksheets` | worksheet renderer, math editor, checking, teacher tools     |
+| `lessons`    | lesson frames, teacher view, projector window                |
+| `quiz`       | live quiz: run state, event stream, student quiz page        |
+
+Modules import each other only through their `index.ts`
+(`chromatis/dependencies` lint rule). All user-visible text lives in a
+`*.de.json` file next to the component that shows it.
+
+## Routes
+
+| Path                                     | Page                           |
+| ---------------------------------------- | ------------------------------ |
+| `/`                                      | my courses                     |
+| `/courses/:courseId`                     | Lernweg                        |
+| `/courses/:courseId/chapters/:chapterId` | chapter page                   |
+| `…/sheets/:sheetId`                      | worksheet                      |
+| `…/challenges`                           | challenges of a chapter        |
+| `…/lesson`                               | lesson frames, teacher view    |
+| `…/lesson/projector`                     | projector window               |
+| `/courses/:courseId/quiz`                | live quiz on student devices   |
+| `/viewer`                                | POST: switch the stubbed role  |
+| `/live`                                  | quiz event stream and commands |
+
+## Live quiz
+
+A teacher starts the quiz of a quiz frame from the notes strip. Students
+of the course who are online land on `/courses/:courseId/quiz` once (also
+when they arrive while it runs) and can navigate freely afterwards. Each
+question goes answering → distribution → reveal; the teacher moves it on
+with the strip button, → or a clicker, and is never blocked by missing
+answers. Percentages count each option against all participants, so a
+multiple choice question can add up to more than 100 %. Leaving the frame
+ends the quiz.
+
+Without a database, the running quizzes live in the memory of the server
+process (`quiz/infrastructure/liveQuizStore.ts`) and reach the browsers as
+server-sent events from `/live`. That needs one long-running server
+process; a restart ends running quizzes. Every student belongs to every
+course, a browser counts as one student (`studyluma-participant` cookie),
+and an optional `studyluma-room` cookie keeps separate demo visitors apart.
+
+## Use as a package
+
+The demo app (`studyluma-demo`) installs this repository as the `studyluma`
+package and mounts its route modules (`studyluma/app/routes/*`) next to its
+own landing page. Route modules therefore use React Router's generic types
+instead of generated `+types`, and all links are absolute.
+
+## Development
 
 ```sh
 bun install
-cp CONFIG.template.yaml CONFIG.yaml
-bun run db                    # start local Postgres and apply schema migrations
-bun run dev                   # start dev server at localhost:5173
+bun run dev      # http://localhost:5173
+bun run check    # typecheck, lint, format, tests
 ```
-
-`CONFIG.yaml` is git-ignored and uses named profiles:
-
-```yaml
-local:
-  database: postgres://studyluma:studyluma@localhost:5432/studyluma_dev
-  session_secret: dev
-
-production:
-  database: ""        # Neon or self-hosted Postgres connection string
-  session_secret: ""  # Long random string, e.g. openssl rand -base64 32
-```
-
-The local profile is ready to run after copying the template. To publish on Cloudflare, edit `CONFIG.yaml`, set `production.database` to your Neon or self-hosted Postgres connection string, set `production.session_secret` to a long random value, then run `bun run cf:deploy`.
-
-See [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md) for the full setup guide including content deployment.
-
-## Scripts
-
-| Command | Description |
-|---------|-------------|
-| `bun run dev` | Start Vite dev server with HMR |
-| `bun run build` | Production build |
-| `bun run start` | Start the built SSR server |
-| `bun run check` | TypeScript type check + ESLint + architecture boundaries |
-| `bun run db` | Start local Postgres and apply pending migrations |
-| `bun run db:reset` | Wipe and reinitialize local database |
-| `bun run db:deploy` | Apply pending migrations to production database |
-| `bun run cf:dev` | Local Cloudflare Workers dev |
-| `bun run cf:deploy` | Sync secrets from CONFIG.yaml, build and deploy to Cloudflare |
-
-## Docs
-
-- [Architecture](docs/ARCHITECTURE.md) - Two-repo model, layer rules, auth, content flow
-- [Local Development](docs/LOCAL_DEVELOPMENT.md) - Step-by-step setup guide
-- [Database](docs/DATABASE.md) - Schema overview, RLS, migrations
-- [Content Pipeline](docs/CONTENT_PIPELINE.md) - How content gets from Markdown to DB
-- [Markdown Content Format](docs/MARKDOWN_CONTENT_FORMAT.md) - Supported syntax for content authors
-- [Deployment](docs/DEPLOYMENT.md) - Docker and Cloudflare Workers deployment

@@ -1,0 +1,1208 @@
+@import "@fontsource/stix-two-math";
+
+/* =====================================================================
+   Lesson frames. A frame is a fixed 1280 × 720 surface scaled as a whole,
+   so all sizes here are logical pixels. Paper in every color mode: the
+   projector has no dark variant.
+   ===================================================================== */
+.lf {
+  --lf-family: var(--frame-ink);
+  --lf-family-fg: var(--frame-family-fg);
+  --lf-scale: 1;
+  position: relative;
+  box-sizing: border-box;
+  width: 1280px;
+  height: 720px;
+  overflow: hidden;
+  background: var(--frame-paper);
+  color: var(--frame-ink);
+  font-family: var(--font-body);
+  font-size: 28px;
+  line-height: 1.4;
+}
+.lf[data-family="einstieg"] {
+  --lf-family: var(--frame-family-einstieg);
+  --lf-family-fg: var(--frame-family-einstieg-fg);
+}
+.lf[data-family="erarbeitung"] {
+  --lf-family: var(--frame-family-erarbeitung);
+}
+.lf[data-family="uebung"] {
+  --lf-family: var(--frame-family-uebung);
+}
+.lf[data-family="sicherung"] {
+  --lf-family: var(--frame-family-sicherung);
+}
+.lf[data-family="quiz"] {
+  --lf-family: var(--frame-family-quiz);
+}
+.lf math {
+  font-family: "STIX Two Math", math;
+}
+/* Paper keeps its light highlighter, also inside the dark teacher view */
+.lf mark {
+  background-image: linear-gradient(
+    var(--frame-highlight),
+    var(--frame-highlight)
+  );
+}
+
+/* Tab and color bar: always in the same spot, also over images */
+.lf__bar {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: 6px;
+  background: var(--lf-family);
+}
+.lf__tab {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 72px;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 0 0 8px 8px;
+  background: var(--lf-family);
+  color: var(--lf-family-fg);
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgb(29 24 48 / 0.18);
+}
+.lf__foot {
+  position: absolute;
+  inset: auto 40px 20px 72px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  color: var(--frame-muted);
+}
+.lf__number {
+  font-weight: 500;
+}
+
+/* Body: content on top, as much as needed; the rest stays free to write */
+.lf__body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 76px 72px 60px;
+  font-size: calc(28px * var(--lf-scale));
+}
+.lf__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: calc(44px * var(--lf-scale));
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.lf__title--small {
+  font-size: calc(38px * var(--lf-scale));
+}
+.lf__blocks {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 18px;
+}
+.lf-md {
+  max-width: none;
+}
+.lf-md > * + * {
+  margin-top: 0.5em;
+}
+.lf-md p {
+  margin: 0;
+}
+.lf-md .math-block {
+  margin: 0.2em 0;
+}
+.lf-md .math-block math {
+  font-size: calc(46px * var(--lf-scale));
+}
+.lf-md ul,
+.lf-md ol {
+  margin: 0;
+  padding-left: 1.1em;
+}
+.lf-md li::marker {
+  color: var(--frame-family-sicherung);
+}
+.lf-md li + li {
+  margin-top: 0.35em;
+}
+
+/* Writing zones: white with a 28px grid; labels sit on top as a sign */
+.lf-zone {
+  position: relative;
+  flex: 1;
+  min-height: 120px;
+  border: 1.5px solid var(--frame-zone-border);
+  border-radius: 8px;
+  background-color: var(--frame-zone-bg);
+  background-image:
+    linear-gradient(var(--frame-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--frame-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+.lf-zone__label {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: #efe8f6;
+  color: #4b4263;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Named areas side by side; empty ones are writing zones */
+.lf-areas {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 24px;
+}
+.lf-areas--named {
+  flex: 0 0 auto;
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 28px;
+  margin-top: 14px;
+}
+.lf-area {
+  padding: 28px 32px;
+  border: 1.5px solid var(--frame-grid);
+  border-radius: 10px;
+  background: var(--frame-zone-bg);
+  font-size: calc(26px * var(--lf-scale));
+}
+.lf[data-family="sicherung"] .lf-area {
+  border: 3px solid var(--frame-family-sicherung);
+}
+.lf-area__title {
+  margin: 0 0 20px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: calc(30px * var(--lf-scale));
+  line-height: 1.15;
+}
+.lf-area .lf-md ul {
+  list-style: none;
+  padding: 0;
+}
+.lf-area .lf-md ul > li {
+  position: relative;
+  padding-left: 26px;
+}
+.lf-area .lf-md ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--frame-family-sicherung);
+}
+.lf-area .lf-md ol li::marker {
+  font-weight: 700;
+}
+
+/* Overview list: "left → right" as two aligned columns */
+.lf-arrows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
+  margin-top: 12px;
+  font-size: calc(30px * var(--lf-scale));
+  line-height: 1.3;
+}
+.lf-arrows__row {
+  display: contents;
+}
+.lf-arrows__row > * {
+  padding: 18px 0;
+  border-top: 1.5px solid var(--frame-grid);
+}
+.lf-arrows__row:last-child > * {
+  border-bottom: 1.5px solid var(--frame-grid);
+}
+.lf-arrows__arrow {
+  box-sizing: border-box;
+  align-self: stretch;
+  width: 40px;
+  height: auto;
+  fill: none;
+  stroke: var(--frame-family-sicherung);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.lf-arrows__right {
+  font-weight: 500;
+}
+
+/* Columns: an image column gets two thirds */
+.lf__columns {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 36px;
+  margin-top: 22px;
+}
+.lf__column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+.lf__column > .lf-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: 1.5px solid var(--frame-grid);
+  border-radius: 10px;
+  background: var(--frame-zone-bg);
+}
+.lf__bleed {
+  display: grid;
+  height: 100%;
+}
+/* With a full-bleed image, the footer starts in the text column */
+.lf[data-bleed] .lf__foot {
+  left: calc(1280px * 2 / 3 + 44px);
+}
+.lf__bleed-image .lf-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lf__bleed-text {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  padding: 76px 44px 64px;
+  font-size: calc(22px * var(--lf-scale));
+}
+.lf__bleed-text .lf-md .math-block math {
+  font-size: calc(28px * var(--lf-scale));
+}
+.lf__bleed-text .lf-zone {
+  margin-top: 4px;
+}
+
+/* Focus: little content, large and centered */
+.lf__body--fokus .lf__blocks {
+  align-items: center;
+  justify-content: center;
+}
+.lf__body--fokus .lf-md {
+  font-size: calc(40px * var(--lf-scale));
+  text-align: center;
+}
+
+/* Merksatz: the Merkkarte large in a violet box; the card carries the title */
+.lf--merkkarte {
+  background: var(--frame-sicherung-bg);
+}
+.lf__center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 64px 72px;
+  box-sizing: border-box;
+}
+.lf-merkkarte {
+  box-sizing: border-box;
+  width: 920px;
+  padding: 48px 60px 36px;
+  border: 3px solid var(--frame-family-sicherung);
+  border-radius: 12px;
+  background: var(--frame-zone-bg);
+}
+.lf-merkkarte__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 48px;
+  line-height: 1.1;
+}
+.lf-merkkarte__rule {
+  margin-top: 26px;
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1.45;
+}
+.lf-merkkarte__hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 34px 0 0;
+  padding-top: 18px;
+  border-top: 1.5px solid #e6dcf1;
+  color: #592388;
+  font-size: 19px;
+  font-weight: 500;
+}
+.lf-merkkarte__hint svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Work phase: the worksheet card */
+.lf-sheet {
+  box-sizing: border-box;
+  width: 780px;
+  padding: 40px 48px 34px;
+  border: 1.5px solid var(--frame-grid);
+  border-radius: 12px;
+  background: var(--frame-zone-bg);
+}
+.lf-sheet p {
+  margin: 0;
+}
+.lf-sheet__kind {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #4b4263;
+  font-size: 20px;
+  font-weight: 500;
+}
+.lf-sheet__kind svg {
+  width: 28px;
+  height: 28px;
+}
+.lf-sheet__title {
+  margin-top: 14px !important;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 52px;
+  line-height: 1.1;
+}
+.lf-sheet__topic {
+  margin-top: 8px !important;
+  color: var(--frame-muted);
+  font-size: 22px;
+}
+.lf-sheet__state {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 30px !important;
+  padding-top: 22px;
+  border-top: 1.5px solid #ece5f3;
+  font-size: 26px;
+}
+.lf-sheet__state svg {
+  width: 30px;
+  height: 30px;
+  color: #4b4263;
+}
+.lf-sheet__state.is-sent svg {
+  color: var(--frame-family-uebung);
+}
+
+/* Quiz frame: the prepared questions */
+.lf-quiz {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: 28px;
+  margin-top: 12px;
+}
+.lf-quiz__question {
+  padding: 24px 28px;
+  border: 1.5px solid var(--frame-grid);
+  border-radius: 10px;
+  background: var(--frame-zone-bg);
+}
+.lf-quiz__number {
+  margin: 0 0 8px;
+  color: var(--frame-family-quiz);
+  font-size: 20px;
+  font-weight: 700;
+}
+.lf-quiz__options {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lf-quiz__options li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.lf-quiz__letter {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--frame-family-quiz);
+  border-radius: 50%;
+  color: var(--frame-family-quiz);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Quiz frame while it runs: one question, then its distribution */
+.lf-live {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  margin-top: 8px;
+}
+.lf-live__kind {
+  margin-left: 16px;
+  color: var(--frame-muted);
+  font-weight: 500;
+}
+.lf-live__prompt {
+  font-size: 34px;
+}
+.lf-live__options {
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lf-live__options li {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 340px) minmax(0, 1fr);
+  align-items: center;
+  gap: 22px;
+  min-height: 70px;
+  padding: 8px 0;
+  border-top: 1.5px solid var(--frame-grid);
+  font-size: 28px;
+}
+.lf-live .lf-quiz__letter {
+  width: 46px;
+  height: 46px;
+  font-size: 22px;
+  border-color: var(--frame-ink);
+  color: var(--frame-ink);
+}
+.lf-live__options li.is-correct .lf-quiz__letter {
+  border-color: var(--frame-quiz-correct);
+  background: var(--frame-quiz-correct);
+  color: var(--frame-family-fg);
+}
+.lf-live__options li.is-correct {
+  font-weight: 700;
+}
+.lf-live__result {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.lf-live__track {
+  flex: 1;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--frame-quiz-track);
+  overflow: hidden;
+}
+.lf-live__bar {
+  display: block;
+  height: 100%;
+  border-radius: 8px;
+  background: var(--frame-quiz-bar);
+  transition: width 0.6s ease;
+}
+.lf-live__options li.is-correct .lf-live__bar {
+  background: var(--frame-quiz-correct);
+}
+.lf-live__count {
+  flex: none;
+  min-width: 190px;
+  text-align: right;
+  font-size: 24px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.lf-live__status {
+  display: flex;
+  gap: 24px;
+  align-items: baseline;
+  margin: auto 0 0;
+  padding-top: 16px;
+  font-size: 22px;
+  color: var(--frame-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lf-live__status strong {
+  color: var(--frame-family-quiz);
+  font-size: 24px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lf-live__bar {
+    transition: none;
+  }
+}
+
+/* Blank surface: squared from edge to edge */
+.lf--flaeche > .lf-zone,
+.lf.lf--flaeche {
+  border: 0;
+  border-radius: 0;
+  background-color: var(--frame-zone-bg);
+  background-image:
+    linear-gradient(var(--frame-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--frame-grid) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: -1px -1px;
+}
+.lf--flaeche > .lf-zone {
+  position: absolute;
+  inset: 0;
+}
+.lf__blank-label {
+  top: 22px;
+  left: 32px;
+}
+
+/* Ink: prepared content and handwriting stay clearly apart */
+.lf-ink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.lf-ink__stroke {
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.lf-ink__stroke--graphit {
+  stroke: var(--frame-ink-graphit);
+}
+.lf-ink__stroke--violett {
+  stroke: var(--frame-ink-violett);
+}
+.lf-ink__stroke--signal {
+  stroke: var(--frame-ink-signal);
+}
+.lf-ink__laser {
+  fill: var(--frame-laser);
+  filter: drop-shadow(0 0 8px var(--frame-laser));
+}
+.lf-input {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  touch-action: none;
+  cursor: crosshair;
+}
+.lf-input--eraser {
+  cursor: cell;
+}
+.lf-input--laser {
+  cursor: none;
+}
+
+/* Stage: 16:9, as large as possible */
+.lf-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+}
+.lf-stage__frame {
+  position: relative;
+  overflow: hidden;
+}
+.lf-stage__surface {
+  width: 1280px;
+  height: 720px;
+  transform-origin: 0 0;
+}
+.lf-thumb {
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+/* =====================================================================
+   Teacher view: the dark Tafel theme around the light stage. Everything
+   on paper the class sees; everything on dark only the teacher.
+   ===================================================================== */
+.lt {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 44px 40px minmax(0, 1fr);
+  gap: 8px 0;
+  padding-bottom: 8px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+.lt kbd {
+  display: inline-block;
+  min-width: 18px;
+  padding: 2px 5px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+  font: 500 11px/1.4 var(--font-body);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+.lt-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 0 16px;
+}
+.lt-head__title {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.lt-head__name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  white-space: nowrap;
+}
+.lt-head__position,
+.lt-head__clock-label,
+.lt-pill__sub {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.lt-head__clock {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 0 8px;
+}
+.lt-head__time {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.lt-head__deviation {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+.lt-head__deviation--late {
+  color: var(--color-status-warning);
+}
+.lt-head__deviation--early {
+  color: var(--color-status-success);
+}
+.lt-head__sep {
+  flex: none;
+  width: 1px;
+  height: 22px;
+  background: var(--color-border-subtle);
+}
+.lt-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 8px 0 12px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 17px;
+  background: transparent;
+  color: var(--color-text);
+  font: 500 13px/1 var(--font-body);
+  cursor: pointer;
+}
+.lt-pill__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-status-success);
+}
+.lt-pill--hidden {
+  border-color: var(--color-status-warning);
+  background: color-mix(in srgb, var(--color-status-warning) 14%, transparent);
+}
+.lt-pill--hidden .lt-pill__dot {
+  background: var(--color-status-warning);
+}
+.lt-pill--none {
+  cursor: default;
+  padding-right: 4px;
+}
+.lt-pill--none .lt-pill__dot {
+  background: transparent;
+  border: 2px solid var(--color-text-muted);
+}
+.lt-pill__open,
+.lt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  flex: none;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
+  font: 700 13px/1 var(--font-body);
+  cursor: pointer;
+}
+.lt-pill__open {
+  height: 26px;
+  border-radius: 13px;
+}
+.lt-btn--quiet {
+  border: 1px solid var(--color-border-subtle);
+  background: transparent;
+  color: var(--color-text);
+  font-weight: 500;
+}
+.lt-btn--back {
+  border: 1px solid var(--color-action-primary-bg);
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+}
+.lt-btn svg,
+.lt-notes__sent svg {
+  width: 15px;
+  height: 15px;
+}
+.lt-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.lt-icon-btn[aria-pressed="true"] {
+  border-color: var(--color-action-primary-bg);
+  background: var(--color-bg-subtle);
+}
+.lt-icon-btn svg {
+  width: 17px;
+  height: 17px;
+}
+.lt-menu {
+  position: absolute;
+  z-index: 30;
+  right: 8px;
+  top: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 300px;
+  padding: 8px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 10px;
+  background: var(--color-bg-subtle);
+  box-shadow: var(--shadow-overlay);
+}
+.lt-menu__info {
+  margin: 0 0 4px;
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+}
+.lt-menu__item {
+  display: flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  font: 500 14px/1 var(--font-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.lt-menu__item:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+}
+.lt-menu__item:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+/* Notes strip: one line above the stage, opens down over it */
+.lt-notes {
+  position: relative;
+  z-index: 20;
+  margin: 0 8px;
+  border-radius: 8px;
+  background: var(--color-bg-subtle);
+}
+.lt-notes.is-open {
+  box-shadow: 0 14px 30px rgb(10 6 22 / 0.5);
+  outline: 1px solid var(--color-border-subtle);
+}
+.lt-notes__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 6px 0 12px;
+}
+.lt-notes__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lt-notes__icon,
+.lt-notes__chevron {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: var(--color-text-muted);
+}
+.lt-notes.is-open .lt-notes__chevron {
+  transform: rotate(180deg);
+}
+.lt-notes__heading {
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-link);
+}
+.lt-notes__preview {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lt-notes__sent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-status-success);
+}
+.lt-notes__count {
+  flex: none;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.lt-notes__count strong {
+  color: var(--color-text);
+}
+.lt-notes__count--failed {
+  color: var(--color-status-warning);
+}
+.lt-notes__next {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  max-width: 320px;
+  height: 32px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text);
+  font: 500 13px/1 var(--font-body);
+  cursor: pointer;
+}
+.lt-notes__next-label {
+  color: var(--color-text-muted);
+}
+.lt-notes__next-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lt-notes__next svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.lt-notes__body {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  right: 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px 16px 18px 34px;
+  border-top: 1px solid var(--color-border-subtle);
+  border-radius: 0 0 8px 8px;
+  background: var(--color-bg-subtle);
+  box-shadow: 0 14px 30px rgb(10 6 22 / 0.5);
+}
+.lt-notes__text {
+  max-width: 70ch;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+/* Stage and toolbar */
+.lt-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px;
+  gap: 8px;
+  min-height: 0;
+  padding: 0 8px;
+}
+.lt-stage {
+  height: 100%;
+}
+.lt-stage .lf-stage__frame {
+  border-radius: 4px;
+  outline: 1px solid var(--color-border-subtle);
+}
+.lt-arrow {
+  position: absolute;
+  z-index: 6;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 88px;
+  border: 0;
+  border-radius: 10px;
+  background: rgb(23 18 42 / 0.55);
+  color: #fff;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+.lt-arrow svg {
+  width: 26px;
+  height: 26px;
+}
+.lt-arrow--prev {
+  left: 10px;
+}
+.lt-arrow--next {
+  right: 10px;
+}
+.lt-hidden {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgb(23 18 42 / 0.8);
+  color: #edeaff;
+  text-align: center;
+  pointer-events: none;
+}
+.lt-hidden strong {
+  font-size: 26px;
+  color: #ffd6a3;
+}
+.lt-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  border-radius: 12px;
+  background: var(--color-bg-subtle);
+}
+.lt-tools__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.lt-tools__sep {
+  width: 28px;
+  height: 1px;
+  margin: 4px 0;
+  background: var(--color-border-subtle);
+}
+.lt-tools__fill {
+  flex: 1;
+}
+.lt-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.lt-tool[aria-pressed="true"] {
+  border: 2px solid var(--color-action-primary-bg);
+  background: var(--color-bg-hover);
+}
+.lt-tool svg {
+  width: 20px;
+  height: 20px;
+}
+.lt-tool--action {
+  border: 1px dashed var(--color-border-subtle);
+}
+.lt-tool__laser {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--frame-laser);
+  box-shadow: 0 0 0 4px rgb(232 37 60 / 0.3);
+}
+.lt-tool__pen {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--color-text);
+}
+.lt-tool__pen--graphit {
+  background: var(--frame-ink-graphit);
+}
+.lt-tool__pen--violett {
+  background: var(--frame-ink-violett);
+}
+.lt-tool__pen--signal {
+  background: var(--frame-ink-signal);
+}
+
+/* Overview over the stage, grouped by lesson */
+.lt-overview {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  overflow-y: auto;
+  padding: 28px 32px;
+  background: var(--color-bg);
+}
+.lt-overview__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.lt-overview__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+}
+.lt-overview__private {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+.lt-overview__fill {
+  flex: 1;
+}
+.lt-overview__lesson-title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+.lt-overview__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(243px, 1fr));
+  gap: 18px 16px;
+}
+.lt-overview__item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lt-overview__item .lf-thumb {
+  outline: 1px solid var(--color-border-subtle);
+}
+.lt-overview__item.is-current .lf-thumb {
+  outline: 3px solid var(--color-action-primary-bg);
+  outline-offset: 3px;
+}
+.lt-overview__caption {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+}
+.lt-overview__num {
+  font-weight: 700;
+  color: var(--color-link);
+}
+.lt-overview__name {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lt-overview__plan {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Projector window: the frame, nothing else */
+.lp {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  background: #111;
+}
+.lp > .lf-stage {
+  height: 100%;
+}
+.lp--hidden {
+  background: #fcfaf6;
+}
+.lp__waiting {
+  place-self: center;
+  color: #ccc;
+  font-family: var(--font-body);
+}

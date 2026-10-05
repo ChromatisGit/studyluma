@@ -1,0 +1,317 @@
+{
+  "chapterId": "7-2",
+  "title": "Nullstellen ermitteln",
+  "lessons": [
+    {
+      "number": 1,
+      "title": "Stunde 1"
+    }
+  ],
+  "frames": [
+    {
+      "id": "wann-erzeugt-die-solarzelle-strom",
+      "lesson": 1,
+      "number": "1",
+      "title": "Wann erzeugt die Solarzelle Strom?",
+      "marking": "Impuls",
+      "family": "einstieg",
+      "planUntil": 240,
+      "notes": "- Bild kurz wirken lassen, erste Ideen sammeln\n- falls nötig klären: Strom wird erzeugt, wenn $f(x) > 0$\n- Frage offenlassen, noch nicht lösen",
+      "columns": [
+        [
+          {
+            "type": "image",
+            "asset": "solar.svg",
+            "alt": "Solarmodule auf einem Hausdach in der Sonne"
+          }
+        ],
+        [
+          {
+            "type": "markdown",
+            "markdown": "Eine kleine Solarzelle wird im Tagesverlauf durch $f(x)$ modelliert.\n\n$ f(x) = -1/2500 x^4 + 1/100 x^3 - 21/400 x^2 $\n\nVon wann bis wann wird Strom erzeugt?"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "achsenschnittpunkte",
+      "lesson": 1,
+      "number": "2",
+      "title": "Achsenschnittpunkte",
+      "marking": "Wiederholung",
+      "family": "einstieg",
+      "planUntil": 420,
+      "notes": "- Wiederholung aktivieren\n- Übergang: Für die Solarzelle brauchen wir die Nullstellen",
+      "blocks": [
+        {
+          "type": "areas",
+          "areas": [
+            {
+              "label": "Schnittpunkt mit der y-Achse",
+              "markdown": "- $x = 0$ einsetzen\n- $f(0) = a_0$\n- genau ein Punkt"
+            },
+            {
+              "label": "Schnittpunkt mit der x-Achse",
+              "markdown": "- $f(x) = 0$ setzen\n- Lösungen heißen **Nullstellen**\n- es kann mehrere geben"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "achsenschnittpunkte-bestimmen",
+      "lesson": 1,
+      "number": "3",
+      "title": "Achsenschnittpunkte bestimmen",
+      "marking": "Beispiel",
+      "family": "erarbeitung",
+      "planUntil": 720,
+      "notes": "- erst y-Achse, dann Nullstellen\n- $f(0) = -6$ → $(0 | -6)$\n- $x^2 - x - 6 = 0$ → $x_1 = 3$, $x_2 = -2$ → $(3 | 0)$, $(-2 | 0)$",
+      "blocks": [
+        {
+          "type": "markdown",
+          "markdown": "Bestimme beide Achsenschnittpunkte von\n\n$ f(x) = x^2 - x - 6 $"
+        },
+        {
+          "type": "areas",
+          "areas": [
+            {
+              "label": "y-Achse"
+            },
+            {
+              "label": "x-Achse"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "welches-verfahren-passt",
+      "lesson": 1,
+      "number": "4",
+      "title": "Welches Verfahren passt?",
+      "marking": "Überblick",
+      "family": "erarbeitung",
+      "planUntil": 840,
+      "notes": "- sehr knapp halten, nur als Orientierung\n- bei Bedarf später nochmal aufrufen",
+      "blocks": [
+        {
+          "type": "markdown",
+          "markdown": "Für Nullstellen schauen wir zuerst: ==In welcher Form liegt der Term vor?=="
+        },
+        {
+          "type": "arrows",
+          "rows": [
+            ["lineare Gleichung", "nach $x$ umformen"],
+            ["kein konstanter Term", "$x$ ausklammern"],
+            ["quadratische Gleichung", "pq-Formel"],
+            ["nur eine Potenz von $x$", "Potenz isolieren"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ausklammern",
+      "lesson": 1,
+      "number": "5",
+      "title": "Ausklammern",
+      "marking": "Verfahren",
+      "family": "erarbeitung",
+      "planUntil": 1140,
+      "notes": "- nicht alles vorbereitet zeigen, gemeinsam entwickeln\n- $x(x^2 + 4x + 3) = 0$, also $x = 0$ oder $x^2 + 4x + 3 = 0$\n- Fokus: Struktur erkennen",
+      "blocks": [
+        {
+          "type": "markdown",
+          "markdown": "Wenn kein konstanter Term vorhanden ist, kann man oft $x$ ausklammern.\n\n$ x^3 + 4x^2 + 3x = 0 $\n\nWie kann man den Term vereinfachen?"
+        }
+      ]
+    },
+    {
+      "id": "jetzt-ihr-ausklammern-anwenden",
+      "lesson": 1,
+      "number": "6",
+      "title": "Jetzt ihr: Ausklammern anwenden",
+      "marking": "Übung",
+      "family": "uebung",
+      "planUntil": 1500,
+      "notes": "- erst selbst versuchen lassen, dann besprechen\n- $x(x^2 - 4) = 0$ → $x_1 = 0$, $x^2 = 4$ → $x = ±2$\n- Nullstellen: $-2$, $0$, $2$",
+      "blocks": [
+        {
+          "type": "markdown",
+          "markdown": "Bestimme alle Nullstellen durch Ausklammern.\n\n$ f(x) = x^3 - 4x $"
+        }
+      ]
+    },
+    {
+      "id": "erst-erkennen-dann-rechnen",
+      "lesson": 1,
+      "number": "7",
+      "title": "Erst erkennen, dann rechnen",
+      "marking": "Merksatz",
+      "family": "sicherung",
+      "planUntil": 1560,
+      "blocks": [
+        {
+          "type": "merkkarte",
+          "id": "form-entscheidet",
+          "title": "Erst erkennen, dann rechnen",
+          "origin": "7.2 · Nullstellen ermitteln",
+          "rule": "Die ==Form des Terms== entscheidet, welches Verfahren sinnvoll ist.",
+          "examples": "$x^3 - 9x = 0$ hat keinen konstanten Term, also $x$ ausklammern: $x(x^2 - 9) = 0$."
+        }
+      ]
+    },
+    {
+      "id": "welches-verfahren-nimmst-du",
+      "lesson": 1,
+      "number": "8",
+      "title": "Welches Verfahren nimmst du?",
+      "marking": "Quiz",
+      "family": "quiz",
+      "planUntil": 1800,
+      "notes": "- Frage 2 prüft, ob „Potenz isolieren“ erkannt wird\n- viele A: kurz zurück zum Überblick (Frame 4)\n- Frage 3 hat zwei richtige Antworten",
+      "blocks": [
+        {
+          "type": "quiz",
+          "questions": [
+            {
+              "prompt": "$ x^3 - 9x = 0 $",
+              "options": [
+                {
+                  "label": "Ausklammern",
+                  "correct": true
+                },
+                {
+                  "label": "pq-Formel",
+                  "correct": false
+                },
+                {
+                  "label": "Potenz isolieren",
+                  "correct": false
+                }
+              ]
+            },
+            {
+              "prompt": "$ x^4 - 16 = 0 $",
+              "options": [
+                {
+                  "label": "Ausklammern",
+                  "correct": false
+                },
+                {
+                  "label": "pq-Formel",
+                  "correct": false
+                },
+                {
+                  "label": "Potenz isolieren",
+                  "correct": true
+                }
+              ]
+            },
+            {
+              "prompt": "Welche Gleichungen löst du durch Ausklammern?",
+              "options": [
+                {
+                  "label": "$x^3 - 9x = 0$",
+                  "correct": true
+                },
+                {
+                  "label": "$x^4 - 16 = 0$",
+                  "correct": false
+                },
+                {
+                  "label": "$x^2 + 5x = 0$",
+                  "correct": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zurueck-zur-solarzelle",
+      "lesson": 1,
+      "number": "9",
+      "title": "Zurück zur Solarzelle",
+      "marking": "Anwendung",
+      "family": "uebung",
+      "planUntil": 2220,
+      "notes": "- jetzt algebraisch lösen, gemeinsam ausklammern\n- $x_1 = 0$, quadratischer Restterm, weitere Nullstellen bei $x = 7.5$ und $x = 17.5$\n- Antwort im Sachkontext: von **7:30 bis 17:30 Uhr**",
+      "blocks": [
+        {
+          "type": "markdown",
+          "markdown": "$ f(x) = -1/2500 x^4 + 1/100 x^3 - 21/400 x^2 $\n\nVon wann bis wann wird Strom erzeugt?"
+        }
+      ]
+    },
+    {
+      "id": "graph-pruefen",
+      "lesson": 1,
+      "number": "10",
+      "title": "Graph prüfen",
+      "marking": "Validierung",
+      "family": "uebung",
+      "planUntil": 2400,
+      "notes": "- Graph zur Validierung, kein Ersatz der Rechnung\n- gemeinsam ablesen: Nullstellen bei $0$, $7.5$ und $17.5$; positiv zwischen $7.5$ und $17.5$\n- also Strom von 7:30 bis 17:30",
+      "columns": [
+        [
+          {
+            "type": "image",
+            "asset": "solar-graph.svg",
+            "alt": "Graph der Leistung der Solarzelle über den Tag"
+          }
+        ],
+        [
+          {
+            "type": "markdown",
+            "markdown": "Was zeigt uns der Graph?\n\n- Wo liegen die Nullstellen?\n- In welchem Bereich ist $f(x) > 0$?"
+          }
+        ]
+      ]
+    },
+    {
+      "id": "zusammenfassung",
+      "lesson": 1,
+      "number": "11",
+      "title": "Zusammenfassung",
+      "marking": "Zusammenfassung",
+      "family": "sicherung",
+      "planUntil": 2580,
+      "notes": "- Schüler sollen die Logik in eigenen Worten wiedergeben können",
+      "blocks": [
+        {
+          "type": "areas",
+          "areas": [
+            {
+              "label": "Nullstellen bestimmen",
+              "markdown": "1. $f(x) = 0$ setzen\n2. passende Form erkennen\n3. geeignetes Verfahren wählen"
+            },
+            {
+              "label": "Typische Verfahren",
+              "markdown": "- lineare Gleichung\n- ausklammern\n- pq-Formel\n- Potenz isolieren"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "uebungsphase",
+      "lesson": 1,
+      "number": "12",
+      "title": "Übungsphase",
+      "marking": "Arbeitsphase",
+      "family": "uebung",
+      "planUntil": 2700,
+      "notes": "- Arbeitsphase\n- später ausgewählte Aufgaben vergleichen",
+      "blocks": [
+        {
+          "type": "sheet",
+          "sheetId": "nullstellen-ermitteln",
+          "title": "Nullstellen ermitteln",
+          "topic": "Polynomfunktionen"
+        }
+      ]
+    }
+  ]
+}
