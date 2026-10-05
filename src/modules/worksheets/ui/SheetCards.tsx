@@ -38,16 +38,7 @@ export function SheetCards({
         const title = `${sheet.number}) ${sheet.title}`;
         const unlocked = isUnlocked(sheet, state);
         if (!unlocked && !teacher) {
-          return (
-            <Card key={sheet.id} surface="subtle" border="default">
-              <CardBody>
-                <span className="card__title">{title}</span>
-                <span className="kapitel-blatt__status">
-                  <Badge status="warning">{TEXT.cards.locked}</Badge>
-                </span>
-              </CardBody>
-            </Card>
-          );
+          return null;
         }
         const badge = !unlocked ? (
           <Badge status="warning">{TEXT.cards.locked}</Badge>

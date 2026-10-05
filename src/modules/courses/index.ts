@@ -19,6 +19,7 @@ export {
   getSummary,
   listCourses,
 } from "./infrastructure/courseRepository";
+export { getConfiguredCourse } from "./infrastructure/coursePlan";
 export { CourseList } from "./ui/CourseList";
 export { CoursePage } from "./ui/CoursePage";
 export type { CoursePageProps } from "./ui/CoursePage";

@@ -14,7 +14,7 @@ const STUDENT = (chapterId: string) => `studyluma:worksheets:${chapterId}`;
 const TEACHER = (chapterId: string) => `studyluma:teacher:${chapterId}`;
 
 type TeacherPart = Pick<ChapterState, "unlocked" | "released">;
-type StudentPart = Omit<ChapterState, "unlocked" | "released">;
+type StudentPart = Omit<ChapterState, "unlocked" | "released" | "ampels">;
 
 function read<T>(key: string): Partial<T> {
   try {
@@ -36,6 +36,7 @@ const SERVER_SNAPSHOT = emptyChapterState();
 
 /**
  * Saves a chapter's answers and the teacher's decisions in this browser.
+ * Demo Ampel responses stay in memory for the current page session.
  * Until there is a server it stands in for both `WorksheetStore` and
  * `TeacherStore`; React reads it through `subscribe`/`getSnapshot`.
  */
@@ -51,9 +52,13 @@ export class LocalChapterStore {
       return;
     }
     this.loaded = true;
+    const saved = read<StudentPart>(STUDENT(this.chapterId));
     this.state = {
       ...emptyChapterState(),
-      ...read<StudentPart>(STUDENT(this.chapterId)),
+      responses: saved.responses ?? {},
+      modes: saved.modes ?? {},
+      seen: saved.seen ?? {},
+      tabs: saved.tabs ?? {},
       ...read<TeacherPart>(TEACHER(this.chapterId)),
     };
     window.addEventListener("storage", (event) => {
@@ -89,7 +94,8 @@ export class LocalChapterStore {
   private update(change: (state: ChapterState) => ChapterState) {
     this.load();
     this.state = change(this.state);
-    const { unlocked, released, ...student } = this.state;
+    const { unlocked, released, responses, modes, seen, tabs } = this.state;
+    const student: StudentPart = { responses, modes, seen, tabs };
     write(STUDENT(this.chapterId), student);
     write(TEACHER(this.chapterId), { unlocked, released });
     this.emit();
@@ -110,10 +116,12 @@ export class LocalChapterStore {
   }
 
   setAmpel(sheetId: string, ampel: AmpelResponse) {
-    this.update((state) => ({
-      ...state,
-      ampels: { ...state.ampels, [sheetId]: ampel },
-    }));
+    this.load();
+    this.state = {
+      ...this.state,
+      ampels: { ...this.state.ampels, [sheetId]: ampel },
+    };
+    this.emit();
   }
 
   markSeen(sheetId: string) {

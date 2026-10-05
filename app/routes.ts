@@ -12,6 +12,7 @@ export default [
   layout("routes/shell.tsx", [
     route("courses", "routes/home.tsx"),
     route("courses/:courseId", "routes/course.tsx"),
+    route("courses/:courseId/control", "routes/control.tsx"),
     route(chapter, "routes/chapter.tsx"),
     route(`${chapter}/sheets/:sheetId`, "routes/sheet.tsx"),
     route(`${chapter}/challenges`, "routes/challenges.tsx"),
@@ -19,6 +20,5 @@ export default [
   ]),
   route(`${chapter}/lesson`, "routes/lesson.tsx"),
   route(`${chapter}/lesson/projector`, "routes/projector.tsx"),
-  route("viewer", "routes/viewer.tsx"),
   route("live", "routes/live.tsx"),
 ] satisfies RouteConfig;

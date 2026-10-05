@@ -3,7 +3,7 @@ import { Outlet, useLoaderData, useLocation, useParams } from "react-router";
 import type { NavigationItem } from "@chromatis/base/ui";
 import { listCourses, coursePath } from "../../src/modules/courses";
 import { LiveQuizProvider } from "../../src/modules/quiz";
-import { readViewer, ViewerSwitch } from "../../src/modules/viewer";
+import { readViewer } from "../../src/modules/viewer";
 import {
   ChapterNav,
   getWorksheetChapter,
@@ -21,7 +21,7 @@ export function loader({ request, params }: LoaderFunctionArgs) {
     viewer,
     courses: listCourses().map(({ id, title }) => ({ id, title })),
     worksheetChapter: params.chapterId
-      ? (getWorksheetChapter(params.chapterId, viewer) ?? null)
+      ? (getWorksheetChapter(params.chapterId, "student") ?? null)
       : null,
   };
 }
@@ -53,7 +53,7 @@ export default function ShellLayout({
           render: (onNavigate?: () => void) => (
             <ChapterNav
               chapter={worksheetChapter}
-              viewer={viewer}
+              viewer="student"
               links={links}
               current={current}
               {...(onNavigate ? { onNavigate } : {})}
@@ -75,9 +75,6 @@ export default function ShellLayout({
       })),
     },
   ];
-  const switchControl = (compact: boolean) => (
-    <ViewerSwitch role={viewer} action="/viewer" compact={compact} />
-  );
   return (
     <StudyShell
       navigation={navigation}
@@ -85,11 +82,6 @@ export default function ShellLayout({
       currentParentTo={
         courseId && !chapterSection ? coursePath(courseId) : undefined
       }
-      sidebarFooter={{
-        compact: switchControl(true),
-        full: switchControl(false),
-      }}
-      quickActions={switchControl(true)}
     >
       <LiveQuizProvider enabled={viewer === "student"} quizPath={quizPath}>
         <Outlet />

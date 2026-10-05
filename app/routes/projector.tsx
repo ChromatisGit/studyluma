@@ -5,12 +5,11 @@ import {
   lessonText,
   ProjectorView,
 } from "../../src/modules/lessons";
-import { readViewer } from "../../src/modules/viewer";
 
-export function loader({ params, request }: LoaderFunctionArgs) {
+export function loader({ params }: LoaderFunctionArgs) {
   const { chapterId = "" } = params;
   const lesson = getLesson(chapterId);
-  if (!lesson || readViewer(request) !== "teacher") {
+  if (!lesson) {
     throw new Response(null, { status: 404 });
   }
   return { lesson };

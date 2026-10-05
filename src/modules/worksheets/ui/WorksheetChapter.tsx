@@ -1,5 +1,6 @@
 import type { ViewerRole } from "../../viewer";
 import type { Chapter } from "../domain/contract";
+import { isUnlocked } from "../domain/structure";
 import { ChallengesPage } from "./ChallengesPage";
 import type { CurrentView } from "./ChapterNav";
 import { Keypad } from "./Keypad";
@@ -34,6 +35,9 @@ export function WorksheetChapter({
     view.kind === "sheet"
       ? chapter.sheets.find((s) => s.id === view.sheetId)
       : undefined;
+  if (sheet && viewer === "student" && !isUnlocked(sheet, controller.state)) {
+    return null;
+  }
   return (
     <WorksheetContext.Provider value={controller}>
       <div className="kapitel-app">

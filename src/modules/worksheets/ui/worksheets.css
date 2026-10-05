@@ -641,49 +641,7 @@
   color: var(--color-text-muted);
   margin: 0;
 }
-.release {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-200);
-  min-height: 2.25rem;
-  padding: 0 var(--space-300);
-  border: var(--border-1) solid var(--color-border-control);
-  border-radius: var(--radius-control);
-  background: var(--color-bg);
-  color: var(--color-text);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  cursor: pointer;
-}
-.release.is-on {
-  background: var(--color-action-primary-bg);
-  border-color: var(--color-action-primary-bg);
-  color: var(--color-action-primary-fg);
-}
-
-/* teacher bar and release notice */
-.lehrkraft {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-300);
-  padding: var(--space-300) var(--space-400);
-  margin-bottom: var(--space-400);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-subtle);
-}
-.lehrkraft__text {
-  margin: 0;
-  font-size: var(--text-sm);
-  max-width: 34rem;
-}
-.lehrkraft__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-200);
-}
+/* Student notice for released solutions. */
 .freigabe {
   display: flex;
   gap: var(--space-200);
@@ -1532,12 +1490,10 @@
 .mark-slot:has(.mark--nochNicht)::before {
   background: var(--notyet) !important;
 }
-.lehrkraft,
 .freigabe {
   margin-right: calc(var(--rand) + var(--colgap));
 }
 @container page (max-width: 56rem) {
-  .lehrkraft,
   .freigabe {
     margin-right: 0;
   }
@@ -1954,64 +1910,8 @@
   font-weight: var(--weight-bold);
 }
 
-/* ---- Teacher: the class's Ampel, anonymous totals ----------------------- */
-.klasse {
-  margin: 0 calc(var(--rand) + var(--colgap)) var(--space-500) 0;
-  padding: var(--space-300) var(--space-400);
-  border: var(--border-1) solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-}
-.klasse__title {
-  margin: 0 0 var(--space-200);
-  font-weight: var(--weight-bold);
-}
-.klasse__demo {
-  margin-left: var(--space-200);
-  font-size: var(--text-sm);
-  font-weight: 400;
-  color: var(--color-text-muted);
-}
-.klasse__bar {
-  display: flex;
-  gap: 2px;
-  margin: 0 0 var(--space-200);
-  height: 1.75rem;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-.klasse__seg {
-  display: grid;
-  place-items: center;
-  min-width: 0;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  color: #fff;
-}
-.klasse__seg[style*="flex:0"] {
-  display: none;
-}
-.klasse__seg[data-level="green"] {
-  background: var(--ok);
-}
-.klasse__seg[data-level="yellow"] {
-  background: var(--almost);
-}
-.klasse__seg[data-level="red"] {
-  background: var(--notyet);
-}
-.klasse__seg--open {
-  background: var(--color-bg-subtle);
-  color: var(--color-text-muted);
-}
-.klasse__meta {
-  margin: 0;
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
 @container page (max-width: 56rem) {
   .check__head,
-  .klasse,
   .modewahl {
     margin-right: 0;
   }

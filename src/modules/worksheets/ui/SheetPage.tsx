@@ -9,7 +9,7 @@ import { ModeChoice, ModeLine } from "./ModeChoice";
 import { NextCard } from "./NextCard";
 import { SectionTabs } from "./SectionTabs";
 import { SheetHeader } from "./SheetHeader";
-import { ReleasedNotice, TeacherBar } from "./TeacherBar";
+import { ReleasedNotice } from "./ReleasedNotice";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
 
@@ -59,14 +59,7 @@ export function SheetPage({ sheet }: { sheet: Sheet }) {
     number: sheet.number,
   });
   if (!unlocked && !teacher) {
-    return (
-      <>
-        <SheetHeader meta={meta} title={sheet.title} />
-        <div className="ws">
-          <p className="ws-locked">{TEXT.sheet.locked}</p>
-        </div>
-      </>
-    );
+    return null;
   }
   const picking =
     (!modeOf(sheet, state) && !teacher && !fixedMode(sheet)) ||
@@ -97,11 +90,7 @@ export function SheetPage({ sheet }: { sheet: Sheet }) {
         aria-labelledby={picking || !section ? undefined : `tab-${section.id}`}
       >
         <div className="ws">
-          {teacher ? (
-            <TeacherBar sheet={sheet} aufgaben={aufgaben} />
-          ) : (
-            <ReleasedNotice aufgaben={aufgaben} />
-          )}
+          {!teacher && <ReleasedNotice aufgaben={aufgaben} />}
           {picking ? (
             <ModeChoice sheet={sheet} />
           ) : (

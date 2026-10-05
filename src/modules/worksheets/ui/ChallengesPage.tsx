@@ -2,7 +2,7 @@ import { fill } from "../../../helper/text";
 import { openChallenges } from "../domain/structure";
 import { AufgabeView } from "./AufgabeView";
 import { SheetHeader } from "./SheetHeader";
-import { ReleasedNotice, TeacherBar } from "./TeacherBar";
+import { ReleasedNotice } from "./ReleasedNotice";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
 
@@ -29,11 +29,7 @@ export function ChallengesPage() {
         </div>
       </div>
       <div className="ws">
-        {teacher ? (
-          <TeacherBar aufgaben={chapter.challenges} />
-        ) : (
-          <ReleasedNotice aufgaben={chapter.challenges} />
-        )}
+        {!teacher && <ReleasedNotice aufgaben={chapter.challenges} />}
         <section className="ws-section" aria-label={TEXT.challenges.title}>
           {chapter.challenges.map((challenge) => {
             const info = index.aufgaben.get(challenge.id);

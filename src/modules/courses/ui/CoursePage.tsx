@@ -4,8 +4,10 @@ import {
   CardBody,
   Page,
   PageHeader,
+  Tabs,
   TextLink,
 } from "@chromatis/base/ui";
+import { useState, type ReactNode } from "react";
 import { fill } from "../../../helper/text";
 import { chapterPath, chaptersInOrder } from "../application/navigation";
 import type { Course, Topic } from "../domain/course";
@@ -50,35 +52,29 @@ export interface CoursePageProps {
   course: Course;
   homeLabel: string;
   homePath: string;
+  teacher?: boolean;
+  teachingControls?: ReactNode;
+  topicControls?: ReactNode;
 }
 
 /** The course view: where the class is, and the Lernweg below. */
-export function CoursePage({ course, homeLabel, homePath }: CoursePageProps) {
+// eslint-disable-next-line max-lines-per-function
+export function CoursePage({
+  course,
+  homeLabel,
+  homePath,
+  teacher = false,
+  teachingControls,
+  topicControls,
+}: CoursePageProps) {
+  const [tab, setTab] = useState(teacher ? "teaching" : "student");
   const chapters = chaptersInOrder(course);
   const currentIndex = chapters.findIndex((chapter) => chapter.current);
   const current = chapters[currentIndex];
   const previous = currentIndex > 0 ? chapters[currentIndex - 1] : undefined;
 
-  return (
-    <Page
-      title={course.title}
-      width="content"
-      className="course-detail stack stack-700"
-    >
-      <PageHeader
-        title={course.title}
-        kicker={course.subject}
-        breadcrumbs={
-          <Breadcrumbs
-            label={TEXT.breadcrumbs}
-            items={[
-              { label: homeLabel, to: homePath },
-              { label: course.title },
-            ]}
-          />
-        }
-      />
-
+  const studentView = (
+    <>
       {current && (
         <Card
           className="lernweg-board"
@@ -112,7 +108,6 @@ export function CoursePage({ course, homeLabel, homePath }: CoursePageProps) {
           </CardBody>
         </Card>
       )}
-
       <section className="stack stack-300" aria-labelledby="lernweg-title">
         <h2 id="lernweg-title" className="h3">
           {TEXT.lernweg.heading}
@@ -125,6 +120,50 @@ export function CoursePage({ course, homeLabel, homePath }: CoursePageProps) {
           currentChapterId={course.currentChapterId}
         />
       </section>
+    </>
+  );
+  return (
+    <Page
+      title={course.title}
+      width={teacher ? "wide" : "content"}
+      className="course-detail stack stack-700"
+    >
+      <PageHeader
+        title={course.title}
+        kicker={course.subject}
+        breadcrumbs={
+          <Breadcrumbs
+            label={TEXT.breadcrumbs}
+            items={[
+              { label: homeLabel, to: homePath },
+              { label: course.title },
+            ]}
+          />
+        }
+      />
+
+      <Tabs
+        label="Kursansichten"
+        value={tab}
+        onValueChange={setTab}
+        items={[
+          ...(teacher
+            ? [
+                {
+                  id: "teaching",
+                  label: "Unterrichtssteuerung",
+                  content: teachingControls,
+                },
+                {
+                  id: "topics",
+                  label: "Themenübersicht",
+                  content: topicControls,
+                },
+              ]
+            : []),
+          { id: "student", label: "Schüleransicht", content: studentView },
+        ]}
+      />
     </Page>
   );
 }

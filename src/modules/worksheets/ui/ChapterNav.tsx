@@ -1,11 +1,9 @@
 import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { Check, ChevronDown, Lock } from "lucide-react";
 import { Link } from "react-router";
-import { Switch } from "@chromatis/base/ui";
-import { fill } from "../../../helper/text";
 import type { ChapterState } from "../domain/chapterState";
 import type { Chapter, Sheet } from "../domain/contract";
-import { isUnlocked, openChallenges, sheetDone } from "../domain/structure";
+import { isUnlocked, sheetDone } from "../domain/structure";
 import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./uiState";
 import { TEXT } from "./texts";
@@ -71,7 +69,6 @@ export function ChapterNav({
     store.getServerSnapshot,
   );
   const teacher = viewer === "teacher";
-  const open = openChallenges(chapter, state).length;
   const [sheetsOpen, setSheetsOpen] = useState(current.kind === "sheet");
   const sheetsId = useId();
 
@@ -113,11 +110,13 @@ export function ChapterNav({
           <ol className="kap-nav__list">
             {chapter.sheets.map((sheet) => {
               const unlocked = isUnlocked(sheet, state);
+              if (!unlocked && !teacher) {
+                return null;
+              }
               const isCurrent =
                 current.kind === "sheet" && current.sheetId === sheet.id;
               const content = (
                 <>
-                  <span className="kap-nav__n">{sheet.number}</span>
                   <span className="kap-nav__t">{sheet.title}</span>
                   <SheetState sheet={sheet} state={state} teacher={teacher} />
                 </>
@@ -144,36 +143,22 @@ export function ChapterNav({
                       {content}
                     </span>
                   )}
-                  {teacher && (
-                    <Switch
-                      className="kap-nav__toggle"
-                      label={unlocked ? TEXT.nav.unlocked : TEXT.nav.unlock}
-                      aria-label={fill(TEXT.nav.unlockLabel, {
-                        title: sheet.title,
-                      })}
-                      checked={unlocked}
-                      onChange={(event) =>
-                        store.setUnlocked(sheet.id, event.target.checked)
-                      }
-                    />
-                  )}
                 </li>
               );
             })}
           </ol>
         </div>
       </div>
-      <Link
-        className={`kap-nav__item${current.kind === "challenges" ? " is-current" : ""}`}
-        to={links.challenges}
-        aria-current={current.kind === "challenges" ? "page" : undefined}
-        onClick={onNavigate}
-      >
-        <span className="kap-nav__t">{TEXT.nav.challenges}</span>
-        <span className="kap-nav__count">
-          {teacher ? chapter.challenges.length : open}
-        </span>
-      </Link>
+      {chapter.challenges.length > 0 && (
+        <Link
+          className={`kap-nav__item${current.kind === "challenges" ? " is-current" : ""}`}
+          to={links.challenges}
+          aria-current={current.kind === "challenges" ? "page" : undefined}
+          onClick={onNavigate}
+        >
+          <span className="kap-nav__t">{TEXT.nav.challenges}</span>
+        </Link>
+      )}
     </div>
   );
 }

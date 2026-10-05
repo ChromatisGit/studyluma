@@ -227,6 +227,7 @@ export interface TeacherViewProps {
   periods: Period[];
   projectorPath: string;
   chapterPath: string;
+  initialFrameId?: string | undefined;
 }
 
 /**
@@ -239,10 +240,11 @@ export function TeacherView({
   periods,
   projectorPath,
   chapterPath,
+  initialFrameId,
 }: TeacherViewProps) {
   useTafelTheme();
   const { session, dispatch, sendLaser, endLesson, clock, projectorConnected } =
-    useLessonSession(lesson, periods);
+    useLessonSession(lesson, periods, initialFrameId);
   const quiz = useFrameQuiz(courseId, lesson, session, dispatch);
   const { onStep } = quiz;
   const { tool, setTool, overview, setOverview, menu, setMenu, onKey } =

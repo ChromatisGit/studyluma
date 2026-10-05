@@ -73,8 +73,6 @@
   "solution": {
     "show": "Musterlösung anzeigen",
     "hide": "Musterlösung ausblenden",
-    "release": "Freigeben",
-    "released": "Freigegeben",
     "gate": "Prüfe zuerst deine eigene Antwort.",
     "label": "Musterlösung"
   },
@@ -157,31 +155,8 @@
     "new": "Neu",
     "done": "erledigt",
     "locked": "noch nicht freigegeben",
-    "unlock": "Freigeben",
-    "unlocked": "Freigegeben",
-    "unlockLabel": "{title} freigeben",
     "open": "Kapitel",
     "close": "Schließen"
-  },
-  "teacher": {
-    "lead": "Lehrkraft-Ansicht.",
-    "text": "Freigaben der Blätter in der Kapitel-Leiste. Du siehst alle Musterlösungen.",
-    "releaseAll": "Alle Lösungen freigeben",
-    "lockAll": "Lösungen sperren",
-    "pult": "Pult-Ansicht",
-    "classAmpel": "Ampel der Klasse",
-    "sample": "Beispieldaten",
-    "open": "offen",
-    "answered": "{answered} von {total} haben die Ampel beantwortet.",
-    "topCauses": "Häufigste Gründe: {causes}.",
-    "causes": {
-      "topic": "Thema nicht verstanden",
-      "task": "Aufgabenstellung nicht verstanden",
-      "approach": "Wusste nicht, wie anfangen",
-      "execution": "Muss mehr üben",
-      "mistake": "Fehler nicht verstanden",
-      "other": "Anderes"
-    }
   },
   "released": {
     "text": "Deine Lehrkraft hat Musterlösungen freigegeben:"

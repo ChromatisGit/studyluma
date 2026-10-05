@@ -118,21 +118,6 @@ button.kap-nav__item.is-locked {
 .kap-nav__item.is-locked:hover:not(button) {
   background: none;
 }
-.kap-nav__n {
-  flex: none;
-  width: 1.75rem;
-  height: 1.75rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  border: var(--border-1) solid var(--color-border-control);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--text-sm);
-}
-.kap-nav__item.is-current .kap-nav__n {
-  border-color: var(--color-text);
-}
 .kap-nav__t {
   flex: 1;
   min-width: 0;
@@ -168,21 +153,9 @@ button.kap-nav__item.is-locked {
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);
 }
-.kap-nav__count {
-  flex: none;
-  min-width: 1.5rem;
-  padding: 0 var(--space-200);
-  border-radius: 999px;
-  background: var(--color-bg-emphasis);
-  color: var(--color-text-on-emphasis);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  text-align: center;
-}
 .kap-nav__toggle {
   align-self: flex-start;
-  margin: 0 0 var(--space-200)
-    calc(var(--space-300) + 1.75rem + var(--space-300));
+  margin: 0 0 var(--space-200) var(--space-300);
   min-height: 2rem;
   font-size: var(--text-sm);
   font-weight: var(--weight-bold);

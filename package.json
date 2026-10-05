@@ -14,7 +14,8 @@
     "./modules/courses": "./src/modules/courses/index.ts",
     "./modules/worksheets": "./src/modules/worksheets/index.ts",
     "./modules/quiz": "./src/modules/quiz/index.ts",
-    "./modules/lessons": "./src/modules/lessons/index.ts"
+    "./modules/lessons": "./src/modules/lessons/index.ts",
+    "./modules/steuerung": "./src/modules/steuerung/index.ts"
   },
   "scripts": {
     "dev": "react-router dev",

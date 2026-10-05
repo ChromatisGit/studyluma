@@ -432,12 +432,6 @@ a.lernweg__chapter:hover .lernweg__chapter-title {
   font-weight: var(--weight-bold);
 }
 
-.kapitel-teacher {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-300);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .lernweg__chevron {
     transition: none;

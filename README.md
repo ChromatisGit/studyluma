@@ -7,8 +7,8 @@ whose UI components and CSS provide almost all styling; StudyLuma adds a
 theme (`app/theme.css`) and CSS only for its own elements.
 
 This stage renders the UI from JSON fixtures. There is no database, login
-or content pipeline yet; the viewer role (student or teacher) is a cookie
-set by the view switch at the bottom of the sidebar.
+or content pipeline yet. The demo opens in the teacher view and shows
+Steuerung in each course.
 
 ## Layout
 
@@ -24,10 +24,11 @@ src/modules/<module>/  one module per area; only index.ts at its root
 
 | Module       | Owns                                                         |
 | ------------ | ------------------------------------------------------------ |
-| `viewer`     | the stubbed viewer role and the view switch                  |
+| `viewer`     | the demo viewer role and participant identity                |
 | `content`    | Markdown with Typst math, Merkkarten, summaries, code blocks |
 | `courses`    | course list, Lernweg, chapter page, course fixtures          |
-| `worksheets` | worksheet renderer, math editor, checking, teacher tools     |
+| `worksheets` | worksheet renderer, math editor and checking                 |
+| `steuerung`  | teacher course and worksheet controls                        |
 | `lessons`    | lesson frames, teacher view, projector window                |
 | `quiz`       | live quiz: run state, event stream, student quiz page        |
 
@@ -41,13 +42,13 @@ Modules import each other only through their `index.ts`
 | ---------------------------------------- | ------------------------------ |
 | `/`                                      | my courses                     |
 | `/courses/:courseId`                     | Lernweg                        |
+| `/courses/:courseId/control`             | Steuerung                      |
 | `/courses/:courseId/chapters/:chapterId` | chapter page                   |
 | `…/sheets/:sheetId`                      | worksheet                      |
 | `…/challenges`                           | challenges of a chapter        |
 | `…/lesson`                               | lesson frames, teacher view    |
 | `…/lesson/projector`                     | projector window               |
 | `/courses/:courseId/quiz`                | live quiz on student devices   |
-| `/viewer`                                | POST: switch the stubbed role  |
 | `/live`                                  | quiz event stream and commands |
 
 ## Live quiz

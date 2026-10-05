@@ -1,13 +1,14 @@
 import type { AmpelResponse, Mode, PartResponse } from "./contract";
 
 /**
- * Everything saved for one chapter in this browser. Student answers are
+ * The in-browser state for one chapter. Student answers are
  * keyed by the contract's stable ids; the teacher's decisions (unlocked
  * sheets, released solutions) override the fixture.
  */
 export type ChapterState = {
   responses: Record<string, PartResponse>;
   modes: Record<string, Mode>;
+  /** Demo feedback stays in memory and is cleared on reload. */
   ampels: Record<string, AmpelResponse>;
   /** Sheets a student has opened since they were unlocked. */
   seen: Record<string, boolean>;

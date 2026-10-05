@@ -63,8 +63,6 @@ export interface ChapterPageProps {
   summary?: string | undefined;
   /** The chapter's worksheets, rendered by the worksheets module. */
   worksheets?: ReactNode;
-  /** Teacher-only actions, e.g. starting the lesson frames. */
-  teacherActions?: ReactNode;
   homeLabel: string;
   homePath: string;
 }
@@ -79,7 +77,6 @@ export function ChapterPage({
   chapterId,
   summary,
   worksheets,
-  teacherActions,
   homeLabel,
   homePath,
 }: ChapterPageProps) {
@@ -114,15 +111,6 @@ export function ChapterPage({
           <h1 className="h1 kapitel-head__title">{heading}</h1>
         </div>
       </header>
-
-      {teacherActions && (
-        <section
-          className="content-section kapitel-teacher"
-          aria-label={TEXT.chapter.teacher}
-        >
-          {teacherActions}
-        </section>
-      )}
 
       {worksheets && (
         <section className="content-section" aria-labelledby="worksheets-title">
