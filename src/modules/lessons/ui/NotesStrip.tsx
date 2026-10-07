@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Check, ChevronDown, ChevronRight, EyeOff, Undo2 } from "lucide-react";
 import { Markdown } from "../../content";
 import { fill } from "../../../helper/text";
@@ -7,6 +7,7 @@ import TEXT from "./lessons.de.json";
 
 export interface NotesStripProps {
   number: string;
+  heading?: string | undefined;
   notes?: string | undefined;
   /** Notes only open while a projector window is connected, or on request. */
   visible: boolean;
@@ -19,12 +20,15 @@ export interface NotesStripProps {
   onSend: () => void;
   /** On a quiz frame: start it and move it on. */
   quiz?: QuizActionsProps | undefined;
+  actions?: ReactNode;
 }
 
 /**
  * One line above the stage: the frame's note, its action and "Nächster".
  * Opened, the same strip grows down over the stage with the whole note.
  */
+// The strip keeps its notes, actions and navigation in one row.
+// eslint-disable-next-line max-lines-per-function
 export function NotesStrip(props: NotesStripProps) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -57,7 +61,8 @@ export function NotesStrip(props: NotesStripProps) {
           <EyeOff className="lt-notes__icon" aria-hidden="true" />
           <span className="lt-notes__heading">
             {props.visible
-              ? fill(TEXT.notes.heading, { number: props.number })
+              ? (props.heading ??
+                fill(TEXT.notes.heading, { number: props.number }))
               : TEXT.notes.collapsed}
           </span>
           {!expanded && <span className="lt-notes__preview">{preview}</span>}
@@ -75,6 +80,7 @@ export function NotesStrip(props: NotesStripProps) {
           </button>
         )}
         {props.quiz && <QuizActions {...props.quiz} />}
+        {props.actions}
         {props.sheet &&
           (props.sheet.sent ? (
             <span className="lt-notes__sent">

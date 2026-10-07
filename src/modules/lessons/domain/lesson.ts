@@ -84,6 +84,14 @@ export type LessonSession = {
   blanks: Blank[];
   ink: InkStroke[];
   hidden: boolean;
+  /** The exact image the projector keeps while the teacher navigates. */
+  frozen?: {
+    currentFrameId: string;
+    blanks: Blank[];
+    ink: InkStroke[];
+    sent: string[];
+    hidden: boolean;
+  } | null;
   /** Frames whose sheet the class was sent to (simulated). */
   sent: string[];
 };

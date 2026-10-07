@@ -1,9 +1,8 @@
 import { isViewerRole, type ViewerRole } from "../domain/viewer";
 
 const COOKIE = "studyluma-viewer";
-const ONE_YEAR = 60 * 60 * 24 * 365;
 
-/** The stubbed role from the request cookie; students by default. */
+/** The demo opens as a teacher. An existing student cookie can still preview learner pages. */
 export function readViewer(request: Request): ViewerRole {
   const header = request.headers.get("Cookie") ?? "";
   for (const part of header.split(";")) {
@@ -12,10 +11,5 @@ export function readViewer(request: Request): ViewerRole {
       return value;
     }
   }
-  return "student";
-}
-
-/** Set-Cookie header value that stores the role. */
-export function viewerCookie(role: ViewerRole): string {
-  return `${COOKIE}=${role}; Path=/; Max-Age=${ONE_YEAR}; SameSite=Lax`;
+  return "teacher";
 }

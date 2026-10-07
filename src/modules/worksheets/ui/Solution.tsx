@@ -1,4 +1,4 @@
-import { ChevronDown, Check, Lock, LockOpen } from "lucide-react";
+import { ChevronDown, LockOpen } from "lucide-react";
 import { Markdown } from "../../content";
 import type { Aufgabe } from "../domain/contract";
 import { checkedOnce, isCheckable, isReleased } from "../domain/structure";
@@ -11,7 +11,7 @@ import { TEXT } from "./texts";
  * release it right here.
  */
 export function Solution({ aufgabe }: { aufgabe: Aufgabe }) {
-  const { teacher, state, ui, setUi, store } = useWorksheet();
+  const { teacher, state, ui, setUi } = useWorksheet();
   const solution = aufgabe.solution;
   const released = isReleased(aufgabe, state);
   if (!solution || solution.state === "locked" || (!teacher && !released)) {
@@ -47,21 +47,6 @@ export function Solution({ aufgabe }: { aufgabe: Aufgabe }) {
           <span>{open ? TEXT.solution.hide : TEXT.solution.show}</span>
           <ChevronDown className="icon icon--sm chev" aria-hidden="true" />
         </button>
-        {teacher && (
-          <button
-            type="button"
-            className={`release${released ? " is-on" : ""}`}
-            aria-pressed={released}
-            onClick={() => store.setReleased([aufgabe.id], !released)}
-          >
-            {released ? (
-              <Check className="icon icon--sm" aria-hidden="true" />
-            ) : (
-              <Lock className="icon icon--sm" aria-hidden="true" />
-            )}
-            {released ? TEXT.solution.released : TEXT.solution.release}
-          </button>
-        )}
       </div>
       <div className="loesung__body" id={bodyId} hidden={!open}>
         {gated ? (

@@ -2,7 +2,11 @@ import { ChevronRight } from "lucide-react";
 import { Link } from "react-router";
 import { plural } from "../../../helper/text";
 import type { Section, Sheet } from "../domain/contract";
-import { openChallenges, recommendation } from "../domain/structure";
+import {
+  openChallenges,
+  recommendation,
+  sectionDone,
+} from "../domain/structure";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
 
@@ -19,15 +23,14 @@ export function NextCard({
   const { chapter, state, links } = useWorksheet();
   const index = sheet.sections.indexOf(section);
   const next = sheet.sections[index + 1];
+  const ready = sectionDone(sheet, section, state);
   if (next) {
-    if (section.kind === "checkpoint" && !state.ampels[sheet.id]) {
-      return null;
-    }
     return (
       <nav className="weiter" aria-label={TEXT.next.label}>
         <button
           type="button"
           className="weiter__card weiter__card--next"
+          disabled={!ready}
           onClick={() => onTab(next.id)}
         >
           <span className="weiter__label">{TEXT.next.label}</span>
@@ -47,7 +50,14 @@ export function NextCard({
     <nav className="weiter" aria-label={TEXT.next.recommendation}>
       <Link
         className="weiter__card weiter__card--next"
-        to={target ? links.sheet(target.id) : links.challenges}
+        to={ready ? (target ? links.sheet(target.id) : links.challenges) : "#"}
+        aria-disabled={!ready}
+        tabIndex={ready ? undefined : -1}
+        onClick={(event) => {
+          if (!ready) {
+            event.preventDefault();
+          }
+        }}
       >
         <span className="weiter__label">{TEXT.next.recommended}</span>
         <span className="weiter__name">

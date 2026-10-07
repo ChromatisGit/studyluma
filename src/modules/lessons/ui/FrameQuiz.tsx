@@ -8,7 +8,10 @@ import TEXT from "./lessons.de.json";
 const LETTERS = "ABCDEFGH";
 
 /** The course's running quiz, for the frames on the stage and projector. */
-export const LiveQuizContext = createContext<TeacherQuizView | null>(null);
+export const LiveQuizContext = createContext<{
+  view: TeacherQuizView | null;
+  teacher: boolean;
+}>({ view: null, teacher: false });
 
 type QuizFrameBlock = Extract<FrameBlock, { type: "quiz" }>;
 
@@ -40,7 +43,13 @@ function PreparedQuiz({ block }: { block: QuizFrameBlock }) {
  * The running question. Bars appear with the distribution, each option
  * counted against all participants; the reveal marks the correct ones.
  */
-function LiveQuestion({ view }: { view: TeacherQuizView }) {
+function LiveQuestion({
+  view,
+  teacher,
+}: {
+  view: TeacherQuizView;
+  teacher: boolean;
+}) {
   const counted = view.step !== "answering";
   const revealed = view.step === "revealed";
   const { participants, answered } = view.distribution;
@@ -67,6 +76,9 @@ function LiveQuestion({ view }: { view: TeacherQuizView }) {
             <li key={option.id} className={correct ? "is-correct" : undefined}>
               <span className="lf-quiz__letter">{LETTERS[i]}</span>
               <Markdown inline markdown={option.label} />
+              {teacher && !revealed && option.correct && (
+                <span className="lf-live__teacher-answer">Richtig</span>
+              )}
               {counted && count && (
                 <span className="lf-live__result">
                   <span className="lf-live__track">
@@ -110,9 +122,9 @@ export function QuizBlock({
   block: QuizFrameBlock;
   frameId: string;
 }) {
-  const view = useContext(LiveQuizContext);
+  const { view, teacher } = useContext(LiveQuizContext);
   return view && !view.ended && view.frameId === frameId ? (
-    <LiveQuestion view={view} />
+    <LiveQuestion view={view} teacher={teacher} />
   ) : (
     <PreparedQuiz block={block} />
   );

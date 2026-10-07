@@ -9,6 +9,7 @@ export type SessionAction =
   | { type: "stroke"; stroke: InkStroke }
   | { type: "erase"; strokeId: string }
   | { type: "toggleHidden" }
+  | { type: "toggleFreeze" }
   | { type: "send"; frameId: string };
 
 export function newSession(
@@ -98,6 +99,19 @@ export function reduceSession(
       };
     case "toggleHidden":
       return { ...session, hidden: !session.hidden };
+    case "toggleFreeze":
+      return session.frozen
+        ? { ...session, frozen: null }
+        : {
+            ...session,
+            frozen: {
+              currentFrameId: session.currentFrameId,
+              blanks: structuredClone(session.blanks),
+              ink: structuredClone(session.ink),
+              sent: [...session.sent],
+              hidden: session.hidden,
+            },
+          };
     case "send":
       return session.sent.includes(action.frameId)
         ? session

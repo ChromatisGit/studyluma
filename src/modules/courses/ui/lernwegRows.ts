@@ -75,7 +75,7 @@ function chapterStatus(
 
 /**
  * The rows of one phase: travelled track is solid, the track ahead pale.
- * Past topics open for review; of the upcoming topics only the next one.
+ * Past and current topics open for review; upcoming topics stay locked.
  * `hereIndex` is the row the class is at.
  */
 export function lernwegRows(
@@ -114,8 +114,7 @@ export function lernwegRows(
         : index === currentTopicIndex
           ? "current"
           : "ahead";
-    const openable =
-      !hasPosition || status !== "ahead" || index === currentTopicIndex + 1;
+    const openable = hasPosition && status !== "ahead";
     const open = openable && openTopic === topic.id;
     rows.push({ kind: "topic", key: topic.id, topic, status, openable, open });
     if (status === "current" && !open) {

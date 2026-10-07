@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 import {
   BookOpen,
@@ -50,26 +50,15 @@ function ColorModeControl({ compact = false }: { compact?: boolean }) {
         <span className="study-sidebar__appearance-label">
           {TEXT.colorMode.label}
         </span>
-        <div
-          className="study-sidebar__appearance-options"
-          role="group"
-          aria-label={TEXT.colorMode.label}
+        <button
+          type="button"
+          className="study-sidebar__theme-button"
+          aria-label={dark ? TEXT.colorMode.toLight : TEXT.colorMode.toDark}
+          title={dark ? TEXT.colorMode.toLight : TEXT.colorMode.toDark}
+          onClick={() => setMode(dark ? "light" : "dark")}
         >
-          <button
-            type="button"
-            aria-pressed={!dark}
-            onClick={() => setMode("light")}
-          >
-            {TEXT.colorMode.light}
-          </button>
-          <button
-            type="button"
-            aria-pressed={dark}
-            onClick={() => setMode("dark")}
-          >
-            {TEXT.colorMode.dark}
-          </button>
-        </div>
+          {dark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
+        </button>
       </div>
     );
   }
@@ -89,14 +78,12 @@ function ColorModeControl({ compact = false }: { compact?: boolean }) {
 function DesktopChapterSection({
   section,
   collapsed,
-  flyout,
-  toggleFlyout,
+  onExpand,
   panelId,
 }: {
   section: ChapterSection;
   collapsed: boolean;
-  flyout: string | null;
-  toggleFlyout: (id: string, trigger: HTMLButtonElement) => void;
+  onExpand: () => void;
   panelId: string;
 }) {
   const [open, setOpen] = useState(true);
@@ -106,36 +93,24 @@ function DesktopChapterSection({
       <div className="study-sidebar__section-row">
         <button
           type="button"
-          className="study-sidebar__rail-section"
-          aria-label={section.label}
-          aria-expanded={flyout === "chapter"}
-          aria-controls={`${panelId}-flyout`}
-          data-active="true"
-          onClick={(event) => toggleFlyout("chapter", event.currentTarget)}
-        >
-          <span aria-hidden="true">
-            <BookOpen />
-          </span>
-        </button>
-        <Link
-          className="study-sidebar__section-link"
-          to={section.to}
-          data-active="true"
+          className="study-sidebar__section-link study-sidebar__section-button"
+          aria-expanded={open}
+          aria-controls={`${panelId}-chapter`}
+          title={collapsed ? section.label : undefined}
+          onClick={() => {
+            if (collapsed) {
+              setOpen(true);
+              onExpand();
+            } else {
+              setOpen((previous) => !previous);
+            }
+          }}
         >
           <span className="study-sidebar__section-icon" aria-hidden="true">
             <BookOpen />
           </span>
           <span className="study-sidebar__section-label">{section.label}</span>
-        </Link>
-        <button
-          type="button"
-          className="study-sidebar__disclosure"
-          aria-label={fill(TEXT.shell.pagesIn, { section: section.label })}
-          aria-expanded={open}
-          aria-controls={`${panelId}-chapter`}
-          onClick={() => setOpen((previous) => !previous)}
-        >
-          <ChevronDown aria-hidden="true" />
+          <ChevronDown className="study-sidebar__chevron" aria-hidden="true" />
         </button>
       </div>
       <div
@@ -151,7 +126,7 @@ function DesktopChapterSection({
   );
 }
 
-// The desktop navigation owns disclosure, rail, and flyout state in one place.
+// The desktop navigation owns its accordion state in one place.
 // eslint-disable-next-line max-lines-per-function
 function DesktopSidebar({
   navigation,
@@ -160,6 +135,7 @@ function DesktopSidebar({
   sidebarFooter,
   collapsed,
   onToggle,
+  onExpand,
 }: {
   navigation: readonly NavigationItem[];
   chapterSection?: ChapterSection | undefined;
@@ -167,61 +143,22 @@ function DesktopSidebar({
   sidebarFooter?: ShellActionSlot | undefined;
   collapsed: boolean;
   onToggle: () => void;
+  onExpand: () => void;
 }) {
-  const path = useLocation().pathname.replace(/\/+$/, "") || "/";
+  const location = useLocation();
+  const path = location.pathname.replace(/\/+$/, "") || "/";
   const selected = currentParentTo ?? path;
   const activeSection = navigation.find((item) => containsPath(item, selected));
   const activeSectionId = activeSection?.id;
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const [flyout, setFlyout] = useState<string | null>(null);
-  const [flyoutTop, setFlyoutTop] = useState(0);
-  const sidebarRef = useRef<HTMLElement>(null);
   const navigationId = useId();
-
-  function toggleFlyout(id: string, trigger: HTMLButtonElement) {
-    if (flyout === id) {
-      setFlyout(null);
-      return;
-    }
-    setFlyoutTop(
-      Math.min(trigger.getBoundingClientRect().top, window.innerHeight * 0.4),
-    );
-    setFlyout(id);
-  }
 
   useEffect(() => {
     setExpanded(activeSectionId ? { [activeSectionId]: true } : {});
-    setFlyout(null);
   }, [activeSectionId, path]);
 
-  useEffect(() => {
-    if (!flyout) {
-      return;
-    }
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setFlyout(null);
-      }
-    };
-    const closeOutside = (event: PointerEvent) => {
-      if (!sidebarRef.current?.contains(event.target as Node)) {
-        setFlyout(null);
-      }
-    };
-    document.addEventListener("keydown", closeOnEscape);
-    document.addEventListener("pointerdown", closeOutside);
-    return () => {
-      document.removeEventListener("keydown", closeOnEscape);
-      document.removeEventListener("pointerdown", closeOutside);
-    };
-  }, [flyout]);
-
   return (
-    <aside
-      ref={sidebarRef}
-      className="study-sidebar"
-      aria-label={TEXT.shell.navigation}
-    >
+    <aside className="study-sidebar" aria-label={TEXT.shell.navigation}>
       <div className="study-sidebar__brand-row">
         <Link
           className="study-sidebar__brand"
@@ -261,61 +198,59 @@ function DesktopSidebar({
           return (
             <div className="study-sidebar__section" key={item.id}>
               <div className="study-sidebar__section-row">
-                {hasChildren && (
+                {hasChildren ? (
                   <button
                     type="button"
-                    className="study-sidebar__rail-section"
-                    aria-label={fill(TEXT.shell.pagesIn, {
-                      section: item.label,
-                    })}
-                    aria-expanded={flyout === item.id}
-                    aria-controls={`${navigationId}-flyout`}
-                    data-active={sectionActive || undefined}
-                    onClick={(event) =>
-                      toggleFlyout(item.id, event.currentTarget)
-                    }
+                    className="study-sidebar__section-link study-sidebar__section-button"
+                    aria-expanded={open}
+                    aria-controls={panelId}
+                    title={collapsed ? item.label : undefined}
+                    onClick={() => {
+                      if (collapsed) {
+                        setExpanded((previous) => ({
+                          ...previous,
+                          [item.id]: true,
+                        }));
+                        onExpand();
+                      } else {
+                        setExpanded((previous) => ({
+                          ...previous,
+                          [item.id]: !open,
+                        }));
+                      }
+                    }}
                   >
-                    <span aria-hidden="true">
+                    <span
+                      className="study-sidebar__section-icon"
+                      aria-hidden="true"
+                    >
                       {item.icon ?? item.label.charAt(0)}
                     </span>
+                    <span className="study-sidebar__section-label">
+                      {item.label}
+                    </span>
+                    <ChevronDown
+                      className="study-sidebar__chevron"
+                      aria-hidden="true"
+                    />
                   </button>
-                )}
-                <Link
-                  className="study-sidebar__section-link"
-                  to={item.to}
-                  aria-current={path === item.to ? "page" : undefined}
-                  data-active={sectionActive || undefined}
-                  title={collapsed ? item.label : undefined}
-                  onClick={() => setFlyout(null)}
-                >
-                  <span
-                    className="study-sidebar__section-icon"
-                    aria-hidden="true"
+                ) : (
+                  <Link
+                    className="study-sidebar__section-link"
+                    to={item.to}
+                    aria-current={path === item.to ? "page" : undefined}
+                    title={collapsed ? item.label : undefined}
                   >
-                    {item.icon ?? item.label.charAt(0)}
-                  </span>
-                  <span className="study-sidebar__section-label">
-                    {item.label}
-                  </span>
-                </Link>
-                {hasChildren && (
-                  <button
-                    type="button"
-                    className="study-sidebar__disclosure"
-                    aria-label={fill(TEXT.shell.pagesIn, {
-                      section: item.label,
-                    })}
-                    aria-controls={panelId}
-                    aria-expanded={open}
-                    onClick={() =>
-                      setExpanded((previous) => ({
-                        ...previous,
-                        [item.id]: !open,
-                      }))
-                    }
-                  >
-                    <ChevronDown aria-hidden="true" />
-                  </button>
+                    <span
+                      className="study-sidebar__section-icon"
+                      aria-hidden="true"
+                    >
+                      {item.icon ?? item.label.charAt(0)}
+                    </span>
+                    <span className="study-sidebar__section-label">
+                      {item.label}
+                    </span>
+                  </Link>
                 )}
               </div>
               {hasChildren && (
@@ -342,8 +277,7 @@ function DesktopSidebar({
           <DesktopChapterSection
             section={chapterSection}
             collapsed={collapsed}
-            flyout={flyout}
-            toggleFlyout={toggleFlyout}
+            onExpand={onExpand}
             panelId={navigationId}
           />
         )}
@@ -361,50 +295,6 @@ function DesktopSidebar({
           </div>
         )}
       </div>
-      {collapsed && flyout && (
-        <div
-          className="study-sidebar__flyout"
-          id={`${navigationId}-flyout`}
-          style={{
-            top: flyoutTop,
-            maxHeight: `calc(100dvh - ${flyoutTop}px - 0.5rem)`,
-          }}
-        >
-          {flyout === "chapter" && chapterSection && (
-            <div>
-              <Link
-                className="study-sidebar__flyout-title"
-                to={chapterSection.to}
-                onClick={() => setFlyout(null)}
-              >
-                {chapterSection.label}
-              </Link>
-              {chapterSection.render(() => setFlyout(null))}
-            </div>
-          )}
-          {navigation
-            .filter((item) => item.id === flyout)
-            .map((item) => (
-              <div key={item.id}>
-                <Link
-                  className="study-sidebar__flyout-title"
-                  to={item.to}
-                  onClick={() => setFlyout(null)}
-                >
-                  {item.label}
-                </Link>
-                {item.children && (
-                  <ChildLinks
-                    items={item.children}
-                    path={path}
-                    parentPath={currentParentTo}
-                    onNavigate={() => setFlyout(null)}
-                  />
-                )}
-              </div>
-            ))}
-        </div>
-      )}
     </aside>
   );
 }
@@ -412,6 +302,7 @@ function DesktopSidebar({
 export interface StudyShellProps {
   children: ReactNode;
   navigation: readonly NavigationItem[];
+  pageWidth?: "default" | "wide";
   chapterSection?: ChapterSection | undefined;
   sidebarFooter?: ShellActionSlot | undefined;
   quickActions?: ReactNode;
@@ -423,6 +314,7 @@ export interface StudyShellProps {
 export function StudyShell({
   children,
   navigation,
+  pageWidth = "default",
   chapterSection,
   sidebarFooter,
   quickActions,
@@ -430,6 +322,7 @@ export function StudyShell({
   footer,
 }: StudyShellProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [animateSidebar, setAnimateSidebar] = useState(false);
 
   useEffect(() => {
     try {
@@ -441,6 +334,7 @@ export function StudyShell({
 
   function toggleSidebar() {
     const next = !collapsed;
+    setAnimateSidebar(true);
     setCollapsed(next);
     try {
       localStorage.setItem(sidebarStorageKey, next ? "closed" : "open");
@@ -449,8 +343,21 @@ export function StudyShell({
     }
   }
 
+  function expandSidebar() {
+    setAnimateSidebar(true);
+    setCollapsed(false);
+    try {
+      localStorage.setItem(sidebarStorageKey, "open");
+    } catch {
+      // Keep the expanded state for this session.
+    }
+  }
+
   return (
-    <div className={`study-shell${collapsed ? " study-shell--collapsed" : ""}`}>
+    <div
+      className={`study-shell${collapsed ? " study-shell--collapsed" : ""}${animateSidebar ? " study-shell--animate-sidebar" : ""}`}
+      data-page-width={pageWidth}
+    >
       <DesktopSidebar
         navigation={navigation}
         chapterSection={chapterSection}
@@ -458,10 +365,12 @@ export function StudyShell({
         sidebarFooter={sidebarFooter}
         collapsed={collapsed}
         onToggle={toggleSidebar}
+        onExpand={expandSidebar}
       />
       <StudyMobileHeader
         navigation={navigation}
         chapterSection={chapterSection}
+        currentParentTo={currentParentTo}
         quickActions={quickActions}
         settings={<ColorModeControl />}
         accountControl={sidebarFooter?.full}

@@ -14,6 +14,7 @@ export function useFrameQuiz(
   lesson: Lesson,
   session: LessonSession | null,
   dispatch: ReturnType<typeof useLessonSession>["dispatch"],
+  keepRunningOnLeave = false,
 ) {
   const { view, start, advance, end } = useTeacherQuiz(courseId);
   const [failed, setFailed] = useState(false);
@@ -25,10 +26,15 @@ export function useFrameQuiz(
   const isQuizFrame = !!frame?.blocks?.some((block) => block.type === "quiz");
 
   useEffect(() => {
-    if (live && currentId && live.frameId !== currentId) {
+    if (
+      !keepRunningOnLeave &&
+      live &&
+      currentId &&
+      live.frameId !== currentId
+    ) {
       void end(live);
     }
-  }, [live, currentId, end]);
+  }, [live, currentId, end, keepRunningOnLeave]);
 
   const report = useCallback((ok: boolean) => setFailed(!ok), []);
 
@@ -69,5 +75,10 @@ export function useFrameQuiz(
     ? { view: here, onStart, onStep: () => onStep(1), failed }
     : undefined;
 
-  return { live, actions, onStep };
+  return {
+    live,
+    actions,
+    onStep,
+    endActive: () => (live ? end(live) : Promise.resolve(true)),
+  };
 }

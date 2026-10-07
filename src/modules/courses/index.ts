@@ -10,7 +10,10 @@ export type {
 export {
   chapterPath,
   chaptersInOrder,
+  courseContentPath,
+  courseOverviewPath,
   coursePath,
+  courseStructurePath,
   findChapter,
   neighbours,
 } from "./application/navigation";
@@ -19,6 +22,7 @@ export {
   getSummary,
   listCourses,
 } from "./infrastructure/courseRepository";
+export { getConfiguredCourse } from "./infrastructure/coursePlan";
 export { CourseList } from "./ui/CourseList";
 export { CoursePage } from "./ui/CoursePage";
 export type { CoursePageProps } from "./ui/CoursePage";

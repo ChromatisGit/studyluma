@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useParams } from "react-router";
-import { findChapter, getCourse } from "../../src/modules/courses";
-import { readViewer } from "../../src/modules/viewer";
+import { findChapter } from "../../src/modules/courses";
+import { getConfiguredCourse } from "../../src/modules/courses/infrastructure/coursePlan";
 import {
   getWorksheetChapter,
   WorksheetChapter,
@@ -10,8 +10,8 @@ import { worksheetLinks } from "../worksheetLinks";
 
 export function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterId = "", courseId = "" } = params;
-  const course = getCourse(courseId);
-  const viewer = readViewer(request);
+  const course = getConfiguredCourse(courseId, request);
+  const viewer = "student" as const;
   const chapter = getWorksheetChapter(chapterId, viewer);
   if (!course || !findChapter(course, chapterId) || !chapter) {
     throw new Response(null, { status: 404 });

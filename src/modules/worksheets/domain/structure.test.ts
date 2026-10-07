@@ -1,13 +1,14 @@
 import { describe, expect, test } from "bun:test";
 import chapterJson from "../infrastructure/fixtures/9-2.json";
 import { emptyChapterState } from "./chapterState";
-import type { Chapter, PartResponse } from "./contract";
+import type { Chapter, PartResponse, Section } from "./contract";
 import {
   baseLevel,
   helpLadder,
   indexChapter,
   recommendation,
   recordCheck,
+  sectionDone,
   sheetDone,
   structureLevel,
 } from "./structure";
@@ -69,6 +70,58 @@ describe("structure and help", () => {
 });
 
 describe("progress", () => {
+  test("next section needs every gap checked, even when the answer is wrong", () => {
+    const source = chapter.sheets[0];
+    const task = source?.sections
+      .flatMap((section) => section.aufgaben)
+      .find((aufgabe) => aufgabe.id === "potenzregel-regel-in-worten");
+    if (!source || !task) {
+      throw new Error("Missing multi-gap fixture");
+    }
+    const part = task.parts[0];
+    if (!part || part.task.type !== "lueckentext") {
+      throw new Error("Missing multi-gap part");
+    }
+    const [first, second] = part.task.gaps;
+    if (!first || !second) {
+      throw new Error("Missing gaps");
+    }
+    const section: Section = {
+      id: "progress-test",
+      kind: "plain",
+      title: "Progress",
+      aufgaben: [task],
+    };
+    const state = emptyChapterState();
+    const sheet = { ...source, sections: [section] };
+    const partial = { [first.id]: "wrong" };
+    state.responses[part.id] = recordCheck(
+      { value: partial, wrongChecks: 0 },
+      { state: "nochNicht" },
+    );
+    expect(sectionDone(sheet, section, state)).toBe(false);
+    const filled = { ...partial, [second.id]: "wrong" };
+    const checked = recordCheck(
+      { value: filled, wrongChecks: 0 },
+      { state: "nochNicht" },
+    );
+    state.responses[part.id] = checked;
+    expect(sectionDone(sheet, section, state)).toBe(true);
+    const changed = {
+      ...checked,
+      value: { ...filled, [second.id]: "changed" },
+    };
+    state.responses[part.id] = changed;
+    expect(sectionDone(sheet, section, state)).toBe(false);
+    section.kind = "checkpoint";
+    state.responses[part.id] = recordCheck(changed, {
+      state: "nochNicht",
+    });
+    expect(sectionDone(sheet, section, state)).toBe(false);
+    state.ampels[sheet.id] = { level: "green" };
+    expect(sectionDone(sheet, section, state)).toBe(true);
+  });
+
   test("a sheet is done once its Ampel is answered", () => {
     const state = emptyChapterState();
     const sheet = chapter.sheets[0];

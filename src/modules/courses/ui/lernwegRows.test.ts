@@ -46,12 +46,12 @@ describe("lernwegRows", () => {
     expect(chapters.map((row) => row.status)).toEqual(["done", "here"]);
   });
 
-  test("only the next upcoming topic can be opened", () => {
+  test("upcoming topics cannot be opened", () => {
     const { rows } = lernwegRows(phases, 1, "3.2", null);
     const openable = rows.flatMap((row) =>
       row.kind === "topic" ? [row.openable] : [],
     );
-    expect(openable).toEqual([true, true, false]);
+    expect(openable).toEqual([true, false, false]);
   });
 
   test("a past year links to the next one and is fully travelled", () => {

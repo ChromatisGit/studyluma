@@ -1,14 +1,24 @@
 import { ArrowRight } from "lucide-react";
 import { EmptyState, Page, PageHeader } from "@chromatis/base/ui";
 import { fill } from "../../../helper/text";
-import { chaptersInOrder, coursePath } from "../application/navigation";
+import {
+  chaptersInOrder,
+  courseOverviewPath,
+  coursePath,
+} from "../application/navigation";
 import type { Course } from "../domain/course";
 import { LinkCard } from "./LinkCard";
 import { Pictogram } from "./Pictogram";
 import TEXT from "./courses.de.json";
 
 /** "Meine Kurse": the start page with one card per course. */
-export function CourseList({ courses }: { courses: Course[] }) {
+export function CourseList({
+  courses,
+  teacher = false,
+}: {
+  courses: Course[];
+  teacher?: boolean;
+}) {
   return (
     <Page title={TEXT.home.title} width="content">
       <PageHeader title={TEXT.home.title} lead={TEXT.home.lead} />
@@ -23,7 +33,11 @@ export function CourseList({ courses }: { courses: Course[] }) {
             return (
               <LinkCard
                 key={course.id}
-                to={coursePath(course.id)}
+                to={
+                  teacher
+                    ? courseOverviewPath(course.id)
+                    : coursePath(course.id)
+                }
                 meta={course.subject}
                 title={course.title}
                 cue={<ArrowRight className="card__cue" aria-hidden="true" />}
