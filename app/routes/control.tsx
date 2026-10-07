@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
-import { coursePath } from "../../src/modules/courses";
+import { courseOverviewPath } from "../../src/modules/courses";
 import {
   coursePlanCookie,
   readCoursePlan,
@@ -15,7 +15,7 @@ export function loader({ params }: LoaderFunctionArgs) {
   if (!base) {
     throw new Response(null, { status: 404 });
   }
-  return redirect(coursePath(courseId));
+  return redirect(courseOverviewPath(courseId));
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {

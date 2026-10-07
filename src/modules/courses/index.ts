@@ -10,7 +10,10 @@ export type {
 export {
   chapterPath,
   chaptersInOrder,
+  courseContentPath,
+  courseOverviewPath,
   coursePath,
+  courseStructurePath,
   findChapter,
   neighbours,
 } from "./application/navigation";

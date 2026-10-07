@@ -1,16 +1,16 @@
-import {
-  Breadcrumbs,
-  Card,
-  CardBody,
-  Page,
-  PageHeader,
-  Tabs,
-  TextLink,
-} from "@chromatis/base/ui";
-import { useState, type ReactNode } from "react";
+import { Breadcrumbs, Page, PageHeader, Tabs } from "@chromatis/base/ui";
+import type { ReactNode } from "react";
+import { useNavigate } from "react-router";
 import { fill } from "../../../helper/text";
-import { chapterPath, chaptersInOrder } from "../application/navigation";
+import {
+  chapterPath,
+  courseContentPath,
+  coursePath,
+  courseOverviewPath,
+  courseStructurePath,
+} from "../application/navigation";
 import type { Course, Topic } from "../domain/course";
+import { CurrentLesson } from "./CurrentLesson";
 import { Lernweg, type LernwegPhase, type LernwegTopic } from "./Lernweg";
 import TEXT from "./courses.de.json";
 
@@ -50,66 +50,37 @@ function lernwegPhases(course: Course): LernwegPhase[] {
 
 export interface CoursePageProps {
   course: Course;
-  homeLabel: string;
-  homePath: string;
   teacher?: boolean;
   teachingControls?: ReactNode;
-  topicControls?: ReactNode;
+  structureControls?: ReactNode;
+  contents?: ReactNode;
+  activeTab?: CourseTab;
 }
+
+type CourseTab = "overview" | "course-structure" | "content" | "student";
 
 /** The course view: where the class is, and the Lernweg below. */
 // eslint-disable-next-line max-lines-per-function
 export function CoursePage({
   course,
-  homeLabel,
-  homePath,
   teacher = false,
   teachingControls,
-  topicControls,
+  structureControls,
+  contents,
+  activeTab = "overview",
 }: CoursePageProps) {
-  const [tab, setTab] = useState(teacher ? "teaching" : "student");
-  const chapters = chaptersInOrder(course);
-  const currentIndex = chapters.findIndex((chapter) => chapter.current);
-  const current = chapters[currentIndex];
-  const previous = currentIndex > 0 ? chapters[currentIndex - 1] : undefined;
-
+  const navigate = useNavigate();
+  const tabLabel = {
+    overview: "Übersicht",
+    "course-structure": "Kursstruktur",
+    content: "Inhalte",
+    student: "Kursübersicht",
+  }[activeTab];
   const studentView = (
     <>
-      {current && (
-        <Card
-          className="lernweg-board"
-          surface="accent"
-          aria-label={TEXT.board.label}
-        >
-          <CardBody>
-            <div className="lernweg-board__stop">
-              <span className="lernweg-board__label">{TEXT.board.current}</span>
-              <TextLink
-                className="lernweg-board__title"
-                to={chapterPath(course.id, current.id)}
-              >
-                {current.number} {current.title}
-              </TextLink>
-              <span className="lernweg-board__sub">{current.topic.title}</span>
-            </div>
-            {previous && (
-              <div className="lernweg-board__stop">
-                <span className="lernweg-board__label">
-                  {TEXT.board.previous}
-                </span>
-                <TextLink
-                  className="lernweg-board__title"
-                  to={chapterPath(course.id, previous.id)}
-                >
-                  {previous.number} {previous.title}
-                </TextLink>
-              </div>
-            )}
-          </CardBody>
-        </Card>
-      )}
+      <CurrentLesson course={course} />
       <section className="stack stack-300" aria-labelledby="lernweg-title">
-        <h2 id="lernweg-title" className="h3">
+        <h2 id="lernweg-title" className="h2">
           {TEXT.lernweg.heading}
         </h2>
         <Lernweg
@@ -125,45 +96,74 @@ export function CoursePage({
   return (
     <Page
       title={course.title}
-      width={teacher ? "wide" : "content"}
+      width="content"
       className="course-detail stack stack-700"
     >
       <PageHeader
         title={course.title}
-        kicker={course.subject}
         breadcrumbs={
           <Breadcrumbs
             label={TEXT.breadcrumbs}
             items={[
-              { label: homeLabel, to: homePath },
-              { label: course.title },
+              { label: course.title, to: coursePath(course.id) },
+              { label: tabLabel },
             ]}
           />
         }
       />
 
-      <Tabs
-        label="Kursansichten"
-        value={tab}
-        onValueChange={setTab}
-        items={[
-          ...(teacher
-            ? [
-                {
-                  id: "teaching",
-                  label: "Unterrichtssteuerung",
-                  content: teachingControls,
-                },
-                {
-                  id: "topics",
-                  label: "Themenübersicht",
-                  content: topicControls,
-                },
-              ]
-            : []),
-          { id: "student", label: "Schüleransicht", content: studentView },
-        ]}
-      />
+      {teacher ? (
+        <Tabs
+          label="Kursansichten"
+          value={activeTab}
+          onValueChange={(value) => {
+            if (
+              value !== "overview" &&
+              value !== "course-structure" &&
+              value !== "content" &&
+              value !== "student"
+            ) {
+              return;
+            }
+            if (value === "student") {
+              void navigate(coursePath(course.id));
+              return;
+            }
+            void navigate(
+              value === "overview"
+                ? courseOverviewPath(course.id)
+                : value === "course-structure"
+                  ? courseStructurePath(course.id)
+                  : courseContentPath(course.id),
+            );
+          }}
+          items={[
+            {
+              id: "overview",
+              label: "Übersicht",
+              content: activeTab === "overview" ? teachingControls : null,
+            },
+            {
+              id: "course-structure",
+              label: "Kursstruktur",
+              content:
+                activeTab === "course-structure" ? structureControls : null,
+            },
+            {
+              id: "content",
+              label: "Inhalte",
+              content: activeTab === "content" ? contents : null,
+            },
+            {
+              id: "student",
+              label: "Schüleransicht",
+              content: activeTab === "student" ? studentView : null,
+            },
+          ]}
+        />
+      ) : (
+        studentView
+      )}
     </Page>
   );
 }

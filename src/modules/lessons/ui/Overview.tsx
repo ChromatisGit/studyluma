@@ -6,6 +6,7 @@ import { FrameThumb } from "./FrameStage";
 import { FrameView } from "./FrameView";
 import { InkStrokes } from "./InkLayer";
 import TEXT from "./lessons.de.json";
+import type { Unterrichtsverlauf } from "../../teaching";
 
 /** All frames, grouped by lesson, with their planned time. Teacher only. */
 export function Overview({
@@ -16,6 +17,7 @@ export function Overview({
   sent,
   onGo,
   onClose,
+  flow,
 }: {
   lesson: Lesson;
   order: OrderEntry[];
@@ -24,6 +26,7 @@ export function Overview({
   sent: string[];
   onGo: (id: string) => void;
   onClose: () => void;
+  flow?: Unterrichtsverlauf | undefined;
 }) {
   return (
     <div className="lt-overview">
@@ -42,7 +45,11 @@ export function Overview({
       {lesson.lessons.map((part) => (
         <section key={part.number} className="lt-overview__lesson">
           <h2 className="lt-overview__lesson-title">
-            {fill(TEXT.overview.lesson, { number: part.number })}
+            {flow
+              ? part.number > flow.steps.length
+                ? `Weitere Lesson Frames des Kapitels · ${part.title}`
+                : `Schritt ${part.number} · ${part.title}`
+              : fill(TEXT.overview.lesson, { number: part.number })}
           </h2>
           <div className="lt-overview__grid">
             {order

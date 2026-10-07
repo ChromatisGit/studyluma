@@ -5,10 +5,13 @@ import {
   lessonText,
   ProjectorView,
 } from "../../src/modules/lessons";
+import { flowFromParam, flowLesson } from "../../src/modules/teaching";
 
-export function loader({ params }: LoaderFunctionArgs) {
+export function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterId = "" } = params;
-  const lesson = getLesson(chapterId);
+  const flowId = new URL(request.url).searchParams.get("flow");
+  const flow = flowFromParam(chapterId, flowId);
+  const lesson = flow ? flowLesson(flow) : getLesson(chapterId);
   if (!lesson) {
     throw new Response(null, { status: 404 });
   }

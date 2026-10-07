@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 export type TeacherKey =
-  "next" | "previous" | "hide" | "overview" | "blank" | "escape";
+  "next" | "previous" | "hide" | "freeze" | "overview" | "blank" | "escape";
 
 const KEYS: Record<string, TeacherKey> = {
   ArrowRight: "next",
@@ -14,6 +14,8 @@ const KEYS: Record<string, TeacherKey> = {
   PageUp: "previous",
   b: "hide",
   B: "hide",
+  f: "freeze",
+  F: "freeze",
   g: "overview",
   G: "overview",
   n: "blank",

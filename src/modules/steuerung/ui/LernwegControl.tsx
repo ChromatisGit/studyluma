@@ -1,9 +1,11 @@
+/* eslint-disable max-lines */
 import { useState, type ReactNode } from "react";
 import { useFetcher } from "react-router";
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { Alert, Badge, Button } from "@chromatis/base/ui";
 import {
   chaptersInOrder,
+  getSummary,
   Linie,
   LinieStop,
   Pictogram,
@@ -11,6 +13,21 @@ import {
   type Course,
   type Topic,
 } from "../../courses";
+import { summaryStore } from "../../teaching";
+import {
+  chapterStore,
+  getWorksheetChapter,
+  isUnlocked,
+} from "../../worksheets";
+import { ChapterHeading } from "./ChapterHeading";
+
+function autoScroll(y: number) {
+  if (y < 90) {
+    window.scrollBy(0, -12);
+  } else if (y > window.innerHeight - 90) {
+    window.scrollBy(0, 12);
+  }
+}
 
 function PlanAction({
   intent,
@@ -71,6 +88,9 @@ function PlanAction({
 
 function AddChapter({ topic }: { topic: Topic }) {
   const [open, setOpen] = useState(false);
+  const [template, setTemplate] = useState("Übungen vor Klausur");
+  const [title, setTitle] = useState("Übungen vor Klausur");
+  const [typed, setTyped] = useState(false);
   const fetcher = useFetcher();
   return open ? (
     <fetcher.Form
@@ -81,8 +101,40 @@ function AddChapter({ topic }: { topic: Topic }) {
       <input type="hidden" name="intent" value="add-chapter" />
       <input type="hidden" name="id" value={topic.id} />
       <label>
+        Vorlage
+        <select
+          className="select__control"
+          name="template"
+          value={template}
+          onChange={(event) => {
+            setTemplate(event.target.value);
+            if (!typed) {
+              setTitle(
+                event.target.value === "Leeres Kapitel"
+                  ? ""
+                  : event.target.value,
+              );
+            }
+          }}
+        >
+          <option>Übungen vor Klausur</option>
+          <option>Wiederholung</option>
+          <option>Leeres Kapitel</option>
+        </select>
+      </label>
+      <label>
         Titel des Kapitels
-        <input className="input" name="title" required autoFocus />
+        <input
+          className="input"
+          name="title"
+          value={title}
+          onChange={(event) => {
+            setTitle(event.target.value);
+            setTyped(true);
+          }}
+          required
+          autoFocus
+        />
       </label>
       <Button type="submit" size="sm">
         Kapitel einfügen
@@ -114,14 +166,29 @@ function AddTopic({ course }: { course: Course }) {
         <input className="input" name="title" required autoFocus />
       </label>
       <label>
-        Schuljahr
-        <select className="select__control" name="phaseId">
-          {course.phases.map((phase) => (
-            <option key={phase.id} value={phase.id}>
-              {phase.label}
+        Position
+        <select className="select__control" name="afterTopicId">
+          <option value="">Am Anfang des Lernwegs</option>
+          {course.topics.map((topic) => (
+            <option key={topic.id} value={topic.id}>
+              Nach {topic.title}
             </option>
           ))}
         </select>
+      </label>
+      <label>
+        Piktogramm
+        <select className="select__control" name="icon">
+          <option value="kurve">Kurve</option>
+          <option value="baum">Baum</option>
+          <option value="terme">Terme</option>
+          <option value="gerade">Gerade</option>
+          <option value="prototyp">Prototyp</option>
+        </select>
+      </label>
+      <label>
+        Erstes Kapitel
+        <input className="input" name="firstChapter" required />
       </label>
       <Button type="submit" size="sm">
         Thema anlegen
@@ -174,11 +241,15 @@ function Rename({ id, title }: { id: string; title: string }) {
 }
 
 // The editable line keeps each topic and its chapters in one ordered list.
+// Each line stop owns its insert and edit controls.
 // eslint-disable-next-line max-lines-per-function
 export function LernwegControl({ course }: { course: Course }) {
   const chapters = chaptersInOrder(course);
+  const currentChapter = chapters.find((chapter) => chapter.current);
   const [pending, setPending] = useState<string | null>(null);
   const fetcher = useFetcher();
+  const [dragged, setDragged] = useState<string | null>(null);
+  const [dropTarget, setDropTarget] = useState<string | null>(null);
   const rows = course.topics.flatMap((topic) => [
     { kind: "topic" as const, topic },
     ...topic.chapters.map((chapter) => ({
@@ -192,19 +263,40 @@ export function LernwegControl({ course }: { course: Course }) {
       row.kind === "chapter" && row.chapter.id === course.currentChapterId,
   );
   const selected = chapters.find((chapter) => chapter.id === pending);
+  const oldIndex = chapters.findIndex(
+    (item) => item.id === course.currentChapterId,
+  );
+  const newIndex = selected
+    ? chapters.findIndex((item) => item.id === selected.id)
+    : oldIndex;
+  const lockedSheets = selected
+    ? (getWorksheetChapter(selected.id, "teacher")?.sheets.filter(
+        (sheet) => !isUnlocked(sheet, chapterStore(selected.id).getSnapshot()),
+      ).length ?? 0)
+    : 0;
+  const summariesToUnlock =
+    newIndex > oldIndex
+      ? chapters.filter((item, index) => {
+          const { rule, unlocked } = summaryStore(item.id).getSnapshot();
+          return (
+            !!getSummary(item.id) &&
+            !unlocked &&
+            ((rule === "abschluss" && index >= oldIndex && index < newIndex) ||
+              (rule === "kapitel" && index > oldIndex && index <= newIndex))
+          );
+        })
+      : [];
   return (
     <div className="steuerung-stack">
-      <p className="steuerung-intro">
-        <strong>Hier legst du das aktuelle Kapitel fest.</strong> Spätere
-        Kapitel sieht die Klasse als Vorschau. Du kannst Themen und Kapitel
-        ergänzen und Kapitel im Thema verschieben.
-      </p>
+      {currentChapter && <ChapterHeading chapter={currentChapter} />}
       <Linie
-        label={`Lernweg ${course.title}`}
+        label={`Kursstruktur ${course.title}`}
         badge={course.badge}
         badgeLabel={course.title}
         className="steuerung-linie"
       >
+        {/* Each stop has its own drop and edit controls. */}
+        {/* eslint-disable-next-line max-lines-per-function */}
         {rows.map((row, index) => {
           const track = trackFor(index, rows.length, hereIndex);
           if (row.kind === "topic") {
@@ -215,7 +307,36 @@ export function LernwegControl({ course }: { course: Course }) {
                 status={index <= hereIndex ? "done" : "ahead"}
                 {...track}
               >
-                <div className="steuerung-topic">
+                <div
+                  className="steuerung-topic"
+                  data-drop={
+                    dropTarget === `${row.topic.id}:start` || undefined
+                  }
+                  onDragOver={(event) => {
+                    if (dragged) {
+                      event.preventDefault();
+                      autoScroll(event.clientY);
+                      setDropTarget(`${row.topic.id}:start`);
+                    }
+                  }}
+                  onDragLeave={() => setDropTarget(null)}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    if (dragged) {
+                      void fetcher.submit(
+                        {
+                          intent: "move",
+                          id: dragged,
+                          targetId: row.topic.id,
+                          position: "start",
+                        },
+                        { method: "post" },
+                      );
+                    }
+                    setDragged(null);
+                    setDropTarget(null);
+                  }}
+                >
                   <Pictogram
                     id={row.topic.icon}
                     fallbackLabel={row.topic.title}
@@ -224,21 +345,57 @@ export function LernwegControl({ course }: { course: Course }) {
                     <h2 className="h4">
                       {row.topic.number} {row.topic.title}
                     </h2>
-                    <Rename id={row.topic.id} title={row.topic.title} />
-                  </div>
-                  <PlanAction
-                    intent="remove"
-                    id={row.topic.id}
-                    label={`${row.topic.title} entfernen`}
-                    role="destructive"
-                    disabled={row.topic.chapters.some(
-                      (item) => item.id === course.currentChapterId,
+                    {row.topic.id.startsWith("custom-topic-") && (
+                      <Rename id={row.topic.id} title={row.topic.title} />
                     )}
-                  >
-                    <Trash2 className="icon icon--sm" aria-hidden="true" />
-                  </PlanAction>
+                  </div>
+                  {row.topic.id.startsWith("custom-topic-") && (
+                    <PlanAction
+                      intent="remove"
+                      id={row.topic.id}
+                      label={`${row.topic.title} entfernen`}
+                      role="destructive"
+                      disabled={row.topic.chapters.some(
+                        (item) => item.id === course.currentChapterId,
+                      )}
+                    >
+                      <Trash2 className="icon icon--sm" aria-hidden="true" />
+                    </PlanAction>
+                  )}
                 </div>
-                {!row.topic.chapters.length && <AddChapter topic={row.topic} />}
+                {!row.topic.chapters.length && (
+                  <div
+                    data-drop={
+                      dropTarget === `${row.topic.id}:end` || undefined
+                    }
+                    onDragOver={(event) => {
+                      if (dragged) {
+                        event.preventDefault();
+                        autoScroll(event.clientY);
+                        setDropTarget(`${row.topic.id}:end`);
+                      }
+                    }}
+                    onDragLeave={() => setDropTarget(null)}
+                    onDrop={(event) => {
+                      event.preventDefault();
+                      if (dragged) {
+                        void fetcher.submit(
+                          {
+                            intent: "move",
+                            id: dragged,
+                            targetId: row.topic.id,
+                            position: "end",
+                          },
+                          { method: "post" },
+                        );
+                      }
+                      setDragged(null);
+                      setDropTarget(null);
+                    }}
+                  >
+                    <AddChapter topic={row.topic} />
+                  </div>
+                )}
               </LinieStop>
             );
           }
@@ -253,7 +410,29 @@ export function LernwegControl({ course }: { course: Course }) {
               status={current ? "here" : index < hereIndex ? "done" : "ahead"}
               {...track}
             >
-              <div className="steuerung-chapter">
+              <div
+                className="steuerung-chapter"
+                data-drop={dropTarget === row.chapter.id || undefined}
+                onDragOver={(event) => {
+                  if (dragged) {
+                    event.preventDefault();
+                    autoScroll(event.clientY);
+                    setDropTarget(row.chapter.id);
+                  }
+                }}
+                onDragLeave={() => setDropTarget(null)}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  if (dragged && dragged !== row.chapter.id) {
+                    void fetcher.submit(
+                      { intent: "move", id: dragged, targetId: row.chapter.id },
+                      { method: "post" },
+                    );
+                  }
+                  setDragged(null);
+                  setDropTarget(null);
+                }}
+              >
                 <label>
                   <input
                     type="radio"
@@ -269,36 +448,84 @@ export function LernwegControl({ course }: { course: Course }) {
                   {current && <Badge status="info">Aktuell</Badge>}
                 </label>
                 <div className="steuerung-chapter__actions">
-                  <Rename id={row.chapter.id} title={row.chapter.title} />
-                  <PlanAction
-                    intent="up"
-                    id={row.chapter.id}
-                    label={`${row.chapter.title} nach oben verschieben`}
-                    disabled={siblingIndex === 0}
-                  >
-                    <ArrowUp className="icon icon--sm" aria-hidden="true" />
-                  </PlanAction>
-                  <PlanAction
-                    intent="down"
-                    id={row.chapter.id}
-                    label={`${row.chapter.title} nach unten verschieben`}
-                    disabled={siblingIndex === row.topic.chapters.length - 1}
-                  >
-                    <ArrowDown className="icon icon--sm" aria-hidden="true" />
-                  </PlanAction>
-                  <PlanAction
-                    intent="remove"
-                    id={row.chapter.id}
-                    label={`${row.chapter.title} entfernen`}
-                    role="destructive"
-                    disabled={current}
-                  >
-                    <Trash2 className="icon icon--sm" aria-hidden="true" />
-                  </PlanAction>
+                  {row.chapter.id.startsWith("custom-chapter-") && (
+                    <>
+                      <button
+                        type="button"
+                        className="icon-btn steuerung-grip"
+                        draggable
+                        aria-label={`${row.chapter.title} verschieben. Mit Pfeil hoch und Pfeil runter verschieben.`}
+                        onDragStart={() => setDragged(row.chapter.id)}
+                        onDragEnd={() => {
+                          setDragged(null);
+                          setDropTarget(null);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "ArrowUp" && siblingIndex > 0) {
+                            event.preventDefault();
+                            void fetcher.submit(
+                              { intent: "up", id: row.chapter.id },
+                              { method: "post" },
+                            );
+                          }
+                          if (
+                            event.key === "ArrowDown" &&
+                            siblingIndex < row.topic.chapters.length - 1
+                          ) {
+                            event.preventDefault();
+                            void fetcher.submit(
+                              { intent: "down", id: row.chapter.id },
+                              { method: "post" },
+                            );
+                          }
+                        }}
+                      >
+                        <GripVertical aria-hidden="true" />
+                      </button>
+                      <Rename id={row.chapter.id} title={row.chapter.title} />
+                      <PlanAction
+                        intent="remove"
+                        id={row.chapter.id}
+                        label={`${row.chapter.title} entfernen`}
+                        role="destructive"
+                        disabled={current}
+                      >
+                        <Trash2 className="icon icon--sm" aria-hidden="true" />
+                      </PlanAction>
+                    </>
+                  )}
                 </div>
               </div>
               {siblingIndex === row.topic.chapters.length - 1 && (
-                <AddChapter topic={row.topic} />
+                <div
+                  data-drop={dropTarget === `${row.topic.id}:end` || undefined}
+                  onDragOver={(event) => {
+                    if (dragged) {
+                      event.preventDefault();
+                      autoScroll(event.clientY);
+                      setDropTarget(`${row.topic.id}:end`);
+                    }
+                  }}
+                  onDragLeave={() => setDropTarget(null)}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    if (dragged) {
+                      void fetcher.submit(
+                        {
+                          intent: "move",
+                          id: dragged,
+                          targetId: row.topic.id,
+                          position: "end",
+                        },
+                        { method: "post" },
+                      );
+                    }
+                    setDragged(null);
+                    setDropTarget(null);
+                  }}
+                >
+                  <AddChapter topic={row.topic} />
+                </div>
               )}
             </LinieStop>
           );
@@ -315,7 +542,34 @@ export function LernwegControl({ course }: { course: Course }) {
               <Button role="secondary" onClick={() => setPending(null)}>
                 Abbrechen
               </Button>
-              <fetcher.Form method="post" onSubmit={() => setPending(null)}>
+              <fetcher.Form
+                method="post"
+                onSubmit={() => {
+                  const oldIndex = chapters.findIndex(
+                    (item) => item.id === course.currentChapterId,
+                  );
+                  const newIndex = chapters.findIndex(
+                    (item) => item.id === selected.id,
+                  );
+                  if (newIndex > oldIndex) {
+                    chapters.forEach((item, index) => {
+                      const store = summaryStore(item.id);
+                      const { rule } = store.getSnapshot();
+                      if (
+                        (rule === "abschluss" &&
+                          index >= oldIndex &&
+                          index < newIndex) ||
+                        (rule === "kapitel" &&
+                          index > oldIndex &&
+                          index <= newIndex)
+                      ) {
+                        store.set({ unlocked: true });
+                      }
+                    });
+                  }
+                  setPending(null);
+                }}
+              >
                 <input type="hidden" name="intent" value="current" />
                 <input type="hidden" name="id" value={selected.id} />
                 <Button type="submit">Als aktuell festlegen</Button>
@@ -323,7 +577,23 @@ export function LernwegControl({ course }: { course: Course }) {
             </div>
           }
         >
-          Die Klasse sieht danach Inhalte bis einschließlich dieses Kapitels.
+          <p>
+            Bisher: {chapters[oldIndex]?.number} {chapters[oldIndex]?.title}.
+          </p>
+          <p>
+            {newIndex > oldIndex
+              ? `Die Klasse sieht danach Inhalte bis einschließlich ${selected.number}.`
+              : "Spätere Kapitel werden wieder zur Vorschau."}
+          </p>
+          <p>
+            {lockedSheets} Arbeitsblätter in diesem Kapitel sind noch gesperrt.
+          </p>
+          {summariesToUnlock.map((item) => (
+            <p key={item.id}>
+              Die Zusammenfassung von {item.number} {item.title} wird
+              freigeschaltet.
+            </p>
+          ))}
         </Alert>
       )}
     </div>

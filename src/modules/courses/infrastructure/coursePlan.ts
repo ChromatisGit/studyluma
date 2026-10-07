@@ -157,6 +157,8 @@ export function getConfiguredCourse(
   return course && applyCoursePlan(course, readCoursePlan(request, courseId));
 }
 
+// The form intents share one pure plan transition.
+// eslint-disable-next-line max-lines-per-function
 export function updateCoursePlan(
   course: Course,
   plan: CoursePlan,
@@ -175,13 +177,32 @@ export function updateCoursePlan(
     next.currentChapterId = id;
   }
   if (action === "add-topic" && title) {
-    const phaseId = String(form.get("phaseId") ?? "");
-    if (!course.phases.some((phase) => phase.id === phaseId)) {
+    const afterTopicId = String(form.get("afterTopicId") ?? "");
+    const afterIndex = current.topics.findIndex(
+      (item) => item.id === afterTopicId,
+    );
+    const phaseId =
+      current.phases.find((phase) => phase.topicIds.includes(afterTopicId))
+        ?.id ??
+      current.phases[0]?.id ??
+      "";
+    const firstChapter = String(form.get("firstChapter") ?? "").trim();
+    if (!firstChapter || !phaseId) {
       return plan;
     }
     const newId = `custom-topic-${crypto.randomUUID()}`;
-    next.topics.push({ id: newId, title, icon: "klausur", phaseId });
-    next.topicOrder = [...current.topics.map((item) => item.id), newId];
+    const chapterId = `custom-chapter-${crypto.randomUUID()}`;
+    next.topics.push({
+      id: newId,
+      title,
+      icon: String(form.get("icon") ?? "kurve"),
+      phaseId,
+    });
+    next.chapters.push({ id: chapterId, title: firstChapter, topicId: newId });
+    const ids = current.topics.map((item) => item.id);
+    ids.splice(afterIndex + 1, 0, newId);
+    next.topicOrder = ids;
+    next.chapterOrder = { ...next.chapterOrder, [newId]: [chapterId] };
   }
   if (action === "add-chapter" && title && topic) {
     const newId = `custom-chapter-${crypto.randomUUID()}`;
@@ -200,19 +221,24 @@ export function updateCoursePlan(
       next.chapters = next.chapters.map((item) =>
         item.id === id ? { ...item, title } : item,
       );
-    } else {
-      next.names = { ...next.names, [id]: title };
     }
   }
   if (action === "remove" && id !== current.currentChapterId) {
     if (topic?.chapters.some((item) => item.id === current.currentChapterId)) {
       return plan;
     }
-    if (topic || chapter) {
+    if (
+      next.topics.some((item) => item.id === id) ||
+      next.chapters.some((item) => item.id === id)
+    ) {
       next.removed = [...(next.removed ?? []), id];
     }
   }
-  if ((action === "up" || action === "down") && chapter) {
+  if (
+    (action === "up" || action === "down") &&
+    chapter &&
+    next.chapters.some((item) => item.id === id)
+  ) {
     const parent = current.topics.find((item) =>
       item.chapters.some((item) => item.id === id),
     );
@@ -227,6 +253,45 @@ export function updateCoursePlan(
         ids[other] = moved;
         next.chapterOrder = { ...next.chapterOrder, [parent.id]: ids };
       }
+    }
+  }
+  if (
+    action === "move" &&
+    chapter &&
+    next.chapters.some((item) => item.id === id)
+  ) {
+    const targetId = String(form.get("targetId") ?? "");
+    const destination = current.topics.find(
+      (item) =>
+        item.id === targetId ||
+        item.chapters.some((part) => part.id === targetId),
+    );
+    const source = current.topics.find((item) =>
+      item.chapters.some((part) => part.id === id),
+    );
+    if (destination && source && id !== targetId) {
+      const fromIds = source.chapters
+        .map((item) => item.id)
+        .filter((item) => item !== id);
+      const toIds =
+        destination.id === source.id
+          ? fromIds
+          : destination.chapters.map((item) => item.id);
+      const at =
+        destination.id === targetId
+          ? form.get("position") === "end"
+            ? toIds.length
+            : 0
+          : toIds.indexOf(targetId);
+      toIds.splice(at, 0, id);
+      next.chapterOrder = {
+        ...next.chapterOrder,
+        [source.id]: fromIds,
+        [destination.id]: toIds,
+      };
+      next.chapters = next.chapters.map((item) =>
+        item.id === id ? { ...item, topicId: destination.id } : item,
+      );
     }
   }
   return next;

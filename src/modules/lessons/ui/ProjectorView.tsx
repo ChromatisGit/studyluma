@@ -31,12 +31,13 @@ export function ProjectorView({
       </div>
     );
   }
-  if (session.hidden) {
+  const display = session.frozen ? { ...session, ...session.frozen } : session;
+  if (display.hidden) {
     return <div className="lp lp--hidden" />;
   }
-  const order = runningOrder(lesson, session.blanks);
+  const order = runningOrder(lesson, display.blanks);
   const entry =
-    order.find((item) => entryId(item) === session.currentFrameId) ?? order[0];
+    order.find((item) => entryId(item) === display.currentFrameId) ?? order[0];
   if (!entry) {
     return <div className="lp" />;
   }
@@ -44,15 +45,15 @@ export function ProjectorView({
   const frame = entry.kind === "frame" ? entry.frame : entry.parent;
   return (
     <div className="lp">
-      <LiveQuizContext.Provider value={quiz}>
+      <LiveQuizContext.Provider value={{ view: quiz, teacher: false }}>
         <FrameStage>
           <FrameView
             entry={entry}
             lessonTitle={lesson.title}
-            sent={session.sent.includes(frame.id)}
+            sent={display.sent.includes(frame.id)}
           >
             <InkStrokes
-              strokes={session.ink.filter((stroke) => stroke.frameId === id)}
+              strokes={display.ink.filter((stroke) => stroke.frameId === id)}
               laser={laser}
             />
           </FrameView>

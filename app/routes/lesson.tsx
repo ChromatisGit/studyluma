@@ -7,11 +7,14 @@ import {
   schoolPeriods,
   TeacherView,
 } from "../../src/modules/lessons";
+import { flowFromParam, flowLesson } from "../../src/modules/teaching";
 
 export function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterId = "", courseId = "" } = params;
   const course = getConfiguredCourse(courseId, request);
-  const lesson = getLesson(chapterId);
+  const flowId = new URL(request.url).searchParams.get("flow");
+  const flow = flowFromParam(chapterId, flowId);
+  const lesson = flow ? flowLesson(flow) : getLesson(chapterId);
   if (!course || !findChapter(course, chapterId) || !lesson) {
     throw new Response(null, { status: 404 });
   }
@@ -19,6 +22,8 @@ export function loader({ params, request }: LoaderFunctionArgs) {
     lesson,
     periods: schoolPeriods(),
     initialFrameId: new URL(request.url).searchParams.get("start") ?? undefined,
+    flowId,
+    flow,
   };
 }
 
@@ -27,7 +32,8 @@ export function meta({ data }: MetaArgs<typeof loader>) {
 }
 
 export default function LessonRoute() {
-  const { lesson, periods, initialFrameId } = useLoaderData<typeof loader>();
+  const { lesson, periods, initialFrameId, flowId, flow } =
+    useLoaderData<typeof loader>();
   const { courseId = "", chapterId = "" } = useParams();
   const chapter = chapterPath(courseId, chapterId);
   return (
@@ -35,9 +41,10 @@ export default function LessonRoute() {
       courseId={courseId}
       lesson={lesson}
       periods={periods}
-      projectorPath={`${chapter}/lesson/projector`}
+      projectorPath={`${chapter}/lesson/projector${flowId ? `?flow=${encodeURIComponent(flowId)}` : ""}`}
       chapterPath={chapter}
       initialFrameId={initialFrameId}
+      flow={flow}
     />
   );
 }

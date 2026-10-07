@@ -12,8 +12,13 @@ export interface LessonHeaderProps {
   position: string;
   seconds: number;
   deviation: number;
-  projector: { connected: boolean; hidden: boolean; number: string };
-  onToggleHidden: () => void;
+  projector: {
+    connected: boolean;
+    hidden: boolean;
+    frozen: boolean;
+    number: string;
+  };
+  onToggleFreeze: () => void;
   onOpenProjector: () => void;
   overviewOpen: boolean;
   onToggleOverview: () => void;
@@ -24,14 +29,14 @@ export interface LessonHeaderProps {
   chapterPath: string;
 }
 
-/** Whether a projector window is connected and what it shows; B blanks it. */
+/** Whether a projector window is connected and frozen on its last image. */
 function ProjectorPill({
   projector,
-  onToggleHidden,
+  onToggleFreeze,
   onOpen,
 }: {
   projector: LessonHeaderProps["projector"];
-  onToggleHidden: () => void;
+  onToggleFreeze: () => void;
   onOpen: () => void;
 }) {
   return (
@@ -39,26 +44,17 @@ function ProjectorPill({
       {projector.connected ? (
         <button
           type="button"
-          className={`lt-pill${projector.hidden ? " lt-pill--hidden" : ""}`}
+          className={`lt-pill${projector.frozen ? " lt-pill--hidden" : ""}`}
           aria-label={
-            projector.hidden
-              ? TEXT.header.projectorShowAria
-              : fill(TEXT.header.projectorAria, { number: projector.number })
+            projector.frozen ? "Projektor fortsetzen" : "Projektor einfrieren"
           }
-          onClick={onToggleHidden}
+          onClick={onToggleFreeze}
         >
           <span className="lt-pill__dot" />
           <strong>
-            {projector.hidden
-              ? TEXT.header.projectorHidden
-              : TEXT.header.projector}
+            {projector.frozen ? "Projektor eingefroren" : "Projektor"}
           </strong>
-          <span className="lt-pill__sub">
-            {projector.hidden
-              ? TEXT.header.projectorHiddenSub
-              : fill(TEXT.header.projectorShows, { number: projector.number })}
-          </span>
-          <kbd>B</kbd>
+          <kbd>F</kbd>
         </button>
       ) : (
         <span className="lt-pill lt-pill--none">
@@ -136,7 +132,7 @@ export function LessonHeader(props: LessonHeaderProps) {
       <span className="lt-head__sep" />
       <ProjectorPill
         projector={projector}
-        onToggleHidden={props.onToggleHidden}
+        onToggleFreeze={props.onToggleFreeze}
         onOpen={props.onOpenProjector}
       />
       <button

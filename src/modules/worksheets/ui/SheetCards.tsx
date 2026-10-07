@@ -1,7 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { ArrowRight } from "lucide-react";
 import { Badge, Card, CardBody, CardLink } from "@chromatis/base/ui";
-import { fill } from "../../../helper/text";
 import type { ViewerRole } from "../../viewer";
 import type { Chapter } from "../domain/contract";
 import {
@@ -14,15 +12,17 @@ import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./useWorksheetController";
 import { TEXT } from "./texts";
 
-/** The chapter page's worksheet list: "1) Titel" with its state. */
+/** Worksheets and the chapter's challenge pool in learning order. */
 export function SheetCards({
   chapter,
   viewer,
   links,
+  availableOnly = false,
 }: {
   chapter: Chapter;
   viewer: ViewerRole;
   links: WorksheetLinks;
+  availableOnly?: boolean;
 }) {
   const store = chapterStore(chapter.id);
   const state = useSyncExternalStore(
@@ -34,48 +34,53 @@ export function SheetCards({
   const open = openChallenges(chapter, state).length;
   return (
     <div className="kapitel-blaetter">
-      {chapter.sheets.map((sheet) => {
-        const title = `${sheet.number}) ${sheet.title}`;
-        const unlocked = isUnlocked(sheet, state);
-        if (!unlocked && !teacher) {
-          return null;
-        }
-        const badge = !unlocked ? (
-          <Badge status="warning">{TEXT.cards.locked}</Badge>
-        ) : sheetDone(sheet, state) ? (
-          <Badge status="success">{TEXT.cards.done}</Badge>
-        ) : sheetStarted(sheet, state) ? (
-          <Badge status="info">{TEXT.cards.started}</Badge>
-        ) : !teacher && !state.seen[sheet.id] ? (
-          <Badge status="info">{TEXT.cards.new}</Badge>
-        ) : null;
-        return (
-          <Card key={sheet.id} kind="action">
-            <CardBody>
-              <CardLink className="card__title" to={links.sheet(sheet.id)}>
-                {title}
-              </CardLink>
-              {badge && <span className="kapitel-blatt__status">{badge}</span>}
-            </CardBody>
-            <ArrowRight className="card__cue" aria-hidden="true" />
-          </Card>
-        );
-      })}
-      {chapter.challenges.length > 0 && (
-        <Card kind="action" surface="subtle">
+      {chapter.sheets
+        .filter((sheet) => !availableOnly || isUnlocked(sheet, state))
+        .map((sheet) => {
+          const title = `${sheet.number}) ${sheet.title}`;
+          const unlocked = isUnlocked(sheet, state);
+          const badge = !unlocked ? (
+            <Badge status="neutral">{TEXT.cards.locked}</Badge>
+          ) : sheetDone(sheet, state) ? (
+            <Badge status="success">{TEXT.cards.done}</Badge>
+          ) : sheetStarted(sheet, state) ? (
+            <Badge status="info">{TEXT.cards.started}</Badge>
+          ) : !teacher && !state.seen[sheet.id] ? (
+            <Badge status="info">{TEXT.cards.new}</Badge>
+          ) : null;
+          return (
+            <Card
+              key={sheet.id}
+              kind={unlocked ? "action" : "content"}
+              {...(!unlocked ? { surface: "subtle" as const } : {})}
+            >
+              <CardBody>
+                {!unlocked && !teacher ? (
+                  <strong className="card__title">{title}</strong>
+                ) : (
+                  <CardLink className="card__title" to={links.sheet(sheet.id)}>
+                    {title}
+                  </CardLink>
+                )}
+                {badge && (
+                  <span className="kapitel-blatt__status">{badge}</span>
+                )}
+              </CardBody>
+            </Card>
+          );
+        })}
+      {open > 0 && (
+        <Card kind="action">
           <CardBody>
-            <span className="card__meta">{TEXT.cards.challengesMeta}</span>
             <CardLink className="card__title" to={links.challenges}>
-              {TEXT.cards.challenges}
+              Challenges
             </CardLink>
             <span className="kapitel-blatt__status">
-              {fill(TEXT.cards.openOf, {
-                open: teacher ? chapter.challenges.length : open,
-                total: chapter.challenges.length,
-              })}
+              <Badge status="info">
+                {open} von {chapter.challenges.length} verfügbar
+              </Badge>
             </span>
           </CardBody>
-          <ArrowRight className="card__cue" aria-hidden="true" />
         </Card>
       )}
     </div>

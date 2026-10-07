@@ -48,6 +48,8 @@ export function useLessonClock(
  * The teacher's running lesson: saved in this browser, so a reload keeps
  * position, ink and branches, and mirrored to the projector window.
  */
+// Session lifecycle, projector feed and clock belong to one hook.
+// eslint-disable-next-line max-lines-per-function
 export function useLessonSession(
   lesson: Lesson,
   periods: Period[],
@@ -69,6 +71,10 @@ export function useLessonSession(
     const opened = Date.now();
     const saved = loadSession(lesson.chapterId);
     const fresh = newSession(lesson, opened, `s${opened.toString(36)}`);
+    const reusable =
+      saved && lesson.frames.some((frame) => frame.id === saved.currentFrameId)
+        ? saved
+        : null;
     if (
       initialFrameId &&
       lesson.frames.some((frame) => frame.id === initialFrameId)
@@ -76,9 +82,9 @@ export function useLessonSession(
       fresh.currentFrameId = initialFrameId;
     }
     setSession(
-      saved && initialFrameId
-        ? { ...saved, currentFrameId: initialFrameId }
-        : (saved ?? fresh),
+      reusable && initialFrameId
+        ? { ...reusable, currentFrameId: initialFrameId }
+        : (reusable ?? fresh),
     );
     channel.current = openProjectorChannel(
       lesson.chapterId,
@@ -141,7 +147,7 @@ export function useLessonSession(
     current.current = fresh;
     setSession(fresh);
     saveSession(fresh);
-    channel.current?.send({ type: "state", session: fresh });
+    // Keep the last image in the projector window until it is closed.
   }, [lesson]);
 
   return {

@@ -74,6 +74,28 @@ export const isCheckable = (part: Part) => part.task.type !== "auftrag";
 export const checkedOnce = (response: PartResponse | undefined) =>
   response?.lastCheckedValue !== undefined;
 
+/** The current answer, including every gap, has been submitted for checking. */
+function validatedAnswer(part: Part, response: PartResponse | undefined) {
+  if (!response?.lastCheck || !checkedOnce(response)) {
+    return false;
+  }
+  if (
+    JSON.stringify(response.value) !== JSON.stringify(response.lastCheckedValue)
+  ) {
+    return false;
+  }
+  if (part.task.type === "lueckentext") {
+    const values = response.value as Record<string, unknown> | undefined;
+    return part.task.gaps.every((gap) => {
+      const value = values?.[gap.id];
+      return typeof value === "string"
+        ? value.trim().length > 0
+        : Array.isArray(value) && value.length > 0;
+    });
+  }
+  return true;
+}
+
 const LEVEL: Record<StructureLevel, number> = {
   none: 0,
   plan: 1,
@@ -180,7 +202,7 @@ export function sectionDone(
   state: ChapterState,
 ): boolean {
   if (section.kind === "checkpoint") {
-    return !!state.ampels[sheet.id];
+    return !!state.ampels[sheet.id] && checkpointChecked(sheet, state);
   }
   const parts = section.aufgaben
     .filter(
@@ -188,10 +210,7 @@ export function sectionDone(
     )
     .flatMap((aufgabe) => aufgabe.parts)
     .filter(isCheckable);
-  return (
-    parts.length > 0 &&
-    parts.every((part) => checkedOnce(state.responses[part.id]))
-  );
+  return parts.every((part) => validatedAnswer(part, state.responses[part.id]));
 }
 
 /** A sheet is done once its checkpoint's Ampel is answered. */
@@ -236,7 +255,7 @@ export function checkpointChecked(sheet: Sheet, state: ChapterState): boolean {
     checkpoint.aufgaben
       .flatMap((aufgabe) => aufgabe.parts)
       .filter(isCheckable)
-      .every((part) => checkedOnce(state.responses[part.id]))
+      .every((part) => validatedAnswer(part, state.responses[part.id]))
   );
 }
 

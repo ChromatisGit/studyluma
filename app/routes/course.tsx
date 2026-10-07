@@ -1,11 +1,19 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
-import { CoursePage } from "../../src/modules/courses";
+import { redirect, useLoaderData, useLocation } from "react-router";
+import {
+  CoursePage,
+  courseContentPath,
+  coursePath,
+  courseStructurePath,
+} from "../../src/modules/courses";
 import { getConfiguredCourse } from "../../src/modules/courses/infrastructure/coursePlan";
 import { readViewer } from "../../src/modules/viewer";
-import { LernwegControl, Unterricht } from "../../src/modules/steuerung";
+import {
+  Inhalte,
+  LernwegControl,
+  Unterricht,
+} from "../../src/modules/steuerung";
 export { action } from "./control";
-import TEXT from "../app.de.json";
 
 export function loader({ params, request }: LoaderFunctionArgs) {
   const { courseId = "" } = params;
@@ -13,19 +21,35 @@ export function loader({ params, request }: LoaderFunctionArgs) {
   if (!course) {
     throw new Response(null, { status: 404 });
   }
-  return { course, viewer: readViewer(request) };
+  const path = new URL(request.url).pathname.replace(/\/+$/, "");
+  const viewer = readViewer(request);
+  const isStudentOverview = path === coursePath(courseId);
+  if (viewer === "student" && !isStudentOverview) {
+    throw redirect(coursePath(courseId));
+  }
+  return { course, viewer };
 }
 
 export default function Course() {
   const { course, viewer } = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const path = location.pathname.replace(/\/+$/, "");
+  const activeTab =
+    path === coursePath(course.id)
+      ? "student"
+      : path === courseStructurePath(course.id)
+        ? "course-structure"
+        : path === courseContentPath(course.id)
+          ? "content"
+          : "overview";
   return (
     <CoursePage
       course={course}
-      homeLabel={TEXT.navigation.courses}
-      homePath="/courses"
       teacher={viewer === "teacher"}
       teachingControls={<Unterricht course={course} />}
-      topicControls={<LernwegControl course={course} />}
+      structureControls={<LernwegControl course={course} />}
+      contents={<Inhalte course={course} />}
+      activeTab={activeTab}
     />
   );
 }

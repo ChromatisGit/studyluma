@@ -2,7 +2,6 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 import { ChevronDown, Menu, X } from "lucide-react";
 import type { NavigationItem } from "@chromatis/base/ui";
-import { fill } from "../src/helper/text";
 import {
   ChildLinks,
   containsPath,
@@ -15,22 +14,31 @@ import TEXT from "./app.de.json";
 export function StudyMobileHeader({
   navigation,
   chapterSection,
+  currentParentTo,
   quickActions,
   settings,
   accountControl,
 }: {
   navigation: readonly NavigationItem[];
   chapterSection?: ChapterSection | undefined;
+  currentParentTo?: string | undefined;
   quickActions?: ReactNode;
   settings: ReactNode;
   accountControl?: ReactNode;
 }) {
-  const path = useLocation().pathname;
+  const location = useLocation();
+  const path = location.pathname;
   const [menuOpen, setMenuOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [chapterOpen, setChapterOpen] = useState(true);
   const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
+  const locationLabel =
+    navigation
+      .flatMap((item) => item.children ?? [])
+      .find((item) => item.to === currentParentTo)?.label ??
+    chapterSection?.label;
   useEffect(() => setMenuOpen(false), [path]);
   useEffect(() => {
     if (!menuOpen) {
@@ -67,6 +75,11 @@ export function StudyMobileHeader({
           </span>
           <span>{TEXT.brand}</span>
         </Link>
+        {locationLabel && (
+          <span className="study-mobile-header__location" title={locationLabel}>
+            {locationLabel}
+          </span>
+        )}
         <div className="study-mobile-header__actions">
           {quickActions}
           <button
@@ -85,66 +98,67 @@ export function StudyMobileHeader({
       {menuOpen && (
         <div className="study-mobile-header__panel" id={menuId}>
           <nav aria-label={TEXT.shell.navigation}>
+            {chapterSection && (
+              <div className="study-mobile-header__section study-mobile-header__section--chapter">
+                <button
+                  type="button"
+                  className="study-mobile-header__section-link study-mobile-header__section-button"
+                  aria-expanded={chapterOpen}
+                  onClick={() => setChapterOpen((previous) => !previous)}
+                >
+                  {chapterSection.label}
+                  <ChevronDown aria-hidden="true" />
+                </button>
+                {chapterOpen && chapterSection.render(() => setMenuOpen(false))}
+              </div>
+            )}
             {navigation.map((item) => (
               <div className="study-mobile-header__section" key={item.id}>
                 <div className="study-mobile-header__section-row">
-                  <Link
-                    className="study-mobile-header__section-link"
-                    to={item.to}
-                    aria-current={path === item.to ? "page" : undefined}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                  {!!item.children?.length && (
+                  {item.children?.length ? (
                     <button
                       type="button"
-                      className="study-mobile-header__disclosure"
-                      aria-label={fill(TEXT.shell.pagesIn, {
-                        section: item.label,
-                      })}
+                      className="study-mobile-header__section-link study-mobile-header__section-button"
                       aria-expanded={
                         expanded[item.id] ??
-                        (!chapterSection && containsPath(item, path))
+                        containsPath(item, currentParentTo ?? path)
                       }
                       onClick={() =>
                         setExpanded((previous) => ({
                           ...previous,
                           [item.id]: !(
                             previous[item.id] ??
-                            (!chapterSection && containsPath(item, path))
+                            containsPath(item, currentParentTo ?? path)
                           ),
                         }))
                       }
                     >
+                      {item.label}
                       <ChevronDown aria-hidden="true" />
                     </button>
+                  ) : (
+                    <Link
+                      className="study-mobile-header__section-link"
+                      to={item.to}
+                      aria-current={path === item.to ? "page" : undefined}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
                   )}
                 </div>
                 {!!item.children?.length &&
                   (expanded[item.id] ??
-                    (!chapterSection && containsPath(item, path))) && (
+                    containsPath(item, currentParentTo ?? path)) && (
                     <ChildLinks
                       items={item.children}
                       path={path}
+                      parentPath={currentParentTo}
                       onNavigate={() => setMenuOpen(false)}
                     />
                   )}
               </div>
             ))}
-            {chapterSection && (
-              <div className="study-mobile-header__section study-mobile-header__section--chapter">
-                <Link
-                  className="study-mobile-header__section-link"
-                  to={chapterSection.to}
-                  aria-current={path === chapterSection.to ? "page" : undefined}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {chapterSection.label}
-                </Link>
-                {chapterSection.render(() => setMenuOpen(false))}
-              </div>
-            )}
           </nav>
           <div className="study-mobile-header__settings">{settings}</div>
           {accountControl && (

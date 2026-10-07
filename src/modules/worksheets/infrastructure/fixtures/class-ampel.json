@@ -10,5 +10,11 @@
     "total": 24,
     "levels": { "green": 4, "yellow": 5, "red": 2 },
     "causes": { "topic": 3, "approach": 4 }
+  },
+  "vermischt": {
+    "answered": 9,
+    "total": 24,
+    "levels": { "green": 5, "yellow": 3, "red": 1 },
+    "causes": { "task": 2, "approach": 1, "mistake": 1 }
   }
 }

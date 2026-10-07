@@ -4,6 +4,18 @@ export function coursePath(courseId: string): string {
   return `/courses/${encodeURIComponent(courseId)}`;
 }
 
+export function courseOverviewPath(courseId: string): string {
+  return `${coursePath(courseId)}/overview`;
+}
+
+export function courseStructurePath(courseId: string): string {
+  return `${coursePath(courseId)}/course-structure`;
+}
+
+export function courseContentPath(courseId: string): string {
+  return `${coursePath(courseId)}/content`;
+}
+
 export function chapterPath(courseId: string, chapterId: string): string {
   return `${coursePath(courseId)}/chapters/${encodeURIComponent(chapterId)}`;
 }

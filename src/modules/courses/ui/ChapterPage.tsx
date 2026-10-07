@@ -1,100 +1,54 @@
-import type { ReactNode } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Badge, Breadcrumbs, Page } from "@chromatis/base/ui";
+import { useSyncExternalStore } from "react";
+import { Link } from "react-router";
+import { Breadcrumbs, Page, PageHeader } from "@chromatis/base/ui";
 import { SummaryRenderer } from "../../content";
+import { summaryStore } from "../../teaching";
 import {
   chapterPath,
   coursePath,
   findChapter,
   neighbours,
 } from "../application/navigation";
+import { getSummary } from "../infrastructure/courseRepository";
 import type { Course } from "../domain/course";
-import { LinkCard } from "./LinkCard";
+import { ChapterMaterials } from "./ChapterMaterials";
 import { Pictogram } from "./Pictogram";
 import TEXT from "./courses.de.json";
-
-/** Previous and next chapter; the next one is a preview until reached. */
-function ChapterNav({
-  course,
-  chapterId,
-}: {
-  course: Course;
-  chapterId: string;
-}) {
-  const { previous, next } = neighbours(course, chapterId);
-  if (!previous && !next) {
-    return null;
-  }
-  return (
-    <nav className="kapitel-nav" aria-label={TEXT.chapter.nav}>
-      {previous ? (
-        <LinkCard
-          to={chapterPath(course.id, previous.id)}
-          meta={TEXT.chapter.previous}
-          title={`${previous.number} ${previous.title}`}
-          cue={<ArrowLeft className="card__cue" aria-hidden="true" />}
-        />
-      ) : (
-        <span />
-      )}
-      {next &&
-        (next.reached ? (
-          <LinkCard
-            to={chapterPath(course.id, next.id)}
-            meta={TEXT.chapter.next}
-            title={`${next.number} ${next.title}`}
-            cue={<ArrowRight className="card__cue" aria-hidden="true" />}
-          />
-        ) : (
-          <div className="kapitel-nav__next">
-            <span className="kapitel-nav__label">{TEXT.chapter.upcoming}</span>
-            <span>
-              {next.number} {next.title}
-            </span>
-          </div>
-        ))}
-    </nav>
-  );
-}
 
 export interface ChapterPageProps {
   course: Course;
   chapterId: string;
-  summary?: string | undefined;
-  /** The chapter's worksheets, rendered by the worksheets module. */
-  worksheets?: ReactNode;
-  homeLabel: string;
-  homePath: string;
 }
 
-/**
- * The chapter page: worksheets first, then the summary (Zusammenfassung),
- * then previous/next chapter. The next chapter is a quiet preview while
- * the class hasn't reached it.
- */
-export function ChapterPage({
-  course,
-  chapterId,
-  summary,
-  worksheets,
-  homeLabel,
-  homePath,
-}: ChapterPageProps) {
+/** Full chapter resources, including the summary when it is available. */
+export function ChapterPage({ course, chapterId }: ChapterPageProps) {
   const chapter = findChapter(course, chapterId);
+  const access = summaryStore(chapterId);
+  const summary = useSyncExternalStore(
+    access.subscribe,
+    access.getSnapshot,
+    access.getServerSnapshot,
+  );
   if (!chapter) {
     return null;
   }
   const heading = `${chapter.number} ${chapter.title}`;
+  const markdown = getSummary(chapterId);
+  const { previous, next } = neighbours(course, chapterId);
 
   return (
-    <Page title={heading} width="content" className="kapitel">
-      <Breadcrumbs
-        label={TEXT.breadcrumbs}
-        items={[
-          { label: homeLabel, to: homePath },
-          { label: course.title, to: coursePath(course.id) },
-          { label: heading },
-        ]}
+    <Page title={heading} width="content" className="kapitel stack stack-700">
+      <PageHeader
+        title={course.title}
+        breadcrumbs={
+          <Breadcrumbs
+            label={TEXT.breadcrumbs}
+            items={[
+              { label: course.title, to: coursePath(course.id) },
+              { label: heading },
+            ]}
+          />
+        }
       />
       <header className="kapitel-head">
         <Pictogram
@@ -102,39 +56,49 @@ export function ChapterPage({
           fallbackLabel={chapter.topic.title}
         />
         <div className="kapitel-head__text">
-          <p className="kapitel-head__meta">
-            <span>{chapter.topic.title}</span>
-            {chapter.current && (
-              <Badge status="info">{TEXT.chapter.current}</Badge>
-            )}
-          </p>
-          <h1 className="h1 kapitel-head__title">{heading}</h1>
+          <p className="kapitel-head__meta">{chapter.topic.title}</p>
+          <h2 className="h2 kapitel-head__title">{heading}</h2>
         </div>
       </header>
-
-      {worksheets && (
-        <section className="content-section" aria-labelledby="worksheets-title">
-          <h2 id="worksheets-title" className="h2">
-            {TEXT.chapter.worksheets}
-          </h2>
-          {worksheets}
-        </section>
-      )}
-
-      {summary?.trim() && (
+      <ChapterMaterials
+        courseId={course.id}
+        chapterId={chapterId}
+        availableOnly
+      />
+      {markdown && summary.unlocked && (
         <section
           className="content-section"
           id="zusammenfassung"
           aria-labelledby="summary-title"
         >
-          <h2 id="summary-title" className="h2">
-            {TEXT.chapter.summary}
+          <h2 className="h2" id="summary-title">
+            Zusammenfassung
           </h2>
-          <SummaryRenderer markdown={summary} />
+          <SummaryRenderer markdown={markdown} />
         </section>
       )}
-
-      <ChapterNav course={course} chapterId={chapterId} />
+      {(previous || next) && (
+        <nav className="kapitel-nav" aria-label="Kapitel wechseln">
+          {previous ? (
+            <Link to={chapterPath(course.id, previous.id)}>
+              <span aria-hidden="true">←</span> {previous.number}{" "}
+              {previous.title}
+            </Link>
+          ) : (
+            <span />
+          )}
+          {next &&
+            (next.reached ? (
+              <Link to={chapterPath(course.id, next.id)}>
+                {next.number} {next.title} <span aria-hidden="true">→</span>
+              </Link>
+            ) : (
+              <span className="kapitel-nav__unavailable">
+                {next.number} {next.title} · Noch nicht verfügbar
+              </span>
+            ))}
+        </nav>
+      )}
     </Page>
   );
 }

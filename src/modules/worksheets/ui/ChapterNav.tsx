@@ -3,13 +3,15 @@ import { Check, ChevronDown, Lock } from "lucide-react";
 import { Link } from "react-router";
 import type { ChapterState } from "../domain/chapterState";
 import type { Chapter, Sheet } from "../domain/contract";
-import { isUnlocked, sheetDone } from "../domain/structure";
+import { isUnlocked, openChallenges, sheetDone } from "../domain/structure";
 import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./uiState";
 import { TEXT } from "./texts";
 import "./chapter-nav.css";
 
 export type CurrentView =
+  | { kind: "course" }
+  | { kind: "chapter" }
   | { kind: "summary" }
   | { kind: "sheet"; sheetId: string }
   | { kind: "challenges" };
@@ -54,12 +56,16 @@ export function ChapterNav({
   viewer,
   links,
   current,
+  summaryUnlocked,
+  hasSummary,
   onNavigate,
 }: {
   chapter: Chapter;
   viewer: Chapter["viewer"];
   links: WorksheetLinks;
   current: CurrentView;
+  summaryUnlocked: boolean;
+  hasSummary: boolean;
   onNavigate?: () => void;
 }) {
   const store = chapterStore(chapter.id);
@@ -69,25 +75,36 @@ export function ChapterNav({
     store.getServerSnapshot,
   );
   const teacher = viewer === "teacher";
-  const [sheetsOpen, setSheetsOpen] = useState(current.kind === "sheet");
+  const [sheetsOpen, setSheetsOpen] = useState(
+    current.kind === "sheet" || current.kind === "course",
+  );
   const sheetsId = useId();
 
   useEffect(() => {
-    if (current.kind === "sheet") {
+    if (current.kind === "sheet" || current.kind === "course") {
       setSheetsOpen(true);
     }
   }, [current.kind]);
 
   return (
     <div className="kap-nav">
-      <Link
-        className={`kap-nav__item${current.kind === "summary" ? " is-current" : ""}`}
-        to={`${links.summary}#zusammenfassung`}
-        aria-current={current.kind === "summary" ? "page" : undefined}
-        onClick={onNavigate}
-      >
-        <span className="kap-nav__t">{TEXT.nav.summary}</span>
-      </Link>
+      {hasSummary &&
+        (summaryUnlocked ? (
+          <Link
+            className={`kap-nav__item${current.kind === "summary" ? " is-current" : ""}`}
+            to={links.summary}
+            aria-current={current.kind === "summary" ? "page" : undefined}
+            onClick={onNavigate}
+          >
+            <span className="kap-nav__t">{TEXT.nav.summary}</span>
+          </Link>
+        ) : (
+          <span className="kap-nav__item is-locked" aria-disabled="true">
+            <span className="kap-nav__t">{TEXT.nav.summary}</span>
+            <Lock className="icon icon--sm" aria-hidden="true" />
+            <span className="visually-hidden">{TEXT.nav.locked}</span>
+          </span>
+        ))}
       <button
         type="button"
         className="kap-nav__group-button"
@@ -108,48 +125,47 @@ export function ChapterNav({
       >
         <div className="kap-nav__sheets-inner">
           <ol className="kap-nav__list">
-            {chapter.sheets.map((sheet) => {
-              const unlocked = isUnlocked(sheet, state);
-              if (!unlocked && !teacher) {
-                return null;
-              }
-              const isCurrent =
-                current.kind === "sheet" && current.sheetId === sheet.id;
-              const content = (
-                <>
-                  <span className="kap-nav__t">{sheet.title}</span>
-                  <SheetState sheet={sheet} state={state} teacher={teacher} />
-                </>
-              );
-              const className = `kap-nav__item${isCurrent ? " is-current" : ""}${unlocked ? "" : " is-locked"}`;
-              return (
-                <li key={sheet.id} className="kap-nav__row">
-                  {unlocked || teacher ? (
-                    <Link
-                      className={className}
-                      to={links.sheet(sheet.id)}
-                      aria-current={isCurrent ? "page" : undefined}
-                      title={sheet.title}
-                      onClick={onNavigate}
-                    >
-                      {content}
-                    </Link>
-                  ) : (
-                    <span
-                      className={className}
-                      aria-disabled="true"
-                      title={sheet.title}
-                    >
-                      {content}
-                    </span>
-                  )}
-                </li>
-              );
-            })}
+            {chapter.sheets
+              .filter((sheet) => teacher || isUnlocked(sheet, state))
+              .map((sheet) => {
+                const unlocked = isUnlocked(sheet, state);
+                const isCurrent =
+                  current.kind === "sheet" && current.sheetId === sheet.id;
+                const content = (
+                  <>
+                    <span className="kap-nav__t">{sheet.title}</span>
+                    <SheetState sheet={sheet} state={state} teacher={teacher} />
+                  </>
+                );
+                const className = `kap-nav__item${isCurrent ? " is-current" : ""}${unlocked ? "" : " is-locked"}`;
+                return (
+                  <li key={sheet.id} className="kap-nav__row">
+                    {unlocked || teacher ? (
+                      <Link
+                        className={className}
+                        to={links.sheet(sheet.id)}
+                        aria-current={isCurrent ? "page" : undefined}
+                        title={sheet.title}
+                        onClick={onNavigate}
+                      >
+                        {content}
+                      </Link>
+                    ) : (
+                      <span
+                        className={className}
+                        aria-disabled="true"
+                        title={sheet.title}
+                      >
+                        {content}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
           </ol>
         </div>
       </div>
-      {chapter.challenges.length > 0 && (
+      {openChallenges(chapter, state).length > 0 && (
         <Link
           className={`kap-nav__item${current.kind === "challenges" ? " is-current" : ""}`}
           to={links.challenges}

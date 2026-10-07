@@ -329,35 +329,30 @@ a.lernweg__chapter:hover .lernweg__chapter-title {
   cursor: pointer;
 }
 
-/* Course page board: current and previous chapter */
-.lernweg-board .card__body {
-  display: grid;
-  gap: var(--space-500);
+/* A single introduction and a direct route into today's work. */
+.current-lesson {
+  min-width: 0;
 }
-@container (min-width: 36rem) {
-  .lernweg-board .card__body {
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-  }
-}
-.lernweg-board__stop {
+.current-lesson__continue {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-100);
-}
-.lernweg-board__label {
-  font-size: var(--text-sm);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-300);
+  padding: var(--space-300) var(--space-400);
+  border: var(--border-1) solid var(--color-border-subtle);
+  border-radius: var(--radius-surface);
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
   font-weight: var(--weight-bold);
-  color: var(--color-text-muted);
+  text-decoration: none;
 }
-.lernweg-board__title {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-label);
+.current-lesson__continue:hover {
+  background: var(--color-bg-hover);
 }
-.lernweg-board__sub {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+.current-lesson__continue svg {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
 }
 
 /* ---------------------------------------------------------------------
@@ -365,27 +360,35 @@ a.lernweg__chapter:hover .lernweg__chapter-title {
    --------------------------------------------------------------------- */
 .kapitel-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-500);
 }
 .kapitel-head .linie__tile {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: calc(3.375rem + 5px);
+  height: calc(3.375rem + 5px);
   border-color: var(--lw-line);
 }
 .kapitel-head .linie__tile svg {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
 }
 .kapitel-head__text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-200);
+  gap: var(--space-100);
   min-width: 0;
 }
 .kapitel-head__title {
   margin: 0;
   text-wrap: pretty;
+}
+.kapitel-head__title a {
+  color: inherit;
+  text-decoration: none;
+}
+.kapitel-head__title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 .kapitel-head__meta {
   display: flex;
@@ -396,8 +399,22 @@ a.lernweg__chapter:hover .lernweg__chapter-title {
   color: var(--color-text-muted);
   font-weight: var(--weight-bold);
 }
+.course-detail .current-lesson + section[aria-labelledby="lernweg-title"] {
+  margin-top: var(--space-300);
+}
+.kapitel {
+  width: 100%;
+  flex: 1;
+}
+.shell__main > main:has(> .kapitel) {
+  display: flex;
+  flex-direction: column;
+}
 .kapitel .content-section + .content-section {
-  margin-top: var(--space-700);
+  margin-top: calc(var(--space-700) - 2 * var(--space-300));
+}
+#zusammenfassung {
+  scroll-margin-top: calc(var(--header-height-sticky) + var(--space-400));
 }
 .kapitel-blaetter {
   display: grid;
@@ -408,28 +425,20 @@ a.lernweg__chapter:hover .lernweg__chapter-title {
   margin-top: var(--space-200);
 }
 .kapitel-nav {
-  display: grid;
-  gap: var(--space-400);
-  margin-top: var(--space-700);
-}
-@container (min-width: 40rem) {
-  .kapitel-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-.kapitel-nav__next {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: var(--space-100);
-  padding: var(--space-500);
-  border: var(--border-1) dashed var(--color-border-subtle);
-  border-radius: var(--radius-surface);
-  color: var(--color-text-muted);
-}
-.kapitel-nav__label {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-300) var(--space-500);
+  margin-top: auto;
+  padding-top: var(--space-400);
+  border-top: var(--border-1) solid var(--color-border-subtle);
   font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
+}
+.kapitel-nav a {
+  color: var(--color-link);
+}
+.kapitel-nav__unavailable {
+  color: var(--color-text-muted);
 }
 
 @media (prefers-reduced-motion: reduce) {
