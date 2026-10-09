@@ -38,7 +38,7 @@
     "check": "bun run typecheck && bun run lint && bun run format:check && bun run test"
   },
   "dependencies": {
-    "@chromatis/base": "git+https://github.com/ChromatisGit/chromatis-base-framework.git#d775734f84497697e12fcab1f7c2797c393bd6cb",
+    "@chromatis/base": "git+https://github.com/ChromatisGit/chromatis-base-framework.git#a824b1cebf0e45b733a99e97c6984ddf1d79a6f0",
     "@fontsource-variable/fraunces": "^5.2.0",
     "@fontsource/dm-sans": "^5.2.0",
     "@fontsource/stix-two-math": "^5.2.0",
