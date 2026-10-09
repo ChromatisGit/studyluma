@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
-import { content } from "../../../../.chromatis/build/content";
+import { content } from "chromatis-content";
 import type {
   Catalog,
   Merkkarte,
