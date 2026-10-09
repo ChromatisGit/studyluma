@@ -17,12 +17,11 @@ export {
   findChapter,
   neighbours,
 } from "./application/navigation";
+export { coursesFromCatalog } from "./domain/fromCatalog";
 export {
-  getCourse,
-  getSummary,
-  listCourses,
-} from "./infrastructure/courseRepository";
-export { getConfiguredCourse } from "./infrastructure/coursePlan";
+  applyCoursePlan,
+  getConfiguredCourse,
+} from "./infrastructure/coursePlan";
 export { CourseList } from "./ui/CourseList";
 export { CoursePage } from "./ui/CoursePage";
 export type { CoursePageProps } from "./ui/CoursePage";
@@ -38,3 +37,7 @@ export type {
 export { Pictogram, hasPictogram } from "./ui/Pictogram";
 export type { PictogramProps } from "./ui/Pictogram";
 export { LinkCard } from "./ui/LinkCard";
+export { sheetsFor } from "./application/sheets";
+export type { SheetsSource } from "./application/sheets";
+export { ChapterMaterials } from "./ui/ChapterMaterials";
+export { summariesToRelease } from "./application/summaryRules";

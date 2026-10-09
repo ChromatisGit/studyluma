@@ -1,14 +1,15 @@
 import { ChevronDown } from "lucide-react";
 import { fill } from "../../../helper/text";
-import type { CheckState, Gap } from "../domain/contract";
+import type { GapNode } from "../../content-renderer";
+import type { CheckState } from "../domain/contract";
 import { MarkSymbol } from "./Mark";
 import { MathField } from "./MathField";
 import { useWorksheet } from "./WorksheetContext";
 import { fieldRef } from "./fieldValues";
-import { TEXT, plainText } from "./texts";
+import { TEXT } from "./texts";
 
 export interface GapInputProps {
-  gap: Gap;
+  gap: GapNode;
   /** 1-based number for the accessible name. */
   number: number;
   partId: string;
@@ -27,15 +28,11 @@ export function GapInput({
   state,
 }: GapInputProps) {
   const { setInput, checkAufgabe, checkStep, index } = useWorksheet();
-  const label = gap.cell
-    ? fill(TEXT.aufgabe.cell, {
-        row: plainText(gap.cell.row),
-        column: plainText(gap.cell.column),
-      })
-    : fill(TEXT.aufgabe.gap, { number });
+  const label = fill(TEXT.aufgabe.gap, { number });
+  const kind = gap.inputKind ?? (gap.choices.length > 1 ? "dropdown" : "math");
   const className = [
     "gap",
-    `gap--${gap.kind === "dropdown" ? "select" : gap.kind}`,
+    `gap--${kind === "dropdown" ? "select" : kind}`,
     state === "nochNicht" && "gap--wrong",
     state === "fast" && "gap--fast",
   ]
@@ -54,7 +51,7 @@ export function GapInput({
     }
   };
 
-  if (gap.kind === "dropdown") {
+  if (kind === "dropdown") {
     return (
       <span className={className} data-state={state}>
         <select
@@ -64,17 +61,15 @@ export function GapInput({
           onChange={(event) => save(event.target.value)}
         >
           <option value="" disabled />
-          {[...gap.options]
-            .sort((a, b) => a.localeCompare(b, "de"))
-            .map((option) => (
-              <option key={option}>{option}</option>
-            ))}
+          {gap.choices.map((option) => (
+            <option key={option}>{option}</option>
+          ))}
         </select>
         <ChevronDown className="icon icon--sm chev" aria-hidden="true" />
       </span>
     );
   }
-  if (gap.kind === "text") {
+  if (kind === "text") {
     return (
       <span className={className} data-state={state}>
         <input

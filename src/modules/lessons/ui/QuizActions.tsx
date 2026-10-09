@@ -1,4 +1,4 @@
-import type { TeacherQuizView } from "../../quiz";
+import type { TeacherQuizView } from "../../classroom";
 import { fill } from "../../../helper/text";
 import TEXT from "./lessons.de.json";
 

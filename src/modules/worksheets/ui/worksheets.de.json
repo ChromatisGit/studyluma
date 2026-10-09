@@ -47,6 +47,10 @@
     "lockedSheet": "Blatt {number}",
     "and": " und "
   },
+  "graph": {
+    "functionFor": "Funktion {number} zu {ref}",
+    "hint": "Gib den Term der Funktion ein. Deine Eingabe wird sofort im Koordinatensystem gezeichnet."
+  },
   "set": {
     "none": "keine Lösung",
     "separate": "Mehrere Lösungen trennst du mit",
@@ -63,7 +67,7 @@
     "tipLabel": "Tipp",
     "merkkarteFrom": "Merkkarte aus {origin}",
     "exampleLabel": "Beispiel",
-    "toSummary": "In der Zusammenfassung ansehen"
+    "toSummary": "Im Inhalt ansehen"
   },
   "steps": {
     "plan": "Plan",
@@ -148,7 +152,7 @@
   "nav": {
     "chapter": "Kapitel {number}",
     "label": "Kapitel {number}",
-    "summary": "Zusammenfassung",
+    "summary": "Inhalt",
     "worksheets": "Arbeitsblätter",
     "fast": "Für Schnelle",
     "challenges": "Challenges",
@@ -199,7 +203,7 @@
       "le": "kleiner gleich",
       "ge": "größer gleich"
     },
-    "semicolon": "Mit ; trennst du Lösungen in einer Lösungsmenge.",
+    "semicolon": "Mit ; trennst du Lösungen in einer Lösungsmenge oder Komponenten eines Vektors.",
     "aria": {
       "frac": "Bruch",
       "sqrt": "Wurzel",
@@ -256,5 +260,8 @@
     "challengesMeta": "Für Schnelle",
     "openOf": "{open} von {total} offen"
   },
-  "reset": "Antworten in diesem Browser zurücksetzen"
+  "reset": "Antworten in diesem Browser zurücksetzen",
+  "vector": {
+    "separate": "Trenne die Komponenten mit"
+  }
 }

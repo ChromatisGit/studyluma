@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import type { MathEditor } from "../domain/editor";
 import { useWorksheet } from "./WorksheetContext";
-import { isSetAnswer } from "./fieldValues";
+import { usesSemicolon } from "./fieldValues";
 import type { KeyAction } from "./keyboard";
 
 /** Runs keypad and keyboard actions on the active math field. */
@@ -47,8 +47,8 @@ export function useMathKeys(onMessage?: (message: string) => void) {
         case "close":
           return openKeys(false);
         case "semicolon": {
-          const part = index.parts.get(active.ref.partId)?.part;
-          if (part && isSetAnswer(part, active.ref)) {
+          const kind = index.parts.get(active.ref.partId)?.part.answerKind;
+          if (usesSemicolon(kind, active.ref)) {
             return run((editor) => editor.char(";"));
           }
           if (semicolonMessage) {

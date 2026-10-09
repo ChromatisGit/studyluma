@@ -1,10 +1,19 @@
-import { Check, FileText, Smartphone, Bookmark } from "lucide-react";
-import { Markdown } from "../../content";
-import type { FrameBlock } from "../domain/lesson";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
+import { Check, FileText, Smartphone } from "lucide-react";
+import type { Merkkarte, RichNode, SlideSegment } from "../../catalog";
+import { RichContent, SummaryContent } from "../../content-renderer";
+import type { Slide } from "../domain/deck";
+import { isFill } from "../domain/layout";
 import { QuizBlock } from "./FrameQuiz";
 import TEXT from "./lessons.de.json";
 
-/** A squared writing surface; a label shows as a small sign on top. */
+/** A squared writing surface (`::schreiben`); a label shows as a small sign on top. */
 export function WritingZone({ label }: { label?: string | undefined }) {
   return (
     <div className="lf-zone">
@@ -13,39 +22,106 @@ export function WritingZone({ label }: { label?: string | undefined }) {
   );
 }
 
-function Areas({ block }: { block: Extract<FrameBlock, { type: "areas" }> }) {
-  const named = block.areas.some((area) => area.markdown);
+/**
+ * Scrolling of the Inhalt follows the teacher on the projector: the
+ * teacher's window reports how far it is scrolled, the projector copies it.
+ */
+export const ScrollSyncContext = createContext<{
+  report?: (slideId: string, ratio: number) => void;
+  follow?: { slideId: string; ratio: number } | null;
+}>({});
+
+/** Content nodes in order; `::schreiben` becomes a writing zone between them. */
+function Nodes({
+  nodes,
+  className,
+}: {
+  nodes: RichNode[];
+  className?: string;
+}) {
+  const groups: (RichNode[] | { label: string | undefined })[] = [];
+  for (const node of nodes) {
+    if (node.type === "writingArea") {
+      groups.push({ label: node.label });
+    } else {
+      const last = groups.at(-1);
+      if (Array.isArray(last)) {
+        last.push(node);
+      } else {
+        groups.push([node]);
+      }
+    }
+  }
   return (
-    <div className={`lf-areas${named ? " lf-areas--named" : ""}`}>
-      {block.areas.map((area) =>
-        area.markdown ? (
-          <section key={area.label} className="lf-area">
-            <h2 className="lf-area__title">{area.label}</h2>
-            <Markdown markdown={area.markdown} className="lf-md" />
-          </section>
+    <>
+      {groups.map((group, i) =>
+        Array.isArray(group) ? (
+          <RichContent key={i} nodes={group} className={className ?? "lf-md"} />
         ) : (
-          <WritingZone key={area.label} label={area.label} />
+          <WritingZone key={i} label={group.label} />
         ),
       )}
+    </>
+  );
+}
+
+/** One piece of a slide's text: running content or a column layout. */
+export function SegmentView({ segment }: { segment: SlideSegment }) {
+  if (segment.type === "content") {
+    return isFill(segment) ? (
+      <div className="lf__fill">
+        <RichContent nodes={segment.content} className="lf-md" />
+      </div>
+    ) : (
+      <Nodes nodes={segment.content} />
+    );
+  }
+  return (
+    <div
+      className="lf__columns"
+      style={{
+        gridTemplateColumns: segment.columns
+          .map((column) => `${column.width}fr`)
+          .join(" "),
+      }}
+    >
+      {segment.columns.map((column, i) => {
+        const fill = isFill({ type: "content", content: column.content });
+        return (
+          <div
+            key={i}
+            className={`lf__column${fill ? " lf__column--fill" : ""}`}
+          >
+            {column.title && (
+              <h2 className="lf__column-title">{column.title}</h2>
+            )}
+            <Nodes nodes={column.content} />
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-function SheetCard({
-  block,
-  sent,
-}: {
-  block: Extract<FrameBlock, { type: "sheet" }>;
-  sent: boolean;
-}) {
+export function SegmentsView({ segments }: { segments: SlideSegment[] }) {
+  return (
+    <>
+      {segments.map((segment, i) => (
+        <SegmentView key={i} segment={segment} />
+      ))}
+    </>
+  );
+}
+
+/** The Arbeitsblatt as the class sees it: a card that says where they are. */
+export function SheetCard({ slide, sent }: { slide: Slide; sent: boolean }) {
   return (
     <article className="lf-sheet">
       <p className="lf-sheet__kind">
         <FileText aria-hidden="true" />
         {TEXT.frame.sheet}
       </p>
-      <p className="lf-sheet__title">{block.title}</p>
-      {block.topic && <p className="lf-sheet__topic">{block.topic}</p>}
+      <p className="lf-sheet__title">{slide.title}</p>
       <p className={`lf-sheet__state${sent ? " is-sent" : ""}`}>
         {sent ? (
           <Check aria-hidden="true" />
@@ -58,55 +134,54 @@ function SheetCard({
   );
 }
 
-/** One content block of a frame. */
-export function FrameBlockView({
-  block,
-  sent,
-  frameId,
+/** A Merkkarte large: the rule, then its examples. */
+export function MerkkarteCard({
+  card,
 }: {
-  block: FrameBlock;
-  sent: boolean;
-  frameId: string;
+  card: Pick<Merkkarte, "title" | "rule" | "examples">;
 }) {
-  switch (block.type) {
-    case "markdown":
-      return <Markdown markdown={block.markdown} className="lf-md" />;
-    case "arrows":
-      return (
-        <div className="lf-arrows">
-          {block.rows.map(([left, right]) => (
-            <div key={left} className="lf-arrows__row">
-              <Markdown inline markdown={left} />
-              <svg
-                className="lf-arrows__arrow"
-                viewBox="0 0 40 24"
-                aria-hidden="true"
-              >
-                <path d="M2 12H36M26 3L37 12L26 21" />
-              </svg>
-              <Markdown inline markdown={right} className="lf-arrows__right" />
-            </div>
-          ))}
-        </div>
-      );
-    case "image":
-      return <img className="lf-image" src={block.asset} alt={block.alt} />;
-    case "areas":
-      return <Areas block={block} />;
-    case "merkkarte":
-      return (
-        <article className="lf-merkkarte">
-          <h1 className="lf-merkkarte__title">{block.title}</h1>
-          <Markdown markdown={block.rule} className="lf-merkkarte__rule" />
-          <p className="lf-merkkarte__hint">
-            <Bookmark aria-hidden="true" />
-            {TEXT.frame.merkkarteHint}
-          </p>
-        </article>
-      );
-    case "sheet":
-      return <SheetCard block={block} sent={sent} />;
-    case "quiz":
-      return <QuizBlock block={block} frameId={frameId} />;
-  }
+  return (
+    <article className="lf-merkkarte">
+      <h1 className="lf-merkkarte__title">{card.title}</h1>
+      <RichContent nodes={card.rule} className="lf-merkkarte__rule" />
+      {card.examples.map((example, i) => (
+        <RichContent
+          key={i}
+          nodes={example}
+          className="lf-merkkarte__example"
+        />
+      ))}
+    </article>
+  );
 }
+
+/** The chapter's Inhalt, scrollable; the class never scrolls it itself. */
+export function InhaltView({ slide }: { slide: Slide }): ReactNode {
+  const { report, follow } = useContext(ScrollSyncContext);
+  const box = useRef<HTMLDivElement>(null);
+  const ratio = follow?.slideId === slide.id ? follow.ratio : null;
+  useEffect(() => {
+    const element = box.current;
+    if (element && ratio !== null) {
+      element.scrollTop = ratio * (element.scrollHeight - element.clientHeight);
+    }
+  }, [ratio]);
+  if (!slide.summary) {
+    return null;
+  }
+  return (
+    <div
+      className="lf-summary"
+      ref={box}
+      onScroll={(event) => {
+        const element = event.currentTarget;
+        const room = element.scrollHeight - element.clientHeight;
+        report?.(slide.id, room > 0 ? element.scrollTop / room : 0);
+      }}
+    >
+      <SummaryContent summary={slide.summary} />
+    </div>
+  );
+}
+
+export { QuizBlock };

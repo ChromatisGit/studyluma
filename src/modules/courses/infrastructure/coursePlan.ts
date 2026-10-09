@@ -1,5 +1,4 @@
 import type { Chapter, Course, Topic } from "../domain/course";
-import { getCourse } from "./courseRepository";
 
 const COOKIE = "studyluma-course-plan";
 const ONE_YEAR = 60 * 60 * 24 * 365;
@@ -149,11 +148,13 @@ export function applyCoursePlan(course: Course, plan: CoursePlan): Course {
   };
 }
 
+/** The course as the teacher arranged it in this browser. */
 export function getConfiguredCourse(
+  courses: Course[],
   courseId: string,
   request: Request,
 ): Course | undefined {
-  const course = getCourse(courseId);
+  const course = courses.find((item) => item.id === courseId);
   return course && applyCoursePlan(course, readCoursePlan(request, courseId));
 }
 
@@ -187,7 +188,7 @@ export function updateCoursePlan(
       current.phases[0]?.id ??
       "";
     const firstChapter = String(form.get("firstChapter") ?? "").trim();
-    if (!firstChapter || !phaseId) {
+    if (!firstChapter) {
       return plan;
     }
     const newId = `custom-topic-${crypto.randomUUID()}`;
@@ -195,7 +196,7 @@ export function updateCoursePlan(
     next.topics.push({
       id: newId,
       title,
-      icon: String(form.get("icon") ?? "kurve"),
+      icon: { gallery: String(form.get("icon") ?? "kurve") },
       phaseId,
     });
     next.chapters.push({ id: chapterId, title: firstChapter, topicId: newId });

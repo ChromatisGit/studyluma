@@ -1,21 +1,30 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useParams } from "react-router";
+import { getCatalog } from "../../src/modules/catalog/server/catalog.server";
 import {
-  getLesson,
+  buildDeck,
   lessonText,
+  presentationFor,
   ProjectorView,
 } from "../../src/modules/lessons";
-import { flowFromParam, flowLesson } from "../../src/modules/teaching";
+import { readViewer } from "../../src/modules/classroom";
 
 export function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterId = "" } = params;
-  const flowId = new URL(request.url).searchParams.get("flow");
-  const flow = flowFromParam(chapterId, flowId);
-  const lesson = flow ? flowLesson(flow) : getLesson(chapterId);
-  if (!lesson) {
+  if (readViewer(request) !== "teacher") {
+    throw new Response(null, { status: 403 });
+  }
+  const catalog = getCatalog();
+  const presentation = presentationFor(
+    catalog,
+    chapterId,
+    new URL(request.url).searchParams.get("presentation"),
+  );
+  const deck = presentation && buildDeck(catalog, presentation.id);
+  if (!deck) {
     throw new Response(null, { status: 404 });
   }
-  return { lesson };
+  return { deck };
 }
 
 export function meta() {
@@ -23,7 +32,7 @@ export function meta() {
 }
 
 export default function ProjectorRoute() {
-  const { lesson } = useLoaderData<typeof loader>();
+  const { deck } = useLoaderData<typeof loader>();
   const { courseId = "" } = useParams();
-  return <ProjectorView courseId={courseId} lesson={lesson} />;
+  return <ProjectorView courseId={courseId} deck={deck} />;
 }

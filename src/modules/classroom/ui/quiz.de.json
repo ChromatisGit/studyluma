@@ -1,0 +1,29 @@
+{
+  "page": {
+    "title": "Quiz",
+    "kicker": "Quiz",
+    "position": "Frage {number} von {total}",
+    "connecting": "Verbinde mit dem Unterricht …",
+    "noneTitle": "Gerade läuft kein Quiz",
+    "noneText": "Sobald deine Lehrkraft ein Quiz startet, landest du automatisch hier.",
+    "toCourse": "Zum Kurs",
+    "endedTitle": "Quiz beendet",
+    "endedText": "Danke fürs Mitmachen. Es geht gleich vorne weiter.",
+    "toChapter": "Zum Kapitel",
+    "choose": "Antwort zu Frage {number}",
+    "chooseOne": "Wähle eine Antwort.",
+    "chooseMany": "Wähle alle passenden Antworten.",
+    "submit": "Abgeben",
+    "change": "Antwort ändern",
+    "submitted": "Abgegeben",
+    "waiting": "Warte auf die anderen. Bis die Lehrkraft weitergeht, kannst du deine Antwort noch ändern.",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
+    "closed": "Die Antworten sind geschlossen. Vorne siehst du, wie die Klasse geantwortet hat.",
+    "missed": "Bei dieser Frage hast du nicht abgestimmt.",
+    "right": "Richtig!",
+    "wrong": "Nicht ganz. Richtig ist {letters}.",
+    "missedReveal": "Richtig ist {letters}.",
+    "noneNext": "Du musst nichts tun: die Seite wechselt von selbst.",
+    "endedNext": "Du kannst jetzt zurück zum Kapitel."
+  }
+}

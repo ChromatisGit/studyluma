@@ -37,8 +37,8 @@ export function MathField({
   const { active, activate, deactivate, index, response, edit } = worksheet;
   const runKey = useMathKeys();
   const isActive = active?.ref.key === field.key;
-  const part = index.parts.get(field.partId)?.part;
-  const stored = part ? readField(part, response(field.partId), field) : [];
+  const kind = index.parts.get(field.partId)?.part.answerKind;
+  const stored = readField(response(field.partId), field, kind);
   const row = isActive && active ? active.editor.root : stored;
 
   const onKeyDown = useCallback(

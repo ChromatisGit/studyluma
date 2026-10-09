@@ -1,10 +1,11 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useParams } from "react-router";
-import { chapterPath, coursePath, getCourse } from "../../src/modules/courses";
-import { QuizPage, quizText } from "../../src/modules/quiz";
+import { chapterPath, coursePath } from "../../src/modules/courses";
+import { loadCourses } from "../site.server";
+import { QuizPage, quizText } from "../../src/modules/classroom";
 
-export function loader({ params }: LoaderFunctionArgs) {
-  if (!getCourse(params.courseId ?? "")) {
+export function loader({ params, request }: LoaderFunctionArgs) {
+  if (!loadCourses(request).some((course) => course.id === params.courseId)) {
     throw new Response(null, { status: 404 });
   }
   return null;

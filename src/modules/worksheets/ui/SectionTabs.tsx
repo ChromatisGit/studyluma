@@ -1,6 +1,6 @@
 import { useRef, type KeyboardEvent } from "react";
 import { Check } from "lucide-react";
-import type { Sheet } from "../domain/contract";
+import type { Worksheet as Sheet } from "../../catalog";
 import { sectionDone } from "../domain/structure";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";

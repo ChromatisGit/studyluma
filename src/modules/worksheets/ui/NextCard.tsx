@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router";
 import { plural } from "../../../helper/text";
-import type { Section, Sheet } from "../domain/contract";
+import type { Worksheet as Sheet, WorksheetSection } from "../../catalog";
 import {
   openChallenges,
   recommendation,
@@ -17,7 +17,7 @@ export function NextCard({
   onTab,
 }: {
   sheet: Sheet;
-  section: Section;
+  section: WorksheetSection;
   onTab: (id: string) => void;
 }) {
   const { chapter, state, links } = useWorksheet();
@@ -46,6 +46,9 @@ export function NextCard({
       ? chapter.sheets.find((s) => s.id === recommended.sheetId)
       : undefined;
   const open = openChallenges(chapter, state).length;
+  if (!target && (!chapter.challenges.length || open === 0)) {
+    return null;
+  }
   return (
     <nav className="weiter" aria-label={TEXT.next.recommendation}>
       <Link

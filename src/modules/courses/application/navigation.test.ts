@@ -5,7 +5,6 @@ import { chaptersInOrder, chapterPath, neighbours } from "./navigation";
 const course: Course = {
   id: "ma",
   title: "Mathe",
-  subject: "Mathematik",
   badge: "MA",
   currentChapterId: "2-1",
   phases: [],

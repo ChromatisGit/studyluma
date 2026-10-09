@@ -1,85 +1,36 @@
 # StudyLuma Website
 
-React Router (SSR) app for StudyLuma: course views, worksheets and lesson
-frames. It is a modular monolith on top of
-[`@chromatis/base`](https://github.com/ChromatisGit/chromatis-base-framework),
-whose UI components and CSS provide almost all styling; StudyLuma adds a
-theme (`app/theme.css`) and CSS only for its own elements.
-
-This stage renders the UI from JSON fixtures. There is no database, login
-or content pipeline yet. The demo opens in the teacher view and shows
-Steuerung in each course.
-
-## Layout
-
-```
-app/                   composition root: root, shell, routes, theme
-src/helper/            tiny shared helpers (text templates)
-src/modules/<module>/  one module per area; only index.ts at its root
-  domain/              types and pure rules
-  application/         use cases on top of the domain
-  infrastructure/      fixtures, local storage, browser channels
-  ui/                  React components, *.de.json texts, module CSS
-```
-
-| Module       | Owns                                                         |
-| ------------ | ------------------------------------------------------------ |
-| `viewer`     | the demo viewer role and participant identity                |
-| `content`    | Markdown with Typst math, Merkkarten, summaries, code blocks |
-| `courses`    | course list, Lernweg, chapter page, course fixtures          |
-| `worksheets` | worksheet renderer, math editor and checking                 |
-| `steuerung`  | teacher course and worksheet controls                        |
-| `lessons`    | lesson frames, teacher view, projector window                |
-| `quiz`       | live quiz: run state, event stream, student quiz page        |
-
-Modules import each other only through their `index.ts`
-(`chromatis/dependencies` lint rule). All user-visible text lives in a
-`*.de.json` file next to the component that shows it.
-
-## Routes
-
-| Path                                     | Page                           |
-| ---------------------------------------- | ------------------------------ |
-| `/`                                      | my courses                     |
-| `/courses/:courseId`                     | Lernweg                        |
-| `/courses/:courseId/control`             | Steuerung                      |
-| `/courses/:courseId/chapters/:chapterId` | chapter page                   |
-| `…/sheets/:sheetId`                      | worksheet                      |
-| `…/challenges`                           | challenges of a chapter        |
-| `…/lesson`                               | lesson frames, teacher view    |
-| `…/lesson/projector`                     | projector window               |
-| `/courses/:courseId/quiz`                | live quiz on student devices   |
-| `/live`                                  | quiz event stream and commands |
-
-## Live quiz
-
-A teacher starts the quiz of a quiz frame from the notes strip. Students
-of the course who are online land on `/courses/:courseId/quiz` once (also
-when they arrive while it runs) and can navigate freely afterwards. Each
-question goes answering → distribution → reveal; the teacher moves it on
-with the strip button, → or a clicker, and is never blocked by missing
-answers. Percentages count each option against all participants, so a
-multiple choice question can add up to more than 100 %. Leaving the frame
-ends the quiz.
-
-Without a database, the running quizzes live in the memory of the server
-process (`quiz/infrastructure/liveQuizStore.ts`) and reach the browsers as
-server-sent events from `/live`. That needs one long-running server
-process; a restart ends running quizzes. Every student belongs to every
-course, a browser counts as one student (`studyluma-participant` cookie),
-and an optional `studyluma-room` cookie keeps separate demo visitors apart.
-
-## Use as a package
-
-The demo app (`studyluma-demo`) installs this repository as the `studyluma`
-package and mounts its route modules (`studyluma/app/routes/*`) next to its
-own landing page. Route modules therefore use React Router's generic types
-instead of generated `+types`, and all links are absolute.
-
-## Development
+The Website renders the compiled StudyLuma catalog (schema v1). It never reads author Markdown. Build a catalog with `bun run compile` in `studyluma-content` (Pipeline underneath), then point the Website at the immutable `v1/<buildId>` directory:
 
 ```sh
-bun install
-bun run dev      # http://localhost:5173
-bun run check    # typecheck, lint, format, tests
+STUDYLUMA_BUNDLE_DIR=../studyluma-content/.generated/studyluma/v1/<buildId> bun run dev
 ```
+
+Without the variable the Website uses the single build under `studyluma-content/.generated/studyluma/v1`.
+
+## How the pieces fit
+
+- **catalog** — the compiled catalog's types, the server loader, release state (released Inhalt and solutions are held in the running server process) and the redaction students get. Students receive the catalog **without** expected answers, correct options, unreleased solutions, unreleased Inhalt and teacher notes. Tip Merkkarten stay available. The teacher receives the complete catalog.
+- **courses** — courses come from `kurse/*.yml` in the content, topics from each topic folder's `thema.yml` (title, icon) and the lesson times from `definitions.yml`. The teacher's arrangement (current chapter, order, additions) is kept in a cookie on top.
+- **worksheets** — worksheets, tasks, challenges and checkpoints are rendered straight from the compiled types. Answers are checked on the server (`POST /api/check`), so the browser never holds them. Solution sets (`L = {-4, 2}`, `{}`) and vectors (`vec(3, 4)`) are separate answer kinds: the field takes the parts separated by `;`. `::schritte N` decides the initially visible Plan or Rechenweg per mode (`struktur`), steps stay available as help; `::optional` folds in "Mehr Challenges".
+- **lessons** — the presentation mode. A started Foliensatz becomes a `Deck`: its expanded placements as slides (author slides with columns, `::schreiben` areas and cover images; embedded Arbeitsblätter, Quizzes, Merkkarten and the chapter's Inhalt), with private notes, planned times in the presentation's own timeline (`::bis` inside an included Foliensatz counts from where it starts) and where each slide came from. The teacher view, projector window, ink, free surfaces and overview work on slide ids.
+- **graphics** — `::grafik` renders a `graphic` rich node with [Mafs](https://mafs.dev) (`content-renderer/ui/Graphic.tsx`): curves and points from compiled math rows, sliders for `parameter`. A `Graph` task uses the Grafik as workspace: each entered function is drawn live and checked on the server against `answers` as a function of `x` (equivalent terms are equal). The math core (`evaluate`, `mathNodes`) lives in the `content-renderer` module so both rendering and checking share it.
+- **classroom** — the temporary Classroom Session of a running lesson, on the Chromatis Stateful Runtime. A teacher starts a session (`Klassenzimmer starten`) and gets a four-character join code; students join at `/join/{CODE}` with a name and no account. The module owns the session lifecycle, the Classroom Controller, Participants, released content (Inhalte and solutions), the lesson position, the live quiz and the realtime protocol, plus the teacher controls. See `../CLASSROOM_RUNTIME.md` for the contract and "Classroom Runtime" below for how it runs.
+
+## Classroom Runtime
+
+One Classroom Session is one Chromatis Runtime Instance (`kind: "classroom"`, id: the join code). The domain (`src/modules/classroom/domain`) is plain state transitions; `runtime/classroomRuntime.ts` is the only file that touches the Stateful Runtime contract, so the same code runs on both hosts.
+
+- **Credentials.** Creating a session returns a Controller Token, joining returns a Participant Token. Both are 256-bit random values kept in an HttpOnly cookie (`studyluma-classroom`); the join code only locates a session. The socket route reads the cookie and passes the token to the session as a trusted connection parameter, so tokens never appear in a URL.
+- **Realtime.** `/classroom/ws` upgrades to a WebSocket. The server pushes a personalised snapshot after every change plus named events (participant joined/left, position changed, content released, quiz started/revealed/ended, response submitted, session ended). Clients send `intent` frames (`place`, `quiz.advance`, `quiz.end`, `quiz.answer`, `end`); the session authorises each one. A reconnect receives a complete snapshot, so nothing is lost. Without a socket (the Vite dev server) the client polls `GET /classroom`.
+- **Join codes.** Case-insensitive, 25 unambiguous characters, drawn with rejection sampling, collisions checked at creation and freed when the session ends. Unknown, ended and expired codes fail identically (404); 20 failed lookups per minute and client are answered with 429. The limiter is process-local.
+- **Lifetime.** A session ends when the teacher ends it or after 12 hours. Expiry is enforced on the next touch; the Bun entry also sweeps every minute. State is memory only: a restart ends every session.
+- **Released content.** Inhalte, solutions and Inhalt rules live in the session. Server-rendered pages redact the catalog according to the session of the requesting browser; without a session nothing is released.
+
+Run it on Bun/Docker with `bun run build && bun run start` (`server/bun.ts`, a `Dockerfile` is included). `server/cloudflare.ts` and `wrangler.jsonc` are the Cloudflare entry (one Durable Object per session); wiring the Website's own Vite build for Workers is not done yet. `bun run dev` serves everything except the socket.
+
+## Not yet there
+
+Sheet unlocking, mode choice and answers are kept in the browser (`localStorage`); database persistence, sign-in and publishing are still missing. The Session Directory and the `studyluma.org/{CODE}` gateway are a later phase: today the join link points at the instance itself.
+
+Run `bun run check` (typecheck, lint, format, tests) and `bun run build` from this directory.

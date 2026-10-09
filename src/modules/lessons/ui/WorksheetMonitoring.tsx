@@ -1,9 +1,6 @@
 import { Card, CardBody } from "@chromatis/base/ui";
-import {
-  sampleClassAmpel,
-  type AmpelCause,
-  type Sheet,
-} from "../../worksheets";
+import type { Worksheet } from "../../catalog";
+import { sampleClassAmpel, type AmpelCause } from "../../worksheets";
 
 // Anonymous fixture totals for the classroom demo. They are not student activity.
 const PROGRESS: Record<
@@ -30,7 +27,7 @@ export function WorksheetMonitoring({
   sheet,
   unlocked,
 }: {
-  sheet: Sheet;
+  sheet: Worksheet;
   unlocked: boolean;
 }) {
   const progress = PROGRESS[sheet.id];

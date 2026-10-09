@@ -4,6 +4,7 @@ import type { LessonSession } from "../domain/lesson";
 export type ProjectorMessage =
   | { type: "state"; session: LessonSession }
   | { type: "laser"; point: [number, number] | null }
+  | { type: "scroll"; slideId: string; ratio: number }
   | { type: "hello" }
   | { type: "ping" }
   | { type: "bye" };
@@ -13,13 +14,13 @@ export type ProjectorMessage =
  * there is no server. Returns `null` where the API is missing.
  */
 export function openProjectorChannel(
-  chapterId: string,
+  presentationId: string,
   onMessage: (message: ProjectorMessage) => void,
 ): { send: (message: ProjectorMessage) => void; close: () => void } | null {
   if (typeof BroadcastChannel === "undefined") {
     return null;
   }
-  const channel = new BroadcastChannel(`studyluma-lesson-${chapterId}`);
+  const channel = new BroadcastChannel(`studyluma-lesson-${presentationId}`);
   channel.onmessage = (event: MessageEvent<ProjectorMessage>) =>
     onMessage(event.data);
   return {

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Button } from "@chromatis/base/ui";
 import { fill } from "../../../helper/text";
-import type { Mode, Sheet } from "../domain/contract";
+import type { Worksheet as Sheet } from "../../catalog";
+import type { Mode } from "../domain/contract";
 import { fixedMode, modeOf } from "../domain/structure";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
@@ -11,7 +12,7 @@ const MODES: Mode[] = ["unterstuetzung", "uebung", "challenges"];
 /** "Wie willst du dieses Blatt bearbeiten?" at the start of a `wahl` sheet. */
 export function ModeChoice({ sheet }: { sheet: Sheet }) {
   const { state, store, setUi } = useWorksheet();
-  const [choice, setChoice] = useState<Mode>(modeOf(sheet, state) ?? "uebung");
+  const [choice, setChoice] = useState<Mode | null>(modeOf(sheet, state));
   return (
     <div className="modewahl">
       <fieldset>
@@ -35,7 +36,11 @@ export function ModeChoice({ sheet }: { sheet: Sheet }) {
         </div>
       </fieldset>
       <Button
+        disabled={!choice}
         onClick={() => {
+          if (!choice) {
+            return;
+          }
           store.setMode(sheet.id, choice);
           setUi((current) => ({
             ...current,

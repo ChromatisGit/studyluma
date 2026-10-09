@@ -1,4 +1,4 @@
-import type { Chapter } from "../domain/contract";
+import type { SheetsData } from "../domain/structure";
 import { AufgabeView } from "./AufgabeView";
 import { Keypad } from "./Keypad";
 import { useWorksheetController } from "./useWorksheetController";
@@ -15,7 +15,7 @@ export function TaskSample({
   chapter,
   aufgabeId,
 }: {
-  chapter: Chapter;
+  chapter: SheetsData;
   aufgabeId: string;
 }) {
   const sample = { ...chapter, id: `sample-${chapter.id}` };

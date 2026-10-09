@@ -74,7 +74,7 @@ function TopicRow({
 }) {
   const inner = (
     <>
-      <Pictogram id={row.topic.pictogram} fallbackLabel={row.topic.title} />
+      <Pictogram icon={row.topic.pictogram} fallbackLabel={row.topic.title} />
       <span className="lernweg__title">
         <span className="lernweg__num">{row.topic.number}</span>
         <span className="lernweg__title-text">{row.topic.title}</span>

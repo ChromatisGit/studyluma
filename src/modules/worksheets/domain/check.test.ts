@@ -1,6 +1,15 @@
 import { describe, expect, test } from "bun:test";
-import { checkGaps, checkMath, checkTask, type CheckMessages } from "./check";
-import type { Gap, MathAnswer, Task } from "./contract";
+import { gap, part } from "../../../test/catalog";
+import {
+  checkGaps,
+  checkMath,
+  checkPart,
+  mathAnswerOf,
+  optionId,
+  type CheckMessages,
+} from "./check";
+import type { MathAnswer } from "./contract";
+import { gapsOf } from "../../content-renderer";
 import { typstToRow } from "./typst";
 
 const m: CheckMessages = {
@@ -143,55 +152,161 @@ describe("solution sets", () => {
   });
 });
 
-describe("tasks", () => {
+describe("parts", () => {
   test("::fehler turns a known wrong answer into its question", () => {
-    const task: Task = {
-      type: "ergebnis",
-      prompt: "",
-      answer: { kind: "term", expected: "4 x^3", variables: ["x"] },
-      errors: [{ answer: "4 x^4", message: "Exponent?" }],
-    };
-    expect(checkTask(task, row("4x^4"), m)).toEqual({
+    const antwort = part("p", "Antwort", {
+      answer: { exact: "4 x^3" },
+      markers: { fehler: [{ answer: "4 x^4", feedback: "Exponent?" }] },
+    });
+    expect(checkPart(antwort, row("4x^4"), m)).toEqual({
       state: "nochNicht",
       message: "Exponent?",
+    });
+    expect(checkPart(antwort, row("4x^3"), m)?.state).toBe("richtig");
+  });
+
+  test("the compiled answer becomes a term or a number rule", () => {
+    expect(mathAnswerOf({ exact: "4 x^3" }).kind).toBe("term");
+    expect(
+      mathAnswerOf({ exact: "1/3", rounded: "0.33", decimals: 2 }),
+    ).toEqual({
+      kind: "number",
+      exact: "1/3",
+      rounded: { value: "0.33", places: 2 },
     });
   });
 
   test("Auswahl compares the selected set", () => {
-    const task: Task = {
-      type: "auswahl",
-      prompt: "",
+    const auswahl = part("p", "Auswahl", {
       multiple: true,
       options: [
-        { id: "a", label: "", correct: true },
-        { id: "b", label: "", correct: false },
-        { id: "c", label: "", correct: true },
+        { content: [], correct: true },
+        { content: [], correct: false },
+        { content: [], correct: true },
       ],
-    };
-    expect(checkTask(task, ["c", "a"], m)?.state).toBe("richtig");
-    expect(checkTask(task, ["a"], m)?.state).toBe("nochNicht");
-    expect(checkTask(task, [], m)).toBeNull();
+    });
+    const [a, , c] = [0, 1, 2].map((i) => optionId("p", i));
+    expect(checkPart(auswahl, [c, a], m)?.state).toBe("richtig");
+    expect(checkPart(auswahl, [a], m)?.state).toBe("nochNicht");
+    expect(checkPart(auswahl, [], m)).toBeNull();
   });
 
-  test("gaps: free gaps are named, text ignores case, cells prefix 'almost'", () => {
-    const gaps: Gap[] = [
-      { id: "g0", kind: "text", correct: "Exponenten", caseSensitive: false },
-      { id: "g1", kind: "dropdown", options: ["1", "2"], correct: "1" },
-      {
-        id: "g2",
-        kind: "math",
-        answer: { kind: "number", exact: "1/2" },
-        cell: { row: "f", column: "x" },
-      },
-    ];
+  test("an Auftrag is never checked", () => {
+    expect(checkPart(part("p", "Auftrag"), "text", m)).toBeNull();
+  });
+
+  test("gaps: free gaps are named, text ignores case, math gaps follow the number rules", () => {
+    const einsetzen = part("p", "Einsetzen", {
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            gap("g0", "Exponenten"),
+            gap("g1", "1", { choices: ["1", "2"] }),
+            gap("g2", "1/2", { math: true }),
+          ],
+        },
+      ],
+    });
+    const gaps = gapsOf(einsetzen.content);
     expect(checkGaps(gaps, { g0: "exponenten " }, m)?.message).toBe("free:2");
-    const almost = checkGaps(
-      gaps,
-      { g0: "exponenten", g1: "1", g2: row("frac(2, 4)") },
+    const right = checkPart(
+      einsetzen,
+      { g0: "exponenten", g1: "1", g2: row("1/2") },
       m,
     );
-    expect(almost?.state).toBe("fast");
-    expect(almost?.message).toBe("f/x: simplify");
-    expect(almost?.items).toEqual({ g0: "richtig", g1: "richtig", g2: "fast" });
+    expect(right?.items).toEqual({
+      g0: "richtig",
+      g1: "richtig",
+      g2: "richtig",
+    });
+    const wrongChoice = checkGaps(
+      gaps,
+      { g0: "exponenten", g1: "2", g2: row("1/2") },
+      m,
+    );
+    expect(wrongChoice?.state).toBe("nochNicht");
+  });
+});
+
+describe("compiled sets and vectors", () => {
+  test("a solution set from the compiled answer: order is free, none is an answer", () => {
+    const set = part("p", "Antwort", {
+      answer: {
+        exact: "{-4, 2}",
+        kind: "set",
+        elements: [
+          { exact: "-4", checkRow: row("-4") },
+          { exact: "2", checkRow: row("2") },
+        ],
+      },
+    });
+    expect(checkPart(set, { row: row("2; −4") }, m)?.state).toBe("richtig");
+    expect(checkPart(set, { row: row("2") }, m)?.message).toBe("missing");
+    expect(checkPart(set, { row: row("2; 5") }, m)?.items).toEqual({
+      "0": "richtig",
+      "1": "nochNicht",
+    });
+    expect(checkPart(set, { row: [], none: true }, m)?.state).toBe("nochNicht");
+    const none = part("p", "Antwort", {
+      answer: { exact: "{}", kind: "set", elements: [] },
+    });
+    expect(checkPart(none, { row: [], none: true }, m)?.state).toBe("richtig");
+    expect(checkPart(none, { row: row("1") }, m)?.state).toBe("nochNicht");
+  });
+
+  test("a vector from the compiled answer: components separated by ;", () => {
+    const vector = part("p", "Antwort", {
+      answer: {
+        exact: "vec(1, 1/2)",
+        kind: "vector",
+        elements: [
+          { exact: "1", checkRow: row("1") },
+          { exact: "1/2", checkRow: row("1/2") },
+        ],
+      },
+    });
+    expect(checkPart(vector, row("1; 1/2"), m)?.state).toBe("richtig");
+    expect(checkPart(vector, row("1; 3"), m)?.items).toEqual({
+      "0": "richtig",
+      "1": "nochNicht",
+    });
+    expect(checkPart(vector, row("1"), m)?.state).toBe("nochNicht");
+  });
+});
+
+describe("Graph: functions as terms in x", () => {
+  const graph = part("graph", "Graph", {
+    answers: [
+      { exact: "2x + 3", checkRow: row("2x + 3") },
+      { exact: "-x + 4", checkRow: row("-x + 4") },
+    ],
+  });
+  const enter = (...terms: string[]) =>
+    Object.fromEntries(terms.map((term, i) => [String(i), row(term)]));
+
+  test("equivalent writings are correct, per position", () => {
+    const own = checkPart(graph, enter("3 + 2x", "4 - x"), m);
+    expect(own?.state).toBe("richtig");
+    expect(own?.items).toEqual({ "0": "richtig", "1": "richtig" });
+  });
+  test("a wrong or swapped function is marked on its own field", () => {
+    const own = checkPart(graph, enter("2x + 3", "x + 4"), m);
+    expect(own?.state).toBe("nochNicht");
+    expect(own?.items).toEqual({ "0": "richtig", "1": "nochNicht" });
+    expect(checkPart(graph, enter("-x + 4", "2x + 3"), m)?.state).toBe(
+      "nochNicht",
+    );
+  });
+  test("an empty field is not yet right; nothing entered is no check", () => {
+    const own = checkPart(graph, enter("2x + 3"), m);
+    expect(own?.state).toBe("nochNicht");
+    expect(own?.message).toBe("free:1");
+    expect(checkPart(graph, {}, m)).toBeNull();
+  });
+  test("an unfinished entry is wrong", () => {
+    expect(checkPart(graph, enter("2x +", "4 - x"), m)?.state).toBe(
+      "nochNicht",
+    );
   });
 });

@@ -1,16 +1,30 @@
 import type { ReactNode } from "react";
 import { Choice } from "@chromatis/base/ui";
-import { Markdown } from "../../content";
+import { RichInlineContent, type RichInline } from "../../content-renderer";
 import type { CheckState } from "../domain/contract";
 import "./worksheets.css";
 
 const LETTERS = "ABCDEFGH";
 
+const inlineLength = (nodes: RichInline[]): number =>
+  nodes.reduce(
+    (sum, node) =>
+      sum +
+      ("value" in node
+        ? node.value.length
+        : "source" in node
+          ? node.source.length
+          : "children" in node
+            ? inlineLength(node.children)
+            : 0),
+    0,
+  );
+
 export interface AuswahlOptionsProps {
   /** Groups the inputs; unique per choice on the page. */
   name: string;
   legend: ReactNode;
-  options: { id: string; label: string }[];
+  options: { id: string; content: RichInline[] }[];
   /** false = exactly one option → radio buttons. */
   multiple: boolean;
   selected: string[];
@@ -35,9 +49,7 @@ export function AuswahlOptions({
   states,
   disabled = false,
 }: AuswahlOptionsProps) {
-  const short = options.every(
-    (option) => option.label.replace(/\$/g, "").length <= 14,
-  );
+  const short = options.every((option) => inlineLength(option.content) <= 14);
   const toggle = (id: string, on: boolean) =>
     onChange(
       multiple
@@ -71,7 +83,7 @@ export function AuswahlOptions({
           label={
             <>
               <span className="option__letter">{LETTERS[i]}</span>
-              <Markdown inline markdown={option.label} />
+              <RichInlineContent nodes={option.content} />
             </>
           }
         />

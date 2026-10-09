@@ -1,35 +1,33 @@
 import { createContext, useContext } from "react";
-import { Markdown } from "../../content";
-import type { TeacherQuizView } from "../../quiz";
+import { RichContent, RichInlineContent } from "../../content-renderer";
+import type { Quiz } from "../../catalog";
+import type { TeacherQuizView } from "../../classroom";
 import { fill } from "../../../helper/text";
-import type { FrameBlock } from "../domain/lesson";
 import TEXT from "./lessons.de.json";
 
 const LETTERS = "ABCDEFGH";
 
-/** The course's running quiz, for the frames on the stage and projector. */
+/** The course's running quiz, for the slides on the stage and projector. */
 export const LiveQuizContext = createContext<{
   view: TeacherQuizView | null;
   teacher: boolean;
 }>({ view: null, teacher: false });
 
-type QuizFrameBlock = Extract<FrameBlock, { type: "quiz" }>;
-
 /** Before the start: all questions side by side, as prepared. */
-function PreparedQuiz({ block }: { block: QuizFrameBlock }) {
+function PreparedQuiz({ quiz }: { quiz: Quiz }) {
   return (
     <div className="lf-quiz">
-      {block.questions.map((question, i) => (
-        <section key={i} className="lf-quiz__question">
+      {quiz.questions.map((question, i) => (
+        <section key={question.id} className="lf-quiz__question">
           <p className="lf-quiz__number">
             {fill(TEXT.frame.question, { number: i + 1 })}
           </p>
-          <Markdown markdown={question.prompt} className="lf-md" />
+          <RichContent nodes={question.prompt} className="lf-md" />
           <ol className="lf-quiz__options">
             {question.options.map((option, k) => (
               <li key={k}>
                 <span className="lf-quiz__letter">{LETTERS[k]}</span>
-                <Markdown inline markdown={option.label} />
+                <RichInlineContent nodes={option.content} />
               </li>
             ))}
           </ol>
@@ -64,8 +62,8 @@ function LiveQuestion({
           <span className="lf-live__kind">{TEXT.quiz.multiple}</span>
         )}
       </p>
-      <Markdown
-        markdown={view.question.prompt}
+      <RichContent
+        nodes={view.question.content}
         className="lf-md lf-live__prompt"
       />
       <ol className="lf-live__options">
@@ -75,7 +73,7 @@ function LiveQuestion({
           return (
             <li key={option.id} className={correct ? "is-correct" : undefined}>
               <span className="lf-quiz__letter">{LETTERS[i]}</span>
-              <Markdown inline markdown={option.label} />
+              <RichInlineContent nodes={option.content} />
               {teacher && !revealed && option.correct && (
                 <span className="lf-live__teacher-answer">Richtig</span>
               )}
@@ -114,18 +112,12 @@ function LiveQuestion({
   );
 }
 
-/** A quiz frame: prepared questions, or the live question while it runs. */
-export function QuizBlock({
-  block,
-  frameId,
-}: {
-  block: QuizFrameBlock;
-  frameId: string;
-}) {
+/** A quiz slide: prepared questions, or the live question while it runs. */
+export function QuizBlock({ quiz, slideId }: { quiz: Quiz; slideId: string }) {
   const { view, teacher } = useContext(LiveQuizContext);
-  return view && !view.ended && view.frameId === frameId ? (
+  return view && !view.ended && view.frameId === slideId ? (
     <LiveQuestion view={view} teacher={teacher} />
   ) : (
-    <PreparedQuiz block={block} />
+    <PreparedQuiz quiz={quiz} />
   );
 }

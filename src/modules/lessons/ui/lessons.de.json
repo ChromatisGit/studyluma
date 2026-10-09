@@ -5,22 +5,30 @@
     "sheet": "Arbeitsblatt",
     "sheetWaiting": "Gleich geht es auf deinem Gerät weiter.",
     "sheetSent": "Das Blatt ist auf deinem Gerät geöffnet.",
-    "question": "Frage {number}"
+    "question": "Frage {number}",
+    "kinds": {
+      "worksheet": "Arbeitsblatt",
+      "quiz": "Quiz",
+      "merkkarte": "Merkkarte",
+      "summary": "Inhalt"
+    },
+    "summaryLocked": "Für die Klasse noch gesperrt",
+    "summaryReleased": "Für die Klasse freigeschaltet"
   },
   "header": {
-    "position": "Stunde {lesson}, Frame {number} von {total}",
-    "branch": "Stunde {lesson}, Abzweig {label}",
+    "position": "Folie {number} von {total}",
+    "branch": "Freie Fläche {label}",
     "clock": "Unterricht",
     "clockTitle": "Unterrichtszeit und Abweichung vom Plan",
     "projector": "Projektor",
     "projectorShows": "zeigt {number}",
     "projectorHidden": "Ausgeblendet",
     "projectorHiddenSub": "leere Fläche",
-    "projectorAria": "Projektor zeigt Frame {number}. Ausblenden (B)",
+    "projectorAria": "Projektor zeigt Folie {number}. Ausblenden (B)",
     "projectorShowAria": "Projektor wieder einblenden (B)",
     "noProjector": "Kein Projektor",
     "openProjector": "Öffnen",
-    "overview": "Übersicht aller Frames (G)",
+    "overview": "Übersicht aller Folien (G)",
     "menu": "Weitere Einstellungen"
   },
   "menu": {
@@ -31,7 +39,7 @@
     "openProjector": "Projektorfenster öffnen",
     "closeProjector": "Projektorfenster schließen",
     "end": "Unterricht beenden",
-    "endConfirm": "Unterricht beenden? Tinte und Abzweige dieser Stunde werden archiviert, die nächste Stunde beginnt leer.",
+    "endConfirm": "Unterricht beenden? Tinte und freie Flächen dieser Stunde werden archiviert, die nächste Stunde beginnt leer.",
     "back": "Zum Kapitel"
   },
   "notes": {
@@ -41,14 +49,14 @@
     "showAnyway": "Trotzdem zeigen",
     "none": "Keine Notiz",
     "next": "Nächster:",
-    "nextAria": "Nächster Frame: {title}",
+    "nextAria": "Nächste Folie: {title}",
     "back": "Zurück zu {number}",
     "send": "Klasse zum Blatt schicken",
     "sent": "Klasse ist auf dem Blatt"
   },
   "stage": {
-    "previous": "Vorheriger Frame",
-    "next": "Nächster Frame",
+    "previous": "Vorherige Folie",
+    "next": "Nächste Folie",
     "hidden": "Projektor ausgeblendet",
     "hiddenHint": "Die Klasse sieht eine leere Fläche. B blendet wieder ein."
   },
@@ -58,7 +66,9 @@
     "close": "Schließen",
     "lesson": "Stunde {number}",
     "until": "bis {time}",
-    "frame": "Frame {number}: {title}"
+    "frame": "Folie {number}: {title}",
+    "included": "Eingebunden: {name}",
+    "own": "Dieser Foliensatz"
   },
   "tools": {
     "label": "Werkzeuge",
@@ -78,8 +88,8 @@
   },
   "start": {
     "teacher": "Unterricht",
-    "open": "Lesson Frames öffnen",
-    "description": "{count} Frames für die Plenumsphasen dieses Kapitels"
+    "open": "Folien öffnen",
+    "description": "{count} Folien"
   },
   "quiz": {
     "position": "Frage {number} von {total}",

@@ -4,7 +4,7 @@ import {
   isBox,
   type MathNode,
   type MathRow,
-} from "./mathNodes";
+} from "../../content-renderer";
 
 export type Cursor = { row: MathRow; i: number };
 

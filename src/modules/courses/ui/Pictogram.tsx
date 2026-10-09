@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { TopicIcon } from "../../catalog";
 
 /**
  * StudyLuma pictograms: one drawing standard so pictograms from different
@@ -244,15 +245,25 @@ export function hasPictogram(id: string | undefined): id is string {
 }
 
 export interface PictogramProps {
-  /** Gallery id, e.g. "trig". Unknown or missing ids show the fallback. */
+  /** A gallery id such as "trig". Unknown or missing ids show the fallback. */
   id?: string | undefined;
+  /** A topic's icon: a gallery id or the topic folder's own icon.svg. */
+  icon?: TopicIcon | undefined;
   /** Shown as an initial when there is no pictogram. */
   fallbackLabel?: string | undefined;
   className?: string;
 }
 
 /** A pictogram tile. Decorative: the text next to it carries the meaning. */
-export function Pictogram({ id, fallbackLabel, className }: PictogramProps) {
+export function Pictogram({
+  id: galleryId,
+  icon,
+  fallbackLabel,
+  className,
+}: PictogramProps) {
+  const id =
+    galleryId ?? (icon && "gallery" in icon ? icon.gallery : undefined);
+  const asset = icon && "assetId" in icon ? icon.assetId : undefined;
   return (
     <span
       className={["linie__tile", className].filter(Boolean).join(" ")}
@@ -269,6 +280,12 @@ export function Pictogram({ id, fallbackLabel, className }: PictogramProps) {
         >
           {gallery[id]}
         </svg>
+      ) : asset ? (
+        <img
+          className="linie__tile-image"
+          src={`/content/assets/${encodeURIComponent(asset)}`}
+          alt=""
+        />
       ) : (
         <span className="linie__tile-initial">
           {fallbackLabel?.trim().charAt(0).toUpperCase()}

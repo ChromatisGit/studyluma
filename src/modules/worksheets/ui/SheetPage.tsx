@@ -1,8 +1,15 @@
 import { useEffect } from "react";
 import { Check } from "lucide-react";
+import { RichContent } from "../../content-renderer";
 import { fill } from "../../../helper/text";
-import type { Section, Sheet } from "../domain/contract";
-import { fixedMode, isUnlocked, modeOf } from "../domain/structure";
+import type { Worksheet as Sheet, WorksheetSection } from "../../catalog";
+import {
+  fixedMode,
+  isUnlocked,
+  modeOf,
+  sheetNumber,
+  tasksOf,
+} from "../domain/structure";
 import { Ampel } from "./Ampel";
 import { AufgabeView } from "./AufgabeView";
 import { ModeChoice, ModeLine } from "./ModeChoice";
@@ -13,9 +20,15 @@ import { ReleasedNotice } from "./ReleasedNotice";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
 
-function SectionView({ sheet, section }: { sheet: Sheet; section: Section }) {
+function SectionView({
+  sheet,
+  section,
+}: {
+  sheet: Sheet;
+  section: WorksheetSection;
+}) {
   const { index } = useWorksheet();
-  const checkpoint = section.kind === "checkpoint";
+  const checkpoint = section.checkpoint;
   return (
     <section
       className={`ws-section${checkpoint ? " check" : ""}`}
@@ -31,12 +44,18 @@ function SectionView({ sheet, section }: { sheet: Sheet; section: Section }) {
           <p className="check__lead">{TEXT.checkpoint.lead}</p>
         </header>
       )}
-      {section.intro && (
-        <div className="ws-section__intro">{section.intro}</div>
-      )}
-      {section.aufgaben.map((aufgabe) => {
-        const info = index.aufgaben.get(aufgabe.id);
-        return info ? <AufgabeView key={aufgabe.id} info={info} /> : null;
+      {section.items.map((item, i) => {
+        if (item.type === "content") {
+          return (
+            <RichContent
+              key={i}
+              nodes={item.content}
+              className="ws-section__intro"
+            />
+          );
+        }
+        const info = index.aufgaben.get(item.task.id);
+        return info ? <AufgabeView key={item.task.id} info={info} /> : null;
       })}
       {checkpoint && <Ampel sheet={sheet} />}
     </section>
@@ -46,7 +65,7 @@ function SectionView({ sheet, section }: { sheet: Sheet; section: Section }) {
 /** A worksheet: head, tabs per section, tasks, checkpoint, recommendation. */
 export function SheetPage({ sheet }: { sheet: Sheet }) {
   const { chapter, state, store, teacher, ui, deactivate } = useWorksheet();
-  const unlocked = isUnlocked(sheet, state);
+  const unlocked = isUnlocked(chapter, sheet, state);
 
   useEffect(() => {
     if (unlocked && !teacher) {
@@ -56,7 +75,7 @@ export function SheetPage({ sheet }: { sheet: Sheet }) {
 
   const meta = fill(TEXT.sheet.meta, {
     chapter: chapter.number,
-    number: sheet.number,
+    number: sheetNumber(chapter, sheet),
   });
   if (!unlocked && !teacher) {
     return null;
@@ -72,7 +91,7 @@ export function SheetPage({ sheet }: { sheet: Sheet }) {
     store.setTab(sheet.id, id);
     window.scrollTo({ top: 0 });
   };
-  const aufgaben = sheet.sections.flatMap((s) => s.aufgaben);
+  const aufgaben = sheet.sections.flatMap(tasksOf);
   return (
     <>
       <SheetHeader

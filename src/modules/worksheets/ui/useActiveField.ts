@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import type { PartResponse } from "../domain/contract";
 import { MathEditor } from "../domain/editor";
-import { cloneRow } from "../domain/mathNodes";
+import { cloneRow } from "../../content-renderer";
 import type { ChapterIndex } from "../domain/structure";
 import { readField, type FieldRef } from "./fieldValues";
 
@@ -30,7 +30,9 @@ export function useActiveField(
           : {
               ref,
               editor: new MathEditor(
-                cloneRow(readField(entry.part, response(ref.partId), ref)),
+                cloneRow(
+                  readField(response(ref.partId), ref, entry.part.answerKind),
+                ),
               ),
             },
       );

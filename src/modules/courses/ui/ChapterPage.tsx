@@ -1,15 +1,16 @@
-import { useSyncExternalStore } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router";
+import { useRevalidator } from "react-router";
 import { Breadcrumbs, Page, PageHeader } from "@chromatis/base/ui";
-import { SummaryRenderer } from "../../content";
-import { summaryStore } from "../../teaching";
+import { SummaryContent } from "../../content-renderer";
+import type { Summary } from "../../catalog";
+import type { SheetsData } from "../../worksheets";
 import {
   chapterPath,
   coursePath,
   findChapter,
   neighbours,
 } from "../application/navigation";
-import { getSummary } from "../infrastructure/courseRepository";
 import type { Course } from "../domain/course";
 import { ChapterMaterials } from "./ChapterMaterials";
 import { Pictogram } from "./Pictogram";
@@ -18,22 +19,34 @@ import TEXT from "./courses.de.json";
 export interface ChapterPageProps {
   course: Course;
   chapterId: string;
+  /** The chapter's worksheets, as the reader may see them. */
+  sheets: SheetsData | undefined;
+  summary: Summary | undefined;
+  /** Whether the reader may read the summary yet. */
+  summaryVisible: boolean;
 }
 
 /** Full chapter resources, including the summary when it is available. */
-export function ChapterPage({ course, chapterId }: ChapterPageProps) {
+export function ChapterPage({
+  course,
+  chapterId,
+  sheets,
+  summary,
+  summaryVisible: visible,
+}: ChapterPageProps) {
+  const revalidator = useRevalidator();
   const chapter = findChapter(course, chapterId);
-  const access = summaryStore(chapterId);
-  const summary = useSyncExternalStore(
-    access.subscribe,
-    access.getSnapshot,
-    access.getServerSnapshot,
-  );
+  useEffect(() => {
+    if (visible) {
+      return;
+    }
+    const timer = window.setInterval(() => revalidator.revalidate(), 5000);
+    return () => window.clearInterval(timer);
+  }, [visible, revalidator]);
   if (!chapter) {
     return null;
   }
   const heading = `${chapter.number} ${chapter.title}`;
-  const markdown = getSummary(chapterId);
   const { previous, next } = neighbours(course, chapterId);
 
   return (
@@ -52,7 +65,7 @@ export function ChapterPage({ course, chapterId }: ChapterPageProps) {
       />
       <header className="kapitel-head">
         <Pictogram
-          id={chapter.topic.icon}
+          icon={chapter.topic.icon}
           fallbackLabel={chapter.topic.title}
         />
         <div className="kapitel-head__text">
@@ -63,18 +76,19 @@ export function ChapterPage({ course, chapterId }: ChapterPageProps) {
       <ChapterMaterials
         courseId={course.id}
         chapterId={chapterId}
+        chapter={sheets}
         availableOnly
       />
-      {markdown && summary.unlocked && (
+      {summary && visible && (
         <section
           className="content-section"
-          id="zusammenfassung"
+          id="inhalt"
           aria-labelledby="summary-title"
         >
           <h2 className="h2" id="summary-title">
-            Zusammenfassung
+            {summary.title}
           </h2>
-          <SummaryRenderer markdown={markdown} />
+          <SummaryContent summary={summary} />
         </section>
       )}
       {(previous || next) && (

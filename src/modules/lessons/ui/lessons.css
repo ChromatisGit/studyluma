@@ -20,22 +20,6 @@
   font-size: 28px;
   line-height: 1.4;
 }
-.lf[data-family="einstieg"] {
-  --lf-family: var(--frame-family-einstieg);
-  --lf-family-fg: var(--frame-family-einstieg-fg);
-}
-.lf[data-family="erarbeitung"] {
-  --lf-family: var(--frame-family-erarbeitung);
-}
-.lf[data-family="uebung"] {
-  --lf-family: var(--frame-family-uebung);
-}
-.lf[data-family="sicherung"] {
-  --lf-family: var(--frame-family-sicherung);
-}
-.lf[data-family="quiz"] {
-  --lf-family: var(--frame-family-quiz);
-}
 .lf math {
   font-family: "STIX Two Math", math;
 }
@@ -100,9 +84,6 @@
   line-height: 1.1;
   letter-spacing: -0.01em;
 }
-.lf__title--small {
-  font-size: calc(38px * var(--lf-scale));
-}
 .lf__blocks {
   flex: 1;
   min-height: 0;
@@ -164,93 +145,6 @@
   font-weight: 700;
 }
 
-/* Named areas side by side; empty ones are writing zones */
-.lf-areas {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  gap: 24px;
-}
-.lf-areas--named {
-  flex: 0 0 auto;
-  display: grid;
-  grid-auto-columns: minmax(0, 1fr);
-  grid-auto-flow: column;
-  gap: 28px;
-  margin-top: 14px;
-}
-.lf-area {
-  padding: 28px 32px;
-  border: 1.5px solid var(--frame-grid);
-  border-radius: 10px;
-  background: var(--frame-zone-bg);
-  font-size: calc(26px * var(--lf-scale));
-}
-.lf[data-family="sicherung"] .lf-area {
-  border: 3px solid var(--frame-family-sicherung);
-}
-.lf-area__title {
-  margin: 0 0 20px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: calc(30px * var(--lf-scale));
-  line-height: 1.15;
-}
-.lf-area .lf-md ul {
-  list-style: none;
-  padding: 0;
-}
-.lf-area .lf-md ul > li {
-  position: relative;
-  padding-left: 26px;
-}
-.lf-area .lf-md ul > li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--frame-family-sicherung);
-}
-.lf-area .lf-md ol li::marker {
-  font-weight: 700;
-}
-
-/* Overview list: "left → right" as two aligned columns */
-.lf-arrows {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr);
-  margin-top: 12px;
-  font-size: calc(30px * var(--lf-scale));
-  line-height: 1.3;
-}
-.lf-arrows__row {
-  display: contents;
-}
-.lf-arrows__row > * {
-  padding: 18px 0;
-  border-top: 1.5px solid var(--frame-grid);
-}
-.lf-arrows__row:last-child > * {
-  border-bottom: 1.5px solid var(--frame-grid);
-}
-.lf-arrows__arrow {
-  box-sizing: border-box;
-  align-self: stretch;
-  width: 40px;
-  height: auto;
-  fill: none;
-  stroke: var(--frame-family-sicherung);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.lf-arrows__right {
-  font-weight: 500;
-}
-
 /* Columns: an image column gets two thirds */
 .lf__columns {
   flex: 1;
@@ -272,45 +166,6 @@
   border: 1.5px solid var(--frame-grid);
   border-radius: 10px;
   background: var(--frame-zone-bg);
-}
-.lf__bleed {
-  display: grid;
-  height: 100%;
-}
-/* With a full-bleed image, the footer starts in the text column */
-.lf[data-bleed] .lf__foot {
-  left: calc(1280px * 2 / 3 + 44px);
-}
-.lf__bleed-image .lf-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.lf__bleed-text {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-height: 0;
-  padding: 76px 44px 64px;
-  font-size: calc(22px * var(--lf-scale));
-}
-.lf__bleed-text .lf-md .math-block math {
-  font-size: calc(28px * var(--lf-scale));
-}
-.lf__bleed-text .lf-zone {
-  margin-top: 4px;
-}
-
-/* Focus: little content, large and centered */
-.lf__body--fokus .lf__blocks {
-  align-items: center;
-  justify-content: center;
-}
-.lf__body--fokus .lf-md {
-  font-size: calc(40px * var(--lf-scale));
-  text-align: center;
 }
 
 /* Merksatz: the Merkkarte large in a violet box; the card carries the title */
@@ -1295,4 +1150,63 @@
   color: var(--color-status-success);
   font-size: 0.8rem;
   font-weight: 700;
+}
+
+/* Images of the author's slides: `![]` stays whole, `!![]` fills its place */
+.lf .lf-md img {
+  max-width: 100%;
+}
+.lf .lf-md .rich-img--contain {
+  max-height: 100%;
+}
+.lf .lf-md:has(.rich-img--cover) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.lf .lf-md:has(.rich-img--cover) > p {
+  margin: 0;
+}
+.lf .lf-md > p:has(> .rich-img--cover) {
+  flex: 1;
+  min-height: 0;
+}
+.lf .rich-img--cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.lf__fill {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.lf__fill > .lf-md {
+  flex: 1;
+}
+.lf__column-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: calc(36px * var(--lf-scale));
+  line-height: 1.15;
+}
+.lf__center--stack {
+  flex-direction: column;
+  gap: 24px;
+}
+.lf-summary {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 12px;
+}
+.lf-merkkarte__example {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1.5px solid #e6dcf1;
+  font-size: 30px;
 }

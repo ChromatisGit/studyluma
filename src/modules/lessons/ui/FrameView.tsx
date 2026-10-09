@@ -1,18 +1,14 @@
+import { useLayoutEffect, useRef, type ReactNode } from "react";
+import { slideLayout, type OrderEntry } from "../domain/layout";
+import type { Slide } from "../domain/deck";
 import {
-  useLayoutEffect,
-  useRef,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
-import {
-  bleedsImage,
-  columnWidths,
-  frameLayout,
-  hasWritingSpace,
-  type OrderEntry,
-} from "../domain/layout";
-import type { LessonFrame } from "../domain/lesson";
-import { FrameBlockView, WritingZone } from "./FrameBlocks";
+  InhaltView,
+  MerkkarteCard,
+  QuizBlock,
+  SegmentsView,
+  SheetCard,
+} from "./FrameBlocks";
+import TEXT from "./lessons.de.json";
 
 /**
  * Content shrinks until it fits, down to a minimum size that stays
@@ -37,126 +33,58 @@ function useFitText(deps: unknown[]) {
 }
 
 function Chrome({
-  frame,
-  lessonTitle,
+  slide,
+  deckTitle,
   children,
 }: {
-  frame: LessonFrame;
-  lessonTitle: string;
+  slide: Slide;
+  deckTitle: string;
   children: ReactNode;
 }) {
+  const kind =
+    slide.kind === "slide" ? undefined : TEXT.frame.kinds[slide.kind];
   return (
     <>
-      {frame.marking && (
+      {kind && (
         <>
           <div className="lf__bar" />
-          <div className="lf__tab">{frame.marking}</div>
+          <div className="lf__tab">{kind}</div>
         </>
       )}
       {children}
       <div className="lf__foot">
-        <span>{lessonTitle}</span>
-        <span className="lf__number">{frame.number}</span>
+        <span>{deckTitle}</span>
+        <span className="lf__number">{slide.number}</span>
       </div>
     </>
   );
 }
 
-function Columns({ frame, sent }: { frame: LessonFrame; sent: boolean }) {
-  const columns = frame.columns ?? [];
-  const bleed = bleedsImage(frame);
-  const fit = useFitText([frame.id]);
-  if (bleed) {
-    const [image, ...rest] = columns;
+function Body({ slide, sent }: { slide: Slide; sent: boolean }) {
+  const layout = slideLayout(slide);
+  const fit = useFitText([slide.id]);
+  if (layout === "merkkarte" && slide.merkkarte) {
     return (
-      <div
-        className="lf__bleed"
-        style={{ gridTemplateColumns: columnWidths(columns) } as CSSProperties}
-      >
-        <div className="lf__bleed-image">
-          {image?.map((block, i) => (
-            <FrameBlockView
-              key={i}
-              block={block}
-              sent={sent}
-              frameId={frame.id}
-            />
-          ))}
-        </div>
-        <div className="lf__bleed-text" ref={fit}>
-          <h1 className="lf__title lf__title--small">{frame.title}</h1>
-          {rest.flat().map((block, i) => (
-            <FrameBlockView
-              key={i}
-              block={block}
-              sent={sent}
-              frameId={frame.id}
-            />
-          ))}
-          <WritingZone />
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="lf__body" ref={fit}>
-      <h1 className="lf__title">{frame.title}</h1>
-      <div
-        className="lf__columns"
-        style={{ gridTemplateColumns: columnWidths(columns) }}
-      >
-        {columns.map((column, c) => (
-          <div key={c} className="lf__column">
-            {column.map((block, i) => (
-              <FrameBlockView
-                key={i}
-                block={block}
-                sent={sent}
-                frameId={frame.id}
-              />
-            ))}
-            {!column.some((block) => block.type === "image") && <WritingZone />}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Body({ frame, sent }: { frame: LessonFrame; sent: boolean }) {
-  const layout = frameLayout(frame);
-  const blocks = frame.blocks ?? [];
-  const fit = useFitText([frame.id]);
-  if (layout === "spalten" && frame.columns) {
-    return <Columns frame={frame} sent={sent} />;
-  }
-  if (layout === "merkkarte") {
-    return (
-      <div className="lf__center">
-        {blocks.map((block, i) => (
-          <FrameBlockView
-            key={i}
-            block={block}
-            sent={sent}
-            frameId={frame.id}
-          />
-        ))}
+      <div className="lf__center lf__center--stack" ref={fit}>
+        <MerkkarteCard card={slide.merkkarte} />
+        <SegmentsView segments={slide.segments} />
       </div>
     );
   }
   return (
     <div className={`lf__body lf__body--${layout}`} ref={fit}>
-      <h1 className="lf__title">{frame.title}</h1>
+      <h1 className="lf__title">
+        {layout === "summary"
+          ? `${TEXT.frame.kinds.summary}: ${slide.title}`
+          : slide.title}
+      </h1>
       <div className="lf__blocks">
-        {blocks.map((block, i) => (
-          <FrameBlockView
-            key={i}
-            block={block}
-            sent={sent}
-            frameId={frame.id}
-          />
-        ))}
-        {hasWritingSpace(frame) && <WritingZone />}
+        {layout === "sheet" && <SheetCard slide={slide} sent={sent} />}
+        {layout === "quiz" && slide.quiz && (
+          <QuizBlock quiz={slide.quiz} slideId={slide.id} />
+        )}
+        {layout === "summary" && <InhaltView slide={slide} />}
+        <SegmentsView segments={slide.segments} />
       </div>
     </div>
   );
@@ -164,18 +92,18 @@ function Body({ frame, sent }: { frame: LessonFrame; sent: boolean }) {
 
 export interface FrameViewProps {
   entry: OrderEntry;
-  lessonTitle: string;
+  deckTitle: string;
   sent?: boolean;
   children?: ReactNode;
 }
 
 /**
- * One frame on the logical 1280 × 720 surface. The same component renders
+ * One slide on the logical 1280 × 720 surface. The same component renders
  * the stage, the overview thumbnails and the projector.
  */
 export function FrameView({
   entry,
-  lessonTitle,
+  deckTitle,
   sent = false,
   children,
 }: FrameViewProps) {
@@ -187,20 +115,11 @@ export function FrameView({
       </div>
     );
   }
-  const { frame } = entry;
-  const layout = frameLayout(frame);
+  const { slide } = entry;
   return (
-    <div
-      className={`lf lf--${layout}`}
-      data-family={frame.family}
-      data-bleed={bleedsImage(frame) ? "" : undefined}
-    >
-      <Chrome frame={frame} lessonTitle={lessonTitle}>
-        {layout === "flaeche" ? (
-          <WritingZone />
-        ) : (
-          <Body frame={frame} sent={sent} />
-        )}
+    <div className={`lf lf--${slideLayout(slide)}`}>
+      <Chrome slide={slide} deckTitle={deckTitle}>
+        <Body slide={slide} sent={sent} />
       </Chrome>
       {children}
     </div>

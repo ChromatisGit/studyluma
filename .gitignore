@@ -4,3 +4,7 @@
 .DS_Store
 .env*
 *.tsbuildinfo
+/react-router.config.ts
+/.chromatis/*
+!/.chromatis/runtime-migrations.json
+/.wrangler/

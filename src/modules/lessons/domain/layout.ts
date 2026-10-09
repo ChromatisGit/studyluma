@@ -1,96 +1,74 @@
-import type { Blank, FrameBlock, Lesson, LessonFrame } from "./lesson";
-
-export type FrameLayout =
-  "standard" | "fokus" | "spalten" | "flaeche" | "quiz" | "merkkarte";
-
-const blocksOf = (frame: LessonFrame): FrameBlock[] =>
-  frame.blocks ?? frame.columns?.flat() ?? [];
-
-const textLength = (block: FrameBlock) =>
-  block.type === "markdown" ? block.markdown.length : 0;
+import type { SlideSegment } from "../../catalog";
+import type { Deck, Slide } from "./deck";
+import type { Blank } from "./lesson";
 
 /**
- * The order in Markdown is the order on the frame; the system only picks
- * sizes. Focus and blank surface are the only automatic layouts.
+ * The order in the Markdown is the order on the slide. Beyond that only
+ * the kind of entry decides how a slide is built.
  */
-export function frameLayout(frame: LessonFrame): FrameLayout {
-  const blocks = blocksOf(frame);
-  if (!blocks.length) {
-    return "flaeche";
-  }
-  if (frame.columns?.length) {
-    return "spalten";
-  }
-  if (blocks.some((block) => block.type === "quiz")) {
-    return "quiz";
-  }
-  if (blocks.length === 1 && blocks[0]?.type === "merkkarte") {
-    return "merkkarte";
-  }
-  if (
-    blocks.some(
-      (block) =>
-        block.type === "areas" && block.areas.some((area) => area.markdown),
-    )
-  ) {
-    return "spalten";
-  }
-  const little =
-    blocks.length === 1 &&
-    (blocks[0]?.type === "sheet" ||
-      (blocks[0]?.type === "markdown" &&
-        textLength(blocks[0]) < 120 &&
-        !blocks[0].markdown.includes("$ ")));
-  return little ? "fokus" : "standard";
+export type SlideLayout = "slide" | "sheet" | "quiz" | "merkkarte" | "summary";
+
+export const slideLayout = (slide: Slide): SlideLayout =>
+  slide.kind === "slide"
+    ? "slide"
+    : slide.kind === "worksheet"
+      ? "sheet"
+      : slide.kind;
+
+/** The columns of a slide share the width the author chose. */
+export function columnWidths(
+  columns: Extract<SlideSegment, { type: "columns" }>["columns"],
+): string {
+  return columns.map((column) => `${column.width}fr`).join(" ");
 }
 
-/** A column with an image gets two thirds; otherwise both are equal. */
-export function columnWidths(columns: FrameBlock[][]): string {
-  const image = columns.findIndex((column) =>
-    column.some((block) => block.type === "image"),
-  );
-  if (image < 0 || columns.length !== 2) {
-    return `repeat(${columns.length}, minmax(0, 1fr))`;
-  }
-  return image === 0 ? "2fr 1fr" : "1fr 2fr";
-}
-
-/** Where a standard frame keeps free space to write below its content. */
-export function hasWritingSpace(frame: LessonFrame): boolean {
-  const layout = frameLayout(frame);
-  if (layout !== "standard") {
-    return false;
-  }
-  const blocks = blocksOf(frame);
-  return !blocks.some(
-    (block) => block.type === "areas" || block.type === "arrows",
-  );
-}
-
-/** An entry in the running order: a planned frame or a blank surface. */
+/** An entry in the running order: a planned slide or a blank surface. */
 export type OrderEntry =
-  | { kind: "frame"; frame: LessonFrame }
-  | { kind: "blank"; blank: Blank; parent: LessonFrame; label: string };
+  | { kind: "slide"; slide: Slide }
+  | { kind: "blank"; blank: Blank; parent: Slide; label: string };
 
-/** The frames in order with blank surfaces right after their frame. */
-export function runningOrder(lesson: Lesson, blanks: Blank[]): OrderEntry[] {
-  return lesson.frames.flatMap((frame): OrderEntry[] => {
-    const own = blanks.filter((blank) => blank.afterFrameId === frame.id);
+/** The slides in order with blank surfaces right after their slide. */
+export function runningOrder(deck: Deck, blanks: Blank[]): OrderEntry[] {
+  return deck.slides.flatMap((slide): OrderEntry[] => {
+    const own = blanks.filter((blank) => blank.afterFrameId === slide.id);
     return [
-      { kind: "frame", frame },
+      { kind: "slide", slide },
       ...own.map((blank, i): OrderEntry => ({
         kind: "blank",
         blank,
-        parent: frame,
-        label: `${frame.number}${String.fromCharCode(97 + i)}`,
+        parent: slide,
+        label: `${slide.number}${String.fromCharCode(97 + i)}`,
       })),
     ];
   });
 }
 
 export const entryId = (entry: OrderEntry) =>
-  entry.kind === "frame" ? entry.frame.id : entry.blank.id;
+  entry.kind === "slide" ? entry.slide.id : entry.blank.id;
 
-/** An opening image fills its two thirds from edge to edge. */
-export const bleedsImage = (frame: LessonFrame) =>
-  frame.family === "einstieg" && frame.columns?.[0]?.[0]?.type === "image";
+export const entrySlide = (entry: OrderEntry) =>
+  entry.kind === "slide" ? entry.slide : entry.parent;
+
+/** The segment that is only a full-bleed image fills its place on the slide. */
+export function isFill(segment: SlideSegment): boolean {
+  if (segment.type !== "content") {
+    return false;
+  }
+  const nodes = segment.content;
+  return (
+    nodes.length > 0 &&
+    nodes.every(
+      (node) =>
+        node.type === "paragraph" &&
+        node.children.length > 0 &&
+        node.children.every(
+          (child) =>
+            child.type === "image" ||
+            (child.type === "text" && !child.value.trim()),
+        ) &&
+        node.children.some(
+          (child) => child.type === "image" && child.fit === "cover",
+        ),
+    )
+  );
+}

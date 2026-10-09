@@ -1,0 +1,9 @@
+name = "studyluma"
+publicUrl = "https://holst.studyluma.org"
+target = "cloudflare"
+postgresql = false
+runtime = ["classroom"]
+serverHook = "server/hook.ts"
+
+[contentMounts]
+catalog = "../studyluma-content/.generated/studyluma/v1/9eb7987dc6e8e08a8caa0ac1e3b24dce141392817daa71490bc87a1339dd0a0e"

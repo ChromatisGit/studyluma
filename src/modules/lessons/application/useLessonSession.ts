@@ -6,7 +6,8 @@ import {
   useState,
 } from "react";
 import { lessonStart, type Period } from "../domain/clock";
-import type { Lesson, LessonSession } from "../domain/lesson";
+import type { Deck } from "../domain/deck";
+import type { LessonSession } from "../domain/lesson";
 import {
   newSession,
   reduceSession,
@@ -51,7 +52,7 @@ export function useLessonClock(
 // Session lifecycle, projector feed and clock belong to one hook.
 // eslint-disable-next-line max-lines-per-function
 export function useLessonSession(
-  lesson: Lesson,
+  deck: Deck,
   periods: Period[],
   initialFrameId?: string,
 ) {
@@ -69,15 +70,15 @@ export function useLessonSession(
 
   useEffect(() => {
     const opened = Date.now();
-    const saved = loadSession(lesson.chapterId);
-    const fresh = newSession(lesson, opened, `s${opened.toString(36)}`);
+    const saved = loadSession(deck.id);
+    const fresh = newSession(deck, opened, `s${opened.toString(36)}`);
     const reusable =
-      saved && lesson.frames.some((frame) => frame.id === saved.currentFrameId)
+      saved && deck.slides.some((slide) => slide.id === saved.currentFrameId)
         ? saved
         : null;
     if (
       initialFrameId &&
-      lesson.frames.some((frame) => frame.id === initialFrameId)
+      deck.slides.some((slide) => slide.id === initialFrameId)
     ) {
       fresh.currentFrameId = initialFrameId;
     }
@@ -87,7 +88,7 @@ export function useLessonSession(
         : (reusable ?? fresh),
     );
     channel.current = openProjectorChannel(
-      lesson.chapterId,
+      deck.id,
       (message: ProjectorMessage) => {
         if (message.type === "hello" || message.type === "ping") {
           projectorSeen.current = Date.now();
@@ -110,7 +111,7 @@ export function useLessonSession(
       clearInterval(heartbeat);
       channel.current?.close();
     };
-  }, [lesson, initialFrameId]);
+  }, [deck, initialFrameId]);
 
   const dispatch = useCallback(
     (action: DistributiveOmit<SessionAction, "now">) => {
@@ -118,7 +119,7 @@ export function useLessonSession(
       if (!previous) {
         return;
       }
-      const next = reduceSession(lesson, previous, {
+      const next = reduceSession(deck, previous, {
         ...action,
         now: seconds.current,
       } as SessionAction);
@@ -130,30 +131,35 @@ export function useLessonSession(
       saveSession(next);
       channel.current?.send({ type: "state", session: next });
     },
-    [lesson],
+    [deck],
   );
 
   const sendLaser = useCallback((point: [number, number] | null) => {
     channel.current?.send({ type: "laser", point });
   }, []);
 
-  /** Ends the lesson; the next session starts empty at the first frame. */
+  const sendScroll = useCallback((slideId: string, ratio: number) => {
+    channel.current?.send({ type: "scroll", slideId, ratio });
+  }, []);
+
+  /** Ends the lesson; the next session starts empty at the first slide. */
   const endLesson = useCallback(() => {
     if (current.current) {
       archiveSession(current.current);
     }
     const opened = Date.now();
-    const fresh = newSession(lesson, opened, `s${opened.toString(36)}`);
+    const fresh = newSession(deck, opened, `s${opened.toString(36)}`);
     current.current = fresh;
     setSession(fresh);
     saveSession(fresh);
     // Keep the last image in the projector window until it is closed.
-  }, [lesson]);
+  }, [deck]);
 
   return {
     session,
     dispatch,
     sendLaser,
+    sendScroll,
     endLesson,
     clock,
     projectorConnected,
@@ -161,18 +167,24 @@ export function useLessonSession(
 }
 
 /** The projector window's side: it asks for the state and follows it. */
-export function useProjectorFeed(chapterId: string) {
+export function useProjectorFeed(presentationId: string) {
   const [session, setSession] = useState<LessonSession | null>(null);
   const [laser, setLaser] = useState<[number, number] | null>(null);
+  const [scroll, setScroll] = useState<{
+    slideId: string;
+    ratio: number;
+  } | null>(null);
   useEffect(() => {
-    const link = openProjectorChannel(chapterId, (message) => {
+    const link = openProjectorChannel(presentationId, (message) => {
       if (message.type === "state") {
         setSession(message.session);
       } else if (message.type === "laser") {
         setLaser(message.point);
+      } else if (message.type === "scroll") {
+        setScroll({ slideId: message.slideId, ratio: message.ratio });
       }
     });
-    setSession(loadSession(chapterId) ?? null);
+    setSession(loadSession(presentationId) ?? null);
     link?.send({ type: "hello" });
     const ping = setInterval(() => link?.send({ type: "ping" }), 2000);
     const bye = () => link?.send({ type: "bye" });
@@ -183,6 +195,6 @@ export function useProjectorFeed(chapterId: string) {
       bye();
       link?.close();
     };
-  }, [chapterId]);
-  return { session, laser };
+  }, [presentationId]);
+  return { session, laser, scroll };
 }

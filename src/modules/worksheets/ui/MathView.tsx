@@ -1,7 +1,7 @@
 import type { MouseEvent, ReactNode } from "react";
 import type { CheckState } from "../domain/contract";
 import type { Cursor } from "../domain/editor";
-import type { MathNode, MathRow } from "../domain/mathNodes";
+import type { MathNode, MathRow } from "../../content-renderer";
 
 type Place = (row: MathRow, i: number) => void;
 

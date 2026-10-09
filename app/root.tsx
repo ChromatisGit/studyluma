@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { LoaderFunctionArgs } from "react-router";
 import {
   isRouteErrorResponse,
   Links,
@@ -6,15 +7,19 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "react-router";
+import { loadSite } from "./site.server";
+import { SiteProvider } from "../src/modules/classroom";
 import { colorModeInitScript, EmptyState, Page } from "@chromatis/base/ui";
 import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/700.css";
 import "@fontsource-variable/fraunces/wght.css";
 import "@fontsource-variable/fraunces/wght-italic.css";
 import "./app.css";
-import { studyColorModeKey } from "./StudyShell";
 import TEXT from "./app.de.json";
+
+const studyColorModeKey = "studyluma:color-mode";
 
 export function meta() {
   return [
@@ -50,8 +55,17 @@ export function Layout({ children }: { children: ReactNode }) {
   );
 }
 
+export async function loader({ request }: LoaderFunctionArgs) {
+  return await loadSite(request);
+}
+
 export default function App() {
-  return <Outlet />;
+  const site = useLoaderData<typeof loader>();
+  return (
+    <SiteProvider site={site}>
+      <Outlet />
+    </SiteProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: { error: unknown }) {
@@ -65,6 +79,7 @@ export function ErrorBoundary({ error }: { error: unknown }) {
         description={
           details ?? (notFound ? TEXT.errors.notFound : TEXT.errors.generic)
         }
+        nextStep={notFound ? TEXT.errors.notFoundNext : TEXT.errors.genericNext}
         actions={<a href="/">{TEXT.errors.home}</a>}
       />
     </Page>

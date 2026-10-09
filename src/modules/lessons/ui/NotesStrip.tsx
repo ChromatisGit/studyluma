@@ -1,6 +1,10 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Check, ChevronDown, ChevronRight, EyeOff, Undo2 } from "lucide-react";
-import { Markdown } from "../../content";
+import {
+  RichContent,
+  walkInlines,
+  type RichNode,
+} from "../../content-renderer";
 import { fill } from "../../../helper/text";
 import { QuizActions, type QuizActionsProps } from "./QuizActions";
 import TEXT from "./lessons.de.json";
@@ -8,7 +12,8 @@ import TEXT from "./lessons.de.json";
 export interface NotesStripProps {
   number: string;
   heading?: string | undefined;
-  notes?: string | undefined;
+  /** The private notes of the slide. */
+  notes: RichNode[];
   /** Notes only open while a projector window is connected, or on request. */
   visible: boolean;
   onShowAnyway: () => void;
@@ -23,12 +28,22 @@ export interface NotesStripProps {
   actions?: ReactNode;
 }
 
+function notePreview(nodes: RichNode[]): string {
+  const words: string[] = [];
+  walkInlines(nodes, (inline) => {
+    if (inline.type === "text") {
+      words.push(inline.value);
+    } else if (inline.type === "math") {
+      words.push(inline.source);
+    }
+  });
+  return words.join(" ").trim();
+}
+
 /**
  * One line above the stage: the frame's note, its action and "Nächster".
  * Opened, the same strip grows down over the stage with the whole note.
  */
-// The strip keeps its notes, actions and navigation in one row.
-// eslint-disable-next-line max-lines-per-function
 export function NotesStrip(props: NotesStripProps) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -38,16 +53,9 @@ export function NotesStrip(props: NotesStripProps) {
   }, [props.visible]);
   const expanded = open && props.visible;
   const preview = props.visible
-    ? (props.notes ?? TEXT.notes.none)
-        .split("\n")
-        .map((line) =>
-          line
-            .replace(/^- /, "")
-            .replace(/\$|\*\*|==/g, "")
-            .trim(),
-        )
-        .filter(Boolean)
-        .join(" · ")
+    ? props.notes.length
+      ? notePreview(props.notes)
+      : TEXT.notes.none
     : TEXT.notes.protected;
   return (
     <div className={`lt-notes${expanded ? " is-open" : ""}`}>
@@ -122,10 +130,11 @@ export function NotesStrip(props: NotesStripProps) {
       </div>
       {expanded && (
         <div className="lt-notes__body">
-          <Markdown
-            markdown={props.notes ?? TEXT.notes.none}
-            className="lt-notes__text"
-          />
+          {props.notes.length ? (
+            <RichContent nodes={props.notes} className="lt-notes__text" />
+          ) : (
+            <p className="lt-notes__text">{TEXT.notes.none}</p>
+          )}
         </div>
       )}
     </div>

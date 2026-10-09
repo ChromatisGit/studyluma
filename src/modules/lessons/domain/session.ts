@@ -1,5 +1,6 @@
 import { entryId, runningOrder } from "./layout";
-import type { InkStroke, Lesson, LessonSession } from "./lesson";
+import type { Deck } from "./deck";
+import type { InkStroke, LessonSession } from "./lesson";
 
 export type SessionAction =
   | { type: "go"; frameId: string; now: number }
@@ -13,15 +14,16 @@ export type SessionAction =
   | { type: "send"; frameId: string };
 
 export function newSession(
-  lesson: Lesson,
+  deck: Deck,
   openedAt: number,
   id: string,
 ): LessonSession {
   return {
     id,
-    chapterId: lesson.chapterId,
+    chapterId: deck.chapterId,
+    presentationId: deck.id,
     openedAt,
-    currentFrameId: lesson.frames[0]?.id ?? "",
+    currentFrameId: deck.slides[0]?.id ?? "",
     enteredAt: 0,
     blanks: [],
     ink: [],
@@ -41,11 +43,11 @@ const enter = (
 
 /** What happens to a session; ink belongs to the session, never to the chapter. */
 export function reduceSession(
-  lesson: Lesson,
+  deck: Deck,
   session: LessonSession,
   action: SessionAction,
 ): LessonSession {
-  const order = runningOrder(lesson, session.blanks);
+  const order = runningOrder(deck, session.blanks);
   const index = order.findIndex(
     (entry) => entryId(entry) === session.currentFrameId,
   );
@@ -62,7 +64,7 @@ export function reduceSession(
     case "addBlank": {
       // A blank hangs after the frame it branches from; from a blank, after its parent.
       const parent =
-        current?.kind === "blank" ? current.parent : current?.frame;
+        current?.kind === "blank" ? current.parent : current?.slide;
       if (!parent) {
         return session;
       }

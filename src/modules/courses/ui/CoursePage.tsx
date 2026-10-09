@@ -10,7 +10,6 @@ import {
   courseStructurePath,
 } from "../application/navigation";
 import type { Course, Topic } from "../domain/course";
-import { CurrentLesson } from "./CurrentLesson";
 import { Lernweg, type LernwegPhase, type LernwegTopic } from "./Lernweg";
 import TEXT from "./courses.de.json";
 
@@ -51,6 +50,8 @@ function lernwegPhases(course: Course): LernwegPhase[] {
 export interface CoursePageProps {
   course: Course;
   teacher?: boolean;
+  /** Where the class is right now, shown above the Lernweg. */
+  currentLesson?: ReactNode;
   teachingControls?: ReactNode;
   structureControls?: ReactNode;
   contents?: ReactNode;
@@ -64,6 +65,7 @@ type CourseTab = "overview" | "course-structure" | "content" | "student";
 export function CoursePage({
   course,
   teacher = false,
+  currentLesson,
   teachingControls,
   structureControls,
   contents,
@@ -78,7 +80,7 @@ export function CoursePage({
   }[activeTab];
   const studentView = (
     <>
-      <CurrentLesson course={course} />
+      {currentLesson}
       <section className="stack stack-300" aria-labelledby="lernweg-title">
         <h2 id="lernweg-title" className="h2">
           {TEXT.lernweg.heading}

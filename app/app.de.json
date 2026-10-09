@@ -27,6 +27,8 @@
     "notFound": "Diese Seite gibt es nicht oder nicht mehr.",
     "title": "Fehler",
     "generic": "Ein unerwarteter Fehler ist aufgetreten.",
-    "home": "Zur Startseite"
+    "home": "Zur Startseite",
+    "notFoundNext": "Prüfe die Adresse oder gehe zur Startseite.",
+    "genericNext": "Versuche es noch einmal oder gehe zur Startseite."
   }
 }

@@ -1,12 +1,13 @@
 import { useSyncExternalStore } from "react";
-import { Badge, Card, CardBody, CardLink } from "@chromatis/base/ui";
-import type { ViewerRole } from "../../viewer";
-import type { Chapter } from "../domain/contract";
+import { ActionCard, Badge, Card, CardBody } from "@chromatis/base/ui";
 import {
   isUnlocked,
   openChallenges,
   sheetDone,
+  sheetNumber,
   sheetStarted,
+  type SheetsData,
+  type Viewer,
 } from "../domain/structure";
 import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./useWorksheetController";
@@ -19,8 +20,8 @@ export function SheetCards({
   links,
   availableOnly = false,
 }: {
-  chapter: Chapter;
-  viewer: ViewerRole;
+  chapter: SheetsData;
+  viewer: Viewer;
   links: WorksheetLinks;
   availableOnly?: boolean;
 }) {
@@ -35,10 +36,10 @@ export function SheetCards({
   return (
     <div className="kapitel-blaetter">
       {chapter.sheets
-        .filter((sheet) => !availableOnly || isUnlocked(sheet, state))
+        .filter((sheet) => !availableOnly || isUnlocked(chapter, sheet, state))
         .map((sheet) => {
-          const title = `${sheet.number}) ${sheet.title}`;
-          const unlocked = isUnlocked(sheet, state);
+          const title = `${sheetNumber(chapter, sheet)}) ${sheet.title}`;
+          const unlocked = isUnlocked(chapter, sheet, state);
           const badge = !unlocked ? (
             <Badge status="neutral">{TEXT.cards.locked}</Badge>
           ) : sheetDone(sheet, state) ? (
@@ -48,40 +49,38 @@ export function SheetCards({
           ) : !teacher && !state.seen[sheet.id] ? (
             <Badge status="info">{TEXT.cards.new}</Badge>
           ) : null;
-          return (
-            <Card
+          const body = (
+            <CardBody>
+              <strong className="card__title">{title}</strong>
+              {badge && <span className="kapitel-blatt__status">{badge}</span>}
+            </CardBody>
+          );
+          // Locked sheets are only a link for the teacher, who may open them.
+          return !unlocked && !teacher ? (
+            <Card key={sheet.id} surface="subtle">
+              {body}
+            </Card>
+          ) : (
+            <ActionCard
               key={sheet.id}
-              kind={unlocked ? "action" : "content"}
+              to={links.sheet(sheet.id)}
               {...(!unlocked ? { surface: "subtle" as const } : {})}
             >
-              <CardBody>
-                {!unlocked && !teacher ? (
-                  <strong className="card__title">{title}</strong>
-                ) : (
-                  <CardLink className="card__title" to={links.sheet(sheet.id)}>
-                    {title}
-                  </CardLink>
-                )}
-                {badge && (
-                  <span className="kapitel-blatt__status">{badge}</span>
-                )}
-              </CardBody>
-            </Card>
+              {body}
+            </ActionCard>
           );
         })}
       {open > 0 && (
-        <Card kind="action">
+        <ActionCard to={links.challenges}>
           <CardBody>
-            <CardLink className="card__title" to={links.challenges}>
-              Challenges
-            </CardLink>
+            <strong className="card__title">Challenges</strong>
             <span className="kapitel-blatt__status">
               <Badge status="info">
                 {open} von {chapter.challenges.length} verfügbar
               </Badge>
             </span>
           </CardBody>
-        </Card>
+        </ActionCard>
       )}
     </div>
   );

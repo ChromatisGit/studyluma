@@ -1,39 +1,33 @@
 import { useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@chromatis/base/ui";
-import { Markdown } from "../../content";
-import type { Aufgabe, Part } from "../domain/contract";
+import { RichContent, RichInlineContent } from "../../content-renderer";
+import type { Task, TaskPart } from "../../catalog";
+import { solutionParts, tasksOf, type AufgabeInfo } from "../domain/structure";
 import { useWorksheet } from "./WorksheetContext";
 import type { CurrentView } from "./ChapterNav";
 import { refLabel, TEXT } from "./texts";
 
 const LETTERS = "ABCDEFGH";
 
-function Prompt({ part }: { part: Part }) {
-  const task = part.task;
-  if (task.type === "lueckentext") {
-    return (
-      <Markdown
-        markdown={task.body}
+function Prompt({ part }: { part: TaskPart }) {
+  return (
+    <>
+      <RichContent
+        nodes={part.content}
         renderGap={() => <span className="pult__gap" />}
       />
-    );
-  }
-  if (task.type === "auswahl") {
-    return (
-      <>
-        <Markdown markdown={task.prompt} />
+      {part.type === "Auswahl" && (
         <p className="pult__opts">
-          {task.options.map((option, i) => (
-            <span key={option.id}>
-              <b>{LETTERS[i]}</b> <Markdown inline markdown={option.label} />
+          {(part.options ?? []).map((option, i) => (
+            <span key={i}>
+              <b>{LETTERS[i]}</b> <RichInlineContent nodes={option.content} />
             </span>
           ))}
         </p>
-      </>
-    );
-  }
-  return <Markdown markdown={task.prompt} />;
+      )}
+    </>
+  );
 }
 
 /** Arrow keys move between tasks, Escape closes. */
@@ -69,12 +63,12 @@ function PultNumbers({
   position,
   onGo,
 }: {
-  list: Aufgabe[];
+  list: Task[];
   position: number;
   onGo: (at: number) => void;
 }) {
   const { index } = useWorksheet();
-  const groups = new Map<string, { aufgabe: Aufgabe; at: number }[]>();
+  const groups = new Map<string, { aufgabe: Task; at: number }[]>();
   list.forEach((item, at) => {
     const group =
       index.aufgaben.get(item.id)?.section?.title ?? TEXT.pult.challenges;
@@ -96,13 +90,71 @@ function PultNumbers({
                 aria-current={item.at === position ? "true" : undefined}
                 onClick={() => onGo(item.at)}
               >
-                {item.aufgabe.number}
+                {itemInfo?.number}
               </button>
             );
           })}
         </span>
       ))}
     </nav>
+  );
+}
+
+/** One task for the desk: its text, then its Musterlösung. */
+function PultTask({
+  aufgabe,
+  info,
+}: {
+  aufgabe: Task;
+  info: AufgabeInfo | undefined;
+}) {
+  const multi = (info?.parts.length ?? 0) > 1;
+  const solution = info ? solutionParts(info) : [];
+  return (
+    <div className="pult__main">
+      <div className="pult__inner">
+        <p className="pult__number">
+          <span className="pult__ref">
+            {info ? refLabel(info).replace(/\s*\d+$/, "") : ""}
+          </span>
+          {info?.number}
+        </p>
+        {aufgabe.title && <h2 className="pult__heading">{aufgabe.title}</h2>}
+        <div className="pult__prompt">
+          {aufgabe.items.map((item, i) =>
+            item.type === "content" ? (
+              <RichContent key={i} nodes={item.content} />
+            ) : (
+              <div key={item.part.id} className="pult__part">
+                {multi && (
+                  <span className="part__letter">
+                    {
+                      info?.parts.find((p) => p.part.id === item.part.id)
+                        ?.letter
+                    }
+                    )
+                  </span>
+                )}
+                <div>
+                  <Prompt part={item.part} />
+                </div>
+              </div>
+            ),
+          )}
+        </div>
+        <div className="pult__sol">
+          <p className="pult__label">{TEXT.pult.solution}</p>
+          {solution.map(({ part, letter }) => (
+            <div key={part.id} className="pult__part">
+              {multi && letter && (
+                <span className="part__letter">{letter})</span>
+              )}
+              <RichContent nodes={part.markers.loesung ?? []} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -113,9 +165,12 @@ export function Pult({ current }: { current: CurrentView }) {
     current.kind === "sheet"
       ? chapter.sheets.find((s) => s.id === current.sheetId)
       : undefined;
-  const list: Aufgabe[] = (
-    sheet ? sheet.sections.flatMap((s) => s.aufgaben) : chapter.challenges
-  ).filter((aufgabe) => aufgabe.solution && "parts" in aufgabe.solution);
+  const list: Task[] = (
+    sheet ? sheet.sections.flatMap(tasksOf) : chapter.challenges
+  ).filter((aufgabe) => {
+    const entry = index.aufgaben.get(aufgabe.id);
+    return !!entry && solutionParts(entry).length > 0;
+  });
   const position = ui.pult;
   const go = (next: number | null) =>
     setUi((state) => ({ ...state, pult: next }));
@@ -127,11 +182,6 @@ export function Pult({ current }: { current: CurrentView }) {
     return null;
   }
   const info = index.aufgaben.get(aufgabe.id);
-  const multi = aufgabe.parts.length > 1;
-  const solution =
-    aufgabe.solution && "parts" in aufgabe.solution
-      ? aufgabe.solution.parts
-      : [];
   return (
     <div
       className="pult"
@@ -149,39 +199,7 @@ export function Pult({ current }: { current: CurrentView }) {
           {TEXT.pult.close}
         </Button>
       </div>
-      <div className="pult__main">
-        <div className="pult__inner">
-          <p className="pult__number">
-            <span className="pult__ref">
-              {info ? refLabel(info).replace(/\s*\d+$/, "") : ""}
-            </span>
-            {aufgabe.number}
-          </p>
-          <h2 className="pult__heading">{aufgabe.title}</h2>
-          <div className="pult__prompt">
-            {aufgabe.intro && <Markdown markdown={aufgabe.intro} />}
-            {aufgabe.parts.map((part) => (
-              <div key={part.id} className="pult__part">
-                {multi && <span className="part__letter">{part.letter})</span>}
-                <div>
-                  <Prompt part={part} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="pult__sol">
-            <p className="pult__label">{TEXT.pult.solution}</p>
-            {solution.map((part) => (
-              <div key={part.partId} className="pult__part">
-                {multi && part.letter && (
-                  <span className="part__letter">{part.letter})</span>
-                )}
-                <Markdown markdown={part.body} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <PultTask aufgabe={aufgabe} info={info} />
       <div className="pult__nav">
         <Button
           role="secondary"

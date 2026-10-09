@@ -1,14 +1,16 @@
 import { LockOpen } from "lucide-react";
 import { Link } from "react-router";
-import type { Aufgabe } from "../domain/contract";
+import type { Task } from "../../catalog";
 import { isReleased } from "../domain/structure";
 import { useWorksheet } from "./WorksheetContext";
 import { refLabel, TEXT } from "./texts";
 
 /** For students: which solutions the teacher released on this page. */
-export function ReleasedNotice({ aufgaben }: { aufgaben: Aufgabe[] }) {
-  const { state, index, setUi } = useWorksheet();
-  const released = aufgaben.filter((aufgabe) => isReleased(aufgabe, state));
+export function ReleasedNotice({ aufgaben }: { aufgaben: Task[] }) {
+  const { chapter, state, index, setUi } = useWorksheet();
+  const released = aufgaben.filter((aufgabe) =>
+    isReleased(aufgabe, state, chapter),
+  );
   if (!released.length) {
     return null;
   }
@@ -35,7 +37,7 @@ export function ReleasedNotice({ aufgaben }: { aufgaben: Aufgabe[] }) {
                   }))
                 }
               >
-                {info ? refLabel(info) : aufgabe.title}
+                {info ? refLabel(info) : (aufgabe.title ?? "")}
               </Link>
             </span>
           );

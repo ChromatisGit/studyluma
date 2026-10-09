@@ -2,8 +2,13 @@ import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { Check, ChevronDown, Lock } from "lucide-react";
 import { Link } from "react-router";
 import type { ChapterState } from "../domain/chapterState";
-import type { Chapter, Sheet } from "../domain/contract";
-import { isUnlocked, openChallenges, sheetDone } from "../domain/structure";
+import type { Worksheet as Sheet } from "../../catalog";
+import {
+  isUnlocked,
+  openChallenges,
+  sheetDone,
+  type SheetsData,
+} from "../domain/structure";
 import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./uiState";
 import { TEXT } from "./texts";
@@ -17,10 +22,12 @@ export type CurrentView =
   | { kind: "challenges" };
 
 function SheetState({
+  data,
   sheet,
   state,
   teacher,
 }: {
+  data: SheetsData;
   sheet: Sheet;
   state: ChapterState;
   teacher: boolean;
@@ -36,7 +43,7 @@ function SheetState({
       </span>
     );
   }
-  if (!isUnlocked(sheet, state)) {
+  if (!isUnlocked(data, sheet, state)) {
     return (
       <span className="kap-nav__state">
         <Lock className="icon icon--sm" aria-hidden="true" />
@@ -60,8 +67,8 @@ export function ChapterNav({
   hasSummary,
   onNavigate,
 }: {
-  chapter: Chapter;
-  viewer: Chapter["viewer"];
+  chapter: SheetsData;
+  viewer: SheetsData["viewer"];
   links: WorksheetLinks;
   current: CurrentView;
   summaryUnlocked: boolean;
@@ -126,15 +133,20 @@ export function ChapterNav({
         <div className="kap-nav__sheets-inner">
           <ol className="kap-nav__list">
             {chapter.sheets
-              .filter((sheet) => teacher || isUnlocked(sheet, state))
+              .filter((sheet) => teacher || isUnlocked(chapter, sheet, state))
               .map((sheet) => {
-                const unlocked = isUnlocked(sheet, state);
+                const unlocked = isUnlocked(chapter, sheet, state);
                 const isCurrent =
                   current.kind === "sheet" && current.sheetId === sheet.id;
                 const content = (
                   <>
                     <span className="kap-nav__t">{sheet.title}</span>
-                    <SheetState sheet={sheet} state={state} teacher={teacher} />
+                    <SheetState
+                      data={chapter}
+                      sheet={sheet}
+                      state={state}
+                      teacher={teacher}
+                    />
                   </>
                 );
                 const className = `kap-nav__item${isCurrent ? " is-current" : ""}${unlocked ? "" : " is-locked"}`;

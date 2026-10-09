@@ -1,4 +1,4 @@
-import { char, type MathNode, type MathRow } from "./mathNodes";
+import { char, type MathNode, type MathRow } from "../../content-renderer";
 
 /**
  * A small Typst math parser for expected answers (`12 x^3`, `sqrt(2)/2`,

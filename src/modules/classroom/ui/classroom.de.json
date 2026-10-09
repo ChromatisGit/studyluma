@@ -1,0 +1,29 @@
+{
+  "join": {
+    "title": "Unterricht beitreten",
+    "intro": "Gib den Code ein, den deine Lehrkraft zeigt, und deinen Namen. Ein Konto brauchst du nicht.",
+    "code": "Code",
+    "codeHint": "Vier Zeichen, Groß- und Kleinschreibung egal.",
+    "name": "Dein Name",
+    "submit": "Beitreten",
+    "unknown": "Diesen Code gibt es nicht (mehr). Prüfe die Eingabe oder frag deine Lehrkraft.",
+    "tooMany": "Zu viele Versuche. Warte eine Minute und versuch es dann noch einmal.",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
+    "full": "Der Unterricht ist voll.",
+    "toCourses": "Zu den Kursen"
+  },
+  "start": {
+    "title": "Klassenzimmer",
+    "idle": "Starte ein Klassenzimmer, damit Schüler:innen mit einem Code beitreten, Quizze mitmachen und freigegebene Inhalte sehen können. Konto und Datenbank sind nicht nötig.",
+    "start": "Klassenzimmer starten",
+    "starting": "Wird gestartet …",
+    "code": "Code zum Beitreten",
+    "link": "Oder dieser Link",
+    "participants": "Schüler:innen verbunden",
+    "offline": "getrennt",
+    "end": "Klassenzimmer beenden",
+    "endConfirm": "Alle werden getrennt und der Code wird frei. Beenden?",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
+    "connecting": "Verbinde …"
+  }
+}

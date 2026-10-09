@@ -2182,3 +2182,9 @@ body.has-keypad .mfield {
 body.has-keypad .task-sample {
   padding-bottom: 0;
 }
+
+.graph__hint {
+  margin: 0.5rem 0;
+  font-size: 0.875rem;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}

@@ -1,22 +1,26 @@
-import type {
-  CheckResult,
-  CheckState,
-  Gap,
-  MathAnswer,
-  NumberAnswer,
-  Task,
-} from "./contract";
+import type { Answer, TaskPart } from "../../catalog";
 import {
   decimalPlaces,
   evaluate,
+  gapsOf,
   hasDecimal,
+  isMathRow,
   parseRow,
   relativelyEqual,
+  splitTop,
   tryParse,
   unsimplified,
   type Ast,
-} from "./evaluate";
-import { isMathRow, splitTop, type MathRow } from "./mathNodes";
+  type GapNode,
+  type MathRow,
+} from "../../content-renderer";
+import type {
+  CheckResult,
+  CheckState,
+  MathAnswer,
+  NumberAnswer,
+} from "./contract";
+
 import { typstToRow } from "./typst";
 
 /** Feedback texts; the UI fills them from its `*.de.json`. */
@@ -104,7 +108,11 @@ export function checkNumber(
   if (!Number.isFinite(value)) {
     return result("nochNicht");
   }
-  const exact = answer.exact !== undefined ? valueOf(answer.exact) : null;
+  const exact = answer.exactRow
+    ? evaluate(parseRow(answer.exactRow))
+    : answer.exact !== undefined
+      ? valueOf(answer.exact)
+      : null;
   const decimal = hasDecimal(ast);
   if (exact !== null && relativelyEqual(value, exact)) {
     if (unsimplified(ast)) {
@@ -137,10 +145,11 @@ const POINTS = [0.73, 1.37, -1.91, 2.44, -0.58, 3.1, -2.6, 0.29, -1.13];
 function checkTerm(
   ast: Ast,
   expected: string,
+  expectedRow: MathRow | undefined,
   variables: string[],
   m: CheckMessages,
 ): CheckResult {
-  const target = parseRow(typstToRow(expected));
+  const target = parseRow(expectedRow ?? typstToRow(expected));
   let used = 0;
   for (const x of POINTS) {
     const env = Object.fromEntries(
@@ -268,43 +277,94 @@ export function checkMath(
   }
   return answer.kind === "number"
     ? checkNumber(ast, answer, m)
-    : checkTerm(ast, answer.expected, answer.variables, m);
+    : checkTerm(ast, answer.expected, answer.expectedRow, answer.variables, m);
 }
 
+/**
+ * The compiled expected answer as a math rule: a term when it has
+ * variables, otherwise a number with optional rounding.
+ */
+export function mathAnswerOf(answer: Answer | undefined): MathAnswer {
+  if (answer?.kind) {
+    const members = (answer.elements ?? []).map(numberAnswerOf);
+    return answer.kind === "set"
+      ? { kind: "set", elements: members }
+      : { kind: "vector", components: members };
+  }
+  const exact = answer?.exact;
+  const variables = [
+    ...new Set((exact ?? "").match(/\b[a-z]\b/g) ?? []),
+  ].filter((name) => name !== "e");
+  const row = answer?.checkRow as MathRow | undefined;
+  return variables.length
+    ? {
+        kind: "term",
+        expected: exact ?? "",
+        ...(row ? { expectedRow: row } : {}),
+        variables,
+      }
+    : {
+        kind: "number",
+        ...(exact ? { exact } : {}),
+        ...(row ? { exactRow: row } : {}),
+        ...(answer?.rounded
+          ? {
+              rounded: {
+                value: answer.rounded,
+                places: answer.decimals ?? 0,
+              },
+            }
+          : {}),
+      };
+}
+
+/** A member of a set or vector: a number; a term there can't be compared. */
+function numberAnswerOf(answer: Answer): NumberAnswer {
+  const own = mathAnswerOf(answer);
+  return own.kind === "number"
+    ? own
+    : { kind: "number", ...(answer.exact ? { exact: answer.exact } : {}) };
+}
+
+/** A gap or answer without math (a word) is compared as text. */
+const isText = (answer: Answer | undefined) =>
+  !!answer?.exact && !answer.checkRow;
+
 export function checkGap(
-  gap: Gap,
+  gap: GapNode,
   value: unknown,
   m: CheckMessages,
 ): CheckResult | null {
-  if (gap.kind === "dropdown") {
+  if (gap.choices.length > 1) {
     return typeof value === "string" && value
-      ? result(value === gap.correct ? "richtig" : "nochNicht")
+      ? result(value === gap.choices[0] ? "richtig" : "nochNicht")
       : null;
   }
-  if (gap.kind === "text") {
+  const answer = gap.answer as Answer | undefined;
+  const word = isText(answer) ? answer?.exact : undefined;
+  if (word !== undefined) {
     if (typeof value !== "string" || !value.trim()) {
       return null;
     }
-    const a = value.trim();
-    const b = gap.correct.trim();
-    const same = gap.caseSensitive
-      ? a === b
-      : a.toLowerCase() === b.toLowerCase();
-    return result(same ? "richtig" : "nochNicht");
+    return result(
+      value.trim().toLowerCase() === word.trim().toLowerCase()
+        ? "richtig"
+        : "nochNicht",
+    );
   }
-  return checkMath(value, gap.answer, m);
+  return checkMath(value, mathAnswerOf(answer), m);
 }
 
-/** A Lückentext or a step line: all gaps together, each with its own state. */
+/** An Einsetzen part or a step: all gaps together, each with its own state. */
 export function checkGaps(
-  gaps: Gap[],
+  gaps: GapNode[],
   values: Record<string, unknown> | undefined,
   m: CheckMessages,
 ): CheckResult | null {
   const items: Record<string, CheckState> = {};
   let filled = 0;
   let wrong = 0;
-  let almost: { gap: Gap; own: CheckResult } | null = null;
+  let almost: CheckResult | null = null;
   for (const gap of gaps) {
     const own = checkGap(gap, values?.[gap.id], m);
     if (!own) {
@@ -316,7 +376,7 @@ export function checkGaps(
       wrong++;
     }
     if (own.state === "fast" && !almost) {
-      almost = { gap, own };
+      almost = own;
     }
   }
   if (!filled) {
@@ -330,65 +390,126 @@ export function checkGaps(
     };
   }
   if (almost) {
-    const message = almost.own.message ?? "";
-    const text = almost.gap.cell ? m.inCell(almost.gap.cell, message) : message;
-    return { ...result("fast", text), items };
+    return { ...result("fast", (almost as CheckResult).message ?? ""), items };
   }
   return { ...result("richtig"), items };
 }
 
-/** Checks one part's task; Aufträge are never checked. */
-export function checkTask(
-  task: Task,
+/**
+ * A Graph part: each entered function must equal the expected one at the
+ * same position as a function of x. Equivalent writings are all correct.
+ */
+function checkGraph(
+  answers: Answer[],
   value: unknown,
   m: CheckMessages,
 ): CheckResult | null {
-  switch (task.type) {
-    case "lueckentext":
+  const entered = (value ?? {}) as Record<string, unknown>;
+  const items: Record<string, CheckState> = {};
+  let filled = 0;
+  let wrong = 0;
+  answers.forEach((answer, index) => {
+    const row = entered[String(index)];
+    if (!isMathRow(row) || !row.length) {
+      return;
+    }
+    filled++;
+    const ast = tryParse(row);
+    const target = answer.checkRow
+      ? tryParse(answer.checkRow as MathRow)
+      : null;
+    const same = !!ast && !!target && sameFunction(ast, target);
+    items[String(index)] = same ? "richtig" : "nochNicht";
+    if (!same) {
+      wrong++;
+    }
+  });
+  if (!filled) {
+    return null;
+  }
+  const free = answers.length - filled;
+  if (wrong || free) {
+    return {
+      ...result("nochNicht", !wrong && free ? m.freeGaps(free) : undefined),
+      items,
+    };
+  }
+  return { ...result("richtig"), items };
+}
+
+function sameFunction(ast: Ast, target: Ast): boolean {
+  let used = 0;
+  for (const x of POINTS) {
+    const want = evaluate(target, { x });
+    if (!Number.isFinite(want)) {
+      continue;
+    }
+    const got = evaluate(ast, { x });
+    if (!Number.isFinite(got) || !relativelyEqual(got, want)) {
+      return false;
+    }
+    if (++used === 5) {
+      break;
+    }
+  }
+  return used > 0;
+}
+
+/** The id of an Auswahl option, stable for a part. */
+export const optionId = (partId: string, index: number) => `${partId}-${index}`;
+
+/** Checks one part against its private answer; Aufträge are never checked. */
+export function checkPart(
+  part: TaskPart,
+  value: unknown,
+  m: CheckMessages,
+): CheckResult | null {
+  switch (part.type) {
+    case "Einsetzen":
       return checkGaps(
-        task.gaps,
+        gapsOf(part.content),
         value as Record<string, unknown> | undefined,
         m,
       );
-    case "auswahl": {
+    case "Auswahl": {
       const selected = Array.isArray(value) ? (value as string[]) : [];
       if (!selected.length) {
         return null;
       }
-      const correct = task.options
-        .filter((o) => o.correct)
-        .map((o) => o.id)
+      const correct = (part.options ?? [])
+        .flatMap((option, index) =>
+          option.correct ? [optionId(part.id, index)] : [],
+        )
         .sort()
         .join();
       return result(
         [...selected].sort().join() === correct ? "richtig" : "nochNicht",
       );
     }
-    case "ergebnis": {
-      const own = checkMath(value, task.answer, m);
+    case "Antwort": {
+      const answer = mathAnswerOf(part.answer);
+      const own = checkMath(value, answer, m);
       // ::fehler: a known wrong answer gets its own question.
-      if (
-        own?.state === "nochNicht" &&
-        task.errors &&
-        task.answer.kind !== "set"
-      ) {
-        for (const known of task.errors) {
+      if (own?.state === "nochNicht") {
+        for (const known of part.markers.fehler ?? []) {
           const as: MathAnswer =
-            task.answer.kind === "term"
+            answer.kind === "term"
               ? {
                   kind: "term",
                   expected: known.answer,
-                  variables: task.answer.variables,
+                  variables: answer.variables,
                 }
               : { kind: "number", exact: known.answer };
           const match = checkMath(value, as, m);
           if (match && match.state !== "nochNicht") {
-            return result("nochNicht", known.message);
+            return result("nochNicht", known.feedback);
           }
         }
       }
       return own;
     }
+    case "Graph":
+      return checkGraph(part.answers ?? [], value, m);
     default:
       return null;
   }

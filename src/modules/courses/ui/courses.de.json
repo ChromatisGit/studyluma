@@ -3,7 +3,9 @@
     "title": "Meine Kurse",
     "lead": "Wähle einen Kurs, um zum Lernweg zu kommen.",
     "currentChapter": "Aktuell: {number} {title}",
-    "empty": "Du bist noch in keinem Kurs."
+    "empty": "Du bist noch in keinem Kurs.",
+    "emptyText": "Sobald deine Lehrkraft dich einem Kurs zuordnet, erscheint er hier.",
+    "emptyNext": "Frag deine Lehrkraft, wenn du einen Kurs erwartest."
   },
   "breadcrumbs": "Brotkrumennavigation",
   "lernweg": {
@@ -22,7 +24,7 @@
   "chapter": {
     "current": "Aktuelles Kapitel",
     "worksheets": "Arbeitsblätter",
-    "summary": "Zusammenfassung",
+    "summary": "Inhalt",
     "nav": "Kapitel wechseln",
     "previous": "Vorheriges Kapitel",
     "next": "Nächstes Kapitel",

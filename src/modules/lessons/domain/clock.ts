@@ -1,4 +1,4 @@
-import type { Lesson, LessonFrame } from "./lesson";
+import type { Deck, Slide } from "./deck";
 
 /** A school period, in minutes after midnight. */
 export type Period = { number: number; start: number; end: number };
@@ -37,9 +37,9 @@ export function lessonStart(
 }
 
 /** The planned end of a frame; frames without `::bis` keep the previous plan. */
-export function plannedEnd(lesson: Lesson, frameId: string): number {
+export function plannedEnd(deck: Deck, frameId: string): number {
   let plan = 0;
-  for (const frame of lesson.frames) {
+  for (const frame of deck.slides) {
     plan = frame.planUntil ?? plan;
     if (frame.id === frameId) {
       return plan;
@@ -49,10 +49,10 @@ export function plannedEnd(lesson: Lesson, frameId: string): number {
 }
 
 /** The planned start of a frame: the end of the frame before it. */
-export function plannedStart(lesson: Lesson, frame: LessonFrame): number {
-  const index = lesson.frames.indexOf(frame);
-  const previous = lesson.frames[index - 1];
-  return previous ? plannedEnd(lesson, previous.id) : 0;
+export function plannedStart(deck: Deck, frame: Slide): number {
+  const index = deck.slides.indexOf(frame);
+  const previous = deck.slides[index - 1];
+  return previous ? plannedEnd(deck, previous.id) : 0;
 }
 
 /**
@@ -61,14 +61,14 @@ export function plannedStart(lesson: Lesson, frame: LessonFrame): number {
  * `abweichung = max(betreten − geplanterBeginn, jetzt − geplantesEnde)`
  */
 export function deviation(
-  lesson: Lesson,
-  frame: LessonFrame,
+  deck: Deck,
+  frame: Slide,
   enteredAt: number,
   now: number,
 ): number {
   return Math.max(
-    enteredAt - plannedStart(lesson, frame),
-    now - plannedEnd(lesson, frame.id),
+    enteredAt - plannedStart(deck, frame),
+    now - plannedEnd(deck, frame.id),
   );
 }
 

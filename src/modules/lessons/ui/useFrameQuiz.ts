@@ -1,52 +1,55 @@
 import { useCallback, useEffect, useState } from "react";
-import { useTeacherQuiz } from "../../quiz";
+import { useTeacherQuiz } from "../../classroom";
 import type { useLessonSession } from "../application/useLessonSession";
-import type { Lesson, LessonSession } from "../domain/lesson";
+import type { Deck } from "../domain/deck";
+import type { LessonSession } from "../domain/lesson";
 import type { QuizActionsProps } from "./QuizActions";
 
 /**
  * The course's live quiz as the teacher view drives it. The quiz belongs
- * to its frame: leaving the frame ends it, so students are never left in
+ * to its slide: leaving the slide ends it, so students are never left in
  * a quiz nobody is running.
  */
 export function useFrameQuiz(
   courseId: string,
-  lesson: Lesson,
+  deck: Deck,
   session: LessonSession | null,
   dispatch: ReturnType<typeof useLessonSession>["dispatch"],
-  keepRunningOnLeave = false,
 ) {
-  const { view, start, advance, end } = useTeacherQuiz(courseId);
+  const { view, start, advance, end, place, running } =
+    useTeacherQuiz(courseId);
   const [failed, setFailed] = useState(false);
   const currentId = session?.currentFrameId;
   const live =
-    view && !view.ended && view.chapterId === lesson.chapterId ? view : null;
+    view && !view.ended && view.chapterId === deck.chapterId ? view : null;
   const here = live && live.frameId === currentId ? live : null;
-  const frame = lesson.frames.find((item) => item.id === currentId);
-  const isQuizFrame = !!frame?.blocks?.some((block) => block.type === "quiz");
+  const slide = deck.slides.find((item) => item.id === currentId);
+  const isQuiz = slide?.kind === "quiz";
 
   useEffect(() => {
-    if (
-      !keepRunningOnLeave &&
-      live &&
-      currentId &&
-      live.frameId !== currentId
-    ) {
+    if (live && currentId && live.frameId !== currentId) {
       void end(live);
     }
-  }, [live, currentId, end, keepRunningOnLeave]);
+  }, [live, currentId, end]);
+
+  // Participants follow where the lesson is.
+  useEffect(() => {
+    if (running && currentId) {
+      void place(deck.chapterId, currentId);
+    }
+  }, [running, currentId, deck.chapterId, place]);
 
   const report = useCallback((ok: boolean) => setFailed(!ok), []);
 
   const onStart = useCallback(() => {
-    if (frame) {
-      void start(lesson.chapterId, frame.id).then(report);
+    if (slide) {
+      void start(deck.chapterId, slide.id).then(report);
     }
-  }, [frame, lesson.chapterId, start, report]);
+  }, [slide, deck.chapterId, start, report]);
 
   /**
    * One step on in the running quiz. Returns "frame" after the last
-   * reveal: the quiz ends and the lesson moves to the next frame.
+   * reveal: the quiz ends and the lesson moves to the next slide.
    */
   const step = useCallback((): "quiz" | "frame" | null => {
     if (!here) {
@@ -60,7 +63,7 @@ export function useFrameQuiz(
     return "quiz";
   }, [here, advance, end, report]);
 
-  /** Frame steps; while a quiz runs, → and the clicker move the quiz on. */
+  /** Slide steps; while a quiz runs, → and the clicker move the quiz on. */
   const onStep = useCallback(
     (by: 1 | -1) => {
       if (by === 1 && step() === "quiz") {
@@ -71,7 +74,7 @@ export function useFrameQuiz(
     [step, dispatch],
   );
 
-  const actions: QuizActionsProps | undefined = isQuizFrame
+  const actions: QuizActionsProps | undefined = isQuiz
     ? { view: here, onStart, onStep: () => onStep(1), failed }
     : undefined;
 

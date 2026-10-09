@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
-import type { ViewerRole } from "../../viewer";
-import type { Chapter, PartResponse } from "../domain/contract";
-import { indexChapter } from "../domain/structure";
+import type { PartResponse } from "../domain/contract";
+import {
+  indexChapter,
+  type SheetsData,
+  type Viewer,
+} from "../domain/structure";
 import { chapterStore } from "../infrastructure/localChapterStore";
 import { emptyResponse, writeInput, type FieldRef } from "./fieldValues";
 import { initialUi, type UiState, type WorksheetLinks } from "./uiState";
@@ -10,8 +13,8 @@ import { useChecking } from "./useChecking";
 
 /** Everything a worksheet page needs: data, saved state, page state, actions. */
 export function useWorksheetController(
-  chapter: Chapter,
-  viewer: ViewerRole,
+  chapter: SheetsData,
+  viewer: Viewer,
   links: WorksheetLinks,
 ) {
   const index = useMemo(() => indexChapter(chapter), [chapter]);
@@ -56,7 +59,7 @@ export function useWorksheetController(
       }
       store.setResponse(
         ref.partId,
-        writeInput(entry.part, response(ref.partId), ref, value),
+        writeInput(response(ref.partId), ref, value, entry.part.answerKind),
       );
       markSaved(ref.partId);
     },
@@ -71,7 +74,7 @@ export function useWorksheetController(
     [store, response, markSaved],
   );
 
-  const checking = useChecking(index, store, response, ui.help, setUi);
+  const checking = useChecking(chapter, index, store, response, ui.help, setUi);
   const field = useActiveField(index, response, setInput);
 
   return {

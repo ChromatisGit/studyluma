@@ -1,5 +1,6 @@
 import { Button, Choice, ChoiceGroup } from "@chromatis/base/ui";
-import type { AmpelCause, AmpelLevel, Sheet } from "../domain/contract";
+import type { Worksheet as Sheet } from "../../catalog";
+import type { AmpelCause, AmpelLevel } from "../domain/contract";
 import { checkpointChecked } from "../domain/structure";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";

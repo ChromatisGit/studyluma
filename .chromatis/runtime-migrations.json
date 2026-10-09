@@ -1,0 +1,10 @@
+{
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "Runtime_classroom"
+      ]
+    }
+  ]
+}

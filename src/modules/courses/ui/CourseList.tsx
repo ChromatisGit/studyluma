@@ -23,7 +23,11 @@ export function CourseList({
     <Page title={TEXT.home.title} width="content">
       <PageHeader title={TEXT.home.title} lead={TEXT.home.lead} />
       {courses.length === 0 ? (
-        <EmptyState title={TEXT.home.empty} />
+        <EmptyState
+          title={TEXT.home.empty}
+          description={TEXT.home.emptyText}
+          nextStep={TEXT.home.emptyNext}
+        />
       ) : (
         <div className="course-grid">
           {courses.map((course) => {
@@ -38,14 +42,13 @@ export function CourseList({
                     ? courseOverviewPath(course.id)
                     : coursePath(course.id)
                 }
-                meta={course.subject}
                 title={course.title}
                 cue={<ArrowRight className="card__cue" aria-hidden="true" />}
               >
                 {current && (
                   <span className="course-card__current">
                     <Pictogram
-                      id={current.topic.icon}
+                      icon={current.topic.icon}
                       fallbackLabel={current.topic.title}
                     />
                     {fill(TEXT.home.currentChapter, {

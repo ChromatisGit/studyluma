@@ -1,17 +1,19 @@
-import { SheetCards, getWorksheetChapter } from "../../worksheets";
+import { SheetCards, type SheetsData } from "../../worksheets";
 import { chapterPath } from "../application/navigation";
 
 /** The chapter's worksheets, followed by its challenge pool. */
 export function ChapterMaterials({
   courseId,
   chapterId,
+  chapter,
   availableOnly = false,
 }: {
   courseId: string;
   chapterId: string;
+  /** The chapter's worksheets, as the reader may see them. */
+  chapter: SheetsData | undefined;
   availableOnly?: boolean;
 }) {
-  const chapter = getWorksheetChapter(chapterId, "student");
   if (!chapter) {
     return null;
   }

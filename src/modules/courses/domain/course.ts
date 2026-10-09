@@ -1,13 +1,14 @@
+import type { TopicIcon } from "../../catalog";
+
 /** A course as the Lernweg shows it: topics with stable numbers. */
 export type Course = {
   id: string;
   title: string;
-  subject: string;
   /** Short line badge, e.g. "MA". */
   badge: string;
   /** Where the class is; set by the teacher. */
   currentChapterId: string | null;
-  /** School years. Without phases there are no tabs. */
+  /** Optional school-year sections. Without phases there are no tabs. */
   phases: CoursePhase[];
   topics: Topic[];
 };
@@ -19,8 +20,8 @@ export type Topic = {
   /** Stable number: "9". */
   number: string;
   title: string;
-  /** Pictogram id from the gallery. */
-  icon?: string;
+  /** A pictogram from the gallery or the topic folder's icon.svg. */
+  icon?: TopicIcon;
   chapters: Chapter[];
 };
 

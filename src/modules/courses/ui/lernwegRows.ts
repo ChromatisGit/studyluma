@@ -1,3 +1,4 @@
+import type { TopicIcon } from "../../catalog";
 import type { StopStatus } from "./Linie";
 
 export type LernwegChapter = {
@@ -10,7 +11,7 @@ export type LernwegTopic = {
   id: string;
   number: string;
   title: string;
-  pictogram?: string | undefined;
+  pictogram?: TopicIcon | undefined;
   chapters: LernwegChapter[];
 };
 export type LernwegPhase = {

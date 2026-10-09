@@ -29,5 +29,9 @@ export default [
   ]),
   route(`${chapter}/lesson`, "routes/lesson.tsx"),
   route(`${chapter}/lesson/projector`, "routes/projector.tsx"),
-  route("live", "routes/live.tsx"),
+  route("join/:code?", "routes/join.tsx"),
+  route("classroom", "routes/classroom.ts"),
+  route(".well-known/studyluma-session/:code", "routes/sessionProbe.ts"),
+  route("content/assets/:assetId", "routes/asset.ts"),
+  route("api/check", "routes/check.ts"),
 ] satisfies RouteConfig;

@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { MathEditor } from "./editor";
-import type { MathRow } from "./mathNodes";
+import type { MathRow } from "../../content-renderer";
 
 const typed = (keys: string, editor = new MathEditor([])) => {
   for (const key of keys) {
