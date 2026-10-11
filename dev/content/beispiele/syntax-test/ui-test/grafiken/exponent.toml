@@ -1,0 +1,14 @@
+#:schema ../../../../../.chromatis/schemas/catalog.graphic.schema.json
+[achsen]
+x = [-3, 3]
+y = [-10, 10]
+
+[[graph]]
+term = "y = x^n"
+
+[[parameter]]
+name = "n"
+von = 1
+bis = 8
+schritt = 1
+start = 2

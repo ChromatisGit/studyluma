@@ -1,85 +1,43 @@
-# StudyLuma Website
+# StudyLuma
 
-React Router (SSR) app for StudyLuma: course views, worksheets and lesson
-frames. It is a modular monolith on top of
-[`@chromatis/base`](https://github.com/ChromatisGit/chromatis-base-framework),
-whose UI components and CSS provide almost all styling; StudyLuma adds a
-theme (`app/theme.css`) and CSS only for its own elements.
+Teaching platform: course views, worksheets, lesson mode and temporary classroom sessions. This repository is a Bun workspace of three packages and the Development instance; the root only holds tooling (`scripts/`).
 
-This stage renders the UI from JSON fixtures. There is no database, login
-or content pipeline yet. The demo opens in the teacher view and shows
-Steuerung in each course.
+| Package                                                     | Role                                                                                                                                                                     |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `packages/catalog-contract` (`@studyluma/catalog-contract`) | The compiled catalog: types, `CATALOG_FORMAT_VERSION`, `CatalogArtifactMeta`, compatibility and artifact validation, shared math helpers. Depends on nothing.            |
+| `packages/compiler` (`@studyluma/compiler`)                 | Author Markdown to catalog artifact; also the catalog build contribution. Build time only; depends on the contract.                                                      |
+| `packages/app` (`@studyluma/app`)                           | The application, a Chromatis product package: modules, routes and the manifest instances discover. Depends on `@chromatis/base` and the contract; never on the compiler. |
+| `dev/` (`studyluma-dev`)                                    | The Development instance: development config, test content, edge cases and UI fixtures. Private, never distributed.                                                      |
 
-## Layout
+`scripts/check-boundaries.ts` enforces the boundaries mechanically (imports and package dependencies): the contract imports only itself, the compiler only the contract, the app never the compiler, and nothing under `packages/` touches `dev/`. `scripts/check-pack.ts` lists what each package would pack (`bun pm pack --dry-run`) and fails on dev content, tests, fixtures, tooling configs, an exported file or a declared route or manifest file the `files` whitelist leaves out.
 
-```
-app/                   composition root: root, shell, routes, theme
-src/helper/            tiny shared helpers (text templates)
-src/modules/<module>/  one module per area; only index.ts at its root
-  domain/              types and pure rules
-  application/         use cases on top of the domain
-  infrastructure/      fixtures, local storage, browser channels
-  ui/                  React components, *.de.json texts, module CSS
-```
+## Workspace
 
-| Module       | Owns                                                         |
-| ------------ | ------------------------------------------------------------ |
-| `viewer`     | the demo viewer role and participant identity                |
-| `content`    | Markdown with Typst math, Merkkarten, summaries, code blocks |
-| `courses`    | course list, Lernweg, chapter page, course fixtures          |
-| `worksheets` | worksheet renderer, math editor and checking                 |
-| `steuerung`  | teacher course and worksheet controls                        |
-| `lessons`    | lesson frames, teacher view, projector window                |
-| `quiz`       | live quiz: run state, event stream, student quiz page        |
+StudyLuma lives in the outer Bun workspace `/home/ch/dev/studyluma-planning` together with `chromatis-base` and the other instances (Holst, Demo). Install once from there (`bun install`); every package and instance links to the others through `workspace:*`, so saved changes are visible everywhere at once. There is no registry, no Git pin, no tarball and no `bun link`; install inside the workspace, not standalone.
 
-Modules import each other only through their `index.ts`
-(`chromatis/dependencies` lint rule). All user-visible text lives in a
-`*.de.json` file next to the component that shows it.
+## From content to running app
 
-## Routes
+An instance (Dev, Holst, Demo) depends on `@chromatis/base` and `@studyluma/app` (and `@studyluma/compiler` as a dev dependency) and holds only its decisions: `config/app.toml` (deployment target and domain, optionally `[modules] disabled`, `[routes] omit`), `config/catalog.toml` (content root and the published course ids), optionally `config/classroom.toml` and `config/shell.toml` (extra sidebar entries, account link), its `content/` and `package.json`. Chromatis discovers the app's manifest (`dist/chromatis.manifest.json`, generated from the modules and the route declaration) and runs the lifecycle:
 
-| Path                                     | Page                           |
-| ---------------------------------------- | ------------------------------ |
-| `/`                                      | my courses                     |
-| `/courses/:courseId`                     | Lernweg                        |
-| `/courses/:courseId/control`             | Steuerung                      |
-| `/courses/:courseId/chapters/:chapterId` | chapter page                   |
-| `…/sheets/:sheetId`                      | worksheet                      |
-| `…/challenges`                           | challenges of a chapter        |
-| `…/lesson`                               | lesson frames, teacher view    |
-| `…/lesson/projector`                     | projector window               |
-| `/courses/:courseId/quiz`                | live quiz on student devices   |
-| `/live`                                  | quiz event stream and commands |
+1. Validate configuration against the module schemas.
+2. Run the `catalog` contribution (`@studyluma/compiler/contribution`): compile the instance's content, only the published courses, into `.chromatis/artifacts/catalog/` (`catalog.json`, `catalog.meta.json`, `asset-manifest.json`, `assets/`).
+3. Validate the artifact (`@studyluma/catalog-contract/validate`: format version, structure, build id, assets); a missing or incompatible catalog fails here.
+4. Build the app with exactly that artifact embedded (`chromatis-artifacts`). The app never rebuilds content, reads no environment variable for it and checks the artifact again at startup.
+5. Validate deployment prerequisites, then deploy.
 
-## Live quiz
+The catalog is immutable and deterministic: `catalog.meta.json` holds `formatVersion`, `buildId` (content hash) and the compiler name and version, no timestamp. The app reads exactly one format version at a time.
 
-A teacher starts the quiz of a quiz frame from the notes strip. Students
-of the course who are online land on `/courses/:courseId/quiz` once (also
-when they arrive while it runs) and can navigate freely afterwards. Each
-question goes answering → distribution → reveal; the teacher moves it on
-with the strip button, → or a clicker, and is never blocked by missing
-answers. Percentages count each option against all participants, so a
-multiple choice question can add up to more than 100 %. Leaving the frame
-ends the quiz.
+## Commands
 
-Without a database, the running quizzes live in the memory of the server
-process (`quiz/infrastructure/liveQuizStore.ts`) and reach the browsers as
-server-sent events from `/live`. That needs one long-running server
-process; a restart ends running quizzes. Every student belongs to every
-course, a browser counts as one student (`studyluma-participant` cookie),
-and an optional `studyluma-room` cookie keeps separate demo visitors apart.
-
-## Use as a package
-
-The demo app (`studyluma-demo`) installs this repository as the `studyluma`
-package and mounts its route modules (`studyluma/app/routes/*`) next to its
-own landing page. Route modules therefore use React Router's generic types
-instead of generated `+types`, and all links are absolute.
-
-## Development
+Run from an instance directory (`dev/`, or Holst or Demo):
 
 ```sh
-bun install
-bun run dev      # http://localhost:5173
-bun run check    # typecheck, lint, format, tests
+bun run check      # chromatis check: config, artifacts, typecheck, lint, format, tests
+bun run build      # chromatis build
+bun run dev        # development server
+bun run inspect    # modules, config, routes, contributions, artifacts, unmet requirements
 ```
+
+`chromatis fix` creates missing config files from schema defaults and formats; `chromatis deploy` runs the preflight first. `bun run check` at this root runs the boundary and pack checks, every package's checks and the Development instance's.
+
+See [packages/app](packages/app/README.md), [packages/compiler](packages/compiler/README.md), [packages/catalog-contract](packages/catalog-contract/README.md) and [dev](dev/README.md).

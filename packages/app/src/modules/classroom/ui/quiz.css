@@ -1,0 +1,51 @@
+/* Student quiz page: only the arrangement; the parts are framework and
+   worksheet components. */
+.quiz-answer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-300) var(--space-400);
+}
+.quiz-answer .muted {
+  flex: 1 1 18rem;
+  margin: 0;
+}
+.quiz-answer__failed {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-status-error);
+}
+.quiz-hint {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+.quiz-connecting {
+  display: flex;
+  align-items: center;
+  gap: var(--space-300);
+  padding-block: var(--space-900);
+}
+
+/* Classroom start and join. */
+.classroom-join {
+  display: grid;
+  gap: var(--space-400);
+  max-width: 24rem;
+}
+.classroom-start {
+  display: grid;
+  gap: var(--space-300);
+  justify-items: start;
+}
+.classroom-start__code {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-3xl, 2.5rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.classroom-start__roster {
+  margin: 0;
+  padding-left: var(--space-500);
+  columns: 2 12rem;
+}

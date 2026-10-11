@@ -1,0 +1,10 @@
+#:schema ../.chromatis/schemas/classroom.schema.json
+# The values are the defaults; they are written out so they can be tuned here.
+[default]
+session_ttl_hours = 12
+max_participants = 120
+max_name_length = 40
+
+[default.join_lookup_limit]
+max_failures = 20
+window_seconds = 60

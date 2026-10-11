@@ -1,10 +1,14 @@
 {
-  "extends": "@chromatis/base/infra/tsconfig",
   "compilerOptions": {
-    "types": ["node", "bun", "vite/client"],
-    "rootDirs": [".", "./.react-router/types"],
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "types": ["bun", "node"],
+    "noEmit": true,
+    "skipLibCheck": true
   },
-  "include": ["app", "src", ".react-router/types/**/*", "*.ts"]
+  "include": ["scripts"]
 }

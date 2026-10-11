@@ -1,0 +1,6 @@
+#:schema ../../.chromatis/schemas/catalog.course.schema.json
+titel = "Randfälle"
+
+[themen]
+icon-test = ["leer"]
+syntax-test = ["randfaelle", "zweites-kapitel"]

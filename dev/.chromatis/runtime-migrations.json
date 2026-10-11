@@ -1,0 +1,22 @@
+{
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "Runtime_classroom"
+      ]
+    },
+    {
+      "tag": "v2",
+      "deleted_classes": [
+        "Runtime_classroom"
+      ]
+    },
+    {
+      "tag": "v3",
+      "new_classes": [
+        "Runtime_classroom"
+      ]
+    }
+  ]
+}

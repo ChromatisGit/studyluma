@@ -1,0 +1,10 @@
+/node_modules
+/build
+/dist
+/.react-router
+.DS_Store
+.env*
+*.tsbuildinfo
+/react-router.config.ts
+/.chromatis/
+/.wrangler/

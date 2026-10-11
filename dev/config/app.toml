@@ -1,0 +1,4 @@
+#:schema ../.chromatis/schemas/app.schema.json
+[deployment]
+target = "bun"
+domain = "dev.studyluma.localhost"

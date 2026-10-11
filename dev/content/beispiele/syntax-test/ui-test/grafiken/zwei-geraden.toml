@@ -1,0 +1,8 @@
+#:schema ../../../../../.chromatis/schemas/catalog.graphic.schema.json
+[achsen]
+x = [-2, 6]
+y = [-2, 8]
+
+[eingabe]
+typ = "funktion"
+anzahl = 2

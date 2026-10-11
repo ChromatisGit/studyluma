@@ -1,0 +1,2 @@
+[test]
+preload = ["@chromatis/base/test-preload", "./src/test/setup.ts"]
