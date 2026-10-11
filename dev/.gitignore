@@ -1,0 +1,11 @@
+/node_modules/
+/build/
+/.react-router/
+/.env
+/.env.*
+!/.env.example
+*.tsbuildinfo
+/react-router.config.ts
+/.chromatis/*
+!/.chromatis/runtime-migrations.json
+/.wrangler/

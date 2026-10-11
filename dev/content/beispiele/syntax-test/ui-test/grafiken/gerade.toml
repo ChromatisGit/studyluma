@@ -1,0 +1,15 @@
+#:schema ../../../../../.chromatis/schemas/catalog.graphic.schema.json
+[achsen]
+x = [-2, 6]
+y = [-2, 8]
+
+[[punkt]]
+position = [1, 2]
+name = "A"
+
+[[punkt]]
+position = [3, 6]
+name = "B"
+
+[eingabe]
+typ = "funktion"

@@ -1,0 +1,7 @@
+{
+  "extends": "@chromatis/base/infra/tsconfig",
+  "compilerOptions": {
+    "types": ["node", "bun", "vite/client"]
+  },
+  "include": ["app", "src", "server", "scripts"]
+}

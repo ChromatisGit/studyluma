@@ -1,0 +1,5 @@
+#:schema ../../.chromatis/schemas/catalog.course.schema.json
+titel = "UI-Test"
+
+[themen]
+syntax-test = ["ui-test", "zweites-kapitel"]

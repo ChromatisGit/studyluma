@@ -1,0 +1,18 @@
+#:schema ../../../../../.chromatis/schemas/catalog.graphic.schema.json
+[achsen]
+x = [-5, 5]
+y = [-2, 10]
+
+[[graph]]
+term = "y = x^2"
+name = "f"
+
+[[graph]]
+term = "y = 2x + 3"
+
+[[punkt]]
+position = [-1, 1]
+name = "A"
+
+[[punkt]]
+position = [3, 9]

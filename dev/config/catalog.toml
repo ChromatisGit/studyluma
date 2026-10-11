@@ -1,0 +1,5 @@
+#:schema ../.chromatis/schemas/catalog.schema.json
+# Which content the catalog is built from and which courses this instance publishes.
+[default]
+content = "content"
+courses = ["ui-test", "randfaelle"]

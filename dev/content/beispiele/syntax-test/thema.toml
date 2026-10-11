@@ -1,0 +1,3 @@
+#:schema ../../../.chromatis/schemas/catalog.topic.schema.json
+titel = "Syntax-Test"
+icon = "terme"
