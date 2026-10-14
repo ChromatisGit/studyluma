@@ -1,7 +1,7 @@
 import type { AmpelResponse } from "../domain/contract";
 
 export type WorksheetLinks = {
-  sheet: (sheetId: string) => string;
+  sheet: (sheetSlug: string) => string;
   challenges: string;
   summary: string;
   chapter: string;

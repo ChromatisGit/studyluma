@@ -75,7 +75,9 @@ function LiveQuestion({
               <span className="lf-quiz__letter">{LETTERS[i]}</span>
               <RichInlineContent nodes={option.content} />
               {teacher && !revealed && option.correct && (
-                <span className="lf-live__teacher-answer">Richtig</span>
+                <span className="lf-live__teacher-answer">
+                  {TEXT.quiz.correct}
+                </span>
               )}
               {counted && count && (
                 <span className="lf-live__result">

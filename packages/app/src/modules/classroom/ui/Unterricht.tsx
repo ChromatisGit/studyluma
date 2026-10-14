@@ -12,13 +12,16 @@ import {
 } from "@chromatis/base/ui";
 import {
   chapterPath,
+  chapterPathById,
   chaptersInOrder,
   sheetsFor,
   type Course,
 } from "../../courses";
 import { ChapterHeading } from "./ChapterHeading";
+import { ResourceSection } from "./ResourceSection";
 import { ClassroomStart } from "./ClassroomStart";
 import { targetStore } from "../infrastructure/targetStore";
+import { localReleases } from "../infrastructure/localReleases";
 import {
   chapterStore,
   isUnlocked,
@@ -26,6 +29,7 @@ import {
   type SheetsData,
 } from "../../worksheets";
 import type { SummaryRule, Worksheet } from "../../catalog";
+import TEXT from "./classroom.de.json";
 
 // The row keeps access, solutions and active-target confirmation together.
 // eslint-disable-next-line max-lines-per-function
@@ -34,12 +38,15 @@ function SheetRow({
   sheet,
   courseId,
   chapterId,
+  chapterSlug,
 }: {
   data: SheetsData;
   sheet: Worksheet;
   courseId: string;
   chapterId: string;
+  chapterSlug: string;
 }) {
+  const site = useSite();
   const store = chapterStore(chapterId);
   const state = useSyncExternalStore(
     store.subscribe,
@@ -74,23 +81,23 @@ function SheetRow({
           {data.sheets.indexOf(sheet) + 1}) {sheet.title}
         </strong>{" "}
         <Badge status={unlocked ? "success" : "neutral"}>
-          {unlocked ? "Freigeschaltet" : "Gesperrt"}
+          {unlocked ? TEXT.teacher.released : TEXT.teacher.locked}
         </Badge>{" "}
-        {released && <Badge status="success">Musterlösungen freigegeben</Badge>}
-        {targetHere && (
-          <Badge status="info">Schüler:innen werden hierher geschickt</Badge>
+        {released && (
+          <Badge status="success">{TEXT.teacher.solutionsReleased}</Badge>
         )}
+        {targetHere && <Badge status="info">{TEXT.teacher.targetHere}</Badge>}
       </div>
       <div className="teacher-controls-access-actions">
         {!unlocked && (
           <Button size="sm" onClick={() => store.setUnlocked(sheet.id, true)}>
-            Freischalten
+            {TEXT.teacher.unlock}
           </Button>
         )}
         <Button
           role="ghost"
           size="sm"
-          aria-label={`Einstellungen für ${sheet.title}`}
+          aria-label={TEXT.teacher.settingsFor.replace("{title}", sheet.title)}
           aria-expanded={open}
           onClick={() => setOpen(!open)}
         >
@@ -100,7 +107,7 @@ function SheetRow({
       {open && (
         <div className="teacher-controls-access-popover">
           <Switch
-            label="Für die Klasse freigeschaltet"
+            label={TEXT.teacher.classUnlocked}
             checked={unlocked}
             onChange={(event) => {
               if (!event.target.checked && targetHere) {
@@ -110,32 +117,16 @@ function SheetRow({
               }
             }}
           />
-          <Switch
-            label="Musterlösungen freigegeben"
-            checked={released}
-            disabled={!solutions.length}
-            onChange={(event) => {
-              const data = new FormData();
-              data.set("intent", "releaseSolutions");
-              data.set("chapterId", chapterId);
-              data.set("sheetId", sheet.id);
-              data.set("released", String(event.target.checked));
-              void releaseFetcher.submit(data, { method: "post" });
-            }}
-          />
-          <Link to={`${chapterPath(courseId, chapterId)}/sheets/${sheet.id}`}>
-            Arbeitsblatt öffnen
-          </Link>
           {confirmLock && (
-            <Alert status="warning" title="Arbeitsblatt sperren?">
-              <p>Schüler:innen werden gerade hierher geschickt.</p>
+            <Alert status="warning" title={TEXT.teacher.lockTitle}>
+              <p>{TEXT.teacher.targetWarning}</p>
               <div className="teacher-controls-actions">
                 <Button
                   role="secondary"
                   size="sm"
                   onClick={() => setConfirmLock(false)}
                 >
-                  Abbrechen
+                  {TEXT.teacher.cancel}
                 </Button>
                 <Button
                   role="destructive"
@@ -146,22 +137,43 @@ function SheetRow({
                     setConfirmLock(false);
                   }}
                 >
-                  Trotzdem sperren
+                  {TEXT.teacher.lockAnyway}
                 </Button>
               </div>
             </Alert>
           )}
+          <Switch
+            label={TEXT.teacher.solutions}
+            checked={released}
+            disabled={!solutions.length}
+            onChange={(event) => {
+              if (site.localReleases) {
+                localReleases.setSolutions(
+                  solutions.map((task) => task.id),
+                  event.target.checked,
+                );
+                return;
+              }
+              const data = new FormData();
+              data.set("intent", "releaseSolutions");
+              data.set("chapterId", chapterId);
+              data.set("sheetId", sheet.id);
+              data.set("released", String(event.target.checked));
+              void releaseFetcher.submit(data, { method: "post" });
+            }}
+          />
+          <Link
+            to={`${chapterPath(courseId, chapterSlug)}/sheets/${encodeURIComponent(sheet.slug)}`}
+          >
+            {TEXT.teacher.openSheet}
+          </Link>
         </div>
       )}
     </li>
   );
 }
 
-const RULES: Record<SummaryRule, string> = {
-  kapitel: "Mit dem Kapitel",
-  abschluss: "Nach Abschluss des Kapitels",
-  manuell: "Nur manuell",
-};
+const RULES: Record<SummaryRule, string> = TEXT.teacher.rules;
 
 /** The chapter's Inhalt: locked until released, by hand or by the rule. */
 function InhaltRow({
@@ -180,19 +192,34 @@ function InhaltRow({
   const released = site.releasedSummaries.includes(chapterId);
   const rule = site.summaryRules[chapterId] ?? "manuell";
   if (!summary) {
-    return <p>Dieses Kapitel hat noch keinen Inhalt.</p>;
+    return <p>{TEXT.teacher.noSummary}</p>;
   }
-  const send = (values: Record<string, string>) =>
+  const send = (values: Record<string, string>) => {
+    if (site.localReleases) {
+      if (
+        values.intent === "releaseSummary" ||
+        values.intent === "lockSummary"
+      ) {
+        localReleases.setSummary(chapterId, values.intent === "releaseSummary");
+      } else if (values.intent === "summaryRule") {
+        localReleases.setRule(chapterId, values.rule as SummaryRule);
+      }
+      return;
+    }
     void fetcher.submit({ chapterId, ...values }, { method: "post" });
+  };
   return (
     <ul className="teacher-controls-access-list">
       <li className="teacher-controls-access-row">
         <div>
           <strong>{summary.title}</strong>{" "}
           <Badge status={released ? "success" : "neutral"}>
-            {released ? "Freigeschaltet" : "Gesperrt"}
+            {released ? TEXT.teacher.released : TEXT.teacher.locked}
           </Badge>
-          <small>Freigabe: {RULES[rule]}</small>
+          <small>
+            {TEXT.teacher.releasePrefix}
+            {RULES[rule]}
+          </small>
         </div>
         <div className="teacher-controls-access-actions">
           {!released && (
@@ -200,13 +227,13 @@ function InhaltRow({
               size="sm"
               onClick={() => send({ intent: "releaseSummary" })}
             >
-              Freischalten
+              {TEXT.teacher.unlock}
             </Button>
           )}
           <Button
             role="ghost"
             size="sm"
-            aria-label="Einstellungen für den Inhalt"
+            aria-label={TEXT.teacher.contentSettings}
             aria-expanded={settings}
             onClick={() => setSettings(!settings)}
           >
@@ -216,7 +243,7 @@ function InhaltRow({
         {settings && (
           <div className="teacher-controls-access-popover">
             <Switch
-              label="Für die Klasse freigeschaltet"
+              label={TEXT.teacher.classUnlocked}
               checked={released}
               onChange={(event) =>
                 send({
@@ -227,7 +254,7 @@ function InhaltRow({
               }
             />
             <fieldset>
-              <legend>Freigabe</legend>
+              <legend>{TEXT.teacher.release}</legend>
               {(Object.keys(RULES) as SummaryRule[]).map((option) => (
                 <label key={option}>
                   <input
@@ -242,8 +269,8 @@ function InhaltRow({
                 </label>
               ))}
             </fieldset>
-            <Link to={`${chapterPath(course.id, chapterId)}#inhalt`}>
-              Inhalt öffnen
+            <Link to={`${chapterPathById(course, chapterId)}#inhalt`}>
+              {TEXT.teacher.openContent}
             </Link>
           </div>
         )}
@@ -272,22 +299,18 @@ function StartPresentation({
   const chosen =
     presentations.find((item) => item.id === selected) ?? presentations[0];
   if (!presentations.length) {
-    return (
-      <Alert status="info">
-        Für dieses Kapitel ist kein Foliensatz in der Übersicht.
-      </Alert>
-    );
+    return <Alert status="info">{TEXT.teacher.noPresentation}</Alert>;
   }
   return (
     <>
       <Button size="lg" onClick={() => setOpen(true)}>
-        Unterrichtsmodus starten
+        {TEXT.teacher.startLesson}
       </Button>
       <Dialog
         open={open}
         onOpenChange={setOpen}
-        closeLabel="Schließen"
-        title="Unterrichtsmodus starten"
+        closeLabel={TEXT.teacher.close}
+        title={TEXT.teacher.startLesson}
       >
         <div className="teacher-controls-start-options">
           {presentations.map((item) => (
@@ -305,14 +328,14 @@ function StartPresentation({
         </div>
         <div className="teacher-controls-actions">
           <Button role="secondary" onClick={() => setOpen(false)}>
-            Abbrechen
+            {TEXT.teacher.cancel}
           </Button>
           {chosen && (
             <Link
               className={buttonClassName({})}
-              to={`${chapterPath(course.id, chapterId)}/lesson?presentation=${encodeURIComponent(chosen.id)}`}
+              to={`${chapterPathById(course, chapterId)}/lesson?presentation=${encodeURIComponent(chosen.id)}`}
             >
-              Unterrichtsmodus starten
+              {TEXT.teacher.startLesson}
             </Link>
           )}
         </div>
@@ -330,7 +353,7 @@ export function Unterricht({ course }: { course: Course }) {
     [site, course.id, current],
   );
   if (!current) {
-    return <Alert status="info">Noch kein aktuelles Kapitel.</Alert>;
+    return <Alert status="info">{TEXT.teacher.noCurrentChapter}</Alert>;
   }
   return (
     <div className="teacher-controls-stack">
@@ -341,33 +364,27 @@ export function Unterricht({ course }: { course: Course }) {
             className={buttonClassName({ size: "sm" })}
             to={`/courses/${course.id}/course-structure`}
           >
-            Kapitel wechseln
+            {TEXT.teacher.changeChapter}
           </Link>
           <Link
             className={buttonClassName({ role: "secondary", size: "sm" })}
             to={`/courses/${course.id}/content`}
           >
-            Inhalte ansehen
+            {TEXT.teacher.viewContent}
           </Link>
         </div>
       </div>
       {site.classroomEnabled && <ClassroomStart courseId={course.id} />}
-      <section aria-labelledby="overview-teaching">
-        <h2 id="overview-teaching" className="h2">
-          Unterricht
-        </h2>
+      <ResourceSection
+        id="overview-teaching"
+        title={TEXT.teacher.teachingTitle}
+      >
         <StartPresentation course={course} chapterId={current.id} />
-      </section>
-      <section aria-labelledby="overview-summary">
-        <h2 id="overview-summary" className="h2">
-          Inhalt
-        </h2>
+      </ResourceSection>
+      <ResourceSection id="overview-summary" title={TEXT.teacher.summaryTitle}>
         <InhaltRow course={course} chapterId={current.id} />
-      </section>
-      <section aria-labelledby="overview-sheets">
-        <h2 id="overview-sheets" className="h2">
-          Arbeitsblätter
-        </h2>
+      </ResourceSection>
+      <ResourceSection id="overview-sheets" title={TEXT.teacher.worksheets}>
         {data?.sheets.length ? (
           <ul className="teacher-controls-access-list">
             {data.sheets.map((sheet) => (
@@ -377,13 +394,14 @@ export function Unterricht({ course }: { course: Course }) {
                 sheet={sheet}
                 courseId={course.id}
                 chapterId={current.id}
+                chapterSlug={current.slug}
               />
             ))}
           </ul>
         ) : (
-          <p>Dieses Kapitel hat noch keine Arbeitsblätter.</p>
+          <p>{TEXT.teacher.noSheets}</p>
         )}
-      </section>
+      </ResourceSection>
     </div>
   );
 }

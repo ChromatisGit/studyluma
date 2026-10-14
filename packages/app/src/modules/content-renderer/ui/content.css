@@ -15,16 +15,52 @@
   height: auto;
 }
 
-/* Math (MathML from kern-typ) */
-.math math {
-  font-size: 1.05em;
+/* Math (MathML from kern-typ). MathML shrinks numerator and denominator,
+   twice for a fraction in a fraction, which is too small to read: they keep
+   the size of the formula (a fraction in a fraction only a little less), and
+   formulas grow with their nesting instead. `.math` and `.math-block` come
+   from Markdown, `.math-inline` and `.math-display` from compiled content.
+   A formula alone in its paragraph (`.math-alone`) is sized like a display
+   formula. */
+:is(.math, .math-inline),
+:is(.math-block, .math-display, .math-alone .math-inline) {
+  --math-size: 1.1em;
+}
+:is(.math-block, .math-display, .math-alone .math-inline) {
+  --math-size: 1.25em;
+}
+:is(.math, .math-inline, .math-block, .math-display) math {
+  font-size: var(--math-size);
+}
+:is(.math, .math-inline, .math-block, .math-display) mfrac > * {
+  font-size: inherit;
+}
+:is(.math, .math-inline, .math-block, .math-display) mfrac mfrac > * {
+  font-size: 0.85em;
+}
+/* The font leaves almost no gap under the fraction bar, so the digits of the
+   denominator touch it. Shift it down by about 1.5px (visual only). */
+:is(.math, .math-inline, .math-block, .math-display) mfrac > :nth-child(2) {
+  transform: translateY(0.08em);
+}
+:is(.math, .math-inline):has(mfrac) {
+  --math-size: 1.15em;
+}
+:is(.math, .math-inline):has(mfrac mfrac) {
+  --math-size: 1.25em;
+}
+:is(.math-block, .math-display, .math-alone .math-inline):has(mfrac) {
+  --math-size: 1.35em;
+}
+:is(.math-block, .math-display, .math-alone .math-inline):has(mfrac mfrac) {
+  --math-size: 1.45em;
+}
+:is(.math, .math-inline) {
+  line-height: 1;
 }
 .math-block {
   overflow: visible;
   text-align: center;
-}
-.math-block math {
-  font-size: 1.25em;
 }
 .math--fallback {
   font-family: var(--font-mono);
@@ -93,16 +129,20 @@ mark {
   margin-top: 0;
 }
 
-/* Two or more Merkkarten in a row become a grid (added by the renderer) */
+/* Merkkarten in a summary: two side by side when there is room, else stacked.
+   Rows have equal heights; MerkkartenGruppe keeps them while some cards are
+   open. The example toggle sits at the bottom of each card.
+   Single cards get the same spacing and a width limit. */
 .merkkarten-gruppe {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: var(--space-500);
-  align-items: start;
 }
-@container (min-width: 34rem) {
-  .merkkarten-gruppe {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.zusammenfassung > :is(.merkkarten-gruppe, .merkkarte) {
+  margin-block: var(--space-600);
+}
+.zusammenfassung > .merkkarte {
+  max-width: 40rem;
 }
 
 /* Merkkarte: framework Card with one violet rule under the title */
@@ -130,6 +170,7 @@ mark {
   line-height: var(--leading-label);
 }
 .merkkarte__body {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -138,6 +179,9 @@ mark {
 }
 .merkkarte__body > * {
   margin: 0;
+}
+.merkkarte__body > .merkkarte__toggle {
+  margin-top: auto;
 }
 .merkkarte__toggle {
   display: inline-flex;

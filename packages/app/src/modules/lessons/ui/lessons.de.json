@@ -39,7 +39,7 @@
     "openProjector": "Projektorfenster öffnen",
     "closeProjector": "Projektorfenster schließen",
     "end": "Unterricht beenden",
-    "endConfirm": "Unterricht beenden? Tinte und freie Flächen dieser Stunde werden archiviert, die nächste Stunde beginnt leer.",
+    "endConfirm": "Unterricht beenden?",
     "back": "Zum Kapitel"
   },
   "notes": {
@@ -92,6 +92,7 @@
     "description": "{count} Folien"
   },
   "quiz": {
+    "correct": "Richtig",
     "position": "Frage {number} von {total}",
     "multiple": "Mehrere Antworten möglich",
     "count": "{count} / {participants} · {percent} %",
@@ -104,5 +105,49 @@
     "finish": "Quiz beenden",
     "allAnswered": "alle haben geantwortet",
     "failed": "Keine Verbindung zum Server"
+  },
+  "monitoring": {
+    "progress": "Fortschritt",
+    "demo": "Demodaten",
+    "locked": "Das Blatt ist noch gesperrt. Sobald du es freischaltest, siehst du hier, wo die Klasse arbeitet.",
+    "registered": "angemeldet:",
+    "working": "arbeiten gerade an diesem Blatt",
+    "section": "Abschnitt",
+    "share": "Anteil",
+    "hereTitle": "Gerade in diesem Abschnitt",
+    "here": "Hier",
+    "beyondTitle": "Schon über diesen Abschnitt hinaus",
+    "beyond": "Weiter",
+    "done": "Fertig",
+    "challenges": "Challenges",
+    "ampel": "CfU-Ampel",
+    "anonymousDemo": "anonym · Demodaten",
+    "rated": "haben bewertet",
+    "green": "Grün",
+    "yellow": "Gelb",
+    "red": "Rot",
+    "open": "Offen",
+    "causes": "Gründe bei Gelb und Rot",
+    "noFeedback": "Noch keine Rückmeldungen. Die Ampel füllt sich, sobald Schüler den Checkpoint erreichen.",
+    "causesLabels": {
+      "topic": "Thema noch unklar",
+      "task": "Aufgabenstellung unklar",
+      "approach": "Weiß nicht, wie anfangen",
+      "execution": "Muss noch mehr üben",
+      "mistake": "Fehler nicht verstanden",
+      "other": "Anderes"
+    },
+    "ampelAria": "{green} grün, {yellow} gelb, {red} rot, {open} offen"
+  },
+  "teacher": {
+    "stopSending": "Nicht mehr schicken",
+    "sendStudents": "Schüler senden",
+    "unlockAndSend": "Freischalten & Schüler senden",
+    "releaseSummary": "Inhalt für die Klasse freigeben",
+    "close": "Schließen",
+    "endTitle": "Unterrichtsmodus beenden",
+    "cancel": "Abbrechen",
+    "end": "Unterrichtsmodus beenden",
+    "endDescription": "Freigeschaltete Inhalte bleiben verfügbar. Schüler:innen werden danach nicht mehr weitergeleitet."
   }
 }

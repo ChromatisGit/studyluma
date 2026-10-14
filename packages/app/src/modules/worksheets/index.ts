@@ -7,6 +7,7 @@ export type { CurrentView } from "./ui/ChapterNav";
 export { ChapterNav } from "./ui/ChapterNav";
 export type { WorksheetLinks } from "./ui/useWorksheetController";
 export { SheetCards } from "./ui/SheetCards";
+export { TeacherLockNotice } from "./ui/TeacherLockNotice";
 export {
   isReleased,
   isUnlocked,

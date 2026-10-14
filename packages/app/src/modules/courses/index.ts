@@ -9,12 +9,14 @@ export type {
 } from "./domain/course";
 export {
   chapterPath,
+  chapterPathById,
   chaptersInOrder,
   courseContentPath,
   courseOverviewPath,
   coursePath,
   courseStructurePath,
   findChapter,
+  findChapterBySlug,
   neighbours,
 } from "./application/navigation";
 export { coursesFromCatalog } from "./domain/fromCatalog";

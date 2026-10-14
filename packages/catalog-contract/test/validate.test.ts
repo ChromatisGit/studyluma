@@ -96,6 +96,26 @@ describe("validateCatalogArtifact", () => {
     expect(errorsOf(writeArtifact(wrongPath))[0]).toContain("invalid path");
   });
 
+  test("a course's current chapter must exist", () => {
+    const base = tinyCatalog();
+    const { buildId: _unused, ...content } = base;
+    const broken = {
+      ...content,
+      courses: [
+        {
+          id: "k",
+          title: "K",
+          topics: [{ topicId: "t1", chapterIds: ["c1"] }],
+          currentChapterId: "zz",
+        },
+      ],
+    };
+    const catalog = { ...broken, buildId: computeCatalogBuildId(broken) };
+    expect(errorsOf(writeArtifact(catalog)).join("\n")).toContain(
+      "unknown chapters zz",
+    );
+  });
+
   test("a rehashed catalog with a dangling reference is rejected", () => {
     const base = tinyCatalog();
     const { buildId: _unused, ...content } = base;

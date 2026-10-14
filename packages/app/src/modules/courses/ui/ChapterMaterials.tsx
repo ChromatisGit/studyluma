@@ -1,15 +1,16 @@
 import { SheetCards, type SheetsData } from "../../worksheets";
 import { chapterPath } from "../application/navigation";
+import TEXT from "./courses.de.json";
 
 /** The chapter's worksheets, followed by its challenge pool. */
 export function ChapterMaterials({
   courseId,
-  chapterId,
+  chapterSlug,
   chapter,
   availableOnly = false,
 }: {
   courseId: string;
-  chapterId: string;
+  chapterSlug: string;
   /** The chapter's worksheets, as the reader may see them. */
   chapter: SheetsData | undefined;
   availableOnly?: boolean;
@@ -17,14 +18,14 @@ export function ChapterMaterials({
   if (!chapter) {
     return null;
   }
-  const base = chapterPath(courseId, chapterId);
+  const base = chapterPath(courseId, chapterSlug);
   return (
     <section
       className="content-section"
       aria-labelledby="arbeitsblaetter-title"
     >
       <h2 className="h2" id="arbeitsblaetter-title">
-        Arbeitsblätter
+        {TEXT.chapter.worksheets}
       </h2>
       <SheetCards
         chapter={chapter}
@@ -32,7 +33,7 @@ export function ChapterMaterials({
         availableOnly={availableOnly}
         links={{
           chapter: base,
-          sheet: (id) => `${base}/sheets/${encodeURIComponent(id)}`,
+          sheet: (slug) => `${base}/sheets/${encodeURIComponent(slug)}`,
           challenges: `${base}/challenges`,
           summary: base,
         }}

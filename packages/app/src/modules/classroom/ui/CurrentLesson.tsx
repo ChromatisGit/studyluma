@@ -1,4 +1,5 @@
 import { useMemo, useSyncExternalStore } from "react";
+import { fill } from "../../../helper/text";
 import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
 import { targetStore } from "../infrastructure/targetStore";
@@ -12,6 +13,7 @@ import {
   sheetsFor,
   type Course,
 } from "../../courses";
+import TEXT from "./classroom.de.json";
 
 /** The work students need when they open their course for a lesson. */
 export function CurrentLesson({ course }: { course: Course }) {
@@ -38,7 +40,7 @@ export function CurrentLesson({ course }: { course: Course }) {
     return null;
   }
 
-  const base = chapterPath(course.id, chapterId);
+  const base = chapterPath(course.id, current.slug);
   const sheet = chapter?.sheets.find((item) => item.id === active?.id);
   const activeSheet =
     active?.chapterId === chapterId &&
@@ -71,9 +73,11 @@ export function CurrentLesson({ course }: { course: Course }) {
       {activeSheet && (
         <Link
           className="current-lesson__continue"
-          to={`${base}/sheets/${encodeURIComponent(activeSheet.id)}`}
+          to={`${base}/sheets/${encodeURIComponent(activeSheet.slug)}`}
         >
-          <span>Weiter mit Arbeitsblatt {activeSheet.title}</span>
+          <span>
+            {fill(TEXT.teacher.continueSheet, { title: activeSheet.title })}
+          </span>
           <ArrowRight aria-hidden="true" />
         </Link>
       )}
@@ -82,13 +86,13 @@ export function CurrentLesson({ course }: { course: Course }) {
           className="current-lesson__continue"
           to={`/courses/${encodeURIComponent(course.id)}/quiz`}
         >
-          <span>Quiz fortsetzen</span>
+          <span>{TEXT.teacher.continueQuiz}</span>
           <ArrowRight aria-hidden="true" />
         </Link>
       )}
       <ChapterMaterials
         courseId={course.id}
-        chapterId={chapterId}
+        chapterSlug={current.slug}
         chapter={chapter}
         availableOnly
       />

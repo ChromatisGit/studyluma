@@ -83,17 +83,17 @@
   "modes": {
     "unterstuetzung": {
       "name": "Mehr Unterstützung",
-      "description": "Die ersten Aufgaben zeigen dir den Rechenweg, dann den Plan. Danach rechnest du allein."
+      "description": "Ich möchte am Anfang mehr Erklärungen und Hilfestellungen bei den Aufgaben erhalten."
     },
     "uebung": {
       "name": "Mehr Übung",
-      "description": "Die ersten Aufgaben geben dir einen Plan. Danach rechnest du allein."
+      "description": "Ich möchte selbstständig üben und bei Bedarf Tipps nutzen."
     },
     "challenges": {
       "name": "Mehr Challenges",
-      "description": "Du rechnest von Anfang an allein. Einige Aufgaben sind eingeklappt, du kommst schneller zum Check."
+      "description": "Ich fühle mich schon sicher und möchte schneller zu schwierigeren Aufgaben kommen."
     },
-    "question": "Wie willst du dieses Blatt bearbeiten?",
+    "question": "Wie möchtest du die Aufgaben angehen?",
     "start": "Los geht's",
     "change": "ändern",
     "preview": "Vorschau: {mode}"
@@ -105,7 +105,8 @@
     "doneTitle": "Erledigt",
     "locked": "Dieses Blatt hat deine Lehrkraft noch nicht freigeschaltet.",
     "lockedTitle": "Noch nicht freigeschaltet",
-    "notFound": "Dieses Blatt gibt es nicht."
+    "notFound": "Dieses Blatt gibt es nicht.",
+    "teacherLocked": "Für Schüler gesperrt: Dieses Blatt ist noch nicht freigeschaltet. Nur du kannst es öffnen."
   },
   "checkpoint": {
     "kicker": "Checkpoint",
@@ -258,7 +259,8 @@
     "new": "Neu",
     "challenges": "Challenges",
     "challengesMeta": "Für Schnelle",
-    "openOf": "{open} von {total} offen"
+    "openOf": "{open} von {total} offen",
+    "availableOf": "{open} von {total} verfügbar"
   },
   "reset": "Antworten in diesem Browser zurücksetzen",
   "vector": {

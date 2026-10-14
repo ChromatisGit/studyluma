@@ -4,13 +4,13 @@ import type { WorksheetLinks } from "../src/modules/worksheets";
 /** Where the worksheet pages of a chapter live. */
 export function worksheetLinks(
   courseId: string,
-  chapterId: string,
+  chapterSlug: string,
 ): WorksheetLinks {
-  const chapter = chapterPath(courseId, chapterId);
+  const chapter = chapterPath(courseId, chapterSlug);
   return {
     chapter,
     summary: chapter,
     challenges: `${chapter}/challenges`,
-    sheet: (sheetId) => `${chapter}/sheets/${encodeURIComponent(sheetId)}`,
+    sheet: (sheetSlug) => `${chapter}/sheets/${encodeURIComponent(sheetSlug)}`,
   };
 }

@@ -6,11 +6,15 @@ import {
   useLocation,
   useParams,
 } from "react-router";
-import { UserRound } from "lucide-react";
+import { House, Map, UserRound } from "lucide-react";
 import type { NavigationItem } from "@chromatis/base/ui";
 import { shellLinks } from "../src/modules/shell";
 import { courseOverviewPath, coursePath } from "../src/modules/courses";
-import { LiveQuizProvider, type readViewer } from "../src/modules/classroom";
+import {
+  LiveQuizProvider,
+  useSite,
+  type readViewer,
+} from "../src/modules/classroom";
 import {
   ChapterNav,
   type CurrentView,
@@ -74,6 +78,22 @@ function AccountLink({
   );
 }
 
+/** What the sidebar highlights for the open page. */
+function currentView(
+  chapter: SheetsData | null,
+  { chapterSlug, sheetSlug }: Readonly<Record<string, string | undefined>>,
+  pathname: string,
+): CurrentView {
+  const sheet = chapter?.sheets.find((item) => item.slug === sheetSlug);
+  if (sheet) {
+    return { kind: "sheet", sheetId: sheet.id };
+  }
+  if (pathname.endsWith("/challenges")) {
+    return { kind: "challenges" };
+  }
+  return chapterSlug ? { kind: "summary" } : { kind: "course" };
+}
+
 /** Pages inside the StudyLuma shell; the lesson views have none. */
 export default function ShellLayout() {
   const {
@@ -81,26 +101,25 @@ export default function ShellLayout() {
     shell,
     courses,
     worksheetChapter,
-    sidebarChapterId,
+    sidebarChapterSlug,
     hasSummary,
     summaryUnlocked,
   } = useLoaderData<typeof loader>();
+  const site = useSite();
   // The instance's extra entries and account link; else the login button.
   const extra = shellLinks(shell);
-  const { courseId, chapterId, sheetId } = useParams();
+  const { courseId, chapterSlug, sheetSlug } = useParams();
   const location = useLocation();
-  const activeChapterId = chapterId ?? sidebarChapterId ?? undefined;
+  const activeChapterSlug = chapterSlug ?? sidebarChapterSlug ?? undefined;
   const links =
-    courseId && activeChapterId
-      ? worksheetLinks(courseId, activeChapterId)
+    courseId && activeChapterSlug
+      ? worksheetLinks(courseId, activeChapterSlug)
       : undefined;
-  const current: CurrentView = sheetId
-    ? { kind: "sheet", sheetId }
-    : location.pathname.endsWith("/challenges")
-      ? { kind: "challenges" }
-      : !chapterId
-        ? { kind: "course" }
-        : { kind: "summary" };
+  const current = currentView(
+    worksheetChapter,
+    { chapterSlug, sheetSlug },
+    location.pathname,
+  );
   const chapterSection =
     worksheetChapter && links
       ? {
@@ -113,7 +132,11 @@ export default function ShellLayout() {
               links={links}
               current={current}
               hasSummary={hasSummary}
-              summaryUnlocked={summaryUnlocked}
+              summaryUnlocked={
+                site.localReleases
+                  ? site.releasedSummaries.includes(worksheetChapter.id)
+                  : summaryUnlocked
+              }
               {...(onNavigate ? { onNavigate } : {})}
             />
           ),
@@ -124,6 +147,12 @@ export default function ShellLayout() {
       id: `shell-${index}`,
       label: entry.label,
       to: entry.href,
+      icon:
+        entry.icon === "house" ? (
+          <House aria-hidden="true" />
+        ) : entry.icon === "map" ? (
+          <Map aria-hidden="true" />
+        ) : undefined,
     })),
     {
       id: "courses",

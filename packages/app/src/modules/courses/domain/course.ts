@@ -27,6 +27,8 @@ export type Topic = {
 
 export type Chapter = {
   id: string;
+  /** Name in the URL, unique within the course. */
+  slug: string;
   /** Stable number: "9.2". */
   number: string;
   title: string;

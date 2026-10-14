@@ -79,6 +79,13 @@ type Document = {
 const hash = (value: string | Uint8Array) =>
   createHash("sha256").update(value).digest("hex");
 const id = (type: string, key: string) => `${type}_${hash(key).slice(0, 16)}`;
+/** URL name of a chapter folder or worksheet file: lowercase, hyphens for spaces, without its `01-` ordering prefix. */
+const slugOf = (name: string) =>
+  name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/^\d+-(?=.)/, "");
 const unquote = (s: string) =>
   s.trim().replace(/^(?:"([\s\S]*)"|'([\s\S]*)')$/, (_m, a, b) => a ?? b);
 /** The text between double quotes, or undefined when `s` is not a quoted title. */
@@ -714,6 +721,7 @@ export function compileContent(
     if (!chapter) {
       chapter = {
         id: id("chapter", key),
+        slug: slugOf(name),
         group,
         topic,
         name,
@@ -1302,6 +1310,7 @@ export function compileContent(
     const filename = basename(doc.file, ".md");
     const sheet: Worksheet = {
       id: id("worksheet", doc.file),
+      slug: slugOf(filename),
       chapterId: doc.chapter.id,
       filename,
       title: front?.titel ?? filename,
@@ -1390,6 +1399,16 @@ export function compileContent(
       error(
         "TASK_DUPLICATE",
         "Duplicate task title across Worksheet",
+        loc(doc.file),
+      );
+    const same = worksheets.find(
+      (other) =>
+        other.chapterId === sheet.chapterId && other.slug === sheet.slug,
+    );
+    if (same)
+      error(
+        "SLUG_DUPLICATE",
+        `Worksheet ${same.filename}.md and ${filename}.md share the URL name ${sheet.slug} (the number prefix does not count)`,
         loc(doc.file),
       );
     doc.chapter.worksheetIds.push(sheet.id);
@@ -2260,6 +2279,8 @@ export function compileContent(
       );
       if (!data) continue;
       const course: Course = { id: courseId, title: data.titel, topics: [] };
+      const courseChapters = new Map<string, Chapter>();
+      const chapterRefs = new Map<string, string>();
       for (const [folder, list] of Object.entries(data.themen)) {
         const topic = topicFolders.get(folder);
         if (!topic) {
@@ -2281,9 +2302,30 @@ export function compileContent(
               `Duplicate chapter ${folder}/${name}`,
               loc(file),
             );
-          else chapterIds.push(chapter.id);
+          else {
+            const same = courseChapters.get(chapter.slug);
+            if (same)
+              error(
+                "SLUG_DUPLICATE",
+                `Chapters ${same.topic}/${same.name} and ${folder}/${name} share the URL name ${chapter.slug} in course ${courseId} (the number prefix does not count)`,
+                loc(file),
+              );
+            courseChapters.set(chapter.slug, chapter);
+            chapterRefs.set(`${folder}/${name}`, chapter.id);
+            chapterIds.push(chapter.id);
+          }
         }
         course.topics.push({ topicId: topic.id, chapterIds });
+      }
+      if (data.aktuell !== undefined) {
+        const current = chapterRefs.get(data.aktuell);
+        if (current === undefined)
+          error(
+            "COURSE_CHAPTER",
+            `aktuell: ${data.aktuell} is not a chapter of this course (write topic folder/chapter as in themen)`,
+            loc(file),
+          );
+        else course.currentChapterId = current;
       }
       courses.push(course);
     }

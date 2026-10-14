@@ -1,6 +1,10 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { loadSite } from "../site.server";
-import { sheetsFor } from "../../src/modules/courses";
+import {
+  findChapter,
+  findChapterBySlug,
+  sheetsFor,
+} from "../../src/modules/courses";
 import { readViewer } from "../../src/modules/classroom";
 import { shellSettings } from "../../src/modules/shell/server/shell.server";
 export { default } from "../StudyShellLayout";
@@ -12,12 +16,19 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
   const configuredCourse = courseId
     ? site.courses.find((course) => course.id === courseId)
     : undefined;
+  const chapter =
+    configuredCourse && params.chapterSlug
+      ? findChapterBySlug(configuredCourse, params.chapterSlug)
+      : undefined;
   const chapterId =
-    params.chapterId ?? configuredCourse?.currentChapterId ?? undefined;
+    chapter?.id ?? configuredCourse?.currentChapterId ?? undefined;
+  const sidebarChapter = chapterId
+    ? configuredCourse && findChapter(configuredCourse, chapterId)
+    : undefined;
   return {
     viewer,
     shell: shellSettings(),
-    sidebarChapterId: chapterId ?? null,
+    sidebarChapterSlug: sidebarChapter?.slug ?? null,
     courses: site.courses.map(({ id, title }) => ({ id, title })),
     worksheetChapter:
       chapterId && courseId

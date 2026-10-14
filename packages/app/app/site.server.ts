@@ -33,14 +33,27 @@ export async function loadSite(request: Request): Promise<SiteData> {
   const viewer = readViewer(request);
   const full = getCatalog();
   const { releases, view, snapshot } = await currentReleases(request);
+  const localReleases = !classroomEnabled();
   const catalog: PublicCatalog =
-    viewer === "teacher" ? teacherCatalog() : publicCatalog(releases);
+    viewer === "teacher"
+      ? teacherCatalog()
+      : publicCatalog(
+          localReleases ? { ...releases, summary: () => true } : releases,
+        );
   const courses = loadCourses(request);
+  // The demo opens on the course's starting chapter with its Inhalt released.
+  const defaultReleasedSummaries = localReleases
+    ? coursesFromCatalog(full).flatMap((course) =>
+        course.currentChapterId ? [course.currentChapterId] : [],
+      )
+    : [];
   return {
     viewer,
     catalog,
     courses,
-    releasedSummaries: view.summaries,
+    releasedSummaries: [
+      ...new Set([...view.summaries, ...defaultReleasedSummaries]),
+    ],
     summaryRules: Object.fromEntries(
       full.chapters.map((chapter) => [
         chapter.id,
@@ -54,6 +67,8 @@ export async function loadSite(request: Request): Promise<SiteData> {
       title: snapshot.title,
     },
     classroomEnabled: classroomEnabled(),
+    localReleases,
+    defaultReleasedSummaries,
     joinOrigin: joinOriginFor(app),
   };
 }

@@ -53,7 +53,9 @@ export function NextCard({
     <nav className="weiter" aria-label={TEXT.next.recommendation}>
       <Link
         className="weiter__card weiter__card--next"
-        to={ready ? (target ? links.sheet(target.id) : links.challenges) : "#"}
+        to={
+          ready ? (target ? links.sheet(target.slug) : links.challenges) : "#"
+        }
         aria-disabled={!ready}
         tabIndex={ready ? undefined : -1}
         onClick={(event) => {

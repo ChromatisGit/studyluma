@@ -124,6 +124,8 @@ export type WorksheetSection = {
 };
 export type Worksheet = {
   id: string;
+  /** URL name: the file name without its number prefix; unique within the chapter. */
+  slug: string;
   chapterId: string;
   filename: string;
   title: string;
@@ -221,6 +223,8 @@ export type Presentation = {
 };
 export type Chapter = {
   id: string;
+  /** URL name: the folder name without its number prefix; unique within each course. */
+  slug: string;
   /** First folder level: a free shelf, carries no meaning. */
   group: string;
   /** Topic folder name. */
@@ -249,6 +253,8 @@ export type CourseDefinition = {
   id: string;
   title: string;
   topics: { topicId: string; chapterIds: string[] }[];
+  /** The chapter the course is at (`aktuell`); the first chapter when absent. */
+  currentChapterId?: string;
 };
 /** Bell times in minutes after midnight. */
 export type Timetable = {

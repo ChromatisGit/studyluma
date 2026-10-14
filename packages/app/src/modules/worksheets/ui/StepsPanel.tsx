@@ -40,7 +40,6 @@ export function StepsPanel({
           const states = own?.lastCheck?.items ?? {};
           const hasGaps = step.content.some((node) => node.type === "gap");
           const last = i === items.length - 1;
-          let number = 0;
           return (
             <li key={step.id} className="weg__step">
               <span className="weg__num">{i + 1}</span>
@@ -48,10 +47,11 @@ export function StepsPanel({
                 <RichInlineContent
                   nodes={step.content}
                   renderGap={(id) => {
-                    const gap = step.content.find(
-                      (node) => node.type === "gap" && node.id === id,
+                    const gaps = step.content.filter(
+                      (node) => node.type === "gap",
                     );
-                    number += 1;
+                    const gap = gaps.find((node) => node.id === id);
+                    const number = gaps.findIndex((node) => node.id === id) + 1;
                     if (!rechenweg || gap?.type !== "gap") {
                       return "…";
                     }

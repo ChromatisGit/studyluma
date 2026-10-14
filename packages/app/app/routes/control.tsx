@@ -18,6 +18,7 @@ import {
   actInSession,
   currentReleases,
 } from "../../src/modules/classroom/server/classroom.server";
+import TEXT from "../app.de.json";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const courseId = params.courseId ?? "";
@@ -79,7 +80,7 @@ export async function action({ params, request }: ActionFunctionArgs) {
   }
   const cookie = coursePlanCookie(request, plan);
   if (cookie.length > 4000) {
-    throw new Response("Der Lernweg ist für den lokalen Speicher zu groß.", {
+    throw new Response(TEXT.control.planTooLarge, {
       status: 413,
     });
   }

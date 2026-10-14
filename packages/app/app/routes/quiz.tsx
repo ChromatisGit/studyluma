@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { useParams } from "react-router";
-import { chapterPath, coursePath } from "../../src/modules/courses";
+import { useLoaderData, useParams } from "react-router";
+import { chapterPathById, coursePath } from "../../src/modules/courses";
 import { loadCourses } from "../site.server";
 import { QuizPage, quizText } from "../../src/modules/classroom";
 import { classroomEnabled } from "../../src/modules/classroom/server/classroom.server";
@@ -10,10 +10,13 @@ export function loader({ params, request }: LoaderFunctionArgs) {
   if (!classroomEnabled()) {
     throw new Response(null, { status: 404 });
   }
-  if (!loadCourses(request).some((course) => course.id === params.courseId)) {
+  const course = loadCourses(request).find(
+    (item) => item.id === params.courseId,
+  );
+  if (!course) {
     throw new Response(null, { status: 404 });
   }
-  return null;
+  return { course };
 }
 
 export function meta() {
@@ -22,12 +25,13 @@ export function meta() {
 
 /** Where students land while their teacher runs a quiz. */
 export default function QuizRoute() {
+  const { course } = useLoaderData<typeof loader>();
   const { courseId = "" } = useParams();
   return (
     <QuizPage
       courseId={courseId}
       coursePath={coursePath(courseId)}
-      chapterPath={(chapterId) => chapterPath(courseId, chapterId)}
+      chapterPath={(chapterId) => chapterPathById(course, chapterId)}
     />
   );
 }

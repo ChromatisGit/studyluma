@@ -33,6 +33,7 @@ export function coursesFromCatalog(catalog: Catalog): Course[] {
               ? [
                   {
                     id: chapter.id,
+                    slug: chapter.slug,
                     number: `${number}.${chapterIndex + 1}`,
                     title: chapter.title,
                   },
@@ -46,7 +47,8 @@ export function coursesFromCatalog(catalog: Catalog): Course[] {
       id: definition.id,
       title: definition.title,
       badge: badgeOf(definition.title),
-      currentChapterId: topics[0]?.chapters[0]?.id ?? null,
+      currentChapterId:
+        definition.currentChapterId ?? topics[0]?.chapters[0]?.id ?? null,
       phases: [],
       topics,
     };

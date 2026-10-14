@@ -33,6 +33,14 @@ export const courseSchema = z
       .describe(
         "Topic folder name = the chapters of that topic in this course, in order.",
       ),
+    aktuell: z
+      .string()
+      .trim()
+      .min(1)
+      .optional()
+      .describe(
+        'The chapter the course is at, written "topic folder/chapter" like in themen; it must be one of them. Default: the first chapter.',
+      ),
   })
   .strict();
 

@@ -7,6 +7,7 @@ export { readViewer } from "./infrastructure/viewerCookie";
 
 // What the class is working on.
 export { targetStore } from "./infrastructure/targetStore";
+export { localReleases } from "./infrastructure/localReleases";
 export type { ActiveTarget } from "./infrastructure/targetStore";
 export { SiteContext, canReadSummary, useSite } from "./ui/SiteContext";
 export type { SiteData } from "./ui/SiteContext";

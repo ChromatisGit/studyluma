@@ -30,5 +30,13 @@
     "home": "Zur Startseite",
     "notFoundNext": "Prüfe die Adresse oder gehe zur Startseite.",
     "genericNext": "Versuche es noch einmal oder gehe zur Startseite."
+  },
+  "login": {
+    "title": "Login",
+    "unavailable": "Die Anmeldung ist derzeit noch nicht verfügbar.",
+    "toCourses": "Zu den Kursen"
+  },
+  "control": {
+    "planTooLarge": "Der Lernweg ist für den lokalen Speicher zu groß."
   }
 }

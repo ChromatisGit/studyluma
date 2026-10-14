@@ -4,6 +4,7 @@ import { coursesFromCatalog } from "./fromCatalog";
 
 const chapter = (id: string, topic: string, name: string) => ({
   id,
+  slug: name,
   group: "g",
   topic,
   name,
@@ -60,6 +61,14 @@ describe("courses from the catalog", () => {
     ]);
     expect(course?.currentChapterId).toBe("c2");
     expect(course?.badge).toBe("MK");
+  });
+
+  test("a course starts at the chapter its file names, else at its first", () => {
+    const named = coursesFromCatalog({
+      ...data,
+      courses: [{ ...data.courses[0]!, currentChapterId: "c3" }],
+    });
+    expect(named[0]?.currentChapterId).toBe("c3");
   });
 
   test("a topic's icon is its gallery id or its own svg", () => {

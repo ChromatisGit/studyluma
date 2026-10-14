@@ -1,7 +1,7 @@
-.teacher-controls-page .page-head {
+.course-detail .page-head {
   padding-bottom: var(--space-500);
 }
-.teacher-controls-page .tabs__panel {
+.course-detail .tabs__panel {
   padding-top: var(--space-700);
 }
 .teacher-controls-stack {
@@ -11,9 +11,7 @@
 .teacher-controls-stack h2 {
   margin: 0;
 }
-.teacher-controls-stack
-  section[aria-labelledby="overview-teaching"]
-  > :not(h2) {
+.teacher-controls-resource-section > :not(h2) {
   margin-top: var(--space-300);
 }
 .teacher-controls-stack .muted {
@@ -21,14 +19,13 @@
   color: var(--color-text-muted);
   font-size: var(--text-sm);
 }
+.teacher-controls-resource-section > .muted {
+  margin: var(--space-300) 0 0;
+}
 .teacher-controls-chapter-intro,
 .teacher-controls-chapter-heading {
   display: grid;
   gap: var(--space-400);
-}
-.teacher-controls-content-intro {
-  display: grid;
-  gap: 0.625rem;
 }
 .teacher-controls-chapter-nav {
   display: flex;
@@ -137,19 +134,16 @@
   gap: var(--space-300);
 }
 .teacher-controls-access-list,
-.teacher-controls-resource-list,
 .teacher-controls-steps {
   list-style: none;
   padding: 0;
   margin: var(--space-300) 0 0;
 }
-.teacher-controls-access-list,
-.teacher-controls-resource-list {
+.teacher-controls-access-list {
   border: var(--border-1) solid var(--color-border-subtle);
   border-radius: var(--radius-surface);
 }
-.teacher-controls-access-row,
-.teacher-controls-resource-list > li {
+.teacher-controls-access-row {
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -158,12 +152,10 @@
   gap: var(--space-300);
   padding: var(--space-400);
 }
-.teacher-controls-access-row + .teacher-controls-access-row,
-.teacher-controls-resource-list > li + li {
+.teacher-controls-access-row + .teacher-controls-access-row {
   border-top: var(--border-1) solid var(--color-border-subtle);
 }
-.teacher-controls-access-row > div:first-child,
-.teacher-controls-resource-list > li > div:first-child {
+.teacher-controls-access-row > div:first-child {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -174,8 +166,7 @@
   color: var(--color-text-muted);
 }
 .teacher-controls-access-actions,
-.teacher-controls-content-head,
-.teacher-controls-resource-list > li > div {
+.teacher-controls-content-head {
   display: flex;
   align-items: center;
   gap: var(--space-200);
@@ -213,8 +204,9 @@
   flex-wrap: wrap;
   margin-bottom: var(--space-300);
 }
-.teacher-controls-resource-list > li > span {
+.teacher-controls-resource-meta {
   color: var(--color-text-muted);
+  font-size: var(--text-sm);
 }
 .teacher-controls-editor {
   display: grid;

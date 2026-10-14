@@ -8,6 +8,7 @@
     "emptyNext": "Frag deine Lehrkraft, wenn du einen Kurs erwartest."
   },
   "breadcrumbs": "Brotkrumennavigation",
+  "summaryTeacherLocked": "Für Schüler gesperrt: Der Inhalt ist noch nicht freigegeben.",
   "lernweg": {
     "heading": "Lernweg",
     "label": "Lernweg {course}",
@@ -29,6 +30,15 @@
     "previous": "Vorheriges Kapitel",
     "next": "Nächstes Kapitel",
     "upcoming": "Als Nächstes",
-    "teacher": "Für die Lehrkraft"
+    "teacher": "Für die Lehrkraft",
+    "notAvailable": "Noch nicht verfügbar"
+  },
+  "tabs": {
+    "overview": "Übersicht",
+    "structure": "Kursstruktur",
+    "content": "Inhalte",
+    "student": "Kursübersicht",
+    "label": "Kursansichten",
+    "studentView": "Schüleransicht"
   }
 }

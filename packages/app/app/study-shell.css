@@ -15,19 +15,6 @@
 .study-sidebar {
   display: none;
 }
-.study-shell {
-  --study-page-max-width: calc(
-    var(--container-reading) + 2 * var(--page-gutter)
-  );
-}
-.study-shell[data-page-width="wide"] {
-  --study-page-max-width: calc(
-    3.25rem + 42rem + var(--space-700) + 11rem + 2 * var(--page-gutter)
-  );
-}
-.study-shell .shell main .container:not(.container--wide) {
-  max-width: var(--study-page-max-width);
-}
 .study-shell .site-header {
   display: none;
 }
@@ -206,6 +193,11 @@
   flex: 1;
 }
 
+/* From 768px the sidebar is fixed and the content never moves when it opens
+   or closes. Below 1100px (`dockedQuery` in StudyShell.tsx) the content keeps
+   the rail's width to its left and the open sidebar overlays it. From 1100px
+   the content is centered, but never closer to the left edge than the open
+   sidebar's width, so even the open sidebar covers nothing. */
 @media (min-width: 768px) {
   .study-shell {
     --study-sidebar-current-width: var(--sidebar-width);
@@ -217,18 +209,32 @@
   .study-shell .shell__sidebar {
     display: none;
   }
-  .study-shell .shell {
-    grid-template-columns: var(--study-sidebar-current-width) minmax(0, 1fr);
+  .study-shell .shell__main {
+    margin-left: var(--sidebar-rail-width);
+    min-height: 100dvh;
   }
-  .study-shell--animate-sidebar .shell {
-    transition: grid-template-columns var(--motion-default) var(--ease-standard);
+  .study-shell:not(.study-shell--collapsed) .study-sidebar {
+    box-shadow: var(--shadow-overlay);
   }
   .study-shell:not(.study-shell--animate-sidebar) .study-sidebar__children {
     transition: none;
   }
-  .study-shell .shell__main {
-    grid-column: 2;
-    min-height: 100dvh;
+  .study-shell .shell__main .container {
+    --study-container-max: calc(
+      var(--container-content) + 2 * var(--page-gutter)
+    );
+    width: auto;
+    max-width: var(--study-container-max);
+    padding-inline: max(var(--page-gutter), env(safe-area-inset-left, 0px))
+      max(var(--page-gutter), env(safe-area-inset-right, 0px));
+  }
+  .study-shell .shell__main .container--reading {
+    --study-container-max: calc(
+      var(--container-reading) + 2 * var(--page-gutter)
+    );
+  }
+  .study-shell .shell__main .container--wide {
+    --study-container-max: calc(var(--container-wide) + 2 * var(--page-gutter));
   }
   .study-sidebar {
     position: fixed;
@@ -267,15 +273,36 @@
   .study-sidebar__brand-name,
   .study-sidebar__section-label {
     overflow: hidden;
-    white-space: nowrap;
     max-width: 12rem;
     opacity: 1;
+  }
+  .study-sidebar__brand-name {
+    white-space: nowrap;
+  }
+  /* Long chapter titles wrap to two lines; the full title is in the link's
+     title attribute. */
+  .study-sidebar__section-label {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow-wrap: anywhere;
   }
   .study-shell--animate-sidebar .study-sidebar__brand-name,
   .study-shell--animate-sidebar .study-sidebar__section-label {
     transition:
       max-width var(--motion-default) var(--ease-standard),
       opacity var(--motion-fast) var(--ease-standard);
+  }
+  /* Expanding: keep the label on one line until the sidebar has its full
+     width, so rows do not flash tall while it grows. Collapsing switches to
+     one line immediately. */
+  .study-shell--animate-sidebar:not(.study-shell--collapsed)
+    .study-sidebar__section-label {
+    transition:
+      max-width var(--motion-default) var(--ease-standard),
+      opacity var(--motion-fast) var(--ease-standard),
+      white-space 0s var(--motion-default) allow-discrete;
   }
   .study-sidebar__toggle {
     position: absolute;
@@ -327,6 +354,10 @@
   }
   .study-sidebar__section--chapter .kap-nav {
     padding: var(--space-100) var(--space-100) var(--space-300);
+  }
+  .study-sidebar__section--chapter .kap-nav__item,
+  .study-sidebar__section--chapter .kap-nav__group-button {
+    min-height: 2.25rem;
   }
   .study-sidebar__section-link {
     position: relative;
@@ -418,8 +449,10 @@
   }
   .study-sidebar__child {
     position: relative;
-    display: block;
-    padding: var(--space-200) var(--space-300);
+    display: flex;
+    align-items: center;
+    min-height: 2.25rem;
+    padding: var(--space-100) var(--space-300);
     border-radius: var(--radius-control);
     color: var(--color-text);
     font-size: var(--text-sm);
@@ -482,6 +515,11 @@
     max-width: 0;
     opacity: 0;
   }
+  .study-shell--collapsed .study-sidebar__section-label {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    white-space: nowrap;
+  }
   .study-shell--collapsed .study-sidebar__section-link {
     justify-content: center;
   }
@@ -504,17 +542,41 @@
   }
 }
 
+/* The whole row toggles the mode, like every other row in the sidebar. */
 .study-sidebar__appearance {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-200);
+  width: 100%;
   min-height: var(--target-min);
+  padding: 0 var(--space-300);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
   color: var(--color-text);
+  font: inherit;
   font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.study-sidebar__appearance:hover {
+  background: var(--color-bg-hover);
+}
+.study-sidebar__appearance:active {
+  background: var(--color-bg-pressed);
 }
 .study-sidebar__appearance-label {
   font-weight: var(--weight-bold);
+}
+.study-sidebar__appearance-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+}
+.study-sidebar__appearance-icon svg {
+  width: var(--size-icon-lg);
+  height: var(--size-icon-lg);
 }
 .study-sidebar__footer-action {
   position: relative;
@@ -576,13 +638,28 @@
   justify-content: center;
 }
 
+@media (min-width: 1100px) {
+  .study-shell .shell__main {
+    margin-left: 0;
+  }
+  .study-shell .shell__main .container {
+    margin-left: max(
+      var(--sidebar-width),
+      calc((100% - var(--study-container-max)) / 2)
+    );
+    margin-right: 0;
+  }
+  .study-shell .study-sidebar {
+    box-shadow: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .study-sidebar,
   .study-sidebar__brand-name,
   .study-sidebar__section-label,
   .study-sidebar__children,
-  .study-sidebar__chevron,
-  .study-shell .shell {
+  .study-sidebar__chevron {
     transition: none;
   }
 }

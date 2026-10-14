@@ -34,31 +34,6 @@
   padding: 0;
   list-style: none;
 }
-.linie__badge-row {
-  display: grid;
-  grid-template-columns: var(--lw-track) minmax(0, 1fr);
-  column-gap: var(--space-300);
-  align-items: center;
-  margin-bottom: var(--space-100);
-}
-.linie__badge {
-  justify-self: center;
-  display: inline-grid;
-  place-items: center;
-  min-width: 2.5rem;
-  height: 1.625rem;
-  padding-inline: var(--space-200);
-  border-radius: var(--radius-sm);
-  background: var(--lw-line);
-  color: var(--color-action-primary-fg);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.04em;
-}
-.linie__badge-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
 .linie__row {
   --lw-y: 1.75rem;
   position: relative;
@@ -100,6 +75,10 @@
 .linie__track::after {
   top: var(--lw-y);
   bottom: 0;
+}
+/* Last stop without a station: the line ends in a rounded cap */
+.lw-end::before {
+  border-radius: 0 0 calc(var(--lw-width) / 2) calc(var(--lw-width) / 2);
 }
 .lw-up-done::before,
 .lw-down-done::after {
@@ -406,6 +385,11 @@ a.lernweg__chapter:hover .lernweg__chapter-title {
 }
 .course-detail .current-lesson + section[aria-labelledby="lernweg-title"] {
   margin-top: var(--space-300);
+}
+.course-detail
+  .current-lesson
+  + section[aria-labelledby="lernweg-title"]:has(> .lernweg) {
+  margin-top: var(--space-700);
 }
 .kapitel {
   width: 100%;

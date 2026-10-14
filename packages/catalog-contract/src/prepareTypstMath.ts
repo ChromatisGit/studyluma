@@ -8,11 +8,16 @@
  *   `1/2500 x^4` as `1/(2500 x^4)` and keep the parentheses in `(a+b)/c`.
  * - A bare colon is rejected; the ratio sign looks the same.
  * - `dot` is the multiplication dot in Typst; kern-typ needs `dot.op`.
+ * - `*` is typed for multiplication; it is shown as the same dot.
  */
 export function prepareTypstMath(source: string): string {
   return rewrite(source)
     .replace(/:/g, "∶")
-    .replace(/\bdot\b(?!\.)/g, "dot.op");
+    .replace(/\bdot\b(?!\.)/g, "dot.op")
+    .replace(
+      /("[^"]*")|\s*\*\s*/g,
+      (whole, text?: string) => text ?? " dot.op ",
+    );
 }
 
 const OPEN: Record<string, string> = { "(": ")", "[": "]", "{": "}" };

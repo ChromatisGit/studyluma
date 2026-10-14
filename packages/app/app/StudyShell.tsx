@@ -1,4 +1,10 @@
-import { useEffect, useId, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import { Link, useLocation } from "react-router";
 import {
   BookOpen,
@@ -33,6 +39,32 @@ const sidebarStorageKey = "studyluma:sidebar";
 
 export const studyColorModeKey = colorModeKey;
 
+/**
+ * From this width the open sidebar stays docked beside the content. Below it
+ * only the rail is reserved and the open sidebar overlays the content.
+ * Keep in step with the media queries in study-shell.css.
+ */
+const dockedQuery = "(min-width: 1100px)";
+
+/**
+ * Sets the collapsed class while the HTML is parsed, so the first paint
+ * already shows the right sidebar. The hooks below reach the same state
+ * before the browser paints again. Mirrors `useSidebarState`.
+ */
+const sidebarInitScript = `(function(){var shell=document.currentScript.parentElement;var closed=!matchMedia(${JSON.stringify(dockedQuery)}).matches;try{closed=closed||localStorage.getItem(${JSON.stringify(sidebarStorageKey)})==="closed"}catch(e){}if(closed)shell.classList.add("study-shell--collapsed")})()`;
+
+function useDocked(): boolean {
+  const [docked, setDocked] = useState(true);
+  useLayoutEffect(() => {
+    const query = window.matchMedia(dockedQuery);
+    const update = () => setDocked(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  return docked;
+}
+
 function ColorModeControl({ compact = false }: { compact?: boolean }) {
   const [mode, setMode] = useColorMode(colorModeKey);
   const [systemDark, setSystemDark] = useState(false);
@@ -46,20 +78,19 @@ function ColorModeControl({ compact = false }: { compact?: boolean }) {
   const dark = mode === "dark" || (mode === "system" && systemDark);
   if (!compact) {
     return (
-      <div className="study-sidebar__appearance">
+      <button
+        type="button"
+        className="study-sidebar__appearance"
+        title={dark ? TEXT.colorMode.toLight : TEXT.colorMode.toDark}
+        onClick={() => setMode(dark ? "light" : "dark")}
+      >
         <span className="study-sidebar__appearance-label">
           {TEXT.colorMode.label}
         </span>
-        <button
-          type="button"
-          className="study-sidebar__theme-button"
-          aria-label={dark ? TEXT.colorMode.toLight : TEXT.colorMode.toDark}
-          title={dark ? TEXT.colorMode.toLight : TEXT.colorMode.toDark}
-          onClick={() => setMode(dark ? "light" : "dark")}
-        >
-          {dark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
-        </button>
-      </div>
+        <span className="study-sidebar__appearance-icon" aria-hidden="true">
+          {dark ? <Sun /> : <Moon />}
+        </span>
+      </button>
     );
   }
   return (
@@ -96,7 +127,7 @@ function DesktopChapterSection({
           className="study-sidebar__section-link study-sidebar__section-button"
           aria-expanded={open}
           aria-controls={`${panelId}-chapter`}
-          title={collapsed ? section.label : undefined}
+          title={section.label}
           onClick={() => {
             if (collapsed) {
               setOpen(true);
@@ -204,7 +235,7 @@ function DesktopSidebar({
                     className="study-sidebar__section-link study-sidebar__section-button"
                     aria-expanded={open}
                     aria-controls={panelId}
-                    title={collapsed ? item.label : undefined}
+                    title={item.label}
                     onClick={() => {
                       if (collapsed) {
                         setExpanded((previous) => ({
@@ -239,7 +270,7 @@ function DesktopSidebar({
                     className="study-sidebar__section-link"
                     to={item.to}
                     aria-current={path === item.to ? "page" : undefined}
-                    title={collapsed ? item.label : undefined}
+                    title={item.label}
                   >
                     <span
                       className="study-sidebar__section-icon"
@@ -299,6 +330,75 @@ function DesktopSidebar({
   );
 }
 
+/** Whether the sidebar is collapsed, and how it changes in each mode. */
+function useSidebarState() {
+  // The stored choice only applies while the sidebar is docked; as an overlay
+  // it is open for one interaction and never stored.
+  const [pinnedCollapsed, setPinnedCollapsed] = useState(false);
+  const [overlayOpen, setOverlayOpen] = useState(false);
+  const [animateSidebar, setAnimateSidebar] = useState(false);
+  const docked = useDocked();
+  const collapsed = docked ? pinnedCollapsed : !overlayOpen;
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    try {
+      setPinnedCollapsed(localStorage.getItem(sidebarStorageKey) === "closed");
+    } catch {
+      // The open sidebar remains usable when storage is unavailable.
+    }
+  }, []);
+
+  useEffect(() => setOverlayOpen(false), [pathname, docked]);
+
+  useEffect(() => {
+    if (docked || !overlayOpen) {
+      return;
+    }
+    const close = () => {
+      setAnimateSidebar(true);
+      setOverlayOpen(false);
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if (!(event.target as Element).closest(".study-sidebar")) {
+        close();
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        close();
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [docked, overlayOpen]);
+
+  function setSidebarCollapsed(next: boolean) {
+    setAnimateSidebar(true);
+    if (!docked) {
+      setOverlayOpen(!next);
+      return;
+    }
+    setPinnedCollapsed(next);
+    try {
+      localStorage.setItem(sidebarStorageKey, next ? "closed" : "open");
+    } catch {
+      // Keep the selected state for this session.
+    }
+  }
+
+  return {
+    collapsed,
+    animateSidebar,
+    toggleSidebar: () => setSidebarCollapsed(!collapsed),
+    expandSidebar: () => setSidebarCollapsed(false),
+  };
+}
+
 export interface StudyShellProps {
   children: ReactNode;
   navigation: readonly NavigationItem[];
@@ -321,43 +421,16 @@ export function StudyShell({
   currentParentTo,
   footer,
 }: StudyShellProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [animateSidebar, setAnimateSidebar] = useState(false);
-
-  useEffect(() => {
-    try {
-      setCollapsed(localStorage.getItem(sidebarStorageKey) === "closed");
-    } catch {
-      // The open sidebar remains usable when storage is unavailable.
-    }
-  }, []);
-
-  function toggleSidebar() {
-    const next = !collapsed;
-    setAnimateSidebar(true);
-    setCollapsed(next);
-    try {
-      localStorage.setItem(sidebarStorageKey, next ? "closed" : "open");
-    } catch {
-      // Keep the selected state for this session.
-    }
-  }
-
-  function expandSidebar() {
-    setAnimateSidebar(true);
-    setCollapsed(false);
-    try {
-      localStorage.setItem(sidebarStorageKey, "open");
-    } catch {
-      // Keep the expanded state for this session.
-    }
-  }
+  const { collapsed, animateSidebar, toggleSidebar, expandSidebar } =
+    useSidebarState();
 
   return (
     <div
       className={`study-shell${collapsed ? " study-shell--collapsed" : ""}${animateSidebar ? " study-shell--animate-sidebar" : ""}`}
       data-page-width={pageWidth}
+      suppressHydrationWarning
     >
+      <script dangerouslySetInnerHTML={{ __html: sidebarInitScript }} />
       <DesktopSidebar
         navigation={navigation}
         chapterSection={chapterSection}

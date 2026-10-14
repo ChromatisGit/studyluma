@@ -23,7 +23,7 @@ function lernwegTopic(course: Course, topic: Topic): LernwegTopic {
       id: chapter.id,
       number: chapter.number,
       title: chapter.title,
-      to: chapterPath(course.id, chapter.id),
+      to: chapterPath(course.id, chapter.slug),
     })),
   };
 }
@@ -73,10 +73,10 @@ export function CoursePage({
 }: CoursePageProps) {
   const navigate = useNavigate();
   const tabLabel = {
-    overview: "Übersicht",
-    "course-structure": "Kursstruktur",
-    content: "Inhalte",
-    student: "Kursübersicht",
+    overview: TEXT.tabs.overview,
+    "course-structure": TEXT.tabs.structure,
+    content: TEXT.tabs.content,
+    student: TEXT.tabs.student,
   }[activeTab];
   const studentView = (
     <>
@@ -87,8 +87,6 @@ export function CoursePage({
         </h2>
         <Lernweg
           label={fill(TEXT.lernweg.label, { course: course.title })}
-          badge={course.badge}
-          badgeLabel={course.title}
           phases={lernwegPhases(course)}
           currentChapterId={course.currentChapterId}
         />
@@ -116,7 +114,7 @@ export function CoursePage({
 
       {teacher ? (
         <Tabs
-          label="Kursansichten"
+          label={TEXT.tabs.label}
           value={activeTab}
           onValueChange={(value) => {
             if (
@@ -142,23 +140,23 @@ export function CoursePage({
           items={[
             {
               id: "overview",
-              label: "Übersicht",
+              label: TEXT.tabs.overview,
               content: activeTab === "overview" ? teachingControls : null,
             },
             {
               id: "course-structure",
-              label: "Kursstruktur",
+              label: TEXT.tabs.structure,
               content:
                 activeTab === "course-structure" ? structureControls : null,
             },
             {
               id: "content",
-              label: "Inhalte",
+              label: TEXT.tabs.content,
               content: activeTab === "content" ? contents : null,
             },
             {
               id: "student",
-              label: "Schüleransicht",
+              label: TEXT.tabs.studentView,
               content: activeTab === "student" ? studentView : null,
             },
           ]}

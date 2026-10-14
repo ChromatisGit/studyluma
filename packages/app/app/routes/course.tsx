@@ -13,6 +13,7 @@ import { actInSession } from "../../src/modules/classroom/server/classroom.serve
 import {
   CurrentLesson,
   Inhalte,
+  LernwegControl,
   Unterricht,
   readViewer,
 } from "../../src/modules/classroom";
@@ -137,8 +138,8 @@ export default function Course() {
       teacher={viewer === "teacher"}
       currentLesson={<CurrentLesson course={course} />}
       teachingControls={<Unterricht course={course} />}
-      structureControls={<Inhalte course={course} showHidden />}
-      contents={<Inhalte course={course} showHidden />}
+      structureControls={<LernwegControl course={course} />}
+      contents={<Inhalte course={course} />}
       activeTab={activeTab}
     />
   );

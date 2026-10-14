@@ -102,7 +102,12 @@ export function applyCoursePlan(course: Course, plan: CoursePlan): Course {
       continue;
     }
     const topic = topics.find((item) => item.id === chapter.topicId);
-    topic?.chapters.push({ id: chapter.id, title: chapter.title, number: "" });
+    topic?.chapters.push({
+      id: chapter.id,
+      slug: chapter.id,
+      title: chapter.title,
+      number: "",
+    });
   }
   const ordered = orderByIds(topics, plan.topicOrder);
   let lastTopicNumber = "0";

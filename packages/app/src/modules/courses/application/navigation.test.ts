@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import type { Course } from "../domain/course";
-import { chaptersInOrder, chapterPath, neighbours } from "./navigation";
+import {
+  chapterPath,
+  chapterPathById,
+  chaptersInOrder,
+  findChapterBySlug,
+  neighbours,
+} from "./navigation";
 
 const course: Course = {
   id: "ma",
@@ -13,15 +19,15 @@ const course: Course = {
       id: "a",
       number: "1",
       title: "A",
-      chapters: [{ id: "1-1", number: "1.1", title: "x" }],
+      chapters: [{ id: "1-1", slug: "eins", number: "1.1", title: "x" }],
     },
     {
       id: "b",
       number: "2",
       title: "B",
       chapters: [
-        { id: "2-1", number: "2.1", title: "y" },
-        { id: "2-2", number: "2.2", title: "z" },
+        { id: "2-1", slug: "zwei", number: "2.1", title: "y" },
+        { id: "2-2", slug: "drei", number: "2.2", title: "z" },
       ],
     },
   ],
@@ -51,6 +57,15 @@ describe("course navigation", () => {
   });
 
   test("paths are English and encoded", () => {
-    expect(chapterPath("ma 1", "2-1")).toBe("/courses/ma%201/chapters/2-1");
+    expect(chapterPath("ma 1", "zwei x")).toBe(
+      "/courses/ma%201/chapters/zwei%20x",
+    );
+  });
+
+  test("a chapter is found by its URL name and linked by id", () => {
+    expect(findChapterBySlug(course, "drei")?.id).toBe("2-2");
+    expect(findChapterBySlug(course, "2-2")).toBeUndefined();
+    expect(chapterPathById(course, "2-2")).toBe("/courses/ma/chapters/drei");
+    expect(chapterPathById(course, "nope")).toBe("/courses/ma");
   });
 });

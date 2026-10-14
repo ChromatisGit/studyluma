@@ -11,6 +11,7 @@ const link = z
   .object({
     label,
     href: internalPath.describe("Internal path, such as /legal."),
+    icon: z.enum(["house", "map"]).optional().describe("Sidebar icon."),
   })
   .strict();
 
@@ -43,7 +44,12 @@ const LOGIN = { label: "Login", to: "/login" } as const;
 
 /** What the shell renders from the configuration: sidebar entries and the account slot link. */
 export function shellLinks(config: ShellConfig): {
-  navigation: { id: string; label: string; to: string }[];
+  navigation: {
+    id: string;
+    label: string;
+    to: string;
+    icon?: "house" | "map";
+  }[];
   account: { label: string; to: string };
 } {
   return {
@@ -51,6 +57,7 @@ export function shellLinks(config: ShellConfig): {
       id: `shell-${index}`,
       label: entry.label,
       to: entry.href,
+      ...(entry.icon ? { icon: entry.icon } : {}),
     })),
     account: config.account
       ? { label: config.account.label, to: config.account.href }

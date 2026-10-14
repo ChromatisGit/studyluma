@@ -16,8 +16,22 @@ export function courseContentPath(courseId: string): string {
   return `${coursePath(courseId)}/content`;
 }
 
-export function chapterPath(courseId: string, chapterId: string): string {
-  return `${coursePath(courseId)}/chapters/${encodeURIComponent(chapterId)}`;
+/** The page of the chapter with this URL name. */
+export function chapterPath(courseId: string, chapterSlug: string): string {
+  return `${coursePath(courseId)}/chapters/${encodeURIComponent(chapterSlug)}`;
+}
+
+/** The page of a chapter given by id, as the course names it. */
+export function chapterPathById(
+  course: Pick<Course, "id" | "topics">,
+  chapterId: string,
+): string {
+  const slug = course.topics
+    .flatMap((topic) => topic.chapters)
+    .find((chapter) => chapter.id === chapterId)?.slug;
+  return slug === undefined
+    ? coursePath(course.id)
+    : chapterPath(course.id, slug);
 }
 
 /** All chapters in course order, with topic and position. */
@@ -42,6 +56,13 @@ export function findChapter(
   chapterId: string,
 ): ChapterInCourse | undefined {
   return chaptersInOrder(course).find((chapter) => chapter.id === chapterId);
+}
+
+export function findChapterBySlug(
+  course: Course,
+  slug: string,
+): ChapterInCourse | undefined {
+  return chaptersInOrder(course).find((chapter) => chapter.slug === slug);
 }
 
 /** Previous and next chapter in course order. */
