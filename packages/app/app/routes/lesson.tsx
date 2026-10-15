@@ -8,7 +8,7 @@ import {
   presentationFor,
   TeacherView,
 } from "../../src/modules/lessons";
-import { readViewer } from "../../src/modules/classroom";
+import { ClassroomConnection, readViewer } from "../../src/modules/classroom";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterSlug = "", courseId = "" } = params;
@@ -48,13 +48,15 @@ export default function LessonRoute() {
   const { courseId = "", chapterSlug = "" } = useParams();
   const chapter = chapterPath(courseId, chapterSlug);
   return (
-    <TeacherView
-      courseId={courseId}
-      deck={deck}
-      periods={periods}
-      projectorPath={`${chapter}/lesson/projector?presentation=${encodeURIComponent(deck.id)}`}
-      chapterPath={chapter}
-      initialFrameId={initialFrameId}
-    />
+    <ClassroomConnection>
+      <TeacherView
+        courseId={courseId}
+        deck={deck}
+        periods={periods}
+        projectorPath={`${chapter}/lesson/projector?presentation=${encodeURIComponent(deck.id)}`}
+        chapterPath={chapter}
+        initialFrameId={initialFrameId}
+      />
+    </ClassroomConnection>
   );
 }

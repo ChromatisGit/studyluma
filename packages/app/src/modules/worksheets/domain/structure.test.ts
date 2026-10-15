@@ -124,6 +124,7 @@ const data: SheetsData = {
   sheets: [sheetA, sheetB],
   challenges: [challenge],
   releasedSolutions: [],
+  sessionSheets: null,
   cards: { m1: card },
 };
 const index = indexChapter(data);
@@ -319,6 +320,19 @@ describe("unlocking, challenges and recommendation", () => {
     expect(isUnlocked(data, sheetB, state)).toBe(false);
     state.unlocked.B = true;
     expect(isUnlocked(data, sheetB, state)).toBe(true);
+  });
+
+  test("in a session only the session's decisions count", () => {
+    const state = emptyChapterState();
+    state.unlocked.B = true;
+    const inSession = (sessionSheets: Record<string, boolean>): SheetsData => ({
+      ...data,
+      sessionSheets,
+    });
+    expect(isUnlocked(inSession({}), sheetB, state)).toBe(false);
+    expect(isUnlocked(inSession({ B: true }), sheetB, state)).toBe(true);
+    expect(isUnlocked(inSession({}), sheetA, state)).toBe(true);
+    expect(isUnlocked(inSession({ A: false }), sheetA, state)).toBe(false);
   });
 
   test("a challenge opens when the sheets of ::braucht are done", () => {

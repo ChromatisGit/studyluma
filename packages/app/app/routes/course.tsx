@@ -25,6 +25,7 @@ const releaseIntents = [
   "lockSummary",
   "summaryRule",
   "releaseSolutions",
+  "unlockSheet",
 ];
 
 export async function action(args: ActionFunctionArgs) {
@@ -75,6 +76,19 @@ export async function action(args: ActionFunctionArgs) {
       rule: rule as SummaryRule,
     });
     return { rule };
+  }
+  if (form.get("intent") === "unlockSheet") {
+    const sheetId = String(form.get("sheetId") ?? "");
+    if (
+      !bundle.worksheets.some(
+        (item) => item.id === sheetId && item.chapterId === chapterId,
+      )
+    ) {
+      throw new Response(null, { status: 400 });
+    }
+    const released = form.get("released") === "true";
+    await actInSession(request, { type: "release.sheet", sheetId, released });
+    return { released };
   }
   if (form.get("intent") === "releaseSolutions") {
     const sheetId = String(form.get("sheetId") ?? "");

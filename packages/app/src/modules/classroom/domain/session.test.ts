@@ -176,9 +176,46 @@ describe("released content", () => {
     release({ type: "release.rule", chapterId: "c1", rule: "abschluss" });
     expect(session.releases).toEqual({
       summaries: ["c1"],
+      sheets: {},
       solutions: ["t2"],
       rules: { c1: "abschluss" },
     });
+  });
+
+  test("a sheet keeps the teacher's last decision, locking included", () => {
+    let session = fresh();
+    const release = (intent: Intent) =>
+      (session = ok(applyIntent(session, controller, intent, ids)));
+    release({ type: "release.sheet", sheetId: "s1", released: true });
+    release({ type: "release.sheet", sheetId: "s2", released: true });
+    release({ type: "release.sheet", sheetId: "s1", released: false });
+    expect(session.releases.sheets).toEqual({ s1: false, s2: true });
+  });
+
+  test("the sent sheet is set and withdrawn by the controller only", () => {
+    const target = { kind: "sheet", id: "s1", chapterId: "c1" } as const;
+    const sent = ok(
+      applyIntent(fresh(), controller, { type: "target", target }, ids),
+    );
+    expect(sent.target).toEqual(target);
+    expect(
+      ok(applyIntent(sent, controller, { type: "target", target: null }, ids))
+        .target,
+    ).toBeNull();
+    const student = joined(fresh(), "p1");
+    for (const intent of [
+      { type: "target", target },
+      { type: "release.sheet", sheetId: "s1", released: true },
+    ] as const) {
+      expect(
+        applyIntent(
+          student,
+          { role: "participant", participantId: "p1" },
+          intent,
+          ids,
+        ),
+      ).toEqual({ ok: false, reason: "forbidden" });
+    }
   });
 });
 

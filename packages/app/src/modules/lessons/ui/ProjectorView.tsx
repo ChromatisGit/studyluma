@@ -6,6 +6,7 @@ import { ScrollSyncContext } from "./FrameBlocks";
 import { LiveQuizContext } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
+import { SheetEmbed } from "./SheetEmbed";
 import { InkStrokes } from "./InkLayer";
 import TEXT from "./lessons.de.json";
 import "./lessons.css";
@@ -17,9 +18,11 @@ import "./lessons.css";
 export function ProjectorView({
   courseId,
   deck,
+  chapterPath,
 }: {
   courseId: string;
   deck: Deck;
+  chapterPath: string;
 }) {
   const { session, laser, scroll } = useProjectorFeed(deck.id);
   const { view } = useTeacherQuiz(courseId);
@@ -43,21 +46,35 @@ export function ProjectorView({
     return <div className="lp" />;
   }
   const id = entryId(entry);
+  const slide = entrySlide(entry);
+  const showSheet =
+    entry.kind === "slide" &&
+    !!slide.worksheet &&
+    display.sheetShown === slide.id;
   return (
     <div className="lp">
       <LiveQuizContext.Provider value={{ view: quiz, teacher: false }}>
         <ScrollSyncContext.Provider value={{ follow: scroll }}>
           <FrameStage>
-            <FrameView
-              entry={entry}
-              deckTitle={deck.title}
-              sent={display.sent.includes(entrySlide(entry).id)}
-            >
-              <InkStrokes
-                strokes={display.ink.filter((stroke) => stroke.frameId === id)}
-                laser={laser}
+            {showSheet && slide.worksheet ? (
+              <SheetEmbed
+                src={`${chapterPath}/lesson/sheets/${encodeURIComponent(slide.worksheet.slug)}`}
+                slideId={slide.id}
+                interactive={false}
               />
-            </FrameView>
+            ) : (
+              <FrameView
+                entry={entry}
+                sent={display.sent.includes(entrySlide(entry).id)}
+              >
+                <InkStrokes
+                  strokes={display.ink.filter(
+                    (stroke) => stroke.frameId === id,
+                  )}
+                  laser={laser}
+                />
+              </FrameView>
+            )}
           </FrameStage>
         </ScrollSyncContext.Provider>
       </LiveQuizContext.Provider>

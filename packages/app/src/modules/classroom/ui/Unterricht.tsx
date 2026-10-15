@@ -19,9 +19,10 @@ import {
 } from "../../courses";
 import { ChapterHeading } from "./ChapterHeading";
 import { ResourceSection } from "./ResourceSection";
+import { ChapterQuizzes } from "./ChapterQuizzes";
 import { ClassroomStart } from "./ClassroomStart";
-import { targetStore } from "../infrastructure/targetStore";
 import { localReleases } from "../infrastructure/localReleases";
+import { useSentTarget, useSheetAccess } from "../application/useSheetAccess";
 import {
   chapterStore,
   isUnlocked,
@@ -56,12 +57,8 @@ function SheetRow({
   const [open, setOpen] = useState(false);
   const [confirmLock, setConfirmLock] = useState(false);
   const releaseFetcher = useFetcher();
-  const target = targetStore(courseId);
-  const active = useSyncExternalStore(
-    target.subscribe,
-    target.getSnapshot,
-    target.getServerSnapshot,
-  );
+  const { active, send } = useSentTarget(courseId);
+  const setUnlocked = useSheetAccess(courseId, chapterId);
   const targetHere = active?.kind === "sheet" && active.id === sheet.id;
   const unlocked = isUnlocked(data, sheet, state);
   const solutions = sheet.sections
@@ -90,7 +87,7 @@ function SheetRow({
       </div>
       <div className="teacher-controls-access-actions">
         {!unlocked && (
-          <Button size="sm" onClick={() => store.setUnlocked(sheet.id, true)}>
+          <Button size="sm" onClick={() => setUnlocked(sheet.id, true)}>
             {TEXT.teacher.unlock}
           </Button>
         )}
@@ -113,7 +110,7 @@ function SheetRow({
               if (!event.target.checked && targetHere) {
                 setConfirmLock(true);
               } else {
-                store.setUnlocked(sheet.id, event.target.checked);
+                setUnlocked(sheet.id, event.target.checked);
               }
             }}
           />
@@ -132,8 +129,8 @@ function SheetRow({
                   role="destructive"
                   size="sm"
                   onClick={() => {
-                    store.setUnlocked(sheet.id, false);
-                    target.set(null);
+                    setUnlocked(sheet.id, false);
+                    send(null);
                     setConfirmLock(false);
                   }}
                 >
@@ -405,6 +402,11 @@ export function Unterricht({ course }: { course: Course }) {
       <ResourceSection id="overview-summary" title={TEXT.teacher.summaryTitle}>
         <InhaltRow course={course} chapterId={current.id} />
       </ResourceSection>
+      {site.classroomEnabled && (
+        <ResourceSection id="overview-quizzes" title={TEXT.quizzes.title}>
+          <ChapterQuizzes courseId={course.id} chapterId={current.id} />
+        </ResourceSection>
+      )}
       <ResourceSection id="overview-sheets" title={TEXT.teacher.worksheets}>
         {data?.sheets.length ? (
           <ul className="teacher-controls-access-list">

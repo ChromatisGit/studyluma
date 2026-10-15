@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import type { ServerMessage, Snapshot, WireIntent } from "../domain/protocol";
 
 /** The resource route: snapshots over HTTP and the commands that need the server. */
@@ -141,4 +148,16 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
   }, []);
 
   return { snapshot: enabled ? snapshot : undefined, send };
+}
+
+/** One connection that all hooks below it share, so a page opens a single socket. */
+export const SharedClassroomContext = createContext<ClassroomConnection | null>(
+  null,
+);
+
+/** The shared connection when a provider offers one, otherwise a connection of its own. */
+export function useSharedClassroom(enabled: boolean): ClassroomConnection {
+  const shared = useContext(SharedClassroomContext);
+  const own = useClassroom(enabled && !shared);
+  return shared ?? own;
 }

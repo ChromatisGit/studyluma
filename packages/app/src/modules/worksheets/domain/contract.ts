@@ -92,6 +92,21 @@ export type ClassAmpel = {
   causes: Partial<Record<AmpelCause, number>>;
 };
 
+/** Was die Lehrkraft pro Blatt über die Klasse sieht: nur Summen, nie Einzelne. */
+export type SheetMonitoring = {
+  /** Verbundene Teilnehmer der Stunde. */
+  registered: number;
+  /** Arbeiten gerade am Blatt. */
+  working: number;
+  /** Mit dem Blatt fertig. */
+  done: number;
+  /** Je Abschnitt (in Blattreihenfolge): wie viele ihn erreicht haben. */
+  sections: number[];
+  /** Haben mit den Challenges begonnen. */
+  challenges: number;
+  ampel: ClassAmpel;
+};
+
 // ─── Adapter ────────────────────────────────────────────────────────────────
 
 /** Speicher für Schülerantworten. Für die UI-Session lokal, später Server. */
@@ -115,5 +130,4 @@ export type TeacherStore = {
     aufgabeIds: string[] | "all",
     released: boolean,
   ): Promise<void>;
-  loadClassAmpel(sheetId: string): Promise<ClassAmpel>;
 };

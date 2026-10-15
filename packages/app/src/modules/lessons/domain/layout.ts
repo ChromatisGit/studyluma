@@ -1,4 +1,4 @@
-import type { SlideSegment } from "../../catalog";
+import type { RichNode, SlideSegment, SlideTone } from "../../catalog";
 import type { Deck, Slide } from "./deck";
 import type { Blank } from "./lesson";
 
@@ -6,14 +6,47 @@ import type { Blank } from "./lesson";
  * The order in the Markdown is the order on the slide. Beyond that only
  * the kind of entry decides how a slide is built.
  */
-export type SlideLayout = "slide" | "sheet" | "quiz" | "merkkarte" | "summary";
+export type SlideLayout = "slide" | "sheet" | "quiz" | "summary";
 
 export const slideLayout = (slide: Slide): SlideLayout =>
-  slide.kind === "slide"
-    ? "slide"
-    : slide.kind === "worksheet"
-      ? "sheet"
-      : slide.kind;
+  slide.kind === "worksheet"
+    ? "sheet"
+    : slide.kind === "quiz" || slide.kind === "summary"
+      ? slide.kind
+      : "slide";
+
+/** A tab's color says what happens on the slide. */
+export type TabTone = SlideTone | "arbeitsblatt" | "quiz" | "inhalt";
+
+/**
+ * The tab of a slide: embedded entries carry a fixed function, author
+ * slides the tag the author chose, else the neutral tab of their section.
+ */
+export function slideTab(slide: Slide): { label: string; tone: TabTone } {
+  switch (slide.kind) {
+    case "worksheet":
+      return { label: "Arbeitsblatt", tone: "arbeitsblatt" };
+    case "quiz":
+      return { label: "Quiz", tone: "quiz" };
+    case "summary":
+      return { label: "Inhalt", tone: "inhalt" };
+    case "merkkarte":
+      return { label: "Merkkarte", tone: "merke" };
+    case "slide":
+      return slide.tag ?? { label: slide.from.at(-1) ?? "", tone: "neutral" };
+  }
+}
+
+const hasSpace = (nodes: RichNode[]) =>
+  nodes.some((node) => node.type === "space");
+
+/** A slide with `::platz` keeps its text compact; the rest of it is for writing. */
+export const isWritingSlide = (slide: Slide): boolean =>
+  slide.segments.some((segment) =>
+    segment.type === "content"
+      ? hasSpace(segment.content)
+      : segment.columns.some((column) => hasSpace(column.content)),
+  );
 
 /** The columns of a slide share the width the author chose. */
 export function columnWidths(

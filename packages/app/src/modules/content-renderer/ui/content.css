@@ -23,10 +23,10 @@
    A formula alone in its paragraph (`.math-alone`) is sized like a display
    formula. */
 :is(.math, .math-inline),
-:is(.math-block, .math-display, .math-alone .math-inline) {
+:is(.math-block, .math-display, :is(.math-alone, .derivation) .math-inline) {
   --math-size: 1.1em;
 }
-:is(.math-block, .math-display, .math-alone .math-inline) {
+:is(.math-block, .math-display, :is(.math-alone, .derivation) .math-inline) {
   --math-size: 1.25em;
 }
 :is(.math, .math-inline, .math-block, .math-display) math {
@@ -49,10 +49,14 @@
 :is(.math, .math-inline):has(mfrac mfrac) {
   --math-size: 1.25em;
 }
-:is(.math-block, .math-display, .math-alone .math-inline):has(mfrac) {
+:is(.math-block, .math-display, :is(.math-alone, .derivation) .math-inline):has(
+  mfrac
+) {
   --math-size: 1.35em;
 }
-:is(.math-block, .math-display, .math-alone .math-inline):has(mfrac mfrac) {
+:is(.math-block, .math-display, :is(.math-alone, .derivation) .math-inline):has(
+  mfrac mfrac
+) {
   --math-size: 1.45em;
 }
 :is(.math, .math-inline) {
@@ -127,6 +131,87 @@ mark {
 }
 .zusammenfassung > h3:first-child {
   margin-top: 0;
+}
+
+/* Example outside a Merkkarte (Beispiel): same toggle and panel as the
+   example of a Merkkarte, standing on its own in the text. */
+.zusammenfassung > .beispiel {
+  max-width: var(--measure);
+  margin-block: var(--space-400);
+}
+.beispiel__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-200);
+  min-height: var(--target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-link);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+.beispiel__toggle:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.beispiel__toggle .icon {
+  transition: transform var(--motion-default) var(--ease-standard);
+}
+.beispiel__toggle[aria-expanded="true"] .icon {
+  transform: rotate(180deg);
+}
+.beispiel__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-200);
+  padding: var(--space-300) var(--space-400);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+}
+.beispiel__panel[hidden] {
+  display: none;
+}
+.beispiel__panel > * {
+  margin: 0;
+}
+@media print {
+  .beispiel__toggle {
+    display: none;
+  }
+  .beispiel__panel[hidden] {
+    display: flex;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .beispiel__toggle .icon {
+    transition: none;
+  }
+}
+
+/* Transformation steps: the equations form one column, the operations
+   (`| -2x`) another, so they line up however long the equations are. */
+.derivation {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
+  align-items: center;
+  overflow-x: auto;
+  margin-block: var(--space-300);
+}
+.derivation__operation {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  margin-left: var(--space-400);
+  padding-left: var(--space-300);
+  border-left: var(--border-2) solid var(--color-border-strong);
+  color: var(--color-text-muted);
+}
+.derivation__equation,
+.derivation__operation {
+  padding-block: var(--space-100);
 }
 
 /* Merkkarten in a summary: two side by side when there is room, else stacked.

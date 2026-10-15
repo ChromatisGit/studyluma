@@ -9,6 +9,14 @@
 
 import type { SummaryRule } from "../../catalog";
 import {
+  sheetFits,
+  withProgress,
+  withRating,
+  type AmpelMap,
+  type ProgressMap,
+} from "./monitoring";
+import type { AmpelCause, AmpelLevel } from "../../worksheets";
+import {
   advanceRun,
   answerRun,
   distribution,
@@ -36,9 +44,14 @@ export type Participant = {
   joinedAt: number;
 };
 
+/** The worksheet the teacher sent to the class; students are led to it. */
+export type Target = { kind: "sheet"; id: string; chapterId: string };
+
 export type Releases = {
   /** Chapters whose Inhalt students may read. */
   summaries: string[];
+  /** The teacher's explicit decision per worksheet; absent: the default applies. */
+  sheets: Record<string, boolean>;
   /** Tasks whose solution students may read. */
   solutions: string[];
   /** How each chapter's Inhalt opens; default manual. */
@@ -56,9 +69,14 @@ export type ClassroomSession = {
   expiresAt: number;
   status: "open" | "ended";
   placement: Placement | null;
+  /** The sheet sent to the class, if any. */
+  target: Target | null;
   releases: Releases;
   participants: Participant[];
   quiz: QuizRun | null;
+  /** What each participant reported per worksheet; only totals leave. */
+  progress: ProgressMap;
+  ampel: AmpelMap;
 };
 
 export type SessionInit = {
@@ -79,9 +97,12 @@ export function createSession(
     expiresAt: now + ttlMs,
     status: "open",
     placement: null,
-    releases: { summaries: [], solutions: [], rules: {} },
+    target: null,
+    releases: { summaries: [], sheets: {}, solutions: [], rules: {} },
     participants: [],
     quiz: null,
+    progress: {},
+    ampel: {},
   };
 }
 
@@ -99,6 +120,8 @@ export type QuizStart = {
 /** Everything a client may ask for. */
 export type Intent =
   | { type: "place"; placement: Placement | null }
+  | { type: "target"; target: Target | null }
+  | { type: "release.sheet"; sheetId: string; released: boolean }
   | { type: "release.summary"; chapterId: string; released: boolean }
   | { type: "release.rule"; chapterId: string; rule: SummaryRule }
   | { type: "release.solutions"; taskIds: string[]; released: boolean }
@@ -116,15 +139,29 @@ export type Intent =
       index: number;
       optionIds: string[];
     }
+  | {
+      type: "progress";
+      sheetId: string;
+      reached: number;
+      done: boolean;
+      challenges: boolean;
+    }
+  | {
+      type: "ampel";
+      sheetId: string;
+      level: AmpelLevel;
+      causes: AmpelCause[];
+    }
   | { type: "end" };
 
 export type ClassroomEvent =
   | { kind: "participant-joined"; participantId: string; name: string }
   | { kind: "participant-left"; participantId: string; name: string }
   | { kind: "placement-changed"; placement: Placement | null }
+  | { kind: "target-changed"; target: Target | null }
   | {
       kind: "content-released";
-      what: "summary" | "solutions";
+      what: "summary" | "solutions" | "sheet";
       ids: string[];
       released: boolean;
     }
@@ -242,13 +279,23 @@ export function setConnected(
   );
 }
 
-type ControllerIntent = Exclude<Intent, { type: "quiz.answer" }>;
+type ParticipantIntent = Extract<
+  Intent,
+  { type: "quiz.answer" | "progress" | "ampel" }
+>;
+type ControllerIntent = Exclude<Intent, ParticipantIntent>;
 
 function release(
   session: ClassroomSession,
   intent: Extract<
     ControllerIntent,
-    { type: "release.summary" | "release.rule" | "release.solutions" }
+    {
+      type:
+        | "release.sheet"
+        | "release.summary"
+        | "release.rule"
+        | "release.solutions";
+    }
   >,
 ): Outcome {
   const { releases } = session;
@@ -257,6 +304,20 @@ function release(
     releases: { ...releases, ...next },
   });
   switch (intent.type) {
+    case "release.sheet":
+      return accept(
+        change({
+          sheets: { ...releases.sheets, [intent.sheetId]: intent.released },
+        }),
+        [
+          {
+            kind: "content-released",
+            what: "sheet",
+            ids: [intent.sheetId],
+            released: intent.released,
+          },
+        ],
+      );
     case "release.summary":
       return accept(
         change({
@@ -381,6 +442,11 @@ function controllerIntent(
       return accept({ ...session, placement: intent.placement }, [
         { kind: "placement-changed", placement: intent.placement },
       ]);
+    case "target":
+      return accept({ ...session, target: intent.target }, [
+        { kind: "target-changed", target: intent.target },
+      ]);
+    case "release.sheet":
     case "release.summary":
     case "release.rule":
     case "release.solutions":
@@ -396,7 +462,7 @@ function controllerIntent(
   }
 }
 
-function participantIntent(
+function answerQuiz(
   session: ClassroomSession,
   participantId: string,
   intent: Extract<Intent, { type: "quiz.answer" }>,
@@ -415,6 +481,54 @@ function participantIntent(
   ]);
 }
 
+/** A sheet the teacher locked takes no reports; one never decided on does. */
+function reportable(session: ClassroomSession, sheetId: string): boolean {
+  return (
+    session.releases.sheets[sheetId] !== false &&
+    sheetFits([session.progress, session.ampel], sheetId)
+  );
+}
+
+function reportProgress(
+  session: ClassroomSession,
+  participantId: string,
+  intent: Extract<Intent, { type: "progress" }>,
+): Outcome {
+  const progress = reportable(session, intent.sheetId)
+    ? withProgress(session.progress, participantId, intent)
+    : null;
+  return progress ? accept({ ...session, progress }) : reject("invalid");
+}
+
+function rateAmpel(
+  session: ClassroomSession,
+  participantId: string,
+  intent: Extract<Intent, { type: "ampel" }>,
+): Outcome {
+  const ampel = reportable(session, intent.sheetId)
+    ? withRating(session.ampel, participantId, intent)
+    : null;
+  return ampel ? accept({ ...session, ampel }) : reject("invalid");
+}
+
+function participantIntent(
+  session: ClassroomSession,
+  participantId: string,
+  intent: ParticipantIntent,
+): Outcome {
+  if (!session.participants.some((item) => item.id === participantId)) {
+    return reject("not-found");
+  }
+  switch (intent.type) {
+    case "quiz.answer":
+      return answerQuiz(session, participantId, intent);
+    case "progress":
+      return reportProgress(session, participantId, intent);
+    case "ampel":
+      return rateAmpel(session, participantId, intent);
+  }
+}
+
 /**
  * Applies a client's intent. Authorization is part of the domain: the
  * controller steers the lesson, a participant can only answer.
@@ -428,7 +542,11 @@ export function applyIntent(
   if (session.status === "ended") {
     return reject("ended");
   }
-  if (intent.type === "quiz.answer") {
+  if (
+    intent.type === "quiz.answer" ||
+    intent.type === "progress" ||
+    intent.type === "ampel"
+  ) {
     return actor.role === "participant"
       ? participantIntent(session, actor.participantId, intent)
       : reject("forbidden");

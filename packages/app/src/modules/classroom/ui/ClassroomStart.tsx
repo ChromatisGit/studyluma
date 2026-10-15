@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRevalidator } from "react-router";
 import { Alert, Badge, Button } from "@chromatis/base/ui";
-import { postClassroom, useClassroom } from "../application/useClassroom";
+import { postClassroom, useSharedClassroom } from "../application/useClassroom";
 import { useSite } from "./SiteContext";
 import TEXT from "./classroom.de.json";
 import "./quiz.css";
@@ -15,7 +15,7 @@ export function ClassroomStart({ courseId }: { courseId: string }) {
   const revalidator = useRevalidator();
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
-  const { snapshot } = useClassroom(classroom?.role === "controller");
+  const { snapshot } = useSharedClassroom(classroom?.role === "controller");
   // This instance's address is only known in the browser; the server renders the path.
   const [origin, setOrigin] = useState("");
   useEffect(() => setOrigin(window.location.origin), []);

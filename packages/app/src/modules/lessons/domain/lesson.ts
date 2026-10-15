@@ -4,7 +4,12 @@
  */
 
 /** A blank surface inserted during the lesson after a slide (5 → 5a). */
-export type Blank = { id: string; afterFrameId: string };
+export type Blank = {
+  id: string;
+  afterFrameId: string;
+  /** A task of the slide's worksheet that was taken onto this surface. */
+  task?: { sheetId: string; taskId: string };
+};
 
 export type InkColor = "graphit" | "violett" | "signal";
 
@@ -30,6 +35,8 @@ export type LessonSession = {
   blanks: Blank[];
   ink: InkStroke[];
   hidden: boolean;
+  /** The slide whose worksheet the projector shows instead of the slide. */
+  sheetShown?: string | null;
   /** The exact image the projector keeps while the teacher navigates. */
   frozen?: {
     currentFrameId: string;
@@ -37,6 +44,7 @@ export type LessonSession = {
     ink: InkStroke[];
     sent: string[];
     hidden: boolean;
+    sheetShown?: string | null;
   } | null;
   /** Slides whose sheet the class was sent to. */
   sent: string[];

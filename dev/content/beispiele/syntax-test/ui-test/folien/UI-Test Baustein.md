@@ -17,7 +17,7 @@ Linke Spalte mit $x^2$.
 
 Rechte Spalte.
 
-::schreiben Freie Rechnung
+::platz
 
 ---
 
@@ -101,6 +101,28 @@ Linker Bereich.
 Alias für `## Mitte Rechts`.
 
 ::bis 11:00
+
+# "Merkkarten auf einer Folie"
+
+::tag Erklären
+
+Text über den Karten.
+
+::merkkarte "Testregel Eins"
+
+Text zwischen den Karten, danach Platz zum Schreiben.
+
+::platz 2
+
+::bis 12:30
+
+# "Aufgabe mit eigenem Etikett"
+
+::tag Einstieg hinweis
+
+Eine Folie mit einem frei gewählten Etikett in einer der Hinweisfarben.
+
+::bis 13:00
 
 # Quiz: UI-Test Quiz
 

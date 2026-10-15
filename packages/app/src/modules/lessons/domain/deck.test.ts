@@ -3,7 +3,7 @@ import { describe, expect, test } from "bun:test";
 import { catalog, entry, para, placement, set } from "../../../test/catalog";
 import { deviation, formatSeconds, lessonStart, plannedEnd } from "./clock";
 import { buildDeck, plannedTimes, presentationFor } from "./deck";
-import { isFill, runningOrder } from "./layout";
+import { isFill, isWritingSlide, runningOrder, slideTab } from "./layout";
 import { newSession, reduceSession, strokeAt } from "./session";
 
 /**
@@ -262,5 +262,119 @@ describe("session", () => {
       reduceSession(deck, written, { type: "undo", now: 130 }).ink,
     ).toEqual([]);
     expect(strokeAt(written.ink, 15, 12)?.id).toBe("k1");
+  });
+});
+
+describe("slides on the stage", () => {
+  test("a slide plans the time between its ::bis and the previous one", () => {
+    expect(deck.slides.map((s) => s.budget)).toEqual([
+      240,
+      undefined,
+      120,
+      undefined,
+    ]);
+  });
+
+  test("the tab shows what happens: the function of embedded entries, the author's tag on slides", () => {
+    expect(slideTab(deck.slides[1]!)).toEqual({
+      label: "Merkkarte",
+      tone: "merke",
+    });
+    expect(slideTab(deck.slides[2]!)).toEqual({ label: "Quiz", tone: "quiz" });
+    expect(slideTab(deck.slides[3]!)).toEqual({
+      label: "Inhalt",
+      tone: "inhalt",
+    });
+    const tagged = {
+      ...deck.slides[0]!,
+      tag: { label: "Aufgabe", tone: "aufgabe" as const },
+    };
+    expect(slideTab(tagged)).toEqual({ label: "Aufgabe", tone: "aufgabe" });
+    expect(slideTab(deck.slides[0]!).tone).toBe("neutral");
+  });
+
+  test("a slide with ::platz keeps its text compact for writing", () => {
+    const space = { type: "space" as const, size: 1 };
+    const writing = {
+      ...deck.slides[0]!,
+      segments: [{ type: "content" as const, content: [space] }],
+    };
+    const columns = {
+      ...deck.slides[0]!,
+      segments: [
+        {
+          type: "columns" as const,
+          columns: [{ width: 1, content: [space] }],
+        },
+      ],
+    };
+    expect(isWritingSlide(deck.slides[0]!)).toBe(false);
+    expect(isWritingSlide(writing)).toBe(true);
+    expect(isWritingSlide(columns)).toBe(true);
+  });
+
+  test("the Merkkarten placed in a slide's text come with the slide", () => {
+    const placed = catalog({
+      ...data,
+      foliensaetze: [
+        set("root", "Stunde", [
+          entry("e1", "slide", {
+            title: "Regel",
+            segments: [
+              {
+                type: "content",
+                content: [{ type: "merkkarteCard", targetId: "m1" }],
+              },
+            ],
+          }),
+        ]),
+      ],
+      presentations: [
+        {
+          id: "p2",
+          rootFoliensatzId: "root",
+          chapterId: "c1",
+          title: "Stunde",
+          placements: [
+            placement("p2-e1", "e1", ["root", "e1"], { title: "Regel" }),
+          ],
+        },
+      ],
+    });
+    expect(Object.keys(buildDeck(placed, "p2")!.slides[0]!.cards)).toEqual([
+      "m1",
+    ]);
+  });
+});
+
+describe("worksheet on the projector", () => {
+  const at = (frameId: string) =>
+    reduceSession(deck, newSession(deck, 0, "s"), {
+      type: "go",
+      frameId,
+      now: 1,
+    });
+
+  test("showing the worksheet toggles per slide", () => {
+    const shown = reduceSession(deck, at("p1-e1"), {
+      type: "toggleSheet",
+      frameId: "p1-e1",
+    });
+    expect(shown.sheetShown).toBe("p1-e1");
+    expect(
+      reduceSession(deck, shown, { type: "toggleSheet", frameId: "p1-e1" })
+        .sheetShown,
+    ).toBeNull();
+  });
+
+  test("a task taken from the worksheet becomes a blank surface that remembers it", () => {
+    const task = { sheetId: "w1", taskId: "t1" };
+    const next = reduceSession(deck, at("p1-e1"), {
+      type: "addBlank",
+      now: 5,
+      task,
+    });
+    expect(next.blanks[0]?.task).toEqual(task);
+    expect(next.currentFrameId).toBe(next.blanks[0]!.id);
   });
 });

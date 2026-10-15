@@ -1,4 +1,5 @@
-import { createElement, useContext, type ReactNode } from "react";
+import { createElement, Fragment, useContext, type ReactNode } from "react";
+import type { DerivationStep } from "@studyluma/catalog-contract";
 import type { RichInline, RichNode } from "../domain/rich";
 import { Graphic } from "./Graphic";
 import { RichReferenceContext } from "./RichReferenceContext";
@@ -102,6 +103,30 @@ export function RichInlineContent({
   });
 }
 
+/** Transformation steps: equations in one column, `| operations` in the next. */
+function Derivation({ steps }: { steps: DerivationStep[] }) {
+  return (
+    <div className="derivation">
+      {steps.map((step, i) => (
+        <Fragment key={i}>
+          <span
+            className="math-inline derivation__equation"
+            dangerouslySetInnerHTML={{ __html: step.equation.display }}
+          />
+          {step.operation ? (
+            <span
+              className="math-inline derivation__operation"
+              dangerouslySetInnerHTML={{ __html: step.operation.display }}
+            />
+          ) : (
+            <span />
+          )}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
 export function RichContent({
   nodes,
   renderGap,
@@ -180,16 +205,24 @@ export function RichContent({
                 dangerouslySetInnerHTML={{ __html: node.display }}
               />
             );
+          case "derivation":
+            return <Derivation key={index} steps={node.steps} />;
           case "graphic":
             return (
               <Graphic key={index} graphic={node.graphic} title={node.title} />
             );
-          case "writingArea":
+          case "space":
             return (
-              <div key={index} className="lf-zone">
-                <span className="lf-zone__label">{node.label}</span>
-              </div>
+              <div
+                key={index}
+                className="lf-space"
+                style={{ height: `${node.size * 120}px` }}
+                aria-hidden="true"
+              />
             );
+          case "merkkarteCard":
+            // Slides place the card themselves (`lessons/ui/FrameBlocks`).
+            return null;
         }
       })}
     </div>

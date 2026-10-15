@@ -1,5 +1,12 @@
-import { createContext, useContext, useEffect, type ReactNode } from "react";
-import { useLocation, useNavigate } from "react-router";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
+import { useLocation, useNavigate, useRevalidator } from "react-router";
+import { SheetReporterContext } from "../../worksheets";
 import { useStudentQuizzes } from "../application/useLiveQuiz";
 import type { StudentQuizView } from "../domain/views";
 
@@ -58,6 +65,25 @@ function useQuizRedirect(
   }, [views, pathname, quizPath, navigate]);
 }
 
+/**
+ * Pages read what the teacher released and sent from their loader data.
+ * When the session reports a change, the data is loaded again.
+ */
+function useSessionRefresh(sync: string | undefined) {
+  const revalidator = useRevalidator();
+  const seen = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (sync === undefined) {
+      return;
+    }
+    // The first snapshot is what the page was loaded with.
+    if (seen.current !== undefined && seen.current !== sync) {
+      void revalidator.revalidate();
+    }
+    seen.current = sync;
+  }, [sync, revalidator]);
+}
+
 export interface LiveQuizProviderProps {
   /** Only students take part; teachers run the quiz from the lesson. */
   enabled: boolean;
@@ -73,8 +99,13 @@ export function LiveQuizProvider({
 }: LiveQuizProviderProps) {
   const live = useStudentQuizzes(enabled);
   useQuizRedirect(enabled ? live.views : undefined, quizPath);
+  useSessionRefresh(enabled ? live.sync : undefined);
   return (
-    <LiveQuizContext.Provider value={live}>{children}</LiveQuizContext.Provider>
+    <LiveQuizContext.Provider value={live}>
+      <SheetReporterContext.Provider value={enabled ? live.reporter : null}>
+        {children}
+      </SheetReporterContext.Provider>
+    </LiveQuizContext.Provider>
   );
 }
 
@@ -83,6 +114,8 @@ export function useLiveQuiz(): LiveQuiz {
     useContext(LiveQuizContext) ?? {
       views: undefined,
       answer: async () => false,
+      sync: undefined,
+      reporter: { progress: () => undefined, ampel: () => undefined },
     }
   );
 }

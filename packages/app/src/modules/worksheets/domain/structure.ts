@@ -35,6 +35,11 @@ export type SheetsData = {
   challenges: Task[];
   /** Tasks whose solution is released (decided by the teacher). */
   releasedSolutions: string[];
+  /**
+   * The unlocked sheets a Classroom Session holds, by sheet id; null without
+   * a session, when this browser's own store decides.
+   */
+  sessionSheets: Record<string, boolean> | null;
   cards: Record<string, MerkkarteCard>;
 };
 
@@ -124,12 +129,18 @@ export const fixedMode = (sheet: Worksheet): Mode | null =>
 export const modeOf = (sheet: Worksheet, state: ChapterState): Mode | null =>
   fixedMode(sheet) ?? state.modes[sheet.id] ?? null;
 
-/** The first sheet is open from the start; the teacher unlocks the rest. */
+/**
+ * The first sheet is open from the start; the teacher unlocks the rest. In a
+ * Classroom Session the session's decisions count, otherwise this browser's.
+ */
 export const isUnlocked = (
   data: SheetsData,
   sheet: Worksheet,
   state: ChapterState,
-) => state.unlocked[sheet.id] ?? data.sheets[0]?.id === sheet.id;
+) =>
+  (data.sessionSheets
+    ? data.sessionSheets[sheet.id]
+    : state.unlocked[sheet.id]) ?? data.sheets[0]?.id === sheet.id;
 
 export const isCheckable = (part: TaskPart) => part.type !== "Auftrag";
 
@@ -335,6 +346,32 @@ export function sheetStarted(sheet: Worksheet, state: ChapterState): boolean {
       ),
     ),
   );
+}
+
+/** What a student reports of a sheet to the class: how far, finished, challenges begun. */
+export function progressOf(
+  data: SheetsData,
+  sheet: Worksheet,
+  state: ChapterState,
+): { reached: number; done: boolean; challenges: boolean } {
+  const answered = (aufgabe: Task) =>
+    partsOf(aufgabe).some(
+      (part) => state.responses[part.id]?.value !== undefined,
+    );
+  const sectionIndex = (id: string | undefined) =>
+    Math.max(
+      0,
+      sheet.sections.findIndex((section) => section.id === id),
+    );
+  const furthestAnswered = sheet.sections.reduce(
+    (furthest, section, i) => (tasksOf(section).some(answered) ? i : furthest),
+    0,
+  );
+  return {
+    reached: Math.max(sectionIndex(state.tabs[sheet.id]), furthestAnswered),
+    done: sheetDone(sheet, state),
+    challenges: data.challenges.some(answered),
+  };
 }
 
 /** A challenge opens once all sheets named by `::braucht` are done. */

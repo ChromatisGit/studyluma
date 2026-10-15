@@ -221,21 +221,86 @@ const releasesScenario: Scenario = async (ctx) => {
     taskIds: ["t1", "t2"],
     released: true,
   });
+  await service.act(controller, {
+    type: "release.sheet",
+    sheetId: "s1",
+    released: true,
+  });
+  const target = { kind: "sheet", id: "s1", chapterId: "c1" } as const;
+  await service.act(controller, { type: "target", target });
   await student.until(
-    (m) => m.type === "snapshot" && m.snapshot.releases.solutions.length === 2,
+    (m) => m.type === "event" && m.event.kind === "target-changed",
   );
   const last = snapshots(student).at(-1);
   expect(last).toMatchObject({
     placement: { chapterId: "c1", frameId: "f2" },
-    releases: { summaries: ["c1"], solutions: ["t1", "t2"] },
+    target,
+    releases: {
+      summaries: ["c1"],
+      sheets: { s1: true },
+      solutions: ["t1", "t2"],
+    },
   });
   expect(kinds(events(student))).toEqual(
-    expect.arrayContaining(["placement-changed", "content-released"]),
+    expect.arrayContaining([
+      "placement-changed",
+      "content-released",
+      "target-changed",
+    ]),
   );
+  // Only the controller steers: a student's attempt changes nothing.
+  student.send({ type: "intent", intent: { type: "target", target: null } });
+  expect((await service.snapshot(controller)).target).toEqual(target);
 
   const viaToken = await service.snapshot(joined);
   expect(viaToken.releases.summaries).toEqual(["c1"]);
   student.close();
+};
+
+const monitoringScenario: Scenario = async (ctx) => {
+  const { harness, service, controller } = ctx;
+  const teacher = await harness.open(controller);
+  const joined = await service.join(controller.code, "Eva", "c1");
+  const student = await harness.open(joined);
+  await student.until((m) => m.type === "snapshot");
+
+  student.send({
+    type: "intent",
+    intent: {
+      type: "progress",
+      sheetId: "s1",
+      reached: 1,
+      done: false,
+      challenges: false,
+    },
+  });
+  student.send({
+    type: "intent",
+    intent: { type: "ampel", sheetId: "s1", level: "red", causes: ["task"] },
+  });
+  const seen = await teacher.until(
+    (m) =>
+      m.type === "snapshot" &&
+      m.snapshot.role === "controller" &&
+      (m.snapshot.monitoring.s1?.ampel.answered ?? 0) === 1,
+  );
+  const totals =
+    seen.type === "snapshot" && seen.snapshot.role === "controller"
+      ? seen.snapshot.monitoring.s1
+      : undefined;
+  expect(totals).toMatchObject({
+    working: 1,
+    done: 0,
+    reached: [0, 1],
+    ampel: { answered: 1, levels: { red: 1 }, causes: { task: 1 } },
+  });
+  // The totals carry no name; nothing of it reaches other students.
+  expect(JSON.stringify(totals)).not.toContain("Eva");
+  const other = await service.join(controller.code, "Finn", "c2");
+  const finn = await service.snapshot(other);
+  expect(JSON.stringify(finn)).not.toContain("monitoring");
+  student.close();
+  teacher.close();
 };
 
 const quizScenario: Scenario = async (ctx) => {
@@ -345,6 +410,10 @@ const scenarios: [string, Scenario][] = [
     steersScenario,
   ],
   ["lesson position and released content reach everyone", releasesScenario],
+  [
+    "worksheet reports reach the teacher as anonymous totals",
+    monitoringScenario,
+  ],
   ["live quiz from start to reveal keeps answers private", quizScenario],
   ["ending the session closes it and frees the join code", endsScenario],
   ["malformed frames are answered, not fatal", malformedScenario],

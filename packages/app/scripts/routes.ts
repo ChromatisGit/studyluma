@@ -49,6 +49,10 @@ export const routes: readonly RouteDeclaration[] = [
   },
   { path: `${chapter}/lesson`, file: file("lesson.tsx") },
   { path: `${chapter}/lesson/projector`, file: file("projector.tsx") },
+  {
+    path: `${chapter}/lesson/sheets/:sheetSlug`,
+    file: file("lessonSheet.tsx"),
+  },
   { path: "content/assets/:assetId", file: file("asset.ts") },
   { path: "api/check", file: file("check.ts") },
 ];

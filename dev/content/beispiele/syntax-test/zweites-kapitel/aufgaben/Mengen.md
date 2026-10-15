@@ -9,7 +9,7 @@ titel = "Mengen und Vektoren üben"
 Löse $x^2 + 2x - 8 = 0$.
 
 ::antwort
-L = {-4, 2}
+L = {-4; 2}
 
 ::tipp
 Schreibe die Lösungen mit Semikolon getrennt.
@@ -26,4 +26,4 @@ Löse $x^2 + 1 = 0$.
 Bestimme den Verbindungsvektor von $A(1, 2)$ nach $B(4, 6)$.
 
 ::antwort
-v = vec(3, 4)
+v = vec(3; 4)

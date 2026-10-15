@@ -22,6 +22,8 @@ export type {
   RichInline,
   RichNode,
   SlideSegment,
+  SlideTag,
+  SlideTone,
   SourceEntry,
   Steps,
   StructureLevel,

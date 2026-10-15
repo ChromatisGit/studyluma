@@ -8,7 +8,7 @@ import {
   ProjectorView,
 } from "../../src/modules/lessons";
 import { readViewer } from "../../src/modules/classroom";
-import { findChapterBySlug } from "../../src/modules/courses";
+import { chapterPath, findChapterBySlug } from "../../src/modules/courses";
 import { loadCourses } from "../site.server";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
@@ -40,6 +40,12 @@ export function meta() {
 
 export default function ProjectorRoute() {
   const { deck } = useLoaderData<typeof loader>();
-  const { courseId = "" } = useParams();
-  return <ProjectorView courseId={courseId} deck={deck} />;
+  const { courseId = "", chapterSlug = "" } = useParams();
+  return (
+    <ProjectorView
+      courseId={courseId}
+      deck={deck}
+      chapterPath={chapterPath(courseId, chapterSlug)}
+    />
+  );
 }

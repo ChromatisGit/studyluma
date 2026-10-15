@@ -8,6 +8,7 @@ import type {
   Task,
   TaskPart,
 } from "../modules/catalog";
+import { CATALOG_FORMAT_VERSION } from "@studyluma/catalog-contract";
 import { typstToRow } from "../modules/worksheets";
 
 /** Small builders for compiled-catalog objects in tests. */
@@ -59,7 +60,7 @@ export function entry(
 }
 
 const base = (): Catalog => ({
-  schemaVersion: 1,
+  schemaVersion: CATALOG_FORMAT_VERSION,
   buildId: "b".repeat(64),
   timetable: { periods: [{ number: 1, start: 480, end: 525 }] },
   topics: [],

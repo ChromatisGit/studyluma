@@ -2,7 +2,7 @@ import { useMemo, useSyncExternalStore } from "react";
 import { fill } from "../../../helper/text";
 import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
-import { targetStore } from "../infrastructure/targetStore";
+import { useSentTarget } from "../application/useSheetAccess";
 import { isUnlocked, chapterStore } from "../../worksheets";
 import { useSite } from "./SiteContext";
 import {
@@ -24,12 +24,7 @@ export function CurrentLesson({ course }: { course: Course }) {
     () => sheetsFor(site, course.id, chapterId),
     [site, course.id, chapterId],
   );
-  const target = targetStore(course.id);
-  const active = useSyncExternalStore(
-    target.subscribe,
-    target.getSnapshot,
-    target.getServerSnapshot,
-  );
+  const { active } = useSentTarget(course.id);
   const store = chapterStore(chapterId);
   const state = useSyncExternalStore(
     store.subscribe,

@@ -1,11 +1,12 @@
 import { entryId, runningOrder } from "./layout";
 import type { Deck } from "./deck";
-import type { InkStroke, LessonSession } from "./lesson";
+import type { Blank, InkStroke, LessonSession } from "./lesson";
 
 export type SessionAction =
   | { type: "go"; frameId: string; now: number }
   | { type: "step"; by: 1 | -1; now: number }
-  | { type: "addBlank"; now: number }
+  | { type: "addBlank"; now: number; task?: Blank["task"] }
+  | { type: "toggleSheet"; frameId: string }
   | { type: "undo"; now: number }
   | { type: "stroke"; stroke: InkStroke }
   | { type: "erase"; strokeId: string }
@@ -69,7 +70,14 @@ export function reduceSession(
         return session;
       }
       const id = `${parent.id}~${session.blanks.filter((b) => b.afterFrameId === parent.id).length + 1}`;
-      const blanks = [...session.blanks, { id, afterFrameId: parent.id }];
+      const blanks = [
+        ...session.blanks,
+        {
+          id,
+          afterFrameId: parent.id,
+          ...(action.task ? { task: action.task } : {}),
+        },
+      ];
       return { ...session, blanks, currentFrameId: id, enteredAt: action.now };
     }
     case "undo": {
@@ -99,6 +107,12 @@ export function reduceSession(
         ...session,
         ink: session.ink.filter((stroke) => stroke.id !== action.strokeId),
       };
+    case "toggleSheet":
+      return {
+        ...session,
+        sheetShown:
+          session.sheetShown === action.frameId ? null : action.frameId,
+      };
     case "toggleHidden":
       return { ...session, hidden: !session.hidden };
     case "toggleFreeze":
@@ -112,6 +126,7 @@ export function reduceSession(
               ink: structuredClone(session.ink),
               sent: [...session.sent],
               hidden: session.hidden,
+              sheetShown: session.sheetShown ?? null,
             },
           };
     case "send":

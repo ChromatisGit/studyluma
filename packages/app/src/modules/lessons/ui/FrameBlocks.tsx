@@ -5,20 +5,112 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { Check, FileText, Smartphone } from "lucide-react";
+import { Check, Clock, FileText, Smartphone } from "lucide-react";
 import type { Merkkarte, RichNode, SlideSegment } from "../../catalog";
 import { RichContent, SummaryContent } from "../../content-renderer";
 import type { Slide } from "../domain/deck";
 import { isFill } from "../domain/layout";
+import { fill } from "../../../helper/text";
 import { QuizBlock } from "./FrameQuiz";
 import TEXT from "./lessons.de.json";
 
-/** A squared writing surface (`::schreiben`); a label shows as a small sign on top. */
-export function WritingZone({ label }: { label?: string | undefined }) {
+/** The Merkkarten that the text of the current slide places, by id. */
+export const CardsContext = createContext<Record<string, Merkkarte>>({});
+
+/** Free space between two parts of a slide (`::platz`): 120px per block. */
+export const SPACE_BLOCK = 120;
+
+/**
+ * A Merkkarte inside a slide, built like the cards of the Inhalt: the rule
+ * under the title, the examples below it, all open because nothing here
+ * can be clicked.
+ */
+export function MerkkarteCard({ card }: { card: Merkkarte }) {
   return (
-    <div className="lf-zone">
-      {label && <span className="lf-zone__label">{label}</span>}
-    </div>
+    <article className="lf-card">
+      <h2 className="lf-card__title">{card.title}</h2>
+      <RichContent nodes={card.rule} className="lf-card__rule" />
+      {card.examples.length > 0 && (
+        <div className="lf-card__examples">
+          {card.examples.map((example, i) => (
+            <RichContent key={i} nodes={example} className="lf-card__example" />
+          ))}
+        </div>
+      )}
+    </article>
+  );
+}
+
+type Group =
+  | { kind: "nodes"; nodes: RichNode[] }
+  | { kind: "space"; size: number }
+  | { kind: "cards"; ids: string[] };
+
+/** Text, free space and Merkkarten in the order the author wrote them. */
+function groupNodes(nodes: RichNode[]): Group[] {
+  const groups: Group[] = [];
+  for (const node of nodes) {
+    const last = groups.at(-1);
+    if (node.type === "space") {
+      groups.push({ kind: "space", size: node.size });
+    } else if (node.type === "merkkarteCard") {
+      if (last?.kind === "cards") {
+        last.ids.push(node.targetId);
+      } else {
+        groups.push({ kind: "cards", ids: [node.targetId] });
+      }
+    } else if (last?.kind === "nodes") {
+      last.nodes.push(node);
+    } else {
+      groups.push({ kind: "nodes", nodes: [node] });
+    }
+  }
+  return groups;
+}
+
+function Nodes({
+  nodes,
+  className,
+}: {
+  nodes: RichNode[];
+  className?: string;
+}) {
+  const cards = useContext(CardsContext);
+  return (
+    <>
+      {groupNodes(nodes).map((group, i) => {
+        if (group.kind === "space") {
+          return (
+            <div
+              key={i}
+              className="lf-space"
+              style={{ height: group.size * SPACE_BLOCK }}
+              aria-hidden="true"
+            />
+          );
+        }
+        if (group.kind === "cards") {
+          const found = group.ids.flatMap((id) => cards[id] ?? []);
+          return (
+            <div
+              key={i}
+              className={`lf-cards${found.length === 1 ? " lf-cards--single" : ""}`}
+            >
+              {found.map((card) => (
+                <MerkkarteCard key={card.id} card={card} />
+              ))}
+            </div>
+          );
+        }
+        return (
+          <RichContent
+            key={i}
+            nodes={group.nodes}
+            className={className ?? "lf-md"}
+          />
+        );
+      })}
+    </>
   );
 }
 
@@ -30,40 +122,6 @@ export const ScrollSyncContext = createContext<{
   report?: (slideId: string, ratio: number) => void;
   follow?: { slideId: string; ratio: number } | null;
 }>({});
-
-/** Content nodes in order; `::schreiben` becomes a writing zone between them. */
-function Nodes({
-  nodes,
-  className,
-}: {
-  nodes: RichNode[];
-  className?: string;
-}) {
-  const groups: (RichNode[] | { label: string | undefined })[] = [];
-  for (const node of nodes) {
-    if (node.type === "writingArea") {
-      groups.push({ label: node.label });
-    } else {
-      const last = groups.at(-1);
-      if (Array.isArray(last)) {
-        last.push(node);
-      } else {
-        groups.push([node]);
-      }
-    }
-  }
-  return (
-    <>
-      {groups.map((group, i) =>
-        Array.isArray(group) ? (
-          <RichContent key={i} nodes={group} className={className ?? "lf-md"} />
-        ) : (
-          <WritingZone key={i} label={group.label} />
-        ),
-      )}
-    </>
-  );
-}
 
 /** One piece of a slide's text: running content or a column layout. */
 export function SegmentView({ segment }: { segment: SlideSegment }) {
@@ -86,11 +144,11 @@ export function SegmentView({ segment }: { segment: SlideSegment }) {
       }}
     >
       {segment.columns.map((column, i) => {
-        const fill = isFill({ type: "content", content: column.content });
+        const fills = isFill({ type: "content", content: column.content });
         return (
           <div
             key={i}
-            className={`lf__column${fill ? " lf__column--fill" : ""}`}
+            className={`lf__column${fills ? " lf__column--fill" : ""}`}
           >
             {column.title && (
               <h2 className="lf__column-title">{column.title}</h2>
@@ -113,44 +171,37 @@ export function SegmentsView({ segments }: { segments: SlideSegment[] }) {
   );
 }
 
-/** The Arbeitsblatt as the class sees it: a card that says where they are. */
+/** "15 Minuten" for the time a slide is planned for. */
+const minutes = (seconds: number) =>
+  fill(TEXT.frame.sheetMinutes, {
+    minutes: Math.max(1, Math.round(seconds / 60)),
+  });
+
+/**
+ * What the class sees while the worksheet is not on the projector: which
+ * sheet, how long they have and that it opens on their own device.
+ */
 export function SheetCard({ slide, sent }: { slide: Slide; sent: boolean }) {
   return (
     <article className="lf-sheet">
-      <p className="lf-sheet__kind">
-        <FileText aria-hidden="true" />
-        {TEXT.frame.sheet}
-      </p>
-      <p className="lf-sheet__title">{slide.title}</p>
-      <p className={`lf-sheet__state${sent ? " is-sent" : ""}`}>
-        {sent ? (
-          <Check aria-hidden="true" />
-        ) : (
-          <Smartphone aria-hidden="true" />
+      <FileText className="lf-sheet__icon" aria-hidden="true" />
+      <p className="lf-sheet__title">{TEXT.frame.sheet}</p>
+      <ul className="lf-sheet__facts">
+        <li className={sent ? "is-sent" : undefined}>
+          {sent ? (
+            <Check aria-hidden="true" />
+          ) : (
+            <Smartphone aria-hidden="true" />
+          )}
+          {sent ? TEXT.frame.sheetSent : TEXT.frame.sheetWaiting}
+        </li>
+        {slide.budget !== undefined && (
+          <li>
+            <Clock aria-hidden="true" />
+            {minutes(slide.budget)}
+          </li>
         )}
-        {sent ? TEXT.frame.sheetSent : TEXT.frame.sheetWaiting}
-      </p>
-    </article>
-  );
-}
-
-/** A Merkkarte large: the rule, then its examples. */
-export function MerkkarteCard({
-  card,
-}: {
-  card: Pick<Merkkarte, "title" | "rule" | "examples">;
-}) {
-  return (
-    <article className="lf-merkkarte">
-      <h1 className="lf-merkkarte__title">{card.title}</h1>
-      <RichContent nodes={card.rule} className="lf-merkkarte__rule" />
-      {card.examples.map((example, i) => (
-        <RichContent
-          key={i}
-          nodes={example}
-          className="lf-merkkarte__example"
-        />
-      ))}
+      </ul>
     </article>
   );
 }

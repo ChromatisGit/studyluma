@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
@@ -7,15 +8,19 @@ import {
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, Dialog } from "@chromatis/base/ui";
-import { useNavigate, useRevalidator } from "react-router";
+import { useNavigate } from "react-router";
 import { fill } from "../../../helper/text";
-import { localReleases, useSite } from "../../classroom";
+import { useSite } from "../../classroom";
 import { sheetsFor } from "../../courses";
-import { targetStore } from "../../classroom";
-import { chapterStore, isUnlocked } from "../../worksheets";
+import { useSentTarget } from "../../classroom";
+import {
+  chapterStore,
+  isUnlocked,
+  type TaskToBlankMessage,
+} from "../../worksheets";
 import { useLessonSession } from "../application/useLessonSession";
 import { deviation, type Period } from "../domain/clock";
-import type { Deck, Slide } from "../domain/deck";
+import type { Deck } from "../domain/deck";
 import {
   entryId,
   entrySlide,
@@ -25,7 +30,8 @@ import {
 import type { LessonSession } from "../domain/lesson";
 import { openProjectorWindow } from "../infrastructure/projectorChannel";
 import { ScrollSyncContext } from "./FrameBlocks";
-import { LiveQuizContext } from "./FrameQuiz";
+import { SheetEmbed } from "./SheetEmbed";
+import { LiveQuizContext, QuizPreview } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
 import { InkInput, InkStrokes, type InkTool } from "./InkLayer";
@@ -36,6 +42,7 @@ import type { QuizActionsProps } from "./QuizActions";
 import { Toolbar } from "./Toolbar";
 import { WorksheetMonitoring } from "./WorksheetMonitoring";
 import { useFrameQuiz } from "./useFrameQuiz";
+import { useSlideActions } from "./useSlideActions";
 import { useTeacherKeys, type TeacherKey } from "./useTeacherKeys";
 import TEXT from "./lessons.de.json";
 import "./lessons.css";
@@ -57,6 +64,7 @@ function TeacherStage({
   onStep,
   sendLaser,
   monitoring,
+  sheet,
 }: {
   deck: Deck;
   session: LessonSession;
@@ -69,8 +77,10 @@ function TeacherStage({
   dispatch: Dispatch;
   onStep: (by: 1 | -1) => void;
   sendLaser: (point: [number, number] | null) => void;
-  /** On a worksheet slide the teacher sees how the class is doing. */
+  /** On a worksheet slide the teacher can look at how the class is doing. */
   monitoring?: ReactNode;
+  /** The worksheet itself, while it is on the projector. */
+  sheet?: ReactNode;
 }) {
   const id = entryId(entry);
   const slide = entrySlide(entry);
@@ -78,12 +88,8 @@ function TeacherStage({
   const order = runningOrder(deck, session.blanks);
   return (
     <FrameStage className="lt-stage">
-      {monitoring ?? (
-        <FrameView
-          entry={entry}
-          deckTitle={deck.title}
-          sent={session.sent.includes(slide.id)}
-        >
+      {monitoring ?? sheet ?? (
+        <FrameView entry={entry} sent={session.sent.includes(slide.id)}>
           <InkStrokes strokes={strokes} />
           <InkInput
             tool={tool}
@@ -174,101 +180,6 @@ function useTeacherControls(dispatch: Dispatch, onStep: (by: 1 | -1) => void) {
   return { tool, setTool, overview, setOverview, menu, setMenu, onKey };
 }
 
-/** What the notes strip offers on this slide besides the notes. */
-function useSlideActions(
-  deck: Deck,
-  courseId: string,
-  slide: Slide | undefined,
-  sheetOpen: boolean,
-  dispatch: Dispatch,
-) {
-  const site = useSite();
-  const revalidator = useRevalidator();
-  const target = targetStore(courseId);
-  const active = useSyncExternalStore(
-    target.subscribe,
-    target.getSnapshot,
-    target.getServerSnapshot,
-  );
-  const store = chapterStore(deck.chapterId);
-  const worksheet = slide?.worksheet;
-  const targetHere =
-    !!worksheet && active?.kind === "sheet" && active.id === worksheet.id;
-  const released = site.releasedSummaries.includes(deck.chapterId);
-  if (worksheet) {
-    return (
-      <>
-        {!sheetOpen && (
-          <button
-            type="button"
-            className="lt-btn lt-btn--quiet"
-            onClick={() => store.setUnlocked(worksheet.id, true)}
-          >
-            Freischalten
-          </button>
-        )}
-        <button
-          type="button"
-          className="lt-btn"
-          onClick={() => {
-            if (!sheetOpen) {
-              store.setUnlocked(worksheet.id, true);
-            }
-            target.set(
-              targetHere
-                ? null
-                : {
-                    kind: "sheet",
-                    id: worksheet.id,
-                    chapterId: deck.chapterId,
-                  },
-            );
-            if (slide) {
-              dispatch({ type: "send", frameId: slide.id });
-            }
-          }}
-        >
-          {targetHere
-            ? TEXT.teacher.stopSending
-            : sheetOpen
-              ? TEXT.teacher.sendStudents
-              : TEXT.teacher.unlockAndSend}
-        </button>
-      </>
-    );
-  }
-  if (slide?.kind === "summary") {
-    return released ? (
-      <span className="lt-notes__sent">{TEXT.frame.summaryReleased}</span>
-    ) : (
-      <button
-        type="button"
-        className="lt-btn"
-        onClick={() => {
-          if (site.localReleases) {
-            localReleases.setSummary(deck.chapterId, true);
-            return;
-          }
-          const data = new FormData();
-          data.set("intent", "releaseSummary");
-          data.set("chapterId", deck.chapterId);
-          void fetch(`/courses/${encodeURIComponent(courseId)}/overview`, {
-            method: "POST",
-            body: data,
-          }).then((response) => {
-            if (response.ok) {
-              void revalidator.revalidate();
-            }
-          });
-        }}
-      >
-        {TEXT.teacher.releaseSummary}
-      </button>
-    );
-  }
-  return undefined;
-}
-
 /** The notes strip for the current slide or blank surface. */
 function SlideNotes({
   entry,
@@ -278,6 +189,7 @@ function SlideNotes({
   dispatch,
   quiz,
   actions,
+  extra,
   onNext,
 }: {
   entry: OrderEntry;
@@ -287,6 +199,7 @@ function SlideNotes({
   dispatch: Dispatch;
   quiz: QuizActionsProps | undefined;
   actions: ReactNode;
+  extra?: ReactNode;
   onNext: () => void;
 }) {
   const slide = entrySlide(entry);
@@ -311,6 +224,7 @@ function SlideNotes({
       onSend={() => undefined}
       quiz={quiz}
       actions={actions}
+      extra={extra}
     />
   );
 }
@@ -367,6 +281,7 @@ export function TeacherView({
   const { tool, setTool, overview, setOverview, menu, setMenu, onKey } =
     useTeacherControls(dispatch, quiz.onStep);
   const [notesForced, setNotesForced] = useState(false);
+  const [classView, setClassView] = useState(false);
   const [endConfirm, setEndConfirm] = useState(false);
   const navigate = useNavigate();
   const access = chapterStore(deck.chapterId);
@@ -390,9 +305,37 @@ export function TeacherView({
     !!sheets &&
     !!slide?.worksheet &&
     isUnlocked(sheets, slide.worksheet, state);
-  const actions = useSlideActions(deck, courseId, slide, sheetOpen, dispatch);
+  const sheetShown =
+    !!slide?.worksheet && session?.sheetShown === slide.id && !classView;
+  const actions = useSlideActions(deck, courseId, slide, sheetOpen, dispatch, {
+    shown: !!slide?.worksheet && session?.sheetShown === slide.id,
+    classView,
+    onClassView: setClassView,
+  });
+  const currentId = session?.currentFrameId;
+  // The class view belongs to the slide it was opened on.
+  useEffect(() => setClassView(false), [currentId]);
+  // A task taken from the shown worksheet becomes a blank surface after the slide.
+  useEffect(() => {
+    const onMessage = (event: MessageEvent<TaskToBlankMessage>) => {
+      const message = event.data;
+      if (
+        event.origin === window.location.origin &&
+        message?.source === "studyluma-sheet" &&
+        message.type === "task-to-blank"
+      ) {
+        dispatch({
+          type: "addBlank",
+          task: { sheetId: message.sheetId, taskId: message.taskId },
+        });
+        setTool("graphit");
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [dispatch, setTool]);
   const scrollSync = useMemo(() => ({ report: sendScroll }), [sendScroll]);
-  const target = targetStore(courseId);
+  const { send: sendTarget } = useSentTarget(courseId);
 
   if (!session || !entry || !slide) {
     return <div className="lt" />;
@@ -403,10 +346,18 @@ export function TeacherView({
   const previous = order[index - 1];
   const number = entry.kind === "slide" ? String(slide.number) : entry.label;
   const monitoring =
-    entry.kind === "slide" && slide.worksheet ? (
+    entry.kind === "slide" && slide.worksheet && classView ? (
       <WorksheetMonitoring sheet={slide.worksheet} unlocked={sheetOpen} />
     ) : undefined;
-  const inkSlide = !monitoring && slide.kind !== "quiz";
+  const sheet =
+    entry.kind === "slide" && slide.worksheet && sheetShown ? (
+      <SheetEmbed
+        src={`${chapterPath}/lesson/sheets/${encodeURIComponent(slide.worksheet.slug)}`}
+        slideId={slide.id}
+        interactive
+      />
+    ) : undefined;
+  const inkSlide = !monitoring && !sheet && slide.kind !== "quiz";
   const openProjector = () => {
     setMenu(false);
     void openProjectorWindow(projectorPath);
@@ -446,6 +397,14 @@ export function TeacherView({
         dispatch={dispatch}
         quiz={quiz.actions}
         actions={actions}
+        extra={
+          slide.quiz && entry.kind === "slide" ? (
+            <>
+              <p className="lt-notes__sub">{TEXT.quiz.prepared}</p>
+              <QuizPreview quiz={slide.quiz} />
+            </>
+          ) : undefined
+        }
         onNext={() => quiz.onStep(1)}
       />
       <main className="lt-main">
@@ -457,6 +416,7 @@ export function TeacherView({
               entry={entry}
               tool={inkSlide ? tool : "cursor"}
               monitoring={monitoring}
+              sheet={sheet}
               hasPrevious={!!previous}
               hasNext={!!next}
               overview={overview}
@@ -489,7 +449,7 @@ export function TeacherView({
             </Button>
             <Button
               onClick={() => {
-                target.set(null);
+                sendTarget(null);
                 void quiz.endActive();
                 endLesson();
                 void navigate(chapterPath);

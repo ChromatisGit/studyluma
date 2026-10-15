@@ -18,6 +18,7 @@ export type {
   Asset,
   ChallengePool,
   Chapter,
+  DerivationStep,
   Location,
   Placement,
   Quiz,

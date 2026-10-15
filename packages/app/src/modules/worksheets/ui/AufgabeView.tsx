@@ -1,4 +1,5 @@
-import { ChevronDown, Lock } from "lucide-react";
+import { useContext } from "react";
+import { ChevronDown, Lock, PenLine } from "lucide-react";
 import { Button } from "@chromatis/base/ui";
 import { RichContent } from "../../content-renderer";
 import { fill } from "../../../helper/text";
@@ -17,7 +18,11 @@ import { Mark } from "./Mark";
 import { Solution } from "./Solution";
 import { StepsPanel } from "./StepsPanel";
 import { TaskView } from "./TaskView";
-import { useWorksheet } from "./WorksheetContext";
+import {
+  EmbedContext,
+  sendTaskToBlank,
+  useWorksheet,
+} from "./WorksheetContext";
 import { refLabel, TEXT } from "./texts";
 
 function PartView({
@@ -195,6 +200,8 @@ function LockedChallenge({ info }: { info: AufgabeInfo }) {
 /** An Aufgabe: number gutter, content, Korrekturrand. */
 export function AufgabeView({ info }: { info: AufgabeInfo }) {
   const { chapter, state, ui, setUi, teacher } = useWorksheet();
+  const embedded = useContext(EmbedContext);
+  const sheetId = info.sheet?.id;
   const { aufgabe } = info;
   if (info.challenge && !teacher && !challengeOpen(aufgabe, chapter, state)) {
     return <LockedChallenge info={info} />;
@@ -260,6 +267,16 @@ export function AufgabeView({ info }: { info: AufgabeInfo }) {
             {label}
             {aufgabe.title ?? ""}
           </h3>
+          {embedded && sheetId && (
+            <Button
+              role="secondary"
+              className="aufgabe__to-blank"
+              onClick={() => sendTaskToBlank(sheetId, aufgabe.id)}
+            >
+              <PenLine className="icon icon--sm" aria-hidden="true" />
+              {TEXT.aufgabe.toBlank}
+            </Button>
+          )}
         </header>
         <AufgabeBody info={info} />
       </div>

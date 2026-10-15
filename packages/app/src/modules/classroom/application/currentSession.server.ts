@@ -21,7 +21,12 @@ export async function currentSnapshot(
   }
 }
 
-const NOTHING: Releases = { summaries: [], solutions: [], rules: {} };
+const NOTHING: Releases = {
+  summaries: [],
+  sheets: {},
+  solutions: [],
+  rules: {},
+};
 
 /** What the browser's session released, as lists and as catalog lookups. */
 export async function currentReleases(request: Request): Promise<{

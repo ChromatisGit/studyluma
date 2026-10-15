@@ -1,13 +1,5 @@
 import { renderToString } from "kern-typ";
-import { prepareTypstMath } from "@studyluma/catalog-contract";
-
-/** German decimal comma inside numbers: 7.5 → 7,5. */
-function germanDecimals(mathml: string): string {
-  return mathml.replace(
-    /<mn>([^<]+)<\/mn>/g,
-    (_, value: string) => `<mn>${value.replace(/(\d)\.(\d)/g, "$1,$2")}</mn>`,
-  );
-}
+import { germanDecimals, prepareTypstMath } from "@studyluma/catalog-contract";
 
 const TRAILING = /\s*(=|<=|>=|<|>|≤|≥|≈)\s*$/;
 const RELATION: Record<string, string> = {

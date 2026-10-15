@@ -1,7 +1,6 @@
 import { emptyChapterState, type ChapterState } from "../domain/chapterState";
 import type {
   AmpelResponse,
-  ClassAmpel,
   Mode,
   PartResponse,
   SheetState,
@@ -189,31 +188,15 @@ export class LocalChapterStore {
     };
   }
 
-  /** The contract's teacher adapter; the class Ampel is a placeholder. */
+  /** The contract's teacher adapter. */
   teacherStore(aufgabenOf: (sheetId: string) => string[]): TeacherStore {
     return {
       setUnlocked: async (sheetId, unlocked) =>
         this.setUnlocked(sheetId, unlocked),
       setReleased: async (sheetId, ids, released) =>
         this.setReleased(ids === "all" ? aufgabenOf(sheetId) : ids, released),
-      loadClassAmpel: async (sheetId) => sampleClassAmpel(sheetId),
     };
   }
-}
-
-/**
- * Totals for the teacher's class Ampel. Answers are not counted yet, so this is
- * always empty; the former sample data was keyed by hand-written sheet ids that
- * no compiled catalog has.
- */
-export function sampleClassAmpel(sheetId: string): ClassAmpel {
-  return {
-    sheetId,
-    answered: 0,
-    total: 24,
-    levels: { green: 0, yellow: 0, red: 0 },
-    causes: {},
-  };
 }
 
 const stores = new Map<string, LocalChapterStore>();

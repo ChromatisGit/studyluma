@@ -61,6 +61,8 @@ export async function loadSite(request: Request): Promise<SiteData> {
       ]),
     ),
     releasedSolutions: view.solutions,
+    sessionSheets: snapshot ? view.sheets : null,
+    sessionTarget: snapshot?.target ?? null,
     classroom: snapshot && {
       code: snapshot.code,
       role: snapshot.role,

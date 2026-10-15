@@ -105,6 +105,9 @@
 .loesung {
   margin-right: calc(var(--rand) + var(--colgap));
 }
+.aufgabe__to-blank {
+  margin-left: auto;
+}
 .aufgabe__head {
   display: flex;
   align-items: baseline;
