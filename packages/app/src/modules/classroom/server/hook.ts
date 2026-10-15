@@ -10,17 +10,25 @@ import {
   CLASSROOM_SOCKET_ROUTE,
   classroomDefinitions,
   configureClassroom,
+  configureTeacherPassword,
   handleClassroomSocket,
   classroomSettings,
+  teacherPassword,
 } from "./classroom.server";
 
 const settings = classroomSettings();
 
 const hook: ServerHook<ReturnType<typeof configureClassroom>> = {
   definitions: classroomDefinitions(settings),
-  createService(host) {
+  createService(host, env) {
     // An unusable catalog stops the server at startup, not at the first request.
     verifyCatalog();
+    configureTeacherPassword(env.TEACHER_PASSWORD);
+    if (!teacherPassword()) {
+      console.warn(
+        "[studyluma] No TEACHER_PASSWORD: the viewer role is a stand-in cookie, a browser without it is a teacher and receives all answers. Do not run this instance for real students.",
+      );
+    }
     // Instances under studyluma.org announce their sessions to the Directory.
     const directory = directoryConfigFor(app);
     return configureClassroom(

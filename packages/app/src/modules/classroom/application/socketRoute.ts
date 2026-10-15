@@ -5,6 +5,19 @@ import type { ClassroomService } from "./classroomService";
 /** The path server entries answer themselves, before the Website's router. */
 export const CLASSROOM_SOCKET_ROUTE = "/classroom/ws";
 
+/** A missing Origin is no browser; `null` (sandboxed frames) and anything unparsable are not this site. */
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) {
+    return true;
+  }
+  try {
+    return new URL(origin).host === new URL(request.url).host;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Upgrades a request to the realtime connection of the browser's Classroom
  * Session. The credential is the HttpOnly cookie; it never travels in the
@@ -21,8 +34,7 @@ export async function handleClassroomSocket(
   if (request.headers.get("upgrade")?.toLowerCase() !== "websocket") {
     return new Response(null, { status: 426 });
   }
-  const origin = request.headers.get("origin");
-  if (origin && new URL(origin).host !== new URL(request.url).host) {
+  if (!sameOrigin(request)) {
     return new Response(null, { status: 403 });
   }
   const auth = readClassroomAuth(request);

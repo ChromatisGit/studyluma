@@ -518,7 +518,16 @@ export function compileContent(
   function noteLink(node: Inline, file: string, line: number) {
     if (node.type !== "link") return;
     const url = node.url;
-    if (/^[a-z][a-z0-9+.-]*:/i.test(url) || url.startsWith("#")) return;
+    const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(url)?.[1]?.toLowerCase();
+    if (scheme && !["http", "https", "mailto", "tel"].includes(scheme)) {
+      error(
+        "LINK_SCHEME",
+        `Links may use http, https, mailto or tel, not ${scheme}:`,
+        loc(file, line),
+      );
+      return;
+    }
+    if (scheme || url.startsWith("#")) return;
     if (/^[^/:#.]+\/[^/:#.]+$/.test(url)) {
       obsolete(
         `Chapter-style reference (${url}) was replaced by a relative link such as ../kapitel/inhalt.md#merkkarte`,

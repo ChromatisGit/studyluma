@@ -34,7 +34,14 @@
   "login": {
     "title": "Login",
     "unavailable": "Die Anmeldung ist derzeit noch nicht verfügbar.",
-    "toCourses": "Zu den Kursen"
+    "toCourses": "Zu den Kursen",
+    "intro": "Melde dich als Lehrkraft an, um Unterrichtsstunden zu starten.",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "invalid": "Das Passwort stimmt nicht.",
+    "tooMany": "Zu viele Versuche. Bitte warte kurz und versuche es später noch einmal.",
+    "signedIn": "Du bist als Lehrkraft angemeldet.",
+    "logout": "Abmelden"
   },
   "control": {
     "planTooLarge": "Der Lernweg ist für den lokalen Speicher zu groß."

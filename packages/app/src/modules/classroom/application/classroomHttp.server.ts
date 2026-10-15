@@ -2,7 +2,7 @@ import type { Snapshot } from "../domain/protocol";
 import type { Intent } from "../domain/session";
 import { readClassroomAuth } from "../infrastructure/classroomCookie";
 import { classroom } from "../infrastructure/classroomServer.server";
-import { RATE_LIMITED } from "./classroomService";
+import { RATE_LIMITED, SERVER_FULL } from "./classroomService";
 
 /**
  * Failures as HTTP answers. An unknown, ended and expired code are the
@@ -16,6 +16,11 @@ export function classroomError(error: unknown): Response {
     case RATE_LIMITED:
       return new Response(null, {
         status: 429,
+        headers: { "Retry-After": "60" },
+      });
+    case SERVER_FULL:
+      return new Response(null, {
+        status: 503,
         headers: { "Retry-After": "60" },
       });
     case "not_found":

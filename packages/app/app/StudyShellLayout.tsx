@@ -13,7 +13,7 @@ import { courseOverviewPath, coursePath } from "../src/modules/courses";
 import {
   LiveQuizProvider,
   useSite,
-  type readViewer,
+  type ViewerRole,
 } from "../src/modules/classroom";
 import {
   ChapterNav,
@@ -36,7 +36,7 @@ function ChapterNavigation({
   summaryUnlocked,
 }: {
   chapter: SheetsData;
-  viewer: ReturnType<typeof readViewer>;
+  viewer: ViewerRole;
   links: ReturnType<typeof worksheetLinks>;
   current: CurrentView;
   onNavigate?: () => void;

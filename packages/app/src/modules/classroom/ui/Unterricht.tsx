@@ -175,6 +175,52 @@ function SheetRow({
 
 const RULES: Record<SummaryRule, string> = TEXT.teacher.rules;
 
+/** The popover of an Inhalt row: release switch, opening rule and a link to the text. */
+function InhaltSettings({
+  course,
+  chapterId,
+  released,
+  rule,
+  send,
+}: {
+  course: Course;
+  chapterId: string;
+  released: boolean;
+  rule: SummaryRule;
+  send: (values: Record<string, string>) => void;
+}) {
+  return (
+    <div className="teacher-controls-access-popover">
+      <Switch
+        label={TEXT.teacher.classUnlocked}
+        checked={released}
+        onChange={(event) =>
+          send({
+            intent: event.target.checked ? "releaseSummary" : "lockSummary",
+          })
+        }
+      />
+      <fieldset>
+        <legend>{TEXT.teacher.release}</legend>
+        {(Object.keys(RULES) as SummaryRule[]).map((option) => (
+          <label key={option}>
+            <input
+              type="radio"
+              name="summary-rule"
+              checked={rule === option}
+              onChange={() => send({ intent: "summaryRule", rule: option })}
+            />
+            {RULES[option]}
+          </label>
+        ))}
+      </fieldset>
+      <Link to={`${chapterPathById(course, chapterId)}#inhalt`}>
+        {TEXT.teacher.openContent}
+      </Link>
+    </div>
+  );
+}
+
 /** The chapter's Inhalt: locked until released, by hand or by the rule. */
 function InhaltRow({
   course,
@@ -241,38 +287,13 @@ function InhaltRow({
           </Button>
         </div>
         {settings && (
-          <div className="teacher-controls-access-popover">
-            <Switch
-              label={TEXT.teacher.classUnlocked}
-              checked={released}
-              onChange={(event) =>
-                send({
-                  intent: event.target.checked
-                    ? "releaseSummary"
-                    : "lockSummary",
-                })
-              }
-            />
-            <fieldset>
-              <legend>{TEXT.teacher.release}</legend>
-              {(Object.keys(RULES) as SummaryRule[]).map((option) => (
-                <label key={option}>
-                  <input
-                    type="radio"
-                    name="summary-rule"
-                    checked={rule === option}
-                    onChange={() =>
-                      send({ intent: "summaryRule", rule: option })
-                    }
-                  />
-                  {RULES[option]}
-                </label>
-              ))}
-            </fieldset>
-            <Link to={`${chapterPathById(course, chapterId)}#inhalt`}>
-              {TEXT.teacher.openContent}
-            </Link>
-          </div>
+          <InhaltSettings
+            course={course}
+            chapterId={chapterId}
+            released={released}
+            rule={rule}
+            send={send}
+          />
         )}
       </li>
     </ul>

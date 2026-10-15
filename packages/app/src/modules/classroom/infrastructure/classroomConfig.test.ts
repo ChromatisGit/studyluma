@@ -18,6 +18,8 @@ describe("classroom configuration", () => {
       sessionTtlMs: 12 * 60 * 60 * 1000,
       maxParticipants: 120,
       maxNameLength: 40,
+      maxSessions: 500,
+      createLimit: { maxCreations: 60, windowMs: 600_000 },
       lookupLimit: { maxFailures: 20, windowMs: 60_000 },
     });
   });

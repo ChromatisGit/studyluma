@@ -663,3 +663,10 @@
     transition: none;
   }
 }
+
+/* The teacher's password form. */
+.teacher-login {
+  display: grid;
+  gap: var(--space-400);
+  max-width: 24rem;
+}

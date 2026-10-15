@@ -265,6 +265,34 @@ describe("gateway", () => {
   });
 });
 
+describe("the gateway and addresses it is given", () => {
+  test("an address that is more than a base address is never contacted", async () => {
+    const probed: string[] = [];
+    const gateway = createGateway(createDirectory(), {
+      domain: "studyluma.org",
+      sessionState: async (instanceUrl) => {
+        probed.push(instanceUrl);
+        return "live";
+      },
+      clientKey: () => "client",
+    });
+    for (const instanceUrl of [
+      "https://a.studyluma.org/path",
+      "https://a.studyluma.org/?x=1",
+      "https://user:pw@a.studyluma.org",
+    ]) {
+      const response = await gateway(
+        new Request("https://studyluma.org/sessions/A3CD", {
+          method: "PUT",
+          body: JSON.stringify({ instanceUrl }),
+        }),
+      );
+      expect(response.status).toBe(400);
+    }
+    expect(probed).toEqual([]);
+  });
+});
+
 describe("session probe", () => {
   test("maps the instance's answer and never follows redirects", async () => {
     const answer = (status: number) =>

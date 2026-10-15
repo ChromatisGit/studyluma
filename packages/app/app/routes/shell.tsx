@@ -10,7 +10,7 @@ import { shellSettings } from "../../src/modules/shell/server/shell.server";
 export { default } from "../StudyShellLayout";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const viewer = readViewer(request);
+  const viewer = await readViewer(request);
   const site = await loadSite(request);
   const courseId = params.courseId ?? "";
   const configuredCourse = courseId

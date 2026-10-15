@@ -1,4 +1,5 @@
 import {
+  normalizeInstanceUrl,
   RateLimited,
   type LookupLimiter,
   type RegisterResult,
@@ -95,13 +96,13 @@ export function createGateway(
     const segments = pathname.split("/").filter(Boolean);
 
     if (segments[0] === "sessions" && segments.length === 2) {
-      const registration = {
-        code: segments[1] ?? "",
-        instanceUrl: await instanceUrlOf(request),
-      };
-      if (!isInstanceOf(options.domain, registration.instanceUrl)) {
+      // Only a clean base address is ever contacted: no path, query,
+      // credentials, and nothing the probe URL could be bent by.
+      const instanceUrl = normalizeInstanceUrl(await instanceUrlOf(request));
+      if (!instanceUrl || !isInstanceOf(options.domain, instanceUrl)) {
         return new Response(null, { status: 400 });
       }
+      const registration = { code: segments[1] ?? "", instanceUrl };
       if (request.method !== "PUT" && request.method !== "DELETE") {
         return new Response(null, { status: 405 });
       }

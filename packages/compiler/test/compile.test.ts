@@ -628,6 +628,19 @@ anzahl = 2
     );
     expect(codes(root)).toContain("ASSET_ESCAPE");
   });
+  test("rejects links with a scheme that runs code", () => {
+    const root = make();
+    edit(
+      root,
+      "folien/Baustein.md",
+      (s) => s + '\n# "Link"\n[Klick](javascript:alert(1))\n',
+    );
+    expect(codes(root)).toContain("LINK_SCHEME");
+    edit(root, "folien/Baustein.md", (s) =>
+      s.replace("javascript:alert(1)", "https://example.org"),
+    );
+    expect(codes(root)).not.toContain("LINK_SCHEME");
+  });
   test("rejects malformed math and missing answers", () => {
     const root = make();
     edit(root, "aufgaben/Steigung.md", (s) =>

@@ -12,7 +12,7 @@ import { readViewer } from "../../src/modules/classroom";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterSlug = "", courseId = "" } = params;
-  if (readViewer(request) !== "teacher") {
+  if ((await readViewer(request)) !== "teacher") {
     throw redirect(chapterPath(courseId, chapterSlug));
   }
   const site = await loadSite(request);

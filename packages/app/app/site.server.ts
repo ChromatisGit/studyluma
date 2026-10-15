@@ -30,7 +30,7 @@ export function loadCourses(request: Request) {
  * Courses carry the teacher's arrangement.
  */
 export async function loadSite(request: Request): Promise<SiteData> {
-  const viewer = readViewer(request);
+  const viewer = await readViewer(request);
   const full = getCatalog();
   const { releases, view, snapshot } = await currentReleases(request);
   const localReleases = !classroomEnabled();

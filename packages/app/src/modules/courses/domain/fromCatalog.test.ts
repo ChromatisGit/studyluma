@@ -64,9 +64,13 @@ describe("courses from the catalog", () => {
   });
 
   test("a course starts at the chapter its file names, else at its first", () => {
+    const [first] = data.courses;
+    if (!first) {
+      throw new Error("fixture has no course");
+    }
     const named = coursesFromCatalog({
       ...data,
-      courses: [{ ...data.courses[0]!, currentChapterId: "c3" }],
+      courses: [{ ...first, currentChapterId: "c3" }],
     });
     expect(named[0]?.currentChapterId).toBe("c3");
   });

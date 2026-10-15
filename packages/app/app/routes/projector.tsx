@@ -11,9 +11,9 @@ import { readViewer } from "../../src/modules/classroom";
 import { findChapterBySlug } from "../../src/modules/courses";
 import { loadCourses } from "../site.server";
 
-export function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterSlug = "", courseId = "" } = params;
-  if (readViewer(request) !== "teacher") {
+  if ((await readViewer(request)) !== "teacher") {
     throw new Response(null, { status: 403 });
   }
   const course = loadCourses(request).find((item) => item.id === courseId);

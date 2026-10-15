@@ -4,6 +4,11 @@
 session_ttl_hours = 12
 max_participants = 120
 max_name_length = 40
+max_sessions = 500
+
+[default.session_create_limit]
+max_creations = 60
+window_seconds = 600
 
 [default.join_lookup_limit]
 max_failures = 20

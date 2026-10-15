@@ -54,6 +54,37 @@ describe("the catalog for browsers", () => {
     expect(JSON.stringify(gaps)).not.toContain("exact");
   });
 
+  test("no private field survives anywhere in the structure", () => {
+    // Redaction deletes named fields; this fails when a new private field
+    // slips past it, whatever the fixture's wording.
+    const PRIVATE = [
+      "answer",
+      "answers",
+      "correct",
+      "fehler",
+      "notes",
+      "loesung",
+    ];
+    const found: string[] = [];
+    const walk = (value: unknown, path: string) => {
+      if (Array.isArray(value)) {
+        value.forEach((item, i) => walk(item, `${path}[${i}]`));
+      } else if (value && typeof value === "object") {
+        for (const [key, child] of Object.entries(value)) {
+          if (PRIVATE.includes(key)) {
+            found.push(`${path}.${key}`);
+          }
+          walk(child, `${path}.${key}`);
+        }
+      }
+    };
+    walk(publicCatalog(), "catalog");
+    expect(found).toEqual([]);
+    // The check can tell: the teacher's catalog does carry them.
+    walk(teacherCatalog(), "teacher");
+    expect(found.length).toBeGreaterThan(0);
+  });
+
   test("gaps keep their kind and a neutral order of choices", () => {
     const [gaps] = parts(publicCatalog());
     const kinds = (

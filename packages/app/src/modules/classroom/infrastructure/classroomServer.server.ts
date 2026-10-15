@@ -35,6 +35,11 @@ export function configureClassroom(
 ): ClassroomService {
   registry.service = createClassroomService(runtime, {
     limiter: createFailureLimiter(settings.lookupLimit),
+    createLimiter: createFailureLimiter({
+      maxFailures: settings.createLimit.maxCreations,
+      windowMs: settings.createLimit.windowMs,
+    }),
+    maxSessions: settings.maxSessions,
     ...(sessionRegistry ? { registry: sessionRegistry } : {}),
   });
   return registry.service;
