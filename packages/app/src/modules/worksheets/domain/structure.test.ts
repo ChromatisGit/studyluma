@@ -78,6 +78,7 @@ const checkTask = task("t-check", [
 
 const sheetA: Worksheet = {
   id: "A",
+  slug: "a",
   chapterId: "c1",
   filename: "A",
   title: "Blatt A",
@@ -104,6 +105,7 @@ const sheetA: Worksheet = {
 };
 const sheetB: Worksheet = {
   id: "B",
+  slug: "b",
   chapterId: "c1",
   filename: "B",
   title: "Blatt B",

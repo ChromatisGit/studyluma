@@ -63,6 +63,7 @@ const setAnswer = part("p-set", "Antwort", {
 });
 const sheet: Worksheet = {
   id: "w1",
+  slug: "blatt",
   chapterId: "c1",
   filename: "w",
   title: "Blatt",
@@ -86,6 +87,7 @@ export const source = catalog({
   chapters: [
     {
       id: "c1",
+      slug: "kapitel",
       group: "g",
       topic: "t",
       name: "n",

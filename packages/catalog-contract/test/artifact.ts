@@ -29,6 +29,7 @@ export function tinyCatalog(
     chapters: [
       {
         id: "c1",
+        slug: "n",
         group: "g",
         topic: "t",
         name: "n",

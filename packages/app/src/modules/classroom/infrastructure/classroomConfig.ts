@@ -36,6 +36,37 @@ export const classroomConfigSchema = z
       .max(100)
       .default(40)
       .describe("Longest participant name, in characters."),
+    /** Sessions an instance runs at once. */
+    max_sessions: z
+      .number()
+      .int()
+      .min(1)
+      .max(10000)
+      .default(500)
+      .describe("Classroom Sessions an instance runs at once."),
+    /** Sessions one client may start within a window. */
+    session_create_limit: z
+      .object({
+        max_creations: z
+          .number()
+          .int()
+          .min(1)
+          .max(1000)
+          .default(60)
+          .describe("Sessions one client may start within the window."),
+        window_seconds: z
+          .number()
+          .int()
+          .min(1)
+          .max(86400)
+          .default(600)
+          .describe("Length of the window, in seconds."),
+      })
+      .strict()
+      .prefault({})
+      .describe(
+        "How many sessions one client may start; a school behind one address starts many at the bell.",
+      ),
     /** Failed join-code lookups one client may make before it is stopped. */
     join_lookup_limit: z
       .object({
@@ -69,6 +100,8 @@ export type ClassroomSettings = Readonly<{
   sessionTtlMs: number;
   maxParticipants: number;
   maxNameLength: number;
+  maxSessions: number;
+  createLimit: Readonly<{ maxCreations: number; windowMs: number }>;
   lookupLimit: Readonly<{ maxFailures: number; windowMs: number }>;
 }>;
 
@@ -79,6 +112,11 @@ export function classroomSettingsFrom(
     sessionTtlMs: config.session_ttl_hours * 60 * 60 * 1000,
     maxParticipants: config.max_participants,
     maxNameLength: config.max_name_length,
+    maxSessions: config.max_sessions,
+    createLimit: {
+      maxCreations: config.session_create_limit.max_creations,
+      windowMs: config.session_create_limit.window_seconds * 1000,
+    },
     lookupLimit: {
       maxFailures: config.join_lookup_limit.max_failures,
       windowMs: config.join_lookup_limit.window_seconds * 1000,

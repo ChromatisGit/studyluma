@@ -40,14 +40,16 @@ function socketUrl(): string {
 /**
  * Follows the Classroom Session of this browser over its WebSocket. The
  * socket reconnects with backoff and, because the server's snapshot is
- * complete, a reconnect recovers everything it missed. Where no socket is
- * available (the Vite dev server) the same snapshot is polled instead.
+ * complete, a reconnect recovers everything it missed. While no socket is
+ * open (a proxy that blocks WebSockets, the Vite dev server) the same
+ * snapshot is polled every `POLL_MS`, whatever the reconnect backoff is.
  */
 export function useClassroom(enabled: boolean): ClassroomConnection {
   const [snapshot, setSnapshot] = useState<Snapshot | null | undefined>(
     undefined,
   );
   const socketRef = useRef<WebSocket | null>(null);
+  const refreshRef = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     if (!enabled || typeof WebSocket === "undefined") {
@@ -101,7 +103,6 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
           return;
         }
         attempt += 1;
-        void poll();
         timer = setTimeout(
           open,
           Math.min(POLL_MS * 2 ** (attempt - 1), MAX_BACKOFF_MS),
@@ -110,9 +111,17 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
     };
     // The first snapshot does not wait for the socket.
     void poll();
+    refreshRef.current = () => void poll();
+    const poller = setInterval(() => {
+      if (!live) {
+        void poll();
+      }
+    }, POLL_MS);
     open();
     return () => {
       stopped = true;
+      clearInterval(poller);
+      refreshRef.current = () => undefined;
       clearTimeout(timer);
       socketRef.current?.close();
       socketRef.current = null;
@@ -125,7 +134,10 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
       socket.send(JSON.stringify({ type: "intent", intent }));
       return true;
     }
-    return postClassroom({ intent: "act", payload: intent });
+    const sent = await postClassroom({ intent: "act", payload: intent });
+    // Over HTTP nothing is pushed back: fetch what the intent changed.
+    refreshRef.current();
+    return sent;
   }, []);
 
   return { snapshot: enabled ? snapshot : undefined, send };

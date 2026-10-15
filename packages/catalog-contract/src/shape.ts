@@ -112,6 +112,9 @@ export function catalogShapeErrors(value: unknown): string[] {
         : [];
       chapterIds.forEach((id) => reference(from, "chapters", id));
     }
+    if (course.currentChapterId !== undefined) {
+      reference(from, "chapters", course.currentChapterId);
+    }
   }
   for (const presentation of value.presentations as Entities) {
     reference(

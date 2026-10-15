@@ -15,8 +15,10 @@ import {
   type Topic,
 } from "../../courses";
 import { useSite } from "./SiteContext";
+import { localReleases } from "../infrastructure/localReleases";
 import { chapterStore, isUnlocked } from "../../worksheets";
 import { ChapterHeading } from "./ChapterHeading";
+import TEXT from "./classroom.de.json";
 
 function autoScroll(y: number) {
   if (y < 90) {
@@ -85,8 +87,8 @@ function PlanAction({
 
 function AddChapter({ topic }: { topic: Topic }) {
   const [open, setOpen] = useState(false);
-  const [template, setTemplate] = useState("Übungen vor Klausur");
-  const [title, setTitle] = useState("Übungen vor Klausur");
+  const [template, setTemplate] = useState("exam-practice");
+  const [title, setTitle] = useState(TEXT.teacher.templateExam);
   const [typed, setTyped] = useState(false);
   const fetcher = useFetcher();
   return open ? (
@@ -107,16 +109,17 @@ function AddChapter({ topic }: { topic: Topic }) {
             setTemplate(event.target.value);
             if (!typed) {
               setTitle(
-                event.target.value === "Leeres Kapitel"
+                event.target.value === "empty"
                   ? ""
-                  : event.target.value,
+                  : (event.target.options[event.target.selectedIndex]?.text ??
+                      ""),
               );
             }
           }}
         >
-          <option>Übungen vor Klausur</option>
-          <option>Wiederholung</option>
-          <option>Leeres Kapitel</option>
+          <option value="exam-practice">{TEXT.teacher.templateExam}</option>
+          <option value="review">{TEXT.teacher.templateReview}</option>
+          <option value="empty">{TEXT.teacher.templateEmpty}</option>
         </select>
       </label>
       <label>
@@ -134,7 +137,7 @@ function AddChapter({ topic }: { topic: Topic }) {
         />
       </label>
       <Button type="submit" size="sm">
-        Kapitel einfügen
+        {TEXT.teacher.insertChapter}
       </Button>
       <Button role="ghost" size="sm" onClick={() => setOpen(false)}>
         Abbrechen
@@ -143,7 +146,7 @@ function AddChapter({ topic }: { topic: Topic }) {
   ) : (
     <Button role="ghost" size="sm" onClick={() => setOpen(true)}>
       <Plus className="icon icon--sm" aria-hidden="true" />
-      Kapitel einfügen in {topic.title}
+      {TEXT.teacher.insertChapterIn.replace("{title}", topic.title)}
     </Button>
   );
 }
@@ -165,7 +168,7 @@ function AddTopic({ course }: { course: Course }) {
       <label>
         Position
         <select className="select__control" name="afterTopicId">
-          <option value="">Am Anfang des Lernwegs</option>
+          <option value="">{TEXT.teacher.startOfPath}</option>
           {course.topics.map((topic) => (
             <option key={topic.id} value={topic.id}>
               Nach {topic.title}
@@ -176,11 +179,11 @@ function AddTopic({ course }: { course: Course }) {
       <label>
         Piktogramm
         <select className="select__control" name="icon">
-          <option value="kurve">Kurve</option>
-          <option value="baum">Baum</option>
-          <option value="terme">Terme</option>
-          <option value="gerade">Gerade</option>
-          <option value="prototyp">Prototyp</option>
+          <option value="kurve">{TEXT.teacher.iconCurve}</option>
+          <option value="baum">{TEXT.teacher.iconTree}</option>
+          <option value="terme">{TEXT.teacher.iconTerms}</option>
+          <option value="gerade">{TEXT.teacher.iconLine}</option>
+          <option value="prototyp">{TEXT.teacher.iconPrototype}</option>
         </select>
       </label>
       <label>
@@ -297,14 +300,14 @@ export function LernwegControl({ course }: { course: Course }) {
       {currentChapter && <ChapterHeading chapter={currentChapter} />}
       <Linie
         label={`Kursstruktur ${course.title}`}
-        badge={course.badge}
-        badgeLabel={course.title}
         className="teacher-controls-linie"
       >
         {/* Each stop has its own drop and edit controls. */}
         {/* eslint-disable-next-line max-lines-per-function */}
         {rows.map((row, index) => {
-          const track = trackFor(index, rows.length, hereIndex);
+          const track = trackFor(index, rows.length, hereIndex, {
+            connectTop: false,
+          });
           if (row.kind === "topic") {
             return (
               <LinieStop
@@ -451,7 +454,9 @@ export function LernwegControl({ course }: { course: Course }) {
                   <span>
                     {row.chapter.number} {row.chapter.title}
                   </span>
-                  {current && <Badge status="info">Aktuell</Badge>}
+                  {current && (
+                    <Badge status="info">{TEXT.teacher.current}</Badge>
+                  )}
                 </label>
                 <div className="teacher-controls-chapter__actions">
                   {row.chapter.id.startsWith("custom-chapter-") && (
@@ -541,35 +546,51 @@ export function LernwegControl({ course }: { course: Course }) {
       {selected && (
         <Alert
           status="info"
-          title={`Neues aktuelles Kapitel: ${selected.number} ${selected.title}`}
+          title={TEXT.teacher.confirmCurrent
+            .replace("{number}", selected.number)
+            .replace("{title}", selected.title)}
           className="teacher-controls-confirm"
           actions={
             <div className="teacher-controls-actions">
               <Button role="secondary" onClick={() => setPending(null)}>
                 Abbrechen
               </Button>
-              <fetcher.Form method="post" onSubmit={() => setPending(null)}>
+              <fetcher.Form
+                method="post"
+                onSubmit={() => {
+                  if (site.localReleases) {
+                    summariesToOpen.forEach((item) =>
+                      localReleases.setSummary(item.id, true),
+                    );
+                  }
+                  setPending(null);
+                }}
+              >
                 <input type="hidden" name="intent" value="current" />
                 <input type="hidden" name="id" value={selected.id} />
-                <Button type="submit">Als aktuell festlegen</Button>
+                <Button type="submit">{TEXT.teacher.setCurrent}</Button>
               </fetcher.Form>
             </div>
           }
         >
           <p>
-            Bisher: {chapters[oldIndex]?.number} {chapters[oldIndex]?.title}.
+            {TEXT.teacher.previousCurrent
+              .replace("{number}", chapters[oldIndex]?.number ?? "")
+              .replace("{title}", chapters[oldIndex]?.title ?? "")}
           </p>
           <p>
             {newIndex > oldIndex
-              ? `Die Klasse sieht danach Inhalte bis einschließlich ${selected.number}.`
-              : "Spätere Kapitel werden wieder zur Vorschau."}
+              ? TEXT.teacher.willSeeThrough.replace("{number}", selected.number)
+              : TEXT.teacher.laterPreview}
           </p>
           <p>
-            {lockedSheets} Arbeitsblätter in diesem Kapitel sind noch gesperrt.
+            {TEXT.teacher.lockedSheets.replace("{count}", String(lockedSheets))}
           </p>
           {summariesToOpen.map((item) => (
             <p key={item.id}>
-              Der Inhalt von {item.number} {item.title} wird freigeschaltet.
+              {TEXT.teacher.summaryWillRelease
+                .replace("{number}", item.number)
+                .replace("{title}", item.title)}
             </p>
           ))}
         </Alert>

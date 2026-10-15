@@ -18,6 +18,7 @@ import {
   actInSession,
   currentReleases,
 } from "../../src/modules/classroom/server/classroom.server";
+import TEXT from "../app.de.json";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const courseId = params.courseId ?? "";
@@ -59,7 +60,7 @@ async function openSummaries(
 }
 
 export async function action({ params, request }: ActionFunctionArgs) {
-  if (readViewer(request) !== "teacher") {
+  if ((await readViewer(request)) !== "teacher") {
     throw new Response(null, { status: 403 });
   }
   const courseId = params.courseId ?? "";
@@ -70,18 +71,19 @@ export async function action({ params, request }: ActionFunctionArgs) {
   const form = await request.formData();
   const before = readCoursePlan(request, courseId);
   const plan = updateCoursePlan(base, before, form);
+  // Refuse before anything is released: a plan that cannot be saved changes nothing.
+  const cookie = coursePlanCookie(request, plan);
+  if (cookie.length > 4000) {
+    throw new Response(TEXT.control.planTooLarge, {
+      status: 413,
+    });
+  }
   if (form.get("intent") === "current") {
     await openSummaries(
       request,
       applyCoursePlan(base, before),
       applyCoursePlan(base, plan),
     );
-  }
-  const cookie = coursePlanCookie(request, plan);
-  if (cookie.length > 4000) {
-    throw new Response("Der Lernweg ist für den lokalen Speicher zu groß.", {
-      status: 413,
-    });
   }
   return Response.json({ ok: true }, { headers: { "Set-Cookie": cookie } });
 }

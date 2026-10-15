@@ -1,7 +1,7 @@
 import type { PublicCatalog } from "../../catalog";
 import type { Course } from "../domain/course";
 import { sheetsData, type SheetsData } from "../../worksheets";
-import { chapterPath, chaptersInOrder } from "./navigation";
+import { chapterPathById, chaptersInOrder } from "./navigation";
 
 /** What a chapter's worksheets are read from: content, courses and releases. */
 export type SheetsSource = {
@@ -37,7 +37,7 @@ export function sheetsFor(
       );
       return {
         origin: other ? `${other.number} · ${other.title}` : "",
-        href: chapterPath(course.id, id),
+        href: chapterPathById(course, id),
       };
     },
   });

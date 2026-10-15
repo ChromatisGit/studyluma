@@ -1,14 +1,19 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import { ChapterPage, findChapter, sheetsFor } from "../../src/modules/courses";
-import { canReadSummary } from "../../src/modules/classroom";
+import {
+  ChapterPage,
+  findChapterBySlug,
+  sheetsFor,
+} from "../../src/modules/courses";
+import { canReadSummary, useSite } from "../../src/modules/classroom";
 import { loadSite } from "../site.server";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  const { chapterId = "", courseId = "" } = params;
+  const { chapterSlug = "", courseId = "" } = params;
   const site = await loadSite(request);
   const course = site.courses.find((item) => item.id === courseId);
-  if (!course || !findChapter(course, chapterId)) {
+  const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
+  if (!course || !chapterId) {
     throw new Response(null, { status: 404 });
   }
   return {
@@ -25,13 +30,19 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 export default function Chapter() {
   const { course, chapterId, sheets, summary, summaryVisible } =
     useLoaderData<typeof loader>();
+  const site = useSite();
   return (
     <ChapterPage
       course={course}
       chapterId={chapterId}
       sheets={sheets}
       summary={summary}
-      summaryVisible={summaryVisible}
+      summaryVisible={
+        site.localReleases ? canReadSummary(site, chapterId) : summaryVisible
+      }
+      summaryLockedForStudents={
+        site.viewer === "teacher" && !site.releasedSummaries.includes(chapterId)
+      }
     />
   );
 }

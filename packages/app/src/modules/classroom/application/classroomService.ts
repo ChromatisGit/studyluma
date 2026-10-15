@@ -23,6 +23,14 @@ export class LookupRateLimitedError extends AppError {
 
 /** Matched by code, not class: a server entry and the bundled app can hold separate copies of this module. */
 export const RATE_LIMITED = "rate_limited";
+export const SERVER_FULL = "server_full";
+
+/** The instance already runs as many sessions as it takes. */
+export class ServerFullError extends AppError {
+  constructor() {
+    super("Too many sessions", SERVER_FULL);
+  }
+}
 
 /**
  * Where an instance announces its sessions so a short address can find
@@ -42,6 +50,8 @@ export type ClassroomService = {
     buildId: string;
     courseId?: string | null;
     title: string;
+    /** Who is asking; creations per client are limited. */
+    client?: string;
   }): Promise<ClassroomAuth>;
   /**
    * Looks a join code up. Unknown, ended and expired codes all fail the
@@ -64,6 +74,10 @@ export type ClassroomService = {
 
 export type ClassroomServiceOptions = {
   limiter?: FailureLimiter;
+  /** Counts every session a client creates (`fail` is its "count"). */
+  createLimiter?: FailureLimiter;
+  /** Sessions this process runs at once. */
+  maxSessions?: number;
   generateCode?: () => string;
   registry?: SessionRegistry;
 };
@@ -81,6 +95,8 @@ function randomSecret(): string {
 type Deps = {
   runtime: StatefulRuntime;
   limiter: FailureLimiter;
+  createLimiter: FailureLimiter;
+  maxSessions: number;
   generateCode: () => string;
   registry: SessionRegistry | undefined;
   /** Codes this process created; the sweeper's list of sessions to check. */
@@ -112,6 +128,15 @@ async function createSession(
   deps: Deps,
   input: Parameters<ClassroomService["create"]>[0],
 ): Promise<ClassroomAuth> {
+  if (input.client !== undefined) {
+    if (!deps.createLimiter.allowed(input.client)) {
+      throw new LookupRateLimitedError();
+    }
+    deps.createLimiter.fail(input.client);
+  }
+  if (deps.known.size >= deps.maxSessions) {
+    throw new ServerFullError();
+  }
   const controllerToken = randomSecret();
   for (let attempt = 0; attempt < MAX_CODE_ATTEMPTS; attempt++) {
     const code = deps.generateCode();
@@ -131,12 +156,17 @@ async function createSession(
       throw error;
     }
     if ((await deps.registry?.register(code)) === "conflict") {
-      // Free here, taken elsewhere: undo and draw another code.
-      await send(deps, code, {
-        type: "act",
-        token: controllerToken,
-        intent: { type: "end" },
-      });
+      // Free here, taken elsewhere: undo and draw another code. If the undo
+      // fails, the sweeper still ends the session when it expires.
+      try {
+        await send(deps, code, {
+          type: "act",
+          token: controllerToken,
+          intent: { type: "end" },
+        });
+      } catch {
+        deps.known.add(code);
+      }
       continue;
     }
     deps.known.add(code);
@@ -172,6 +202,10 @@ export function createClassroomService(
   const deps: Deps = {
     runtime,
     limiter: options.limiter ?? createFailureLimiter(),
+    createLimiter:
+      options.createLimiter ??
+      createFailureLimiter({ maxFailures: 60, windowMs: 600_000 }),
+    maxSessions: options.maxSessions ?? 500,
     generateCode: options.generateCode ?? (() => generateJoinCode()),
     registry: options.registry,
     known: new Set(),

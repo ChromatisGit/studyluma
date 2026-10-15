@@ -12,6 +12,7 @@ import {
 import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./useWorksheetController";
 import { TEXT } from "./texts";
+import { fill } from "../../../helper/text";
 
 /** Worksheets and the chapter's challenge pool in learning order. */
 export function SheetCards({
@@ -63,7 +64,7 @@ export function SheetCards({
           ) : (
             <ActionCard
               key={sheet.id}
-              to={links.sheet(sheet.id)}
+              to={links.sheet(sheet.slug)}
               {...(!unlocked ? { surface: "subtle" as const } : {})}
             >
               {body}
@@ -73,10 +74,13 @@ export function SheetCards({
       {open > 0 && (
         <ActionCard to={links.challenges}>
           <CardBody>
-            <strong className="card__title">Challenges</strong>
+            <strong className="card__title">{TEXT.cards.challenges}</strong>
             <span className="kapitel-blatt__status">
               <Badge status="info">
-                {open} von {chapter.challenges.length} verfügbar
+                {fill(TEXT.cards.availableOf, {
+                  open,
+                  total: chapter.challenges.length,
+                })}
               </Badge>
             </span>
           </CardBody>

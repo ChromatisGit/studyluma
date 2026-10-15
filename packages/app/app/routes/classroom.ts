@@ -42,6 +42,15 @@ function startQuiz(input: Record<string, unknown>) {
     return null;
   }
   const catalog = getCatalog();
+  // The course must be one that contains the chapter: the run is stored with it.
+  const inCourse = catalog.courses.some(
+    (course) =>
+      course.id === courseId &&
+      course.topics.some((topic) => topic.chapterIds.includes(chapterId)),
+  );
+  if (!inCourse) {
+    return null;
+  }
   const placement = catalog.presentations
     .filter((presentation) => presentation.chapterId === chapterId)
     .flatMap((presentation) => presentation.placements)
@@ -73,7 +82,7 @@ export async function action({ request }: ActionFunctionArgs) {
   try {
     switch (body.intent) {
       case "create": {
-        if (readViewer(request) !== "teacher") {
+        if ((await readViewer(request)) !== "teacher") {
           return new Response(null, { status: 403 });
         }
         const catalog = getCatalog();
@@ -81,6 +90,7 @@ export async function action({ request }: ActionFunctionArgs) {
           buildId: catalog.buildId,
           courseId: typeof body.courseId === "string" ? body.courseId : null,
           title: typeof body.title === "string" ? body.title.slice(0, 80) : "",
+          client: clientKey(request),
         });
         return Response.json(
           { code: auth.code },

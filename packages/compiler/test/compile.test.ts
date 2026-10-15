@@ -43,6 +43,8 @@ const tasksOf = (sheet: Sheet) =>
     s.items.flatMap((i) => (i.type === "task" ? [i.task] : [])),
   );
 
+const blank = '+++\ntitel = "Blatt"\n+++\n\n# "Abschnitt"\n\nText.\n';
+
 describe("compiler (new authoring syntax)", () => {
   test("the representative fixture compiles", () => {
     const { bundle } = compileContent(fixture);
@@ -88,6 +90,56 @@ describe("compiler (new authoring syntax)", () => {
       { number: 1, start: 480, end: 525 },
       { number: 2, start: 530, end: 575 },
     ]);
+  });
+  test("a course's aktuell names the chapter it is at and must be one of its chapters", () => {
+    const at = compileContent(
+      make({
+        "math/lineare-funktionen/07-neu/inhalt.md": '# "x"\n',
+        "kurse/mathe.toml":
+          'titel = "X"\naktuell = "lineare-funktionen/07-neu"\n\n[themen]\nlineare-funktionen = ["kapitel-a", "07-neu"]\n',
+      }),
+    ).bundle;
+    const neu = at.chapters.find((c) => c.slug === "neu")!;
+    expect(at.courses[0]!.currentChapterId).toBe(neu.id);
+    expect(
+      codes(
+        make({
+          "kurse/mathe.toml":
+            'titel = "X"\naktuell = "lineare-funktionen/fehlt"\n\n[themen]\nlineare-funktionen = ["kapitel-a"]\n',
+        }),
+      ),
+    ).toContain("COURSE_CHAPTER");
+  });
+  test("chapters and worksheets get URL names without their number prefix", () => {
+    const { bundle } = compileContent(fixture);
+    expect(bundle.chapters[0]!.slug).toBe("kapitel-a");
+    expect(bundle.worksheets.find((w) => w.filename === "Steigung")!.slug).toBe(
+      "steigung",
+    );
+    const root = make({
+      "math/lineare-funktionen/07-neu/inhalt.md": '# "x"\n',
+      "math/lineare-funktionen/07-neu/aufgaben/03-blatt.md": blank,
+      "kurse/mathe.toml":
+        'titel = "X"\n\n[themen]\nlineare-funktionen = ["kapitel-a", "07-neu"]\n',
+    });
+    const numbered = compileContent(root).bundle;
+    expect(numbered.chapters.map((c) => c.slug).sort()).toEqual([
+      "kapitel-a",
+      "neu",
+    ]);
+    expect(numbered.worksheets.map((w) => w.slug)).toContain("blatt");
+  });
+  test("URL names must be unique: per chapter for worksheets, per course for chapters", () => {
+    const sheets = make({
+      [`${CHAPTER}/aufgaben/01-Steigung.md`]: blank,
+    });
+    expect(codes(sheets)).toContain("SLUG_DUPLICATE");
+    const chapters = make({
+      "math/lineare-funktionen/02-kapitel-a/inhalt.md": '# "x"\n',
+      "kurse/mathe.toml":
+        'titel = "X"\n\n[themen]\nlineare-funktionen = ["kapitel-a", "02-kapitel-a"]\n',
+    });
+    expect(codes(chapters)).toContain("SLUG_DUPLICATE");
   });
   test("topic icon.svg becomes an asset; metadata errors are reported", () => {
     const root = make({
@@ -575,6 +627,19 @@ anzahl = 2
         '\n# "Bild"\n![bad](../../../../../outside.png)\n',
     );
     expect(codes(root)).toContain("ASSET_ESCAPE");
+  });
+  test("rejects links with a scheme that runs code", () => {
+    const root = make();
+    edit(
+      root,
+      "folien/Baustein.md",
+      (s) => s + '\n# "Link"\n[Klick](javascript:alert(1))\n',
+    );
+    expect(codes(root)).toContain("LINK_SCHEME");
+    edit(root, "folien/Baustein.md", (s) =>
+      s.replace("javascript:alert(1)", "https://example.org"),
+    );
+    expect(codes(root)).not.toContain("LINK_SCHEME");
   });
   test("rejects malformed math and missing answers", () => {
     const root = make();

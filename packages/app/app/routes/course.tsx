@@ -13,6 +13,7 @@ import { actInSession } from "../../src/modules/classroom/server/classroom.serve
 import {
   CurrentLesson,
   Inhalte,
+  LernwegControl,
   Unterricht,
   readViewer,
 } from "../../src/modules/classroom";
@@ -28,7 +29,7 @@ const releaseIntents = [
 
 export async function action(args: ActionFunctionArgs) {
   const { request, params } = args;
-  if (readViewer(request) !== "teacher") {
+  if ((await readViewer(request)) !== "teacher") {
     throw new Response(null, { status: 403 });
   }
   const form = await request.clone().formData();
@@ -104,14 +105,14 @@ export async function action(args: ActionFunctionArgs) {
   throw new Response(null, { status: 400 });
 }
 
-export function loader({ params, request }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const { courseId = "" } = params;
   const course = loadCourses(request).find((item) => item.id === courseId);
   if (!course) {
     throw new Response(null, { status: 404 });
   }
   const path = new URL(request.url).pathname.replace(/\/+$/, "");
-  const viewer = readViewer(request);
+  const viewer = await readViewer(request);
   const isStudentOverview = path === coursePath(courseId);
   if (viewer === "student" && !isStudentOverview) {
     throw redirect(coursePath(courseId));
@@ -137,8 +138,8 @@ export default function Course() {
       teacher={viewer === "teacher"}
       currentLesson={<CurrentLesson course={course} />}
       teachingControls={<Unterricht course={course} />}
-      structureControls={<Inhalte course={course} showHidden />}
-      contents={<Inhalte course={course} showHidden />}
+      structureControls={<LernwegControl course={course} />}
+      contents={<Inhalte course={course} />}
       activeTab={activeTab}
     />
   );

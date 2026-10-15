@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { injectChromatis } from "@chromatis/base/testing";
-import { serveSiteFixture } from "../src/test/site";
+import { fixtureFiles, serveSiteFixture, source } from "../src/test/site";
+import { provideCatalogFiles } from "../src/modules/catalog/server/catalog.server";
 import { loadSite } from "./site.server";
 import { loader as quizLoader } from "./routes/quiz";
 
@@ -34,6 +35,36 @@ describe("without the classroom module", () => {
     );
     expect(site.classroom).toBeNull();
     expect(site.summaryRules).toBeDefined();
+  });
+
+  test("the demo sends summary content for browser-local release controls", async () => {
+    const site = await loadSite(request("studyluma-viewer=student"));
+    expect(site.localReleases).toBe(true);
+    expect(site.releasedSummaries).toEqual([]);
+    expect(site.catalog.summaries[0]?.content).toHaveLength(1);
+  });
+
+  test("the demo starts with the Inhalt of each course's starting chapter released", async () => {
+    provideCatalogFiles(
+      fixtureFiles({
+        ...source,
+        topics: [{ id: "t1", group: "g", folder: "t", title: "Thema" }],
+        courses: [
+          {
+            id: "k",
+            title: "Kurs",
+            topics: [{ topicId: "t1", chapterIds: ["c1"] }],
+          },
+        ],
+      }),
+    );
+    try {
+      const site = await loadSite(request("studyluma-viewer=teacher"));
+      expect(site.defaultReleasedSummaries).toEqual(["c1"]);
+      expect(site.releasedSummaries).toEqual(["c1"]);
+    } finally {
+      provideCatalogFiles(fixtureFiles());
+    }
   });
 
   test("the live-quiz page does not exist", () => {

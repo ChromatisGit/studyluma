@@ -8,11 +8,18 @@ import {
   ProjectorView,
 } from "../../src/modules/lessons";
 import { readViewer } from "../../src/modules/classroom";
+import { findChapterBySlug } from "../../src/modules/courses";
+import { loadCourses } from "../site.server";
 
-export function loader({ params, request }: LoaderFunctionArgs) {
-  const { chapterId = "" } = params;
-  if (readViewer(request) !== "teacher") {
+export async function loader({ params, request }: LoaderFunctionArgs) {
+  const { chapterSlug = "", courseId = "" } = params;
+  if ((await readViewer(request)) !== "teacher") {
     throw new Response(null, { status: 403 });
+  }
+  const course = loadCourses(request).find((item) => item.id === courseId);
+  const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
+  if (!chapterId) {
+    throw new Response(null, { status: 404 });
   }
   const catalog = getCatalog();
   const presentation = presentationFor(

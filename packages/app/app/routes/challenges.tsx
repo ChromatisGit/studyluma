@@ -1,14 +1,16 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useParams } from "react-router";
 import { loadSite } from "../site.server";
-import { sheetsFor } from "../../src/modules/courses";
+import { findChapterBySlug, sheetsFor } from "../../src/modules/courses";
 import { WorksheetChapter } from "../../src/modules/worksheets";
 import { worksheetLinks } from "../worksheetLinks";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  const { chapterId = "", courseId = "" } = params;
+  const { chapterSlug = "", courseId = "" } = params;
   const site = await loadSite(request);
-  const chapter = sheetsFor(site, courseId, chapterId);
+  const course = site.courses.find((item) => item.id === courseId);
+  const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
+  const chapter = chapterId ? sheetsFor(site, courseId, chapterId) : undefined;
   if (!chapter) {
     throw new Response(null, { status: 404 });
   }
@@ -17,13 +19,13 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 export default function ChallengesRoute() {
   const { chapter, viewer } = useLoaderData<typeof loader>();
-  const { courseId = "", chapterId = "" } = useParams();
+  const { courseId = "", chapterSlug = "" } = useParams();
   return (
     <WorksheetChapter
       chapter={chapter}
       viewer={viewer}
       view={{ kind: "challenges" }}
-      links={worksheetLinks(courseId, chapterId)}
+      links={worksheetLinks(courseId, chapterSlug)}
     />
   );
 }

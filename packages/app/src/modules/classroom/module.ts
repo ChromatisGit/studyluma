@@ -11,6 +11,15 @@ export default defineModule({
   name: "classroom",
   config: { schema: classroomConfigSchema },
   runtime: ["classroom"],
+  // Without it every visitor is a teacher; an instance for real students
+  // cannot be deployed without it.
+  secrets: [
+    {
+      name: "TEACHER_PASSWORD",
+      description: "The teacher's login password",
+      required: "production",
+    },
+  ],
   serverHook: "server/hook.ts",
   // Join links are `<host>/CODE`; the loader answers 404 for anything that is
   // not shaped like a join code, and static routes win over `:code`.

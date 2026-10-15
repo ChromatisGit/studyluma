@@ -28,6 +28,9 @@
 }
 .kapitel-app math {
   font-family: var(--font-math);
+}
+.kapitel-app
+  math:not(:is(.math, .math-inline, .math-block, .math-display) math) {
   font-size: 1.08em;
 }
 
@@ -842,6 +845,13 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* overflow clips to the line box; fractions are taller than a line */
+  padding-block: 0.4em;
+  margin-block: -0.4em;
+}
+/* formulas in the task keep full contrast; only the words are muted */
+.kp-display__text :is(.math, .math-inline) {
+  color: var(--color-text);
 }
 .kp-display__prompt[aria-expanded="true"] .kp-display__text {
   white-space: normal;
@@ -2171,7 +2181,7 @@ body.has-keypad .mfield {
 }
 /* A single task outside its sheet (landing page) */
 .task-sample .ws {
-  padding-block: 0;
+  padding: 0;
 }
 .task-sample .ws::after {
   display: none;

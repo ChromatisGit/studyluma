@@ -3,10 +3,10 @@ import { CourseList } from "../../src/modules/courses";
 import { loadCourses } from "../site.server";
 import { readViewer } from "../../src/modules/classroom";
 
-export function loader({ request }: LoaderFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   return {
     courses: loadCourses(request),
-    viewer: readViewer(request),
+    viewer: await readViewer(request),
   };
 }
 

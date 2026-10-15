@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs, MetaArgs } from "react-router";
 import { redirect, useLoaderData, useParams } from "react-router";
 import { getCatalog } from "../../src/modules/catalog/server/catalog.server";
 import { loadSite } from "../site.server";
-import { chapterPath, findChapter } from "../../src/modules/courses";
+import { chapterPath, findChapterBySlug } from "../../src/modules/courses";
 import {
   buildDeck,
   presentationFor,
@@ -11,12 +11,16 @@ import {
 import { readViewer } from "../../src/modules/classroom";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  const { chapterId = "", courseId = "" } = params;
-  if (readViewer(request) !== "teacher") {
-    throw redirect(chapterPath(courseId, chapterId));
+  const { chapterSlug = "", courseId = "" } = params;
+  if ((await readViewer(request)) !== "teacher") {
+    throw redirect(chapterPath(courseId, chapterSlug));
   }
   const site = await loadSite(request);
   const course = site.courses.find((item) => item.id === courseId);
+  const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
+  if (!course || !chapterId) {
+    throw new Response(null, { status: 404 });
+  }
   const url = new URL(request.url);
   const catalog = getCatalog();
   const presentation = presentationFor(
@@ -25,7 +29,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     url.searchParams.get("presentation"),
   );
   const deck = presentation && buildDeck(catalog, presentation.id);
-  if (!course || !findChapter(course, chapterId) || !deck?.slides.length) {
+  if (!deck?.slides.length) {
     throw new Response(null, { status: 404 });
   }
   return {
@@ -41,8 +45,8 @@ export function meta({ data }: MetaArgs<typeof loader>) {
 
 export default function LessonRoute() {
   const { deck, periods, initialFrameId } = useLoaderData<typeof loader>();
-  const { courseId = "", chapterId = "" } = useParams();
-  const chapter = chapterPath(courseId, chapterId);
+  const { courseId = "", chapterSlug = "" } = useParams();
+  const chapter = chapterPath(courseId, chapterSlug);
   return (
     <TeacherView
       courseId={courseId}

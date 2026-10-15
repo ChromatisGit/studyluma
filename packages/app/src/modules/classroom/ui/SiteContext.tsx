@@ -22,6 +22,10 @@ export type SiteData = {
   } | null;
   /** Whether the classroom is part of this build; if not there is no session to start or join. */
   classroomEnabled: boolean;
+  /** Release controls use this browser only when the classroom module is disabled. */
+  localReleases: boolean;
+  /** With local releases: the chapters released until the visitor changes one. */
+  defaultReleasedSummaries: string[];
   /** Where join links point (the Session Directory); null: this instance's own address. */
   joinOrigin: string | null;
 };

@@ -128,8 +128,7 @@ function groupCards(nodes: MarkdownNode[]): MarkdownNode[] {
       grouped.push({
         type: "merkkartenGruppe",
         data: {
-          hName: "div",
-          hProperties: { className: ["merkkarten-gruppe"] },
+          hName: "MerkkartenGruppe",
         },
         children: run,
       });

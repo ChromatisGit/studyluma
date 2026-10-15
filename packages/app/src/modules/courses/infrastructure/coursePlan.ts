@@ -21,45 +21,112 @@ function emptyPlan(courseId: string): CoursePlan {
   return { courseId, topics: [], chapters: [] };
 }
 
-export function readCoursePlan(request: Request, courseId: string): CoursePlan {
+function encode(value: unknown): string {
+  let binary = "";
+  for (const byte of new TextEncoder().encode(JSON.stringify(value))) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary)
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
+}
+
+function decode(value: string): unknown {
+  const binary = atob(value.replaceAll("-", "+").replaceAll("_", "/"));
+  return JSON.parse(
+    new TextDecoder().decode(Uint8Array.from(binary, (c) => c.charCodeAt(0))),
+  );
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const isStrings = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((item) => typeof item === "string");
+
+const isStringMap = (value: unknown): value is Record<string, string> =>
+  isRecord(value) && Object.values(value).every((v) => typeof v === "string");
+
+function isTopic(value: unknown): value is AddedTopic {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    typeof value.title === "string" &&
+    typeof value.phaseId === "string" &&
+    isRecord(value.icon)
+  );
+}
+
+function isChapter(value: unknown): value is AddedChapter {
+  return (
+    isRecord(value) &&
+    typeof value.id === "string" &&
+    typeof value.title === "string" &&
+    typeof value.topicId === "string"
+  );
+}
+
+/** The plan a cookie holds for this course, or null: the cookie is the browser's, so nothing in it is trusted. */
+function validPlan(value: unknown, courseId: string): CoursePlan | null {
+  if (
+    !isRecord(value) ||
+    value.courseId !== courseId ||
+    !Array.isArray(value.topics) ||
+    !value.topics.every(isTopic) ||
+    !Array.isArray(value.chapters) ||
+    !value.chapters.every(isChapter) ||
+    (value.currentChapterId !== undefined &&
+      value.currentChapterId !== null &&
+      typeof value.currentChapterId !== "string") ||
+    (value.topicOrder !== undefined && !isStrings(value.topicOrder)) ||
+    (value.removed !== undefined && !isStrings(value.removed)) ||
+    (value.names !== undefined && !isStringMap(value.names)) ||
+    (value.chapterOrder !== undefined &&
+      !(
+        isRecord(value.chapterOrder) &&
+        Object.values(value.chapterOrder).every(isStrings)
+      ))
+  ) {
+    return null;
+  }
+  return value as CoursePlan;
+}
+
+/** All plans of the cookie by course id; unusable plans are dropped. */
+function readPlans(request: Request): Record<string, CoursePlan> {
   const pair = (request.headers.get("Cookie") ?? "")
     .split(";")
     .map((part) => part.trim())
     .find((part) => part.startsWith(`${COOKIE}=`));
   if (!pair) {
-    return emptyPlan(courseId);
+    return {};
   }
   try {
-    const plans = JSON.parse(
-      Buffer.from(pair.slice(COOKIE.length + 1), "base64url").toString("utf8"),
-    ) as Record<string, CoursePlan>;
-    const plan = plans[courseId];
-    return plan?.courseId === courseId ? plan : emptyPlan(courseId);
+    const raw = decode(pair.slice(COOKIE.length + 1));
+    if (!isRecord(raw)) {
+      return {};
+    }
+    const plans: Record<string, CoursePlan> = {};
+    for (const [courseId, plan] of Object.entries(raw)) {
+      const valid = validPlan(plan, courseId);
+      if (valid) {
+        plans[courseId] = valid;
+      }
+    }
+    return plans;
   } catch {
-    return emptyPlan(courseId);
+    return {};
   }
 }
 
+export function readCoursePlan(request: Request, courseId: string): CoursePlan {
+  return readPlans(request)[courseId] ?? emptyPlan(courseId);
+}
+
 export function coursePlanCookie(request: Request, plan: CoursePlan): string {
-  let plans: Record<string, CoursePlan> = {};
-  const pair = (request.headers.get("Cookie") ?? "")
-    .split(";")
-    .map((part) => part.trim())
-    .find((part) => part.startsWith(`${COOKIE}=`));
-  if (pair) {
-    try {
-      plans = JSON.parse(
-        Buffer.from(pair.slice(COOKIE.length + 1), "base64url").toString(
-          "utf8",
-        ),
-      ) as Record<string, CoursePlan>;
-    } catch {
-      // Replace an invalid cookie with the new plan.
-    }
-  }
-  plans[plan.courseId] = plan;
-  const value = Buffer.from(JSON.stringify(plans)).toString("base64url");
-  return `${COOKIE}=${value}; Path=/; Max-Age=${ONE_YEAR}; SameSite=Lax`;
+  const plans = { ...readPlans(request), [plan.courseId]: plan };
+  return `${COOKIE}=${encode(plans)}; Path=/; Max-Age=${ONE_YEAR}; SameSite=Lax`;
 }
 
 function orderByIds<T extends { id: string }>(items: T[], ids?: string[]): T[] {
@@ -102,7 +169,12 @@ export function applyCoursePlan(course: Course, plan: CoursePlan): Course {
       continue;
     }
     const topic = topics.find((item) => item.id === chapter.topicId);
-    topic?.chapters.push({ id: chapter.id, title: chapter.title, number: "" });
+    topic?.chapters.push({
+      id: chapter.id,
+      slug: chapter.id,
+      title: chapter.title,
+      number: "",
+    });
   }
   const ordered = orderByIds(topics, plan.topicOrder);
   let lastTopicNumber = "0";
@@ -232,7 +304,7 @@ export function updateCoursePlan(
       next.topics.some((item) => item.id === id) ||
       next.chapters.some((item) => item.id === id)
     ) {
-      next.removed = [...(next.removed ?? []), id];
+      next.removed = [...new Set([...(next.removed ?? []), id])];
     }
   }
   if (

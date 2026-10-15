@@ -6,6 +6,7 @@ import { createClassroomRuntime } from "../runtime/classroomRuntime";
 import {
   createClassroomService,
   LookupRateLimitedError,
+  ServerFullError,
 } from "./classroomService";
 import { createFailureLimiter } from "./rateLimit";
 
@@ -47,6 +48,35 @@ describe("creating sessions", () => {
     expect((await service.create({ buildId: build, title: "2" })).code).toBe(
       "CCCC",
     );
+  });
+});
+
+describe("limits on creating sessions", () => {
+  const hostOf = () =>
+    createBunRuntimeHost([
+      createClassroomRuntime({ settings: defaultClassroomSettings }),
+    ]);
+
+  test("one client may only start so many sessions per window", async () => {
+    const service = createClassroomService(hostOf(), {
+      createLimiter: createFailureLimiter({ maxFailures: 2 }),
+    });
+    const create = (client: string) =>
+      service.create({ buildId: build, title: "x", client });
+    await create("a");
+    await create("a");
+    await expect(create("a")).rejects.toBeInstanceOf(LookupRateLimitedError);
+    await create("b");
+  });
+
+  test("an instance takes a bounded number of sessions, ending one frees a place", async () => {
+    const service = createClassroomService(hostOf(), { maxSessions: 1 });
+    const first = await service.create({ buildId: build, title: "1" });
+    await expect(
+      service.create({ buildId: build, title: "2" }),
+    ).rejects.toBeInstanceOf(ServerFullError);
+    await service.act(first, { type: "end" });
+    await service.create({ buildId: build, title: "2" });
   });
 });
 

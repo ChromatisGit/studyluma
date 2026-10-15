@@ -18,8 +18,6 @@ export type { LernwegChapter, LernwegPhase, LernwegTopic } from "./lernwegRows";
 export interface LernwegProps {
   /** Accessible name of the line, e.g. "Lernweg Mathematik". */
   label: string;
-  badge?: string | undefined;
-  badgeLabel?: string | undefined;
   phases: LernwegPhase[];
   /** Where the class is; set by the teacher. */
   currentChapterId: string | null;
@@ -109,13 +107,7 @@ function TopicRow({
  * school years appear as tabs (past years and the current one only), and
  * the line continues dashed into the neighbouring year.
  */
-export function Lernweg({
-  label,
-  badge,
-  badgeLabel,
-  phases,
-  currentChapterId,
-}: LernwegProps) {
+export function Lernweg({ label, phases, currentChapterId }: LernwegProps) {
   const { currentTopic, currentPhaseIndex } = lernwegPosition(
     phases,
     currentChapterId,
@@ -172,18 +164,11 @@ export function Lernweg({
       openTopic,
     );
     return (
-      <Linie
-        label={label}
-        badge={badge}
-        badgeLabel={badgeLabel}
-        className="lernweg"
-      >
+      <Linie label={label} className="lernweg">
         {rows.map((row, index) =>
           renderRow(
             row,
-            trackFor(index, rows.length, hereIndex, {
-              connectTop: !(index === 0 && row.kind === "stub"),
-            }),
+            trackFor(index, rows.length, hereIndex, { connectTop: false }),
           ),
         )}
       </Linie>

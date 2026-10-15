@@ -107,10 +107,12 @@
   color: var(--color-text-muted);
   cursor: default;
 }
-button.kap-nav__item.is-locked {
+button.kap-nav__item.is-locked,
+a.kap-nav__item.is-locked {
   cursor: pointer;
 }
-.kap-nav__item.is-locked:hover:not(button) {
+/* a locked row the teacher may still open keeps the hover of a link */
+.kap-nav__item.is-locked:hover:not(button):not(a) {
   background: none;
 }
 .kap-nav__t {

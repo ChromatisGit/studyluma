@@ -64,16 +64,16 @@ describe("shell configuration", () => {
       shellLinks(
         shellConfigSchema.parse({
           navigation: [
-            { label: "Startseite", href: "/" },
-            { label: "Roadmap", href: "/roadmap" },
+            { label: "Startseite", href: "/", icon: "house" },
+            { label: "Roadmap", href: "/roadmap", icon: "map" },
           ],
           account: { label: "Lehrer", href: "/courses" },
         }),
       ),
     ).toEqual({
       navigation: [
-        { id: "shell-0", label: "Startseite", to: "/" },
-        { id: "shell-1", label: "Roadmap", to: "/roadmap" },
+        { id: "shell-0", label: "Startseite", to: "/", icon: "house" },
+        { id: "shell-1", label: "Roadmap", to: "/roadmap", icon: "map" },
       ],
       account: { label: "Lehrer", to: "/courses" },
     });

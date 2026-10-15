@@ -23,7 +23,7 @@
 .lf math {
   font-family: "STIX Two Math", math;
 }
-/* Paper keeps its light highlighter, also inside the dark teacher view */
+/* Paper keeps its light highlighter in every color mode. */
 .lf mark {
   background-image: linear-gradient(
     var(--frame-highlight),
@@ -495,8 +495,8 @@
 }
 
 /* =====================================================================
-   Teacher view: the dark Tafel theme around the light stage. Everything
-   on paper the class sees; everything on dark only the teacher.
+   Teacher view: the stage stays paper; the surrounding controls follow
+   the selected color mode.
    ===================================================================== */
 .lt {
   position: fixed;

@@ -1,8 +1,9 @@
-import { useMemo, type ReactNode } from "react";
+import { useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { useParams } from "react-router";
 import { RichReferenceContext } from "../../content-renderer";
-import { chapterPath, type Course } from "../../courses";
+import { chapterPathById, type Course } from "../../courses";
 import { SiteContext, type SiteData } from "./SiteContext";
+import { localReleases } from "../infrastructure/localReleases";
 
 const teaches = (course: Course, chapterId: string) =>
   course.topics.some((topic) =>
@@ -22,7 +23,7 @@ function merkkarteHrefs(site: SiteData, courseId?: string) {
     }
     for (const card of summary.merkkarten) {
       hrefs[card.id] =
-        `${chapterPath(course.id, summary.chapterId)}#${card.anchor}`;
+        `${chapterPathById(course, summary.chapterId)}#${card.anchor}`;
     }
   }
   return hrefs;
@@ -36,9 +37,30 @@ export function SiteProvider({
   children: ReactNode;
 }) {
   const { courseId } = useParams();
-  const hrefs = useMemo(() => merkkarteHrefs(site, courseId), [site, courseId]);
+  localReleases.setDefaults(site.defaultReleasedSummaries);
+  const releases = useSyncExternalStore(
+    localReleases.subscribe,
+    localReleases.getSnapshot,
+    localReleases.getServerSnapshot,
+  );
+  const current = useMemo(
+    () =>
+      site.localReleases
+        ? {
+            ...site,
+            releasedSummaries: releases.summaries,
+            releasedSolutions: releases.solutions,
+            summaryRules: { ...site.summaryRules, ...releases.rules },
+          }
+        : site,
+    [site, releases],
+  );
+  const hrefs = useMemo(
+    () => merkkarteHrefs(current, courseId),
+    [current, courseId],
+  );
   return (
-    <SiteContext.Provider value={site}>
+    <SiteContext.Provider value={current}>
       <RichReferenceContext.Provider value={hrefs}>
         {children}
       </RichReferenceContext.Provider>

@@ -96,14 +96,20 @@ export function ChapterNav({
   return (
     <div className="kap-nav">
       {hasSummary &&
-        (summaryUnlocked ? (
+        (summaryUnlocked || teacher ? (
           <Link
-            className={`kap-nav__item${current.kind === "summary" ? " is-current" : ""}`}
+            className={`kap-nav__item${current.kind === "summary" ? " is-current" : ""}${summaryUnlocked ? "" : " is-locked"}`}
             to={links.summary}
             aria-current={current.kind === "summary" ? "page" : undefined}
             onClick={onNavigate}
           >
             <span className="kap-nav__t">{TEXT.nav.summary}</span>
+            {!summaryUnlocked && (
+              <span className="kap-nav__state">
+                <Lock className="icon icon--sm" aria-hidden="true" />
+                <span className="visually-hidden">{TEXT.nav.locked}</span>
+              </span>
+            )}
           </Link>
         ) : (
           <span className="kap-nav__item is-locked" aria-disabled="true">
@@ -155,7 +161,7 @@ export function ChapterNav({
                     {unlocked || teacher ? (
                       <Link
                         className={className}
-                        to={links.sheet(sheet.id)}
+                        to={links.sheet(sheet.slug)}
                         aria-current={isCurrent ? "page" : undefined}
                         title={sheet.title}
                         onClick={onNavigate}
@@ -177,7 +183,8 @@ export function ChapterNav({
           </ol>
         </div>
       </div>
-      {openChallenges(chapter, state).length > 0 && (
+      {(openChallenges(chapter, state).length > 0 ||
+        (teacher && chapter.challenges.length > 0)) && (
         <Link
           className={`kap-nav__item${current.kind === "challenges" ? " is-current" : ""}`}
           to={links.challenges}

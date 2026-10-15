@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
@@ -10,7 +9,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, Dialog } from "@chromatis/base/ui";
 import { useNavigate, useRevalidator } from "react-router";
 import { fill } from "../../../helper/text";
-import { useSite } from "../../classroom";
+import { localReleases, useSite } from "../../classroom";
 import { sheetsFor } from "../../courses";
 import { targetStore } from "../../classroom";
 import { chapterStore, isUnlocked } from "../../worksheets";
@@ -40,22 +39,6 @@ import { useFrameQuiz } from "./useFrameQuiz";
 import { useTeacherKeys, type TeacherKey } from "./useTeacherKeys";
 import TEXT from "./lessons.de.json";
 import "./lessons.css";
-
-/** Teacher view on the dark Tafel theme: everything on paper the class sees. */
-function useTafelTheme() {
-  useEffect(() => {
-    const root = document.documentElement;
-    const previous = root.dataset.theme;
-    root.dataset.theme = "dark";
-    return () => {
-      if (previous) {
-        root.dataset.theme = previous;
-      } else {
-        delete root.dataset.theme;
-      }
-    };
-  }, []);
-}
 
 type Dispatch = ReturnType<typeof useLessonSession>["dispatch"];
 
@@ -246,10 +229,10 @@ function useSlideActions(
           }}
         >
           {targetHere
-            ? "Nicht mehr schicken"
+            ? TEXT.teacher.stopSending
             : sheetOpen
-              ? "Schüler senden"
-              : "Freischalten & Schüler senden"}
+              ? TEXT.teacher.sendStudents
+              : TEXT.teacher.unlockAndSend}
         </button>
       </>
     );
@@ -262,6 +245,10 @@ function useSlideActions(
         type="button"
         className="lt-btn"
         onClick={() => {
+          if (site.localReleases) {
+            localReleases.setSummary(deck.chapterId, true);
+            return;
+          }
           const data = new FormData();
           data.set("intent", "releaseSummary");
           data.set("chapterId", deck.chapterId);
@@ -275,7 +262,7 @@ function useSlideActions(
           });
         }}
       >
-        Inhalt für die Klasse freigeben
+        {TEXT.teacher.releaseSummary}
       </button>
     );
   }
@@ -366,7 +353,6 @@ export function TeacherView({
   chapterPath,
   initialFrameId,
 }: TeacherViewProps) {
-  useTafelTheme();
   const site = useSite();
   const {
     session,
@@ -494,12 +480,12 @@ export function TeacherView({
       <Dialog
         open={endConfirm}
         onOpenChange={setEndConfirm}
-        closeLabel="Schließen"
-        title="Unterrichtsmodus beenden"
+        closeLabel={TEXT.teacher.close}
+        title={TEXT.teacher.endTitle}
         actions={
           <>
             <Button role="secondary" onClick={() => setEndConfirm(false)}>
-              Abbrechen
+              {TEXT.teacher.cancel}
             </Button>
             <Button
               onClick={() => {
@@ -509,15 +495,12 @@ export function TeacherView({
                 void navigate(chapterPath);
               }}
             >
-              Unterrichtsmodus beenden
+              {TEXT.teacher.end}
             </Button>
           </>
         }
       >
-        <p>
-          Freigeschaltete Inhalte bleiben verfügbar. Schüler:innen werden danach
-          nicht mehr weitergeleitet.
-        </p>
+        <p>{TEXT.teacher.endDescription}</p>
       </Dialog>
     </div>
   );

@@ -24,6 +24,7 @@ import {
   remarkUnwrapParagraph,
 } from "./markdown/plugins";
 import { BlockMath, InlineMath } from "./TypstMath";
+import { MerkkartenGruppe } from "./MerkkartenGruppe";
 
 type RenderGap = (index: number) => ReactNode;
 
@@ -55,6 +56,7 @@ const components = {
   GapSlot,
   Merkkarte,
   MerkkarteBeispiel,
+  MerkkartenGruppe,
 };
 
 function processor(options: {

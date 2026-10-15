@@ -17,6 +17,7 @@ import { NextCard } from "./NextCard";
 import { SectionTabs } from "./SectionTabs";
 import { SheetHeader } from "./SheetHeader";
 import { ReleasedNotice } from "./ReleasedNotice";
+import { TeacherLockNotice } from "./TeacherLockNotice";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
 
@@ -99,6 +100,11 @@ export function SheetPage({ sheet }: { sheet: Sheet }) {
         title={sheet.title}
         lead={sheet.intro}
         modeLine={picking ? null : <ModeLine sheet={sheet} />}
+        notice={
+          teacher && !unlocked ? (
+            <TeacherLockNotice>{TEXT.sheet.teacherLocked}</TeacherLockNotice>
+          ) : null
+        }
       />
       {!picking && section && (
         <SectionTabs sheet={sheet} current={section.id} onSelect={selectTab} />

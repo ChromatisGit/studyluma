@@ -31,6 +31,13 @@ export { parseClientMessage } from "../domain/protocol";
 export { validQuestions } from "../domain/quiz";
 export { readViewer, viewerCookie } from "../infrastructure/viewerCookie";
 export {
+  clearTeacherCookie,
+  configureTeacherPassword,
+  passwordMatches,
+  teacherCookie,
+  teacherPassword,
+} from "../infrastructure/teacherLogin";
+export {
   CLASSROOM_SOCKET_ROUTE,
   handleClassroomSocket,
 } from "../application/socketRoute";

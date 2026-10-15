@@ -7,12 +7,14 @@ export function SheetHeader({
   lead,
   dark = false,
   modeLine,
+  notice,
 }: {
   meta: string;
   title: string;
   lead?: string | undefined;
   dark?: boolean;
   modeLine?: ReactNode;
+  notice?: ReactNode;
 }) {
   return (
     <header className={`page-top${dark ? " page-top--dark" : ""}`}>
@@ -25,6 +27,7 @@ export function SheetHeader({
         </h1>
         {lead && <p className="page-top__lead">{lead}</p>}
         {modeLine}
+        {notice}
       </div>
     </header>
   );

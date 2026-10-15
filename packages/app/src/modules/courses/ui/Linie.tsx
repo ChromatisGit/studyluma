@@ -14,32 +14,13 @@ export type StopStatus = "done" | "current" | "ahead" | "here";
 
 export interface LinieProps {
   label: string;
-  /** Short line badge at the top, e.g. "MA". */
-  badge?: string | undefined;
-  badgeLabel?: string | undefined;
   className?: string;
   children: ReactNode;
 }
 
-export function Linie({
-  label,
-  badge,
-  badgeLabel,
-  className,
-  children,
-}: LinieProps) {
+export function Linie({ label, className, children }: LinieProps) {
   return (
     <div className={["linie", className].filter(Boolean).join(" ")}>
-      {badge && (
-        <div className="linie__badge-row">
-          <span className="linie__badge" aria-hidden="true">
-            {badge}
-          </span>
-          {badgeLabel && (
-            <span className="linie__badge-label">{badgeLabel}</span>
-          )}
-        </div>
-      )}
       <ol className="linie__list" aria-label={label}>
         {children}
       </ol>
@@ -83,7 +64,13 @@ export function LinieStop({
   className,
   children,
 }: LinieStopProps) {
-  const station = stationClass(kind, status);
+  // A tick is a side branch off the line; at the very end it would only
+  // leave an L-shaped stub, so the line simply ends there.
+  const end = down === "none" && !trail && up !== "none";
+  const station =
+    end && kind === "chapter" && status !== "here"
+      ? undefined
+      : stationClass(kind, status);
   const isCurrent = status === "current" || status === "here";
   return (
     <li
@@ -103,6 +90,7 @@ export function LinieStop({
           `lw-up-${up}`,
           `lw-down-${trail ? "trail" : down}`,
           dashed && "lw-stub",
+          end && !station && "lw-end",
         ]
           .filter(Boolean)
           .join(" ")}

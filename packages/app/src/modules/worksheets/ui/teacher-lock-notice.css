@@ -1,0 +1,20 @@
+/* Teacher-only note that the page is locked for students. It carries its own
+   surface so it reads the same on the paper and on the dark header. */
+.lock-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-200);
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 var(--space-400);
+  padding: var(--space-200) var(--space-300);
+  border: var(--border-1) solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-subtle);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+.lock-notice .icon {
+  flex: none;
+  margin-top: 0.15em;
+}

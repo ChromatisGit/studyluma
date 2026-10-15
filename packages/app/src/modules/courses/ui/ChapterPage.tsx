@@ -4,7 +4,7 @@ import { useRevalidator } from "react-router";
 import { Breadcrumbs, Page, PageHeader } from "@chromatis/base/ui";
 import { SummaryContent } from "../../content-renderer";
 import type { Summary } from "../../catalog";
-import type { SheetsData } from "../../worksheets";
+import { TeacherLockNotice, type SheetsData } from "../../worksheets";
 import {
   chapterPath,
   coursePath,
@@ -24,6 +24,8 @@ export interface ChapterPageProps {
   summary: Summary | undefined;
   /** Whether the reader may read the summary yet. */
   summaryVisible: boolean;
+  /** A teacher reads the summary the class has not been given yet. */
+  summaryLockedForStudents?: boolean;
 }
 
 /** Full chapter resources, including the summary when it is available. */
@@ -33,6 +35,7 @@ export function ChapterPage({
   sheets,
   summary,
   summaryVisible: visible,
+  summaryLockedForStudents = false,
 }: ChapterPageProps) {
   const revalidator = useRevalidator();
   const chapter = findChapter(course, chapterId);
@@ -75,7 +78,7 @@ export function ChapterPage({
       </header>
       <ChapterMaterials
         courseId={course.id}
-        chapterId={chapterId}
+        chapterSlug={chapter.slug}
         chapter={sheets}
         availableOnly
       />
@@ -88,13 +91,16 @@ export function ChapterPage({
           <h2 className="h2" id="summary-title">
             {summary.title}
           </h2>
+          {summaryLockedForStudents && (
+            <TeacherLockNotice>{TEXT.summaryTeacherLocked}</TeacherLockNotice>
+          )}
           <SummaryContent summary={summary} />
         </section>
       )}
       {(previous || next) && (
-        <nav className="kapitel-nav" aria-label="Kapitel wechseln">
+        <nav className="kapitel-nav" aria-label={TEXT.chapter.nav}>
           {previous ? (
-            <Link to={chapterPath(course.id, previous.id)}>
+            <Link to={chapterPath(course.id, previous.slug)}>
               <span aria-hidden="true">←</span> {previous.number}{" "}
               {previous.title}
             </Link>
@@ -103,12 +109,12 @@ export function ChapterPage({
           )}
           {next &&
             (next.reached ? (
-              <Link to={chapterPath(course.id, next.id)}>
+              <Link to={chapterPath(course.id, next.slug)}>
                 {next.number} {next.title} <span aria-hidden="true">→</span>
               </Link>
             ) : (
               <span className="kapitel-nav__unavailable">
-                {next.number} {next.title} · Noch nicht verfügbar
+                {next.number} {next.title} · {TEXT.chapter.notAvailable}
               </span>
             ))}
         </nav>

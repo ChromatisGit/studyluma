@@ -69,7 +69,6 @@ export function JoinPage({
       <form onSubmit={submit} className="classroom-join">
         <Input
           label={TEXT.join.code}
-          hint={TEXT.join.codeHint}
           value={code}
           onChange={(event) => setCode(event.target.value.toUpperCase())}
           maxLength={4}

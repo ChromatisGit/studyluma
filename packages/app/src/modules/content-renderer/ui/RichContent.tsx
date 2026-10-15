@@ -10,6 +10,16 @@ export type RichContentProps = {
   className?: string;
 };
 
+/** A paragraph that holds nothing but one formula shows it at display size. */
+function aloneMath(children: RichInline[]): string | undefined {
+  const content = children.filter(
+    (child) => child.type !== "text" || child.value.trim() !== "",
+  );
+  return content.length === 1 && content[0]?.type === "math"
+    ? "math-alone"
+    : undefined;
+}
+
 export function RichInlineContent({
   nodes,
   renderGap,
@@ -113,7 +123,11 @@ export function RichContent({
       {nodes.map((node, index) => {
         switch (node.type) {
           case "paragraph":
-            return <p key={index}>{inline(node.children)}</p>;
+            return (
+              <p key={index} className={aloneMath(node.children)}>
+                {inline(node.children)}
+              </p>
+            );
           case "heading":
             return createElement(
               `h${Math.min(Math.max(node.depth ?? 2, 1), 6)}`,

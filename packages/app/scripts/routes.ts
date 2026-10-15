@@ -11,7 +11,7 @@
  */
 import type { RouteDeclaration } from "@chromatis/base/module";
 
-const chapter = "courses/:courseId/chapters/:chapterId";
+const chapter = "courses/:courseId/chapters/:chapterSlug";
 const file = (name: string) =>
   `@studyluma/app/app/routes/${name.replace(/\.tsx?$/, "")}`;
 
@@ -42,7 +42,7 @@ export const routes: readonly RouteDeclaration[] = [
         id: "course-content",
       },
       { path: chapter, file: file("chapter.tsx") },
-      { path: `${chapter}/sheets/:sheetId`, file: file("sheet.tsx") },
+      { path: `${chapter}/sheets/:sheetSlug`, file: file("sheet.tsx") },
       { path: `${chapter}/challenges`, file: file("challenges.tsx") },
       { path: "courses/:courseId/quiz", file: file("quiz.tsx") },
     ],

@@ -36,4 +36,9 @@ describe("prepareTypstMath", () => {
   test("dot becomes the operator dot", () => {
     expect(prepareTypstMath("a dot b")).toBe("a dot.op b");
   });
+
+  test("asterisk becomes the operator dot, but not inside text", () => {
+    expect(prepareTypstMath("a * b")).toBe("a dot.op b");
+    expect(prepareTypstMath('"x*y" * 2')).toBe('"x*y" dot.op 2');
+  });
 });
