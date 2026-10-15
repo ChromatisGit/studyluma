@@ -1,4 +1,5 @@
-import { LayoutGrid, MoreHorizontal } from "lucide-react";
+import { useState } from "react";
+import { LayoutGrid, MoreHorizontal, UserPlus } from "lucide-react";
 import { Link } from "react-router";
 import { fill } from "../../../helper/text";
 import { formatSeconds, type Period } from "../domain/clock";
@@ -7,11 +8,39 @@ import TEXT from "./lessons.de.json";
 const clockTime = (minutes: number) =>
   `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`;
 
+/** One entry of the choice where lesson time starts. */
+export type StartChoice = {
+  key: string;
+  label: string;
+  selected: boolean;
+  onChoose: () => void;
+};
+
+/** The invitation of students: the code, how many joined, and whether the projector shows it. */
+export type InviteState = {
+  /** The teacher has invited; the code exists. */
+  open: boolean;
+  code: string | null;
+  joined: number;
+  onShownProjector: boolean;
+  onInvite: () => void;
+  onToggleProjector: () => void;
+};
+
 export interface LessonHeaderProps {
   title: string;
   position: string;
   seconds: number;
   deviation: number;
+  /** "3. Stunde · ab 09:50"; null without a timetable. */
+  startLabel: string | null;
+  startChoices: StartChoice[];
+  /** In a detour: the slide of the main deck to return to. */
+  detour: { slideNumber: number; onReturn: () => void } | null;
+  /** Where the deck on the stage can be switched to, besides the current one. */
+  decks: { id: string; title: string; href: string }[];
+  /** Absent without a classroom (the Demo). */
+  invite: InviteState | null;
   projector: {
     connected: boolean;
     hidden: boolean;
@@ -26,7 +55,7 @@ export interface LessonHeaderProps {
   onToggleMenu: () => void;
   period: Period | null;
   onEnd: () => void;
-  chapterPath: string;
+  overviewPath: string;
 }
 
 /** Whether a projector window is connected and frozen on its last image. */
@@ -81,12 +110,23 @@ function LessonMenu(props: LessonHeaderProps) {
               end: clockTime(props.period.end),
             })
           : TEXT.menu.noPeriod}
-        <br />
-        {TEXT.menu.single}
       </p>
-      <button type="button" role="menuitem" className="lt-menu__item" disabled>
-        {TEXT.menu.double}
-      </button>
+      {props.decks.length > 0 && (
+        <>
+          <p className="lt-menu__group">{TEXT.menu.switchDeck}</p>
+          {props.decks.map((deck) => (
+            <Link
+              key={deck.id}
+              role="menuitem"
+              className="lt-menu__item"
+              to={deck.href}
+              onClick={props.onToggleMenu}
+            >
+              {deck.title}
+            </Link>
+          ))}
+        </>
+      )}
       {!projector.connected && (
         <button
           type="button"
@@ -97,18 +137,98 @@ function LessonMenu(props: LessonHeaderProps) {
           {TEXT.menu.openProjector}
         </button>
       )}
+      <Link
+        role="menuitem"
+        className="lt-menu__item"
+        to={props.overviewPath}
+        onClick={props.onToggleMenu}
+      >
+        {TEXT.menu.closeSlides}
+      </Link>
       <button
         type="button"
         role="menuitem"
-        className="lt-menu__item"
+        className="lt-menu__item lt-menu__item--end"
         onClick={props.onEnd}
       >
         {TEXT.menu.end}
       </button>
-      <Link role="menuitem" className="lt-menu__item" to={props.chapterPath}>
-        {TEXT.menu.back}
-      </Link>
     </div>
+  );
+}
+
+/** Where lesson time starts, and a way to change it. */
+function StartChip({
+  label,
+  choices,
+}: {
+  label: string;
+  choices: StartChoice[];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span className="lt-start">
+      <button
+        type="button"
+        className="lt-start__chip"
+        aria-expanded={open}
+        title={TEXT.header.startTitle}
+        onClick={() => setOpen(!open)}
+      >
+        {label}
+      </button>
+      {open && (
+        <span className="lt-start__choices" role="menu">
+          {choices.map((choice) => (
+            <button
+              key={choice.key}
+              type="button"
+              role="menuitemradio"
+              aria-checked={choice.selected}
+              className="lt-menu__item"
+              onClick={() => {
+                choice.onChoose();
+                setOpen(false);
+              }}
+            >
+              {choice.label}
+            </button>
+          ))}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** "Schüler einladen"; once invited, the code and how many have joined. */
+function InviteButton({ invite }: { invite: InviteState }) {
+  if (!invite.open) {
+    return (
+      <button type="button" className="lt-pill" onClick={invite.onInvite}>
+        <UserPlus className="lt-pill__icon" aria-hidden="true" />
+        <strong>{TEXT.header.invite}</strong>
+      </button>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className="lt-pill"
+      aria-pressed={invite.onShownProjector}
+      aria-label={fill(
+        invite.onShownProjector
+          ? TEXT.header.inviteHide
+          : TEXT.header.inviteShow,
+        { code: invite.code ?? "" },
+      )}
+      onClick={invite.onToggleProjector}
+    >
+      <UserPlus className="lt-pill__icon" aria-hidden="true" />
+      <strong className="lt-pill__code">{invite.code}</strong>
+      <span className="lt-pill__sub">
+        {fill(TEXT.header.joined, { count: invite.joined })}
+      </span>
+    </button>
   );
 }
 
@@ -122,12 +242,24 @@ export function LessonHeader(props: LessonHeaderProps) {
         <span className="lt-head__name">{props.title}</span>
         <span className="lt-head__position">{props.position}</span>
       </div>
+      {props.detour && (
+        <button
+          type="button"
+          className="lt-detour"
+          onClick={props.detour.onReturn}
+        >
+          {fill(TEXT.header.detour, { number: props.detour.slideNumber })}
+        </button>
+      )}
       <div className="lt-head__clock" title={TEXT.header.clockTitle}>
         <span className="lt-head__clock-label">{TEXT.header.clock}</span>
         <span className="lt-head__time">{formatSeconds(props.seconds)}</span>
         <span className={`lt-head__deviation lt-head__deviation--${late}`}>
           {formatSeconds(deviation, true)}
         </span>
+        {props.startLabel && (
+          <StartChip label={props.startLabel} choices={props.startChoices} />
+        )}
       </div>
       <span className="lt-head__sep" />
       <ProjectorPill
@@ -135,6 +267,7 @@ export function LessonHeader(props: LessonHeaderProps) {
         onToggleFreeze={props.onToggleFreeze}
         onOpen={props.onOpenProjector}
       />
+      {props.invite && <InviteButton invite={props.invite} />}
       <button
         type="button"
         className="lt-icon-btn"

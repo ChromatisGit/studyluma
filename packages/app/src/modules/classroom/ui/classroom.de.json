@@ -11,24 +11,10 @@
     "full": "Der Unterricht ist voll.",
     "toCourses": "Zu den Kursen"
   },
-  "start": {
-    "title": "Klassenzimmer",
-    "idle": "Starte ein Klassenzimmer, damit Schüler mit einem Code beitreten, Quizze mitmachen und freigegebene Inhalte sehen können.",
-    "start": "Klassenzimmer starten",
-    "starting": "Wird gestartet …",
-    "code": "Code zum Beitreten",
-    "link": "Oder dieser Link",
-    "participants": "Schüler verbunden",
-    "offline": "getrennt",
-    "end": "Klassenzimmer beenden",
-    "endConfirm": "Alle werden getrennt und der Code wird frei. Beenden?",
-    "failed": "Das hat nicht geklappt. Versuch es noch einmal.",
-    "connecting": "Verbinde …"
-  },
   "quizzes": {
     "title": "Quizzes",
     "none": "Dieses Kapitel hat noch kein Quiz.",
-    "needSession": "Starte das Klassenzimmer, dann kannst du ein Quiz mit der Klasse spielen.",
+    "needSession": "Quizze laufen im Unterricht. Starte den Unterricht, dann kannst du eins mit der Klasse spielen.",
     "start": "Quiz starten",
     "questions": "{count} Fragen",
     "position": "Frage {number} von {total}",
@@ -68,7 +54,6 @@
     "release": "Freigabe",
     "openContent": "Inhalt öffnen",
     "noPresentation": "Für dieses Kapitel ist kein Foliensatz in der Übersicht.",
-    "startLesson": "Unterrichtsmodus starten",
     "close": "Schließen",
     "noCurrentChapter": "Noch kein aktuelles Kapitel.",
     "changeChapter": "Kapitel wechseln",
@@ -117,5 +102,6 @@
     "summaryWillRelease": "Der Inhalt von {number} {title} wird freigeschaltet.",
     "teachingTitle": "Unterricht",
     "summaryTitle": "Inhalt"
-  }
+  },
+  "teacherAway": "Die Lehrkraft ist gerade nicht verbunden."
 }

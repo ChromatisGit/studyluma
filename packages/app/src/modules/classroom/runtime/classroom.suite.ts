@@ -400,7 +400,42 @@ const malformedScenario: Scenario = async (ctx) => {
   teacher.close();
 };
 
+const presenceScenario: Scenario = async (ctx) => {
+  const { harness, service, controller } = ctx;
+  const joined = await service.join(controller.code, "Eva", "c1");
+  const student = await harness.open(joined);
+  await student.until((m) => m.type === "snapshot");
+  const awayOf = (m: ServerMessage) =>
+    m.type === "snapshot" && m.snapshot.role === "participant"
+      ? m.snapshot.teacherAwayForMs
+      : undefined;
+  /** The next snapshot after now whose away value satisfies `wanted`. */
+  const nextAway = async (wanted: (away: number | null) => boolean) => {
+    const from = student.messages.length;
+    await student.until((m) => {
+      const away = awayOf(m);
+      return (
+        student.messages.indexOf(m) >= from &&
+        away !== undefined &&
+        wanted(away)
+      );
+    });
+  };
+  // Nobody has led the session since it started: the teacher counts as away.
+  expect(awayOf(student.messages.at(-1) as ServerMessage)).not.toBeNull();
+
+  const connecting = nextAway((away) => away === null);
+  const teacher = await harness.open(controller);
+  await connecting;
+
+  const leaving = nextAway((away) => away !== null);
+  teacher.close();
+  await leaving;
+  student.close();
+};
+
 const scenarios: [string, Scenario][] = [
+  ["students see whether their teacher is connected", presenceScenario],
   [
     "students join without accounts and reconnect with their token",
     joinsScenario,
@@ -437,6 +472,8 @@ export function runClassroomSuite(
           courseId: "mathe",
           title: "Mathe 8a",
         });
+        // Most scenarios are about students, so the class is invited.
+        await service.act(controller, { type: "invite" });
         await scenario({ harness, service, controller });
       } finally {
         await harness.dispose();

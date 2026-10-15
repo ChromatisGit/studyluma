@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, test } from "bun:test";
 import { catalog, entry, para, placement, set } from "../../../test/catalog";
-import { deviation, formatSeconds, lessonStart, plannedEnd } from "./clock";
+import { deviation, formatSeconds, plannedEnd } from "./clock";
 import { buildDeck, plannedTimes, presentationFor } from "./deck";
 import { isFill, isWritingSlide, runningOrder, slideTab } from "./layout";
-import { newSession, reduceSession, strokeAt } from "./session";
+import { newDeckState, reduceSession, strokeAt } from "./session";
 
 /**
  * Stunde: Einstieg (bis 4:00), Baustein (bis 8:00), Inhalt
@@ -170,35 +170,6 @@ describe("layout", () => {
 });
 
 describe("lesson clock", () => {
-  const periods = [
-    { number: 2, start: 8 * 60 + 50, end: 9 * 60 + 35 },
-    { number: 3, start: 9 * 60 + 50, end: 10 * 60 + 35 },
-  ];
-  const opened = new Date("2026-10-05T07:00:00");
-
-  test("counts from the start of the current period", () => {
-    const { start, period } = lessonStart(
-      new Date("2026-10-05T09:56:00"),
-      periods,
-      opened,
-    );
-    expect(period?.number).toBe(3);
-    expect(start.getHours() * 60 + start.getMinutes()).toBe(9 * 60 + 50);
-  });
-
-  test("in a break it refers to the next period", () => {
-    expect(
-      lessonStart(new Date("2026-10-05T09:40:00"), periods, opened).period
-        ?.number,
-    ).toBe(3);
-  });
-
-  test("outside the timetable it counts from opening", () => {
-    expect(
-      lessonStart(new Date("2026-10-05T18:00:00"), periods, opened).start,
-    ).toBe(opened);
-  });
-
   test("slides without ::bis keep the previous plan", () => {
     expect(plannedEnd(deck, "p1-b1")).toBe(240);
     expect(plannedEnd(deck, "p1-b2")).toBe(360);
@@ -215,16 +186,15 @@ describe("lesson clock", () => {
 });
 
 describe("session", () => {
-  const start = newSession(deck, 0, "s1");
+  const start = newDeckState(deck);
   const at2 = reduceSession(deck, start, {
     type: "go",
     frameId: "p1-b1",
     now: 100,
   });
 
-  test("a session starts on the first slide of its deck", () => {
+  test("a deck starts on its first slide", () => {
     expect(start.currentFrameId).toBe("p1-e1");
-    expect(start.presentationId).toBe("p1");
   });
 
   test("a blank hangs after the current slide and is labelled 2a", () => {
@@ -349,7 +319,7 @@ describe("slides on the stage", () => {
 
 describe("worksheet on the projector", () => {
   const at = (frameId: string) =>
-    reduceSession(deck, newSession(deck, 0, "s"), {
+    reduceSession(deck, newDeckState(deck), {
       type: "go",
       frameId,
       now: 1,

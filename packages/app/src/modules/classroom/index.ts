@@ -18,11 +18,18 @@ export { CurrentLesson } from "./ui/CurrentLesson";
 // Teacher controls.
 export { LernwegControl } from "./ui/LernwegControl";
 export { Unterricht } from "./ui/Unterricht";
+export type { UnterrichtProps } from "./ui/Unterricht";
 export { Inhalte } from "./ui/Inhalte";
 
 // Joining and running a Classroom Session.
 export { JoinPage } from "./ui/JoinPage";
-export { ClassroomStart } from "./ui/ClassroomStart";
+export {
+  createClassroom,
+  endClassroom,
+  readClassroom,
+  useSharedClassroom,
+} from "./application/useClassroom";
+export type { ClassroomConnection as ClassroomConnectionState } from "./application/useClassroom";
 export { normalizeJoinCode } from "./domain/joinCode";
 export type {
   ControllerSnapshot,

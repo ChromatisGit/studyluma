@@ -92,6 +92,7 @@ describe("classroom configuration", () => {
       buildId: "b".repeat(64),
       title: "x",
     });
+    await service.act(session, { type: "invite" });
     await expect(
       service.join(session.code, "Alice", "c"),
     ).rejects.toBeInstanceOf(ValidationError);

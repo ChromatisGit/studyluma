@@ -17,6 +17,7 @@ import {
   type Releases,
   type Target,
 } from "./session";
+import { teacherAwayFor } from "./presence";
 import type { QuizStep } from "./quiz";
 import {
   AMPEL_CAUSES,
@@ -38,6 +39,8 @@ type SnapshotBase = {
   courseId: string | null;
   title: string;
   status: ClassroomSession["status"];
+  /** Whether students may join with the code. */
+  inviteOpen: boolean;
   placement: Placement | null;
   target: Target | null;
   releases: Releases;
@@ -56,6 +59,8 @@ export type ParticipantSnapshot = SnapshotBase & {
   you: { id: string; name: string };
   /** Connected participants; names stay with the controller. */
   participantCount: number;
+  /** How long no teacher has been connected (ms, as of this snapshot); null: connected. */
+  teacherAwayForMs: number | null;
   quiz: StudentQuizView | null;
 };
 
@@ -104,6 +109,7 @@ export function controllerSnapshot(
 export function participantSnapshot(
   session: ClassroomSession,
   participantId: string,
+  now: number,
 ): ParticipantSnapshot | null {
   const me = session.participants.find((item) => item.id === participantId);
   if (!me) {
@@ -114,6 +120,7 @@ export function participantSnapshot(
     role: "participant",
     you: { id: me.id, name: me.name },
     participantCount: presentIds(session).length,
+    teacherAwayForMs: teacherAwayFor(session, now),
     quiz: session.quiz && studentView(session.quiz, participantId),
   };
 }
@@ -124,6 +131,7 @@ function base(session: ClassroomSession): SnapshotBase {
     courseId: session.courseId,
     title: session.title,
     status: session.status,
+    inviteOpen: session.inviteOpen,
     placement: session.placement,
     target: session.target,
     releases: session.releases,
@@ -237,6 +245,8 @@ function parseWireIntent(input: unknown): WireIntent | null {
             optionIds: c.optionIds as string[],
           }
         : null;
+    case "invite":
+      return { type: "invite" };
     case "end":
       return { type: "end" };
     default:

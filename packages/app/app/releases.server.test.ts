@@ -35,6 +35,7 @@ describe("released content follows the Classroom Session", () => {
       defaultClassroomSettings,
     );
     const controller = await service.create({ buildId, title: "Test" });
+    await service.act(controller, { type: "invite" });
     const joined = await service.join(controller.code, "Ada", "test");
     const before = await loadSite(student(cookieOf(joined)));
     expect(before.classroom).toMatchObject({ role: "participant" });

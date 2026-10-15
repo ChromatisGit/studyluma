@@ -31,19 +31,27 @@
     "projectorShowAria": "Projektor wieder einblenden (B)",
     "noProjector": "Kein Projektor",
     "openProjector": "Öffnen",
+    "startPeriod": "{number}. Stunde · ab {time}",
+    "startNow": "ab jetzt · {time}",
+    "choosePeriod": "{number}. Stunde (ab {time})",
+    "chooseNow": "ab jetzt",
+    "startTitle": "Von wann die Unterrichtszeit zählt. Klicken zum Ändern.",
+    "detour": "Exkurs · zurück zu Folie {number}",
+    "invite": "Schüler einladen",
+    "inviteShow": "Einladung {code} auf dem Projektor zeigen",
+    "inviteHide": "Einladung {code} vom Projektor nehmen",
+    "joined": "{count} da",
     "overview": "Übersicht aller Folien (G)",
     "menu": "Weitere Einstellungen"
   },
   "menu": {
     "period": "{number}. Stunde, {start} bis {end} Uhr",
-    "noPeriod": "Außerhalb der Stundenzeiten, Zeit ab Öffnen",
-    "single": "Einzelstunde, 45 Minuten",
-    "double": "Als Doppelstunde planen (später)",
+    "noPeriod": "Die Unterrichtszeit zählt ab dem Start",
+    "switchDeck": "Foliensatz wechseln",
     "openProjector": "Projektorfenster öffnen",
     "closeProjector": "Projektorfenster schließen",
-    "end": "Unterricht beenden",
-    "endConfirm": "Unterricht beenden?",
-    "back": "Zum Kapitel"
+    "closeSlides": "Folien schließen (Unterricht läuft weiter)",
+    "end": "Unterricht beenden"
   },
   "notes": {
     "heading": "Notiz {number}",
@@ -85,14 +93,21 @@
     "undoBlank": "Rückgängig: freie Fläche entfernen",
     "blank": "Freie Fläche einfügen (N)"
   },
+  "none": {
+    "title": "Es läuft kein Unterricht",
+    "description": "Dieser Unterricht ist beendet oder wurde in einem anderen Browser gestartet.",
+    "start": "Unterricht starten",
+    "back": "Zur Übersicht",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal."
+  },
+  "join": {
+    "title": "Mach mit",
+    "qrLabel": "QR-Code zum Beitreten",
+    "count": "{count} dabei"
+  },
   "projector": {
     "title": "Projektor",
     "waiting": "Warte auf die Lehrkraft-Ansicht …"
-  },
-  "start": {
-    "teacher": "Unterricht",
-    "open": "Folien öffnen",
-    "description": "{count} Folien"
   },
   "quiz": {
     "soon": "Das Quiz startet gleich.",
@@ -115,7 +130,7 @@
     "progress": "Fortschritt",
     "demo": "Demodaten",
     "locked": "Das Blatt ist noch gesperrt. Sobald du es freischaltest, siehst du hier, wo die Klasse arbeitet.",
-    "noSession": "Starte das Klassenzimmer, dann siehst du hier, wo die Klasse arbeitet.",
+    "noSession": "Hier siehst du, wo die Klasse arbeitet, sobald Schüler beigetreten sind.",
     "registered": "angemeldet",
     "working": "arbeiten gerade am Blatt",
     "section": "Abschnitt",
@@ -157,13 +172,25 @@
     "taskToBlank": "Auf freie Fläche",
     "showSheet": "Arbeitsblatt zeigen",
     "hideSheet": "Folie zeigen",
-    "sheetOnProjector": "Arbeitsblatt auf dem Projektor",
-    "taskToBlank": "Auf freie Fläche",
     "releaseSummary": "Inhalt für die Klasse freigeben",
     "close": "Schließen",
-    "endTitle": "Unterrichtsmodus beenden",
+    "endTitle": "Unterricht beenden",
     "cancel": "Abbrechen",
-    "end": "Unterrichtsmodus beenden",
-    "endDescription": "Freigeschaltete Inhalte bleiben verfügbar. Schüler:innen werden danach nicht mehr weitergeleitet."
+    "end": "Unterricht beenden",
+    "endDescription": "Alle Schüler werden getrennt und der Code wird frei. Freigeschaltete Inhalte bleiben verfügbar."
+  },
+  "unit": {
+    "start": "Unterricht starten",
+    "starting": "Wird gestartet …",
+    "running": "Unterricht läuft",
+    "invited": "Schüler können mit dem Code {code} beitreten · {count} verbunden",
+    "resume": "Zurück zur Präsentation",
+    "end": "Beenden",
+    "endTitle": "Unterricht beenden",
+    "endDescription": "Alle Schüler werden getrennt und der Code wird frei. Freigeschaltete Inhalte bleiben verfügbar.",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "noPresentation": "Für dieses Kapitel ist kein Foliensatz in der Übersicht.",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal."
   }
 }

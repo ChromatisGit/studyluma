@@ -17,6 +17,7 @@ import {
   Unterricht,
   readViewer,
 } from "../../src/modules/classroom";
+import { LessonStart } from "../../src/modules/lessons";
 import type { SummaryRule } from "../../src/modules/catalog";
 import { action as planAction } from "./control";
 
@@ -151,7 +152,17 @@ export default function Course() {
       course={course}
       teacher={viewer === "teacher"}
       currentLesson={<CurrentLesson course={course} />}
-      teachingControls={<Unterricht course={course} />}
+      teachingControls={
+        <Unterricht
+          course={course}
+          start={
+            <LessonStart
+              course={course}
+              chapterId={course.currentChapterId ?? ""}
+            />
+          }
+        />
+      }
       structureControls={<LernwegControl course={course} />}
       contents={<Inhalte course={course} />}
       activeTab={activeTab}

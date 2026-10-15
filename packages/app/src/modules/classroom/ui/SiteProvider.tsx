@@ -2,6 +2,7 @@ import { useMemo, useSyncExternalStore, type ReactNode } from "react";
 import { useParams } from "react-router";
 import { RichReferenceContext } from "../../content-renderer";
 import { chapterPathById, type Course } from "../../courses";
+import { ClassroomConnection } from "./ClassroomConnection";
 import { SiteContext, type SiteData } from "./SiteContext";
 import { localReleases } from "../infrastructure/localReleases";
 
@@ -62,7 +63,8 @@ export function SiteProvider({
   return (
     <SiteContext.Provider value={current}>
       <RichReferenceContext.Provider value={hrefs}>
-        {children}
+        {/* The teacher's one connection, on every page, so a running unit sees its teacher. */}
+        <ClassroomConnection>{children}</ClassroomConnection>
       </RichReferenceContext.Provider>
     </SiteContext.Provider>
   );

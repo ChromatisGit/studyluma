@@ -9,6 +9,7 @@ import { useLocation, useNavigate, useRevalidator } from "react-router";
 import { SheetReporterContext } from "../../worksheets";
 import { useStudentQuizzes } from "../application/useLiveQuiz";
 import type { StudentQuizView } from "../domain/views";
+import TEXT from "./classroom.de.json";
 
 type LiveQuiz = ReturnType<typeof useStudentQuizzes>;
 
@@ -103,6 +104,11 @@ export function LiveQuizProvider({
   return (
     <LiveQuizContext.Provider value={live}>
       <SheetReporterContext.Provider value={enabled ? live.reporter : null}>
+        {enabled && live.teacherAway && (
+          <p className="teacher-away" role="status">
+            {TEXT.teacherAway}
+          </p>
+        )}
         {children}
       </SheetReporterContext.Provider>
     </LiveQuizContext.Provider>
@@ -115,6 +121,7 @@ export function useLiveQuiz(): LiveQuiz {
       views: undefined,
       answer: async () => false,
       sync: undefined,
+      teacherAway: false,
       reporter: { progress: () => undefined, ampel: () => undefined },
     }
   );

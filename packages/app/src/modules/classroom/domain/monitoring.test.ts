@@ -24,11 +24,14 @@ function ok(outcome: Outcome): ClassroomSession {
 
 /** A session with the named participants, all connected. */
 function sessionWith(...names: string[]): ClassroomSession {
-  let session = createSession(
-    { code: "ABCD", buildId: "b", courseId: null, title: "T" },
-    1000,
-    5000,
-  );
+  let session = {
+    ...createSession(
+      { code: "ABCD", buildId: "b", courseId: null, title: "T" },
+      1000,
+      5000,
+    ),
+    inviteOpen: true,
+  };
   for (const id of names) {
     session = ok(addParticipant(session, { id, name: id }, 2000, limits));
     session = ok(setConnected(session, id, true));
@@ -159,7 +162,7 @@ describe("Ampel", () => {
     const teacher = JSON.stringify(controllerSnapshot(session).monitoring);
     expect(teacher).not.toContain("anna");
     expect(teacher).not.toContain("ben");
-    const student = participantSnapshot(session, "ben");
+    const student = participantSnapshot(session, "ben", 0);
     expect(JSON.stringify(student)).not.toContain('"red"');
     expect(JSON.stringify(student)).not.toContain("monitoring");
   });

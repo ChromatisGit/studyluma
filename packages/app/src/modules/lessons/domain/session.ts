@@ -1,6 +1,6 @@
 import { entryId, runningOrder } from "./layout";
 import type { Deck } from "./deck";
-import type { Blank, InkStroke, LessonSession } from "./lesson";
+import type { Blank, InkStroke, DeckState } from "./lesson";
 
 export type SessionAction =
   | { type: "go"; frameId: string; now: number }
@@ -14,16 +14,8 @@ export type SessionAction =
   | { type: "toggleFreeze" }
   | { type: "send"; frameId: string };
 
-export function newSession(
-  deck: Deck,
-  openedAt: number,
-  id: string,
-): LessonSession {
+export function newDeckState(deck: Deck): DeckState {
   return {
-    id,
-    chapterId: deck.chapterId,
-    presentationId: deck.id,
-    openedAt,
     currentFrameId: deck.slides[0]?.id ?? "",
     enteredAt: 0,
     blanks: [],
@@ -33,21 +25,17 @@ export function newSession(
   };
 }
 
-const enter = (
-  session: LessonSession,
-  frameId: string,
-  now: number,
-): LessonSession =>
+const enter = (session: DeckState, frameId: string, now: number): DeckState =>
   frameId === session.currentFrameId
     ? session
     : { ...session, currentFrameId: frameId, enteredAt: now };
 
-/** What happens to a session; ink belongs to the session, never to the chapter. */
+/** What happens to a deck in the lesson; ink belongs to the lesson, never to the chapter. */
 export function reduceSession(
   deck: Deck,
-  session: LessonSession,
+  session: DeckState,
   action: SessionAction,
-): LessonSession {
+): DeckState {
   const order = runningOrder(deck, session.blanks);
   const index = order.findIndex(
     (entry) => entryId(entry) === session.currentFrameId,

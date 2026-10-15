@@ -22,13 +22,8 @@ export type InkStroke = {
   points: [number, number][];
 };
 
-export type LessonSession = {
-  id: string;
-  chapterId: string;
-  /** The deck this session runs; slide ids are its placement ids. */
-  presentationId: string;
-  /** When the session was opened (ms), for the archive. */
-  openedAt: number;
+/** What the teacher does with one deck during a lesson. */
+export type DeckState = {
   currentFrameId: string;
   /** Lesson time (s) when the current slide was entered. */
   enteredAt: number;

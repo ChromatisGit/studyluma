@@ -8,17 +8,21 @@ import {
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, Dialog } from "@chromatis/base/ui";
-import { useNavigate } from "react-router";
+import { useNavigate, useRevalidator } from "react-router";
 import { fill } from "../../../helper/text";
 import { useSite } from "../../classroom";
 import { sheetsFor } from "../../courses";
-import { useSentTarget } from "../../classroom";
 import {
   chapterStore,
   isUnlocked,
   type TaskToBlankMessage,
 } from "../../worksheets";
 import { useLessonSession } from "../application/useLessonSession";
+import {
+  beginUnit,
+  finishUnit,
+  useEndedSessionGuard,
+} from "../application/unitLifecycle";
 import { deviation, type Period } from "../domain/clock";
 import type { Deck } from "../domain/deck";
 import {
@@ -27,7 +31,7 @@ import {
   runningOrder,
   type OrderEntry,
 } from "../domain/layout";
-import type { LessonSession } from "../domain/lesson";
+import type { DeckState } from "../domain/lesson";
 import { openProjectorWindow } from "../infrastructure/projectorChannel";
 import { ScrollSyncContext } from "./FrameBlocks";
 import { SheetEmbed } from "./SheetEmbed";
@@ -36,12 +40,14 @@ import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
 import { InkInput, InkStrokes, type InkTool } from "./InkLayer";
 import { LessonHeader } from "./LessonHeader";
-import { NotesStrip } from "./NotesStrip";
+import { NoUnit } from "./NoUnit";
+import { SlideNotes } from "./SlideNotes";
+import { planOf, startHeader } from "./startHeader";
 import { Overview } from "./Overview";
-import type { QuizActionsProps } from "./QuizActions";
 import { Toolbar } from "./Toolbar";
 import { WorksheetMonitoring } from "./WorksheetMonitoring";
 import { useFrameQuiz } from "./useFrameQuiz";
+import { useInvitation } from "./useInvitation";
 import { useSlideActions } from "./useSlideActions";
 import { useTeacherKeys, type TeacherKey } from "./useTeacherKeys";
 import TEXT from "./lessons.de.json";
@@ -67,7 +73,7 @@ function TeacherStage({
   sheet,
 }: {
   deck: Deck;
-  session: LessonSession;
+  session: DeckState;
   entry: OrderEntry;
   tool: InkTool;
   hasPrevious: boolean;
@@ -180,55 +186,6 @@ function useTeacherControls(dispatch: Dispatch, onStep: (by: 1 | -1) => void) {
   return { tool, setTool, overview, setOverview, menu, setMenu, onKey };
 }
 
-/** The notes strip for the current slide or blank surface. */
-function SlideNotes({
-  entry,
-  next,
-  visible,
-  onShowAnyway,
-  dispatch,
-  quiz,
-  actions,
-  extra,
-  onNext,
-}: {
-  entry: OrderEntry;
-  next: OrderEntry | undefined;
-  visible: boolean;
-  onShowAnyway: () => void;
-  dispatch: Dispatch;
-  quiz: QuizActionsProps | undefined;
-  actions: ReactNode;
-  extra?: ReactNode;
-  onNext: () => void;
-}) {
-  const slide = entrySlide(entry);
-  const number = entry.kind === "slide" ? String(slide.number) : entry.label;
-  const nextTitle = next
-    ? next.kind === "slide"
-      ? next.slide.title
-      : TEXT.frame.blank
-    : undefined;
-  return (
-    <NotesStrip
-      number={number}
-      notes={entry.kind === "slide" ? slide.notes : []}
-      visible={visible}
-      onShowAnyway={onShowAnyway}
-      next={nextTitle ? { title: nextTitle } : undefined}
-      onNext={onNext}
-      back={
-        entry.kind === "blank" ? { number: String(slide.number) } : undefined
-      }
-      onBack={() => dispatch({ type: "go", frameId: slide.id })}
-      onSend={() => undefined}
-      quiz={quiz}
-      actions={actions}
-      extra={extra}
-    />
-  );
-}
-
 /** "Folie 3 von 12 · Baustein" or "Freie Fläche 5a". */
 function positionText(deck: Deck, entry: OrderEntry): string {
   if (entry.kind === "blank") {
@@ -246,10 +203,18 @@ function positionText(deck: Deck, entry: OrderEntry): string {
 export interface TeacherViewProps {
   /** The course whose students take part in the quiz. */
   courseId: string;
+  /** The deck on the stage. */
   deck: Deck;
+  /** The unit's main deck, whose plan the clock follows; the same deck outside a detour. */
+  mainDeck: Deck;
   periods: Period[];
+  /** The other decks of the course the unit can visit. */
+  targets: { id: string; title: string; path: string }[];
+  /** This page, to come back to. */
+  lessonPath: string;
   projectorPath: string;
   chapterPath: string;
+  overviewPath: string;
   initialFrameId?: string | undefined;
 }
 
@@ -262,28 +227,44 @@ export interface TeacherViewProps {
 export function TeacherView({
   courseId,
   deck,
+  mainDeck,
   periods,
+  targets,
+  lessonPath,
   projectorPath,
   chapterPath,
+  overviewPath,
   initialFrameId,
 }: TeacherViewProps) {
   const site = useSite();
   const {
+    unit,
     session,
     dispatch,
     sendLaser,
     sendScroll,
-    endLesson,
+    sendJoin,
+    setClockStart,
     clock,
     projectorConnected,
-  } = useLessonSession(deck, periods, initialFrameId);
+  } = useLessonSession(
+    { deck, path: lessonPath, projectorPath },
+    periods,
+    initialFrameId,
+  );
+  useEndedSessionGuard(unit);
+  const invite = useInvitation(sendJoin);
   const quiz = useFrameQuiz(courseId, deck, session, dispatch);
   const { tool, setTool, overview, setOverview, menu, setMenu, onKey } =
     useTeacherControls(dispatch, quiz.onStep);
   const [notesForced, setNotesForced] = useState(false);
   const [classView, setClassView] = useState(false);
   const [endConfirm, setEndConfirm] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [startFailed, setStartFailed] = useState(false);
+  useEffect(() => setReady(true), []);
   const navigate = useNavigate();
+  const revalidator = useRevalidator();
   const access = chapterStore(deck.chapterId);
   const state = useSyncExternalStore(
     access.subscribe,
@@ -335,8 +316,33 @@ export function TeacherView({
     return () => window.removeEventListener("message", onMessage);
   }, [dispatch, setTool]);
   const scrollSync = useMemo(() => ({ report: sendScroll }), [sendScroll]);
-  const { send: sendTarget } = useSentTarget(courseId);
 
+  if (!unit) {
+    return ready ? (
+      <NoUnit
+        failed={startFailed}
+        overviewPath={overviewPath}
+        onStart={() =>
+          void beginUnit({
+            courseId,
+            presentationId: deck.id,
+            path: lessonPath,
+            periods,
+            classroom: site.classroomEnabled,
+            existingCode:
+              site.classroom?.role === "controller"
+                ? site.classroom.code
+                : null,
+            refresh: async () => {
+              await revalidator.revalidate();
+            },
+          }).then((started) => setStartFailed(!started))
+        }
+      />
+    ) : (
+      <div className="lt" />
+    );
+  }
   if (!session || !entry || !slide) {
     return <div className="lt" />;
   }
@@ -363,13 +369,43 @@ export function TeacherView({
     void openProjectorWindow(projectorPath);
   };
 
+  const { planDeck, planState, planSlide, detour } = planOf(
+    unit,
+    deck,
+    mainDeck,
+  );
+  const { startLabel, choices } = startHeader(unit, periods, setClockStart);
+
   return (
     <div className="lt">
       <LessonHeader
         title={deck.title}
         position={positionText(deck, entry)}
         seconds={clock.seconds}
-        deviation={deviation(deck, slide, session.enteredAt, clock.seconds)}
+        deviation={
+          planSlide
+            ? deviation(planDeck, planSlide, planState.enteredAt, clock.seconds)
+            : 0
+        }
+        startLabel={startLabel}
+        startChoices={choices}
+        detour={
+          detour && planSlide
+            ? {
+                slideNumber: planSlide.number,
+                onReturn: () => void navigate(unit.mainPath),
+              }
+            : null
+        }
+        decks={targets.map((target) => ({
+          id: target.id,
+          title: target.title,
+          href:
+            target.id === unit.mainPresentationId
+              ? unit.mainPath
+              : `${target.path}&main=${encodeURIComponent(unit.mainPresentationId)}`,
+        }))}
+        invite={invite}
         projector={{
           connected: projectorConnected,
           hidden: session.hidden,
@@ -387,7 +423,7 @@ export function TeacherView({
           setMenu(false);
           setEndConfirm(true);
         }}
-        chapterPath={chapterPath}
+        overviewPath={overviewPath}
       />
       <SlideNotes
         entry={entry}
@@ -449,10 +485,7 @@ export function TeacherView({
             </Button>
             <Button
               onClick={() => {
-                sendTarget(null);
-                void quiz.endActive();
-                endLesson();
-                void navigate(chapterPath);
+                void finishUnit(unit).then(() => navigate(overviewPath));
               }}
             >
               {TEXT.teacher.end}

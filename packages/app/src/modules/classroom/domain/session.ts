@@ -8,6 +8,7 @@
  */
 
 import type { SummaryRule } from "../../catalog";
+import type { ClassroomEvent, Intent } from "./intents";
 import {
   sheetFits,
   withProgress,
@@ -15,7 +16,6 @@ import {
   type AmpelMap,
   type ProgressMap,
 } from "./monitoring";
-import type { AmpelCause, AmpelLevel } from "../../worksheets";
 import {
   advanceRun,
   answerRun,
@@ -24,9 +24,7 @@ import {
   leaveRun,
   startRun,
   validQuestions,
-  type QuizQuestion,
   type QuizRun,
-  type QuizStep,
 } from "./quiz";
 
 /** What a session takes: how many participants, and how long a name may be. */
@@ -68,6 +66,13 @@ export type ClassroomSession = {
   startedAt: number;
   expiresAt: number;
   status: "open" | "ended";
+  /** Students may join with the code; set when the teacher first invites. */
+  inviteOpen: boolean;
+  /**
+   * Since when no teacher connection exists (or when the teacher was last
+   * seen, for a teacher without a socket); null while a connection is open.
+   */
+  controllerAbsentSince: number | null;
   placement: Placement | null;
   /** The sheet sent to the class, if any. */
   target: Target | null;
@@ -96,6 +101,9 @@ export function createSession(
     startedAt: now,
     expiresAt: now + ttlMs,
     status: "open",
+    inviteOpen: false,
+    // Nobody has connected yet: the unit ends if the teacher never shows up.
+    controllerAbsentSince: now,
     placement: null,
     target: null,
     releases: { summaries: [], sheets: {}, solutions: [], rules: {} },
@@ -109,72 +117,7 @@ export function createSession(
 export type Actor =
   { role: "controller" } | { role: "participant"; participantId: string };
 
-export type QuizStart = {
-  courseId: string;
-  chapterId: string;
-  frameId: string;
-  title: string;
-  questions: QuizQuestion[];
-};
-
-/** Everything a client may ask for. */
-export type Intent =
-  | { type: "place"; placement: Placement | null }
-  | { type: "target"; target: Target | null }
-  | { type: "release.sheet"; sheetId: string; released: boolean }
-  | { type: "release.summary"; chapterId: string; released: boolean }
-  | { type: "release.rule"; chapterId: string; rule: SummaryRule }
-  | { type: "release.solutions"; taskIds: string[]; released: boolean }
-  | ({ type: "quiz.start" } & QuizStart)
-  | {
-      type: "quiz.advance";
-      runId: string;
-      index: number;
-      step: QuizStep;
-    }
-  | { type: "quiz.end"; runId: string }
-  | {
-      type: "quiz.answer";
-      runId: string;
-      index: number;
-      optionIds: string[];
-    }
-  | {
-      type: "progress";
-      sheetId: string;
-      reached: number;
-      done: boolean;
-      challenges: boolean;
-    }
-  | {
-      type: "ampel";
-      sheetId: string;
-      level: AmpelLevel;
-      causes: AmpelCause[];
-    }
-  | { type: "end" };
-
-export type ClassroomEvent =
-  | { kind: "participant-joined"; participantId: string; name: string }
-  | { kind: "participant-left"; participantId: string; name: string }
-  | { kind: "placement-changed"; placement: Placement | null }
-  | { kind: "target-changed"; target: Target | null }
-  | {
-      kind: "content-released";
-      what: "summary" | "solutions" | "sheet";
-      ids: string[];
-      released: boolean;
-    }
-  | { kind: "quiz-started"; runId: string }
-  | {
-      kind: "response-submitted";
-      runId: string;
-      answered: number;
-      participants: number;
-    }
-  | { kind: "quiz-revealed"; runId: string; index: number }
-  | { kind: "quiz-ended"; runId: string }
-  | { kind: "session-ended" };
+export type { ClassroomEvent, Intent, QuizStart } from "./intents";
 
 /** Why an intent was not applied. The runtime maps these to protocol errors. */
 export type Rejection =
@@ -224,6 +167,10 @@ export function addParticipant(
 ): Outcome {
   if (session.status === "ended") {
     return reject("ended");
+  }
+  // Until the teacher invites, the code finds nobody.
+  if (!session.inviteOpen) {
+    return reject("not-found");
   }
   if (session.participants.length >= limits.maxParticipants) {
     return reject("full");
@@ -438,6 +385,10 @@ function controllerIntent(
   newRunId: () => string,
 ): Outcome {
   switch (intent.type) {
+    case "invite":
+      return accept(
+        session.inviteOpen ? session : { ...session, inviteOpen: true },
+      );
     case "place":
       return accept({ ...session, placement: intent.placement }, [
         { kind: "placement-changed", placement: intent.placement },

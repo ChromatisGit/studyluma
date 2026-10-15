@@ -1,5 +1,7 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SheetReporter } from "../../worksheets";
+import { TEACHER_AWAY_NOTICE_MS } from "../domain/presence";
+import type { Snapshot } from "../domain/protocol";
 import type { StudentQuizView, TeacherQuizView } from "../domain/views";
 import { useSite } from "../ui/SiteContext";
 import { postClassroom, useSharedClassroom } from "./useClassroom";
@@ -54,6 +56,28 @@ export function useTeacherQuiz(courseId: string) {
   };
 }
 
+/**
+ * Whether the teacher has been away long enough to tell the student. The
+ * server reports how long as of the snapshot; the device counts on from there,
+ * so no clock of the server is needed and nothing is pushed at the threshold.
+ */
+function useTeacherAway(snapshot: Snapshot | null | undefined): boolean {
+  const away =
+    snapshot?.role === "participant" ? snapshot.teacherAwayForMs : null;
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (away === null) {
+      setElapsed(0);
+      return;
+    }
+    const received = Date.now();
+    setElapsed(0);
+    const timer = setInterval(() => setElapsed(Date.now() - received), 5000);
+    return () => clearInterval(timer);
+  }, [snapshot, away]);
+  return away !== null && away + elapsed >= TEACHER_AWAY_NOTICE_MS;
+}
+
 /** A student device: the quiz of the session the student joined. */
 export function useStudentQuizzes(enabled: boolean) {
   const { classroom } = useSite();
@@ -89,5 +113,6 @@ export function useStudentQuizzes(enabled: boolean) {
     }),
     [send],
   );
-  return { views, answer, sync, reporter };
+  const teacherAway = useTeacherAway(snapshot);
+  return { views, answer, sync, reporter, teacherAway };
 }
