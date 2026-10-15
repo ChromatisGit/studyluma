@@ -43,6 +43,8 @@ export type DeckState = {
   } | null;
   /** Slides whose sheet the class was sent to. */
   sent: string[];
+  /** Ink taken off a frame by "clear", newest last, so undo can bring it back. */
+  cleared?: { frameId: string; strokes: InkStroke[] }[];
 };
 
 /** The logical size every slide is laid out in. */

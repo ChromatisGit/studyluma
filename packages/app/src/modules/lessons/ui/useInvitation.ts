@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSharedClassroom, useSite } from "../../classroom";
 import type { JoinInfo } from "../infrastructure/projectorChannel";
 import type { InviteState } from "./LessonHeader";
@@ -20,8 +20,8 @@ export function useInvitation(
   const joined =
     view?.participants.filter((item) => item.connected).length ?? 0;
   const base = site.joinOrigin ?? origin;
-  useEffect(() => {
-    sendJoin(
+  const join = useMemo<JoinInfo | null>(
+    () =>
       shown && open && code && base
         ? {
             code,
@@ -30,8 +30,9 @@ export function useInvitation(
             count: joined,
           }
         : null,
-    );
-  }, [shown, open, code, base, joined, sendJoin]);
+    [shown, open, code, base, joined],
+  );
+  useEffect(() => sendJoin(join), [join, sendJoin]);
   if (!controller) {
     return null;
   }
@@ -45,5 +46,6 @@ export function useInvitation(
       void send({ type: "invite" });
     },
     onToggleProjector: () => setShown(!shown),
+    join,
   };
 }

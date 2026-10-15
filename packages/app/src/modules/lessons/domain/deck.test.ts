@@ -235,6 +235,68 @@ describe("session", () => {
   });
 });
 
+describe("strokeAt", () => {
+  const line = {
+    id: "k1",
+    frameId: "f",
+    color: "graphit" as const,
+    points: [
+      [0, 0],
+      [400, 0],
+    ] as [number, number][],
+  };
+
+  test("hits a straight two-point stroke anywhere along it", () => {
+    expect(strokeAt([line], 200, 8)?.id).toBe("k1");
+    expect(strokeAt([line], 200, 40)).toBeUndefined();
+    expect(strokeAt([line], 430, 0)).toBeUndefined();
+  });
+});
+
+describe("clearing a slide", () => {
+  const stroke = (id: string, frameId: string) => ({
+    id,
+    frameId,
+    color: "graphit" as const,
+    points: [[10, 10]] as [number, number][],
+  });
+
+  const at2 = reduceSession(deck, newDeckState(deck), {
+    type: "go",
+    frameId: "p1-b1",
+    now: 100,
+  });
+
+  test("clear wipes only this slide and undo brings it back", () => {
+    const written = [stroke("k1", "p1-b1"), stroke("k2", "p1-b1")].reduce(
+      (state, item) =>
+        reduceSession(deck, state, { type: "stroke", stroke: item }),
+      reduceSession(deck, at2, {
+        type: "stroke",
+        stroke: stroke("k0", "other"),
+      }),
+    );
+    const cleared = reduceSession(deck, written, { type: "clear" });
+    expect(cleared.ink.map((s) => s.id)).toEqual(["k0"]);
+    const back = reduceSession(deck, cleared, { type: "undo", now: 140 });
+    expect(back.ink.map((s) => s.id)).toEqual(["k0", "k1", "k2"]);
+    expect(back.cleared).toEqual([]);
+  });
+
+  test("undo on a cleared empty blank restores before removing the blank", () => {
+    const branched = reduceSession(deck, at2, { type: "addBlank", now: 120 });
+    const frameId = branched.currentFrameId;
+    const written = reduceSession(deck, branched, {
+      type: "stroke",
+      stroke: stroke("k1", frameId),
+    });
+    const cleared = reduceSession(deck, written, { type: "clear" });
+    const first = reduceSession(deck, cleared, { type: "undo", now: 130 });
+    expect(first.ink).toHaveLength(1);
+    expect(first.blanks).toHaveLength(1);
+  });
+});
+
 describe("slides on the stage", () => {
   test("a slide plans the time between its ::bis and the previous one", () => {
     expect(deck.slides.map((s) => s.budget)).toEqual([

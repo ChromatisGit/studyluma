@@ -43,7 +43,9 @@ export function ProjectorView({
   if (join) {
     return (
       <div className="lp">
-        <JoinView join={join} />
+        <FrameStage>
+          <JoinView join={join} />
+        </FrameStage>
       </div>
     );
   }

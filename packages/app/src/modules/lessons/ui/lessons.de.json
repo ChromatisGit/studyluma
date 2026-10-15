@@ -22,7 +22,9 @@
     "position": "Folie {number} von {total}",
     "branch": "Freie Fläche {label}",
     "clock": "Unterricht",
-    "clockTitle": "Unterrichtszeit und Abweichung vom Plan",
+    "clockTitle": "Unterrichtszeit und Restzeit der Folie laut Plan",
+    "remaining": "noch {time}",
+    "over": "über {time}",
     "projector": "Projektor",
     "projectorShows": "zeigt {number}",
     "projectorHidden": "Ausgeblendet",
@@ -35,7 +37,6 @@
     "startNow": "ab jetzt · {time}",
     "choosePeriod": "{number}. Stunde (ab {time})",
     "chooseNow": "ab jetzt",
-    "startTitle": "Von wann die Unterrichtszeit zählt. Klicken zum Ändern.",
     "detour": "Exkurs · zurück zu Folie {number}",
     "invite": "Schüler einladen",
     "inviteShow": "Einladung {code} auf dem Projektor zeigen",
@@ -48,7 +49,7 @@
     "period": "{number}. Stunde, {start} bis {end} Uhr",
     "noPeriod": "Die Unterrichtszeit zählt ab dem Start",
     "switchDeck": "Foliensatz wechseln",
-    "openProjector": "Projektorfenster öffnen",
+    "clockStart": "Unterrichtszeit zählt ab",
     "closeProjector": "Projektorfenster schließen",
     "closeSlides": "Folien schließen (Unterricht läuft weiter)",
     "end": "Unterricht beenden"
@@ -89,6 +90,7 @@
     "violett": "Stift Violett",
     "signal": "Stift Signalfarbe",
     "eraser": "Radierer",
+    "clear": "Folie leeren (rückgängig machbar)",
     "undo": "Rückgängig",
     "undoBlank": "Rückgängig: freie Fläche entfernen",
     "blank": "Freie Fläche einfügen (N)"
@@ -180,6 +182,7 @@
     "endDescription": "Alle Schüler werden getrennt und der Code wird frei. Freigeschaltete Inhalte bleiben verfügbar."
   },
   "unit": {
+    "open": "Öffnen",
     "start": "Unterricht starten",
     "starting": "Wird gestartet …",
     "running": "Unterricht läuft",

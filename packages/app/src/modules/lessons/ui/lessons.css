@@ -32,33 +32,22 @@
 }
 
 /* Tab and color bar: the color says what happens on the slide */
-.lf--tone-erklaeren {
-  --lf-family: var(--frame-family-erarbeitung);
+.lf--tone-erklaeren,
+.lf--tone-inhalt,
+.lf--tone-merke,
+.lf--tone-neutral {
+  --lf-family: var(--frame-family-standard);
 }
-.lf--tone-aufgabe {
-  --lf-family: var(--frame-family-uebung);
-}
+.lf--tone-aufgabe,
 .lf--tone-arbeitsblatt {
-  --lf-family: var(--frame-family-sicherung);
+  --lf-family: var(--frame-family-arbeit);
 }
 .lf--tone-quiz {
   --lf-family: var(--frame-family-quiz);
 }
-.lf--tone-inhalt {
-  --lf-family: var(--frame-family-inhalt);
-}
-.lf--tone-merke {
-  --lf-family: var(--frame-family-einstieg);
-  --lf-family-fg: var(--frame-family-einstieg-fg);
-}
-.lf--tone-hinweis {
-  --lf-family: var(--frame-family-hinweis);
-}
+.lf--tone-hinweis,
 .lf--tone-wichtig {
-  --lf-family: var(--frame-family-wichtig);
-}
-.lf--tone-neutral {
-  --lf-family: var(--frame-family-neutral);
+  --lf-family: var(--frame-family-achtung);
 }
 .lf__bar {
   position: absolute;
@@ -159,7 +148,7 @@
   padding-left: 1.1em;
 }
 .lf-md li::marker {
-  color: var(--frame-family-sicherung);
+  color: var(--frame-family-standard);
 }
 .lf-md li + li {
   margin-top: 0.35em;
@@ -222,7 +211,7 @@
 .lf-card__title {
   margin: 0;
   padding: 16px 28px 12px;
-  border-bottom: 3px solid var(--frame-family-sicherung);
+  border-bottom: 3px solid var(--frame-family-standard);
   font-family: var(--font-display);
   font-size: 1.1em;
   font-weight: 600;
@@ -301,7 +290,7 @@
   color: var(--frame-muted);
 }
 .lf-sheet__facts .is-sent svg {
-  color: var(--frame-family-uebung);
+  color: var(--frame-family-arbeit);
 }
 
 /* Quiz frame before it starts: only the title, calm and centered */
@@ -473,13 +462,17 @@
 }
 .lf-blanktask__label {
   margin: 0;
-  color: var(--frame-family-sicherung);
+  color: var(--frame-family-standard);
   font-size: 18px;
   font-weight: 700;
 }
 .lf-blanktask__part {
   display: flex;
   gap: 12px;
+}
+.lf-blanktask__gap {
+  display: inline-block;
+  min-width: 4.5em;
 }
 .lf-blanktask__letter {
   font-weight: 700;
@@ -496,6 +489,7 @@
 /* Ink: prepared content and handwriting stay clearly apart */
 .lf-ink {
   position: absolute;
+  z-index: 2; /* above a task card on a blank, below the input layer */
   inset: 0;
   width: 100%;
   height: 100%;
@@ -636,9 +630,6 @@
 .lt-head__deviation--late {
   color: var(--color-status-warning);
 }
-.lt-head__deviation--early {
-  color: var(--color-status-success);
-}
 .lt-head__sep {
   flex: none;
   width: 1px;
@@ -652,7 +643,7 @@
   height: 34px;
   padding: 0 8px 0 12px;
   border: 1px solid var(--color-border-subtle);
-  border-radius: 17px;
+  border-radius: 6px;
   background: transparent;
   color: var(--color-text);
   font: 500 13px/1 var(--font-body);
@@ -696,7 +687,7 @@
 }
 .lt-pill__open {
   height: 26px;
-  border-radius: 13px;
+  border-radius: 6px;
 }
 .lt-btn--quiet {
   border: 1px solid var(--color-border-subtle);
@@ -794,42 +785,7 @@
   border-radius: 0 0 6px 6px;
   color: var(--color-status-danger, var(--color-text));
 }
-.lt-start {
-  position: relative;
-  display: inline-flex;
-}
-.lt-start__chip {
-  height: 26px;
-  padding: 0 10px;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 13px;
-  background: transparent;
-  color: var(--color-text-muted);
-  font: 500 13px/1 var(--font-body);
-  white-space: nowrap;
-  cursor: pointer;
-}
-.lt-start__chip:hover,
-.lt-start__chip[aria-expanded="true"] {
-  color: var(--color-text);
-  background: var(--color-bg-hover);
-}
-.lt-start__choices {
-  position: absolute;
-  z-index: 30;
-  top: 32px;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 200px;
-  padding: 6px;
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 10px;
-  background: var(--color-bg-subtle);
-  box-shadow: var(--shadow-overlay);
-}
-.lt-start__choices [aria-checked="true"] {
+.lt-menu [aria-checked="true"] {
   font-weight: 700;
   background: var(--color-bg-hover);
 }
@@ -838,7 +794,7 @@
   height: 28px;
   padding: 0 12px;
   border: 1px solid var(--color-status-warning);
-  border-radius: 14px;
+  border-radius: 6px;
   background: color-mix(in srgb, var(--color-status-warning) 14%, transparent);
   color: var(--color-text);
   font: 600 13px/1 var(--font-body);
@@ -1115,6 +1071,10 @@
 .lt-tool--action {
   border: 1px dashed var(--color-border-subtle);
 }
+.lt-tool:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 .lt-tool__laser {
   width: 10px;
   height: 10px;
@@ -1315,7 +1275,7 @@
 .lm__heading {
   margin: 0 0 14px;
   padding-bottom: 10px;
-  border-bottom: 3px solid var(--frame-family-sicherung);
+  border-bottom: 3px solid var(--frame-family-standard);
   font-size: 26px;
 }
 .lm__sub {
@@ -1356,7 +1316,7 @@
   background: var(--frame-quiz-track);
 }
 .lm__bar span {
-  background: var(--frame-family-uebung);
+  background: var(--frame-family-arbeit);
 }
 .lm__ampel {
   height: 28px;
@@ -1439,8 +1399,23 @@
 .lf-summary {
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   padding-right: 12px;
+}
+/* On the slide the Inhalt is never wider than two cards, whatever the text size */
+.lf-summary .merkkarten-gruppe {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.lf-summary .merkkarte {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.lf-summary img,
+.lf-summary table,
+.lf-summary pre {
+  max-width: 100%;
 }
 
 /* The worksheet as the class sees it, in a frame on stage and projector */
@@ -1497,52 +1472,40 @@
   }
 }
 
-/* Invitation on the projector */
-.lj {
+/* Invitation as a slide: the address students type is the code, so it is the
+   one thing set large, below the QR code */
+.lj__body {
+  box-sizing: border-box;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6vmin;
-  width: 100%;
+  gap: 18px;
   height: 100%;
-  padding: 4vmin;
-  background: #fcfaf6;
-  color: #1c1b19;
+  padding: 56px 48px 36px;
+  text-align: center;
+}
+.lj__body p {
+  margin: 0;
 }
 .lj__qr {
   flex: none;
-  width: min(48vmin, 46vw);
-  aspect-ratio: 1;
-  border-radius: 1.5vmin;
-}
-.lj__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2vmin;
-  min-width: 0;
-}
-.lj__text p {
-  margin: 0;
-}
-.lj__title {
-  font-family: var(--font-display);
-  font-size: 6vmin;
-  font-weight: 600;
+  width: 380px;
+  height: 380px;
+  border: 1.5px solid var(--frame-grid);
+  border-radius: 10px;
 }
 .lj__address {
-  font-size: 4vmin;
-  color: #5a574f;
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.1;
   overflow-wrap: anywhere;
 }
-.lj__code {
-  font-family: var(--font-mono);
-  font-size: 12vmin;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
 .lj__count {
-  font-size: 3.4vmin;
-  color: #5a574f;
+  font-size: 28px;
+  color: var(--frame-muted);
 }
 
 /* No unit runs in this browser */

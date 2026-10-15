@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { LayoutGrid, MoreHorizontal, UserPlus } from "lucide-react";
 import { Link } from "react-router";
 import { fill } from "../../../helper/text";
 import { formatSeconds, type Period } from "../domain/clock";
+import type { JoinInfo } from "../infrastructure/projectorChannel";
 import TEXT from "./lessons.de.json";
 
 const clockTime = (minutes: number) =>
@@ -25,13 +25,16 @@ export type InviteState = {
   onShownProjector: boolean;
   onInvite: () => void;
   onToggleProjector: () => void;
+  /** What is shown while the projector shows the invitation; null otherwise. */
+  join: JoinInfo | null;
 };
 
 export interface LessonHeaderProps {
   title: string;
   position: string;
   seconds: number;
-  deviation: number;
+  /** Seconds left of the current slide's plan, negative when over; null without a plan. */
+  remaining: number | null;
   /** "3. Stunde · ab 09:50"; null without a timetable. */
   startLabel: string | null;
   startChoices: StartChoice[];
@@ -99,7 +102,6 @@ function ProjectorPill({
 }
 
 function LessonMenu(props: LessonHeaderProps) {
-  const { projector } = props;
   return (
     <div className="lt-menu" role="menu">
       <p className="lt-menu__info">
@@ -127,15 +129,25 @@ function LessonMenu(props: LessonHeaderProps) {
           ))}
         </>
       )}
-      {!projector.connected && (
-        <button
-          type="button"
-          role="menuitem"
-          className="lt-menu__item"
-          onClick={props.onOpenProjector}
-        >
-          {TEXT.menu.openProjector}
-        </button>
+      {props.startLabel && (
+        <>
+          <p className="lt-menu__group">{TEXT.menu.clockStart}</p>
+          {props.startChoices.map((choice) => (
+            <button
+              key={choice.key}
+              type="button"
+              role="menuitemradio"
+              aria-checked={choice.selected}
+              className="lt-menu__item"
+              onClick={() => {
+                choice.onChoose();
+                props.onToggleMenu();
+              }}
+            >
+              {choice.label}
+            </button>
+          ))}
+        </>
       )}
       <Link
         role="menuitem"
@@ -154,49 +166,6 @@ function LessonMenu(props: LessonHeaderProps) {
         {TEXT.menu.end}
       </button>
     </div>
-  );
-}
-
-/** Where lesson time starts, and a way to change it. */
-function StartChip({
-  label,
-  choices,
-}: {
-  label: string;
-  choices: StartChoice[];
-}) {
-  const [open, setOpen] = useState(false);
-  return (
-    <span className="lt-start">
-      <button
-        type="button"
-        className="lt-start__chip"
-        aria-expanded={open}
-        title={TEXT.header.startTitle}
-        onClick={() => setOpen(!open)}
-      >
-        {label}
-      </button>
-      {open && (
-        <span className="lt-start__choices" role="menu">
-          {choices.map((choice) => (
-            <button
-              key={choice.key}
-              type="button"
-              role="menuitemradio"
-              aria-checked={choice.selected}
-              className="lt-menu__item"
-              onClick={() => {
-                choice.onChoose();
-                setOpen(false);
-              }}
-            >
-              {choice.label}
-            </button>
-          ))}
-        </span>
-      )}
-    </span>
   );
 }
 
@@ -232,10 +201,10 @@ function InviteButton({ invite }: { invite: InviteState }) {
   );
 }
 
-/** Title and position, lesson time with plan deviation, projector, overview, menu. */
+/** Title and position, lesson time with the time left on the slide, projector, overview, menu. */
 export function LessonHeader(props: LessonHeaderProps) {
-  const { projector, deviation } = props;
-  const late = deviation > 60 ? "late" : deviation < -60 ? "early" : "on-time";
+  const { projector, remaining } = props;
+  const late = remaining !== null && remaining < 0 ? "late" : "on-time";
   return (
     <header className="lt-head">
       <div className="lt-head__title">
@@ -254,11 +223,12 @@ export function LessonHeader(props: LessonHeaderProps) {
       <div className="lt-head__clock" title={TEXT.header.clockTitle}>
         <span className="lt-head__clock-label">{TEXT.header.clock}</span>
         <span className="lt-head__time">{formatSeconds(props.seconds)}</span>
-        <span className={`lt-head__deviation lt-head__deviation--${late}`}>
-          {formatSeconds(deviation, true)}
-        </span>
-        {props.startLabel && (
-          <StartChip label={props.startLabel} choices={props.startChoices} />
+        {remaining !== null && (
+          <span className={`lt-head__deviation lt-head__deviation--${late}`}>
+            {fill(remaining < 0 ? TEXT.header.over : TEXT.header.remaining, {
+              time: formatSeconds(Math.abs(remaining)),
+            })}
+          </span>
         )}
       </div>
       <span className="lt-head__sep" />

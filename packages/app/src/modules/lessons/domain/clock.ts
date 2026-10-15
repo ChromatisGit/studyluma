@@ -103,6 +103,19 @@ export function deviation(
   );
 }
 
+/**
+ * Time left until the planned end of a frame, negative once it is over; null
+ * where the deck has no plan up to this frame.
+ */
+export function remaining(
+  deck: Deck,
+  frameId: string,
+  now: number,
+): number | null {
+  const end = plannedEnd(deck, frameId);
+  return end > 0 ? end - now : null;
+}
+
 /** "10:20", "−1:40" */
 export function formatSeconds(seconds: number, sign = false): string {
   const total = Math.round(Math.abs(seconds));

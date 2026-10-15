@@ -17,7 +17,7 @@ import {
   Unterricht,
   readViewer,
 } from "../../src/modules/classroom";
-import { LessonStart } from "../../src/modules/lessons";
+import { LessonStart, OpenSlides } from "../../src/modules/lessons";
 import type { SummaryRule } from "../../src/modules/catalog";
 import { action as planAction } from "./control";
 
@@ -164,7 +164,12 @@ export default function Course() {
         />
       }
       structureControls={<LernwegControl course={course} />}
-      contents={<Inhalte course={course} />}
+      contents={
+        <Inhalte
+          course={course}
+          openSlides={(target) => <OpenSlides course={course} {...target} />}
+        />
+      }
       activeTab={activeTab}
     />
   );

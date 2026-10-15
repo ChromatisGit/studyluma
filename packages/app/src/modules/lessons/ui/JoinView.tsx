@@ -35,17 +35,17 @@ function QrCode({ text, label }: { text: string; label: string }) {
   );
 }
 
-/** What the projector shows while the teacher invites students. */
+/** The invitation as a slide: on the projector, and on the teacher's stage while it is shown. */
 export function JoinView({ join }: { join: JoinInfo }) {
   return (
-    <div className="lj">
-      <QrCode text={join.url} label={TEXT.join.qrLabel} />
-      <div className="lj__text">
-        <p className="lj__title">{TEXT.join.title}</p>
+    <div className="lf lf--slide lf--tone-neutral lj">
+      <div className="lf__bar" />
+      <div className="lf__tab">
+        <span className="lf__tab-label">{TEXT.join.title}</span>
+      </div>
+      <div className="lj__body">
+        <QrCode text={join.url} label={TEXT.join.qrLabel} />
         <p className="lj__address">{join.address}</p>
-        <p className="lj__code" aria-label={join.code}>
-          {[...join.code].join(" ")}
-        </p>
         <p className="lj__count">
           {fill(TEXT.join.count, { count: join.count })}
         </p>

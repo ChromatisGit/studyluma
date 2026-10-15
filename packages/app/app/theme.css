@@ -150,19 +150,13 @@
 /* Lesson frames: the families' tab colors and the writing surfaces.
    Frames are paper in both color modes; the projector has no dark mode. */
 :root[data-brand="studyluma"] {
-  --frame-family-einstieg: #e6a23c;
-  --frame-family-einstieg-fg: #2b1d05;
-  --frame-family-erarbeitung: #3159a6;
-  --frame-family-uebung: #23764d;
-  --frame-family-sicherung: #7131a8;
+  --frame-family-standard: #7131a8;
+  --frame-family-arbeit: #23764d;
   --frame-family-quiz: #a3346a;
   --frame-quiz-track: #efe8f5;
   --frame-quiz-bar: #c4b2dc;
   --frame-quiz-correct: #7131a8;
-  --frame-family-hinweis: #17737f;
-  --frame-family-wichtig: #c2410c;
-  --frame-family-neutral: #6b6280;
-  --frame-family-inhalt: #1d1830;
+  --frame-family-achtung: #c2410c;
   --frame-family-fg: #fff;
   --frame-paper: #fcfaf6;
   --frame-ink: #1d1830;

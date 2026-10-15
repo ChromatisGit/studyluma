@@ -23,7 +23,7 @@ import {
   finishUnit,
   useEndedSessionGuard,
 } from "../application/unitLifecycle";
-import { deviation, type Period } from "../domain/clock";
+import { remaining, type Period } from "../domain/clock";
 import type { Deck } from "../domain/deck";
 import {
   entryId,
@@ -39,6 +39,7 @@ import { LiveQuizContext, QuizPreview } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
 import { InkInput, InkStrokes, type InkTool } from "./InkLayer";
+import { JoinView } from "./JoinView";
 import { LessonHeader } from "./LessonHeader";
 import { NoUnit } from "./NoUnit";
 import { SlideNotes } from "./SlideNotes";
@@ -49,7 +50,7 @@ import { WorksheetMonitoring } from "./WorksheetMonitoring";
 import { useFrameQuiz } from "./useFrameQuiz";
 import { useInvitation } from "./useInvitation";
 import { useSlideActions } from "./useSlideActions";
-import { useTeacherKeys, type TeacherKey } from "./useTeacherKeys";
+import { useTeacherControls } from "./useTeacherControls";
 import TEXT from "./lessons.de.json";
 import "./lessons.css";
 
@@ -92,18 +93,27 @@ function TeacherStage({
   const slide = entrySlide(entry);
   const strokes = session.ink.filter((stroke) => stroke.frameId === id);
   const order = runningOrder(deck, session.blanks);
+  // The pointer shows on the teacher's own screen too, not only on the projector.
+  const [laser, setLaser] = useState<[number, number] | null>(null);
+  const moveLaser = (point: [number, number] | null) => {
+    setLaser(point);
+    sendLaser(point);
+  };
   return (
     <FrameStage className="lt-stage">
       {monitoring ?? sheet ?? (
         <FrameView entry={entry} sent={session.sent.includes(slide.id)}>
-          <InkStrokes strokes={strokes} />
+          <InkStrokes
+            strokes={strokes}
+            laser={tool === "laser" ? laser : null}
+          />
           <InkInput
             tool={tool}
             frameId={id}
             strokes={strokes}
             onStroke={(stroke) => dispatch({ type: "stroke", stroke })}
             onErase={(strokeId) => dispatch({ type: "erase", strokeId })}
-            onLaser={sendLaser}
+            onLaser={moveLaser}
           />
         </FrameView>
       )}
@@ -149,41 +159,6 @@ function TeacherStage({
       )}
     </FrameStage>
   );
-}
-
-/** Tool, overview and menu state, and what each key does. */
-function useTeacherControls(dispatch: Dispatch, onStep: (by: 1 | -1) => void) {
-  const [tool, setTool] = useState<InkTool>("cursor");
-  const [overview, setOverview] = useState(false);
-  const [menu, setMenu] = useState(false);
-
-  const onKey = useCallback(
-    (key: TeacherKey) => {
-      if (key === "escape") {
-        setOverview(false);
-        setMenu(false);
-      } else if (key === "next" || key === "previous") {
-        onStep(key === "next" ? 1 : -1);
-      } else if (key === "hide") {
-        dispatch({ type: "toggleHidden" });
-      } else if (key === "freeze") {
-        dispatch({ type: "toggleFreeze" });
-      } else if (key === "overview") {
-        setOverview((open) => !open);
-      } else {
-        dispatch({ type: "addBlank" });
-        setTool((current) =>
-          current === "graphit" || current === "violett" || current === "signal"
-            ? current
-            : "graphit",
-        );
-      }
-    },
-    [dispatch, onStep],
-  );
-  useTeacherKeys(onKey);
-
-  return { tool, setTool, overview, setOverview, menu, setMenu, onKey };
 }
 
 /** "Folie 3 von 12 · Baustein" or "Freie Fläche 5a". */
@@ -255,8 +230,19 @@ export function TeacherView({
   useEndedSessionGuard(unit);
   const invite = useInvitation(sendJoin);
   const quiz = useFrameQuiz(courseId, deck, session, dispatch);
+  // While the invitation is on the stage there is no slide to move away from.
+  const inviting = !!invite?.join;
+  const { onStep } = quiz;
+  const step = useCallback(
+    (by: 1 | -1) => {
+      if (!inviting) {
+        onStep(by);
+      }
+    },
+    [inviting, onStep],
+  );
   const { tool, setTool, overview, setOverview, menu, setMenu, onKey } =
-    useTeacherControls(dispatch, quiz.onStep);
+    useTeacherControls(dispatch, step);
   const [notesForced, setNotesForced] = useState(false);
   const [classView, setClassView] = useState(false);
   const [endConfirm, setEndConfirm] = useState(false);
@@ -363,17 +349,15 @@ export function TeacherView({
         interactive
       />
     ) : undefined;
-  const inkSlide = !monitoring && !sheet && slide.kind !== "quiz";
+  const invitation = invite?.join ? <JoinView join={invite.join} /> : undefined;
+  const inkSlide =
+    !invitation && !monitoring && !sheet && slide.kind !== "quiz";
   const openProjector = () => {
     setMenu(false);
     void openProjectorWindow(projectorPath);
   };
 
-  const { planDeck, planState, planSlide, detour } = planOf(
-    unit,
-    deck,
-    mainDeck,
-  );
+  const { planDeck, planSlide, detour } = planOf(unit, deck, mainDeck);
   const { startLabel, choices } = startHeader(unit, periods, setClockStart);
 
   return (
@@ -382,10 +366,8 @@ export function TeacherView({
         title={deck.title}
         position={positionText(deck, entry)}
         seconds={clock.seconds}
-        deviation={
-          planSlide
-            ? deviation(planDeck, planSlide, planState.enteredAt, clock.seconds)
-            : 0
+        remaining={
+          planSlide ? remaining(planDeck, planSlide.id, clock.seconds) : null
         }
         startLabel={startLabel}
         startChoices={choices}
@@ -441,7 +423,7 @@ export function TeacherView({
             </>
           ) : undefined
         }
-        onNext={() => quiz.onStep(1)}
+        onNext={() => step(1)}
       />
       <main className="lt-main">
         <LiveQuizContext.Provider value={{ view: quiz.live, teacher: true }}>
@@ -451,14 +433,14 @@ export function TeacherView({
               session={session}
               entry={entry}
               tool={inkSlide ? tool : "cursor"}
-              monitoring={monitoring}
+              monitoring={invitation ?? monitoring}
               sheet={sheet}
-              hasPrevious={!!previous}
-              hasNext={!!next}
-              overview={overview}
+              hasPrevious={!!previous && !invitation}
+              hasNext={!!next && !invitation}
+              overview={overview && !invitation}
               onCloseOverview={() => setOverview(false)}
               dispatch={dispatch}
-              onStep={quiz.onStep}
+              onStep={step}
               sendLaser={sendLaser}
             />
           </ScrollSyncContext.Provider>
@@ -468,7 +450,13 @@ export function TeacherView({
             tool={tool}
             onTool={setTool}
             onUndo={() => dispatch({ type: "undo" })}
-            undoRemovesBlank={entry.kind === "blank" && strokes.length === 0}
+            onClear={() => dispatch({ type: "clear" })}
+            canClear={strokes.length > 0}
+            undoRemovesBlank={
+              entry.kind === "blank" &&
+              strokes.length === 0 &&
+              !session.cleared?.some((item) => item.frameId === id)
+            }
             onBlank={() => onKey("blank")}
           />
         )}

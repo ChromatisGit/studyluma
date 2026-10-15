@@ -7,6 +7,9 @@ import TEXT from "./lessons.de.json";
 
 const LETTERS = "ABCDEFGH";
 
+/** Gaps stay empty room to write in; the surface is the answer sheet. */
+const renderGap = () => <span className="lf-blanktask__gap" />;
+
 /** The task of the slide's worksheet that a blank surface was opened for. */
 function taskOf(
   sheet: Worksheet | undefined,
@@ -46,7 +49,11 @@ export function BlankTask({ blank, parent }: { blank: Blank; parent: Slide }) {
             </span>
           )}
           <div>
-            <RichContent nodes={part.content} className="lf-md" />
+            <RichContent
+              nodes={part.content}
+              className="lf-md"
+              renderGap={renderGap}
+            />
             {part.type === "Auswahl" && (
               <ol className="lf-blanktask__options">
                 {(part.options ?? []).map((option, k) => (
