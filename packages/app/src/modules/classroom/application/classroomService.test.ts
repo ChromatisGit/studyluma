@@ -9,6 +9,10 @@ import {
   ServerFullError,
 } from "./classroomService";
 import { createFailureLimiter } from "./rateLimit";
+import {
+  TEACHER_AWAY_END_MS,
+  TEACHER_AWAY_NOTICE_MS,
+} from "../domain/presence";
 
 const build = "b".repeat(64);
 
@@ -124,6 +128,7 @@ describe("looking codes up", () => {
       limiter: createFailureLimiter({ maxFailures: 2 }),
     });
     const session = await service.create({ buildId: build, title: "x" });
+    await service.act(session, { type: "invite" });
     for (let i = 0; i < 10; i++) {
       await service.join(session.code, `S${i}`, "school-router");
     }
@@ -163,6 +168,7 @@ describe("participants without accounts", () => {
   test("two students with the same name are different participants", async () => {
     const { service } = setup();
     const session = await service.create({ buildId: build, title: "x" });
+    await service.act(session, { type: "invite" });
     const a = await service.join(session.code, "Alex", "c");
     const b = await service.join(session.code, "Alex", "c");
     expect(a.participantId).not.toBe(b.participantId);
@@ -180,6 +186,7 @@ describe("participants without accounts", () => {
   test("a student's snapshot never contains other names or the tokens", async () => {
     const { service } = setup();
     const session = await service.create({ buildId: build, title: "x" });
+    await service.act(session, { type: "invite" });
     const a = await service.join(session.code, "Alex", "c");
     await service.join(session.code, "Bea", "c");
     const view = JSON.stringify(await service.snapshot(a));
@@ -243,5 +250,73 @@ describe("session registry", () => {
     );
     const session = await service.create({ buildId: build, title: "x" });
     expect(await service.lookup(session.code, "c1")).toBe(session.code);
+  });
+});
+
+describe("the unit and its teacher", () => {
+  function clocked() {
+    const clock = { now: 1_000_000 };
+    const host = createBunRuntimeHost([
+      createClassroomRuntime({
+        now: () => clock.now,
+        settings: defaultClassroomSettings,
+      }),
+    ]);
+    return { clock, service: createClassroomService(host) };
+  }
+
+  test("students cannot join before the teacher invites them", async () => {
+    const { service } = clocked();
+    const session = await service.create({ buildId: build, title: "x" });
+    await expect(service.join(session.code, "Ada", "c")).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+    await service.act(session, { type: "invite" });
+    expect(
+      (await service.join(session.code, "Ada", "c")).participantId,
+    ).toBeTruthy();
+  });
+
+  test("students are told when the teacher has been away for a while", async () => {
+    const { clock, service } = clocked();
+    const session = await service.create({ buildId: build, title: "x" });
+    await service.act(session, { type: "invite" });
+    const student = await service.join(session.code, "Ada", "c");
+    const away = async () => {
+      const snapshot = await service.snapshot(student);
+      return snapshot.role === "participant" ? snapshot.teacherAwayForMs : -1;
+    };
+    clock.now += TEACHER_AWAY_NOTICE_MS;
+    expect(await away()).toBe(TEACHER_AWAY_NOTICE_MS);
+    // The teacher is seen over HTTP again.
+    await service.snapshot(session);
+    expect(await away()).toBe(0);
+  });
+
+  test("the unit ends after a quarter of an hour without the teacher", async () => {
+    const { clock, service } = clocked();
+    const session = await service.create({ buildId: build, title: "x" });
+    await service.act(session, { type: "invite" });
+    const student = await service.join(session.code, "Ada", "c");
+    clock.now += TEACHER_AWAY_END_MS - 1;
+    expect(await service.sweep()).toBe(0);
+    clock.now += 1;
+    expect(await service.sweep()).toBe(1);
+    await expect(service.snapshot(student)).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+    await expect(service.lookup(session.code, "c")).rejects.toBeInstanceOf(
+      NotFoundError,
+    );
+  });
+
+  test("a teacher who keeps coming back keeps the unit alive", async () => {
+    const { clock, service } = clocked();
+    const session = await service.create({ buildId: build, title: "x" });
+    for (let i = 0; i < 10; i++) {
+      clock.now += TEACHER_AWAY_END_MS - 1000;
+      await service.snapshot(session);
+      expect(await service.sweep()).toBe(0);
+    }
   });
 });

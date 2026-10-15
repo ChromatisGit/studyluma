@@ -1,8 +1,26 @@
-import type { LessonSession } from "../domain/lesson";
+import type { DeckState } from "../domain/lesson";
+
+/** The invitation the projector shows instead of the slide. */
+export type JoinInfo = {
+  code: string;
+  /** The address students open, without the scheme. */
+  address: string;
+  /** The full link behind the QR code. */
+  url: string;
+  /** Students who have joined; no names. */
+  count: number;
+};
 
 /** Messages between the teacher window and the projector window. */
 export type ProjectorMessage =
-  | { type: "state"; session: LessonSession }
+  | {
+      type: "state";
+      /** The deck on the stage and where the projector shows it. */
+      presentationId: string;
+      projectorPath: string;
+      deck: DeckState;
+    }
+  | { type: "join"; join: JoinInfo | null }
   | { type: "laser"; point: [number, number] | null }
   | { type: "scroll"; slideId: string; ratio: number }
   | { type: "hello" }
@@ -14,13 +32,12 @@ export type ProjectorMessage =
  * there is no server. Returns `null` where the API is missing.
  */
 export function openProjectorChannel(
-  presentationId: string,
   onMessage: (message: ProjectorMessage) => void,
 ): { send: (message: ProjectorMessage) => void; close: () => void } | null {
   if (typeof BroadcastChannel === "undefined") {
     return null;
   }
-  const channel = new BroadcastChannel(`studyluma-lesson-${presentationId}`);
+  const channel = new BroadcastChannel("studyluma-unit");
   channel.onmessage = (event: MessageEvent<ProjectorMessage>) =>
     onMessage(event.data);
   return {

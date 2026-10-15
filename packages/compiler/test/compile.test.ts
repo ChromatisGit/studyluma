@@ -312,9 +312,9 @@ describe("compiler (new authoring syntax)", () => {
       "aufgaben/Folgeblatt.md",
       (s) =>
         s +
-        "\n## Antwort\n\nLöse.\n\n::antwort\nL = {-4, 1/2 ~ 0.5}\n" +
+        "\n## Antwort\n\nLöse.\n\n::antwort\nL = {-4; 1/2 ~ 0.5}\n" +
         "\n## Antwort\n\nKeine Lösung.\n\n::antwort\n{}\n" +
-        "\n## Antwort\n\nVektor.\n\n::antwort\nvec(1, (2, 3))\n",
+        "\n## Antwort\n\nVektor.\n\n::antwort\nvec(1; (2, 3))\n",
     );
     const sheet = compileContent(root).bundle.worksheets.find(
       (w) => w.filename === "Folgeblatt",
@@ -328,13 +328,86 @@ describe("compiler (new authoring syntax)", () => {
     expect(set).toMatchObject({
       kind: "set",
       label: "L",
-      exact: "{-4, 1/2 ~ 0.5}",
+      exact: "{-4; 1/2 ~ 0.5}",
     });
     expect(set?.elements?.map((e) => e.exact)).toEqual(["-4", "1/2"]);
     expect(set?.elements?.[1]).toMatchObject({ rounded: "0.5", decimals: 1 });
     expect(none).toMatchObject({ kind: "set", elements: [] });
     expect(vector?.kind).toBe("vector");
     expect(vector?.elements).toHaveLength(2);
+  });
+  test("answers may use the decimal comma", () => {
+    const root = make();
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace(
+        "Die Steigung ist ((2)).",
+        "Die Steigung ist ((0,5 ~ 0,5)), ((1/3 ~ 0,33)).",
+      ),
+    );
+    edit(
+      root,
+      "aufgaben/Folgeblatt.md",
+      (s) =>
+        s +
+        "\n## Antwort\n\nLöse.\n\n::antwort\nx = 2,5\n" +
+        "\n## Antwort\n\nMenge.\n\n::antwort\nL = {-4; 1/2 ~ 0,5}\n",
+    );
+    const { bundle } = compileContent(root);
+    const answers = (name: string) =>
+      tasksOf(bundle.worksheets.find((w) => w.filename === name)!).flatMap(
+        (t) =>
+          t.items.flatMap((i) => {
+            if (i.type !== "part") return [];
+            const gaps = i.part.content.flatMap((n) =>
+              n.type === "paragraph"
+                ? n.children.flatMap((c) => (c.type === "gap" ? [c] : []))
+                : [],
+            );
+            return [...gaps.map((g) => g.answer), i.part.answer];
+          }),
+      );
+    const all = [...answers("Steigung"), ...answers("Folgeblatt")].filter(
+      (a) => a !== undefined,
+    );
+    expect(all.find((a) => a.exact === "0.5")).toMatchObject({
+      rounded: "0.5",
+      decimals: 1,
+    });
+    expect(all.find((a) => a.exact === "1/3")).toMatchObject({
+      rounded: "0.33",
+      decimals: 2,
+    });
+    expect(all.find((a) => a.exact === "2.5")).toMatchObject({ label: "x" });
+    const set = all.find((a) => a.kind === "set" && a.elements?.length === 2);
+    expect(set?.elements?.[1]).toMatchObject({ rounded: "0.5", decimals: 1 });
+  });
+  test("sets and vectors are separated by semicolons, not commas", () => {
+    const root = make();
+    const write = (answer: string) =>
+      edit(
+        root,
+        "aufgaben/Folgeblatt.md",
+        (s) => s + `\n## Antwort\n\nLöse.\n\n::antwort\n${answer}\n`,
+      );
+    write("L = {1; 2,5; 3}");
+    const set = compileContent(root)
+      .bundle.worksheets.find((w) => w.filename === "Folgeblatt")!
+      .sections.flatMap((x) => x.items)
+      .flatMap((x) => (x.type === "task" ? x.task.items : []))
+      .flatMap((x) =>
+        x.type === "part" && x.part.answer ? [x.part.answer] : [],
+      )
+      .find((a) => a.kind === "set");
+    expect(set?.elements?.map((e) => e.exact)).toEqual(["1", "2.5", "3"]);
+    for (const wrong of ["{1, 2, 3}", "{1,2,3}", "vec(1, 2)"]) {
+      const bad = make();
+      edit(
+        bad,
+        "aufgaben/Folgeblatt.md",
+        (s) => s + `\n## Antwort\n\nLöse.\n\n::antwort\n${wrong}\n`,
+      );
+      expect(codes(bad)).toEqual(["ANSWER_SEPARATOR"]);
+    }
   });
   test("a solution set or vector is not allowed in a gap", () => {
     const root = make();
@@ -423,6 +496,96 @@ anzahl = 2
       expect(part.type).toBe("Graph");
       expect(part.answers?.map((a) => a.exact)).toEqual(["2x + 1", "-x + 4"]);
       expect(part.answers?.[0]?.checkRow?.length).toBeGreaterThan(0);
+    });
+    test("a Graph answer may use the decimal comma", () => {
+      const root = withGraphic(
+        `[achsen]
+x = [-2, 6]
+y = [-2, 8]
+
+[eingabe]
+typ = "funktion"
+anzahl = 1
+`,
+        "\n## Graph\n\nGib eine Gerade an.\n\n::grafik [Fläche](../grafiken/g.toml)\n\n::antwort\ny = 0,5x + 1,5\n",
+      );
+      const part = (
+        tasksOf(sheetOf(root)).at(-1)!.items[0] as { part: TaskPartLike }
+      ).part;
+      expect(part.answers?.map((a) => a.exact)).toEqual(["0.5x + 1.5"]);
+    });
+    test("::beispiel outside a Merkkarte is an example of its own", () => {
+      const root = make();
+      edit(
+        root,
+        "inhalt.md",
+        (s) =>
+          s +
+          '\n## "Gleichungen"\n\nText davor.\n\n::beispiel\n$3x = 6$\n\n::beispiel\n$x = 2$\n\n---\n\nText danach.\n',
+      );
+      const content = compileContent(root).bundle.summaries[0]!.content;
+      expect(content.map((x) => x.type)).toEqual([
+        "content",
+        "merkkarte",
+        "content",
+        "example",
+        "example",
+        "content",
+      ]);
+      const after = content.at(-1) as { content: { type: string }[] };
+      expect(JSON.stringify(after)).toContain("Text danach");
+      edit(root, "inhalt.md", (s) => s + "\n::beispiel\n");
+      expect(codes(root)).toContain("EXAMPLE_EMPTY");
+    });
+    test("a heading ends an example", () => {
+      const root = make();
+      edit(
+        root,
+        "inhalt.md",
+        (s) => s + '\n::beispiel\n$x = 1$\n\n## "Weiter"\n\nText.\n',
+      );
+      const content = compileContent(root).bundle.summaries[0]!.content;
+      expect(content.slice(-3).map((x) => x.type)).toEqual([
+        "content",
+        "example",
+        "content",
+      ]);
+      expect(JSON.stringify(content.at(-1))).toContain("Weiter");
+    });
+    test("formula lines with | operations become one aligned derivation", () => {
+      const root = make();
+      edit(
+        root,
+        "inhalt.md",
+        (s) =>
+          s +
+          "\n$0,5 x + 2 = x + 1,5 | *2$\n$|x + 3| = 5 | -5$\n$x = 5$\n\n$a = b | +1$\n\nText.\n\n$c = d$\n$e = f$\n",
+      );
+      const { content } = compileContent(root).bundle.summaries[0]!;
+      const nodes = content.flatMap((x) =>
+        x.type === "content" ? x.content : [],
+      );
+      const derivations = nodes.filter((x) => x.type === "derivation");
+      // A blank line starts a new derivation.
+      expect(derivations).toHaveLength(2);
+      expect(
+        derivations[0]!.steps.map((x) => [
+          x.equation.source,
+          x.operation?.source,
+        ]),
+      ).toEqual([
+        ["0,5 x + 2 = x + 1,5", "*2"],
+        ["|x + 3| = 5", "-5"],
+        ["x = 5", undefined],
+      ]);
+      expect(derivations[0]!.steps[0]!.equation.display).toContain(
+        "<mn>0,5</mn>",
+      );
+      // Formula lines without an operation stay a plain paragraph.
+      const plain = nodes.filter(
+        (x) => x.type === "paragraph" && JSON.stringify(x).includes('"e = f"'),
+      );
+      expect(plain).toHaveLength(1);
     });
     test("::grafik works in chapter content, Merkkarten, slides and tips", () => {
       const root = make({
@@ -523,7 +686,7 @@ anzahl = 2
     expect(a.bundle.buildId).toBe(b.bundle.buildId);
     expect(a.path).toBe(b.path);
     expect(readFileSync(join(a.path, "catalog.json"), "utf8")).toContain(
-      '"schemaVersion": 1',
+      `"schemaVersion": ${CATALOG_FORMAT_VERSION}`,
     );
     expect(a.bundle.assets).toHaveLength(1);
     expect(
@@ -743,24 +906,61 @@ anzahl = 2
       include.id,
     ]);
   });
-  test("::schreiben is only allowed on slides", () => {
+  test("::platz is only allowed on slides", () => {
     const root = make();
     edit(root, "folien/Stunde.md", (s) =>
-      s.replace("Was fällt euch auf?", "::schreiben Rechnung"),
+      s.replace("Was fällt euch auf?", "::platz 2"),
     );
     const first = compileContent(root).bundle.foliensaetze.find(
       (x) => x.filename === "Stunde",
     )!.entries[0]!;
-    expect(JSON.stringify(first.segments)).toContain(
-      '"type":"writingArea","label":"Rechnung"',
-    );
+    expect(JSON.stringify(first.segments)).toContain('"type":"space","size":2');
     edit(root, "inhalt.md", (s) =>
-      s.replace(
-        '# "Lineare Funktionen"',
-        '# "Lineare Funktionen"\n\n::schreiben',
-      ),
+      s.replace('# "Lineare Funktionen"', '# "Lineare Funktionen"\n\n::platz'),
     );
     expect(codes(root)).toContain("MARKER_INVALID");
+  });
+  test("::schreiben was replaced by ::platz", () => {
+    const root = make();
+    edit(root, "folien/Stunde.md", (s) =>
+      s.replace("Was fällt euch auf?", "::schreiben Rechnung"),
+    );
+    expect(codes(root)).toContain("OBSOLETE_SYNTAX");
+  });
+  test("::tag sets the tab of a slide", () => {
+    const root = make();
+    edit(root, "folien/Stunde.md", (s) =>
+      s.replace("Was fällt euch auf?", "::tag Aufgabe\nWas fällt euch auf?"),
+    );
+    const first = compileContent(root).bundle.foliensaetze.find(
+      (x) => x.filename === "Stunde",
+    )!.entries[0]!;
+    expect(first.tag).toEqual({ label: "Aufgabe", tone: "aufgabe" });
+    edit(root, "folien/Stunde.md", (s) =>
+      s.replace("::tag Aufgabe", "::tag Einstieg wichtig"),
+    );
+    expect(
+      compileContent(root).bundle.foliensaetze.find(
+        (x) => x.filename === "Stunde",
+      )!.entries[0]!.tag,
+    ).toEqual({ label: "Einstieg", tone: "wichtig" });
+  });
+  test("::merkkarte places a Merkkarte on a slide", () => {
+    const root = make();
+    edit(root, "folien/Stunde.md", (s) =>
+      s.replace(
+        "Was fällt euch auf?",
+        'Was fällt euch auf?\n\n::merkkarte "Steigung bestimmen"',
+      ),
+    );
+    const { bundle } = compileContent(root);
+    const card = bundle.summaries[0]!.merkkarten[0]!;
+    expect(
+      JSON.stringify(
+        bundle.foliensaetze.find((x) => x.filename === "Stunde")!.entries[0]!
+          .segments,
+      ),
+    ).toContain(`"type":"merkkarteCard","targetId":"${card.id}"`);
   });
   test("rejects invalid layout and task-scoped markers", () => {
     const root = make();

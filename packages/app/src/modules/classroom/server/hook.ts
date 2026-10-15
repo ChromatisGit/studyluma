@@ -1,4 +1,5 @@
 import type { ServerHook } from "@chromatis/base/server-hook";
+import { devOpen } from "@chromatis/base/dev";
 import { app } from "chromatis-config";
 // The hook is the one place that starts the server side of the application, so
 // it reaches the catalog's server entry, which the catalog's public index does
@@ -24,7 +25,11 @@ const hook: ServerHook<ReturnType<typeof configureClassroom>> = {
     // An unusable catalog stops the server at startup, not at the first request.
     verifyCatalog();
     configureTeacherPassword(env.TEACHER_PASSWORD);
-    if (!teacherPassword()) {
+    if (devOpen(env)) {
+      console.info(
+        "[studyluma] dev --open: the login is off, the viewer role is a stand-in cookie and a browser without it is a teacher.",
+      );
+    } else if (!teacherPassword()) {
       console.warn(
         "[studyluma] No TEACHER_PASSWORD: the viewer role is a stand-in cookie, a browser without it is a teacher and receives all answers. Do not run this instance for real students.",
       );

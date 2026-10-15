@@ -37,4 +37,9 @@ export type {
   MathSup,
 } from "./mathNodes";
 export { typstToRow } from "./typstToRow";
-export { prepareTypstMath } from "./prepareTypstMath";
+export {
+  decimalCommas,
+  germanDecimals,
+  prepareTypstMath,
+  splitOperation,
+} from "./prepareTypstMath";

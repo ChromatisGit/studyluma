@@ -32,12 +32,15 @@ export async function loader({ request }: LoaderFunctionArgs) {
   );
 }
 
+/** The id a quiz started on its own (not from a slide) runs under. */
+const standaloneFrame = (quizId: string) => `quiz:${quizId}`;
+
 function startQuiz(input: Record<string, unknown>) {
-  const { courseId, chapterId, frameId } = input;
+  const { courseId, chapterId, frameId, quizId } = input;
   if (
     typeof courseId !== "string" ||
     typeof chapterId !== "string" ||
-    typeof frameId !== "string"
+    (typeof frameId !== "string") === (typeof quizId !== "string")
   ) {
     return null;
   }
@@ -51,11 +54,19 @@ function startQuiz(input: Record<string, unknown>) {
   if (!inCourse) {
     return null;
   }
-  const placement = catalog.presentations
-    .filter((presentation) => presentation.chapterId === chapterId)
-    .flatMap((presentation) => presentation.placements)
-    .find((item) => item.id === frameId && item.kind === "quiz");
-  const quiz = catalog.quizzes.find((item) => item.id === placement?.targetId);
+  // From a slide of the chapter's presentations, or one of the chapter's quizzes alone.
+  const placement =
+    typeof frameId === "string"
+      ? catalog.presentations
+          .filter((presentation) => presentation.chapterId === chapterId)
+          .flatMap((presentation) => presentation.placements)
+          .find((item) => item.id === frameId && item.kind === "quiz")
+      : undefined;
+  const quiz = catalog.quizzes.find(
+    (item) =>
+      item.id === (placement ? placement.targetId : quizId) &&
+      (placement || item.chapterId === chapterId),
+  );
   const questions = quiz && quizQuestions(quiz);
   if (!quiz || !questions || !validQuestions(questions)) {
     return null;
@@ -64,7 +75,7 @@ function startQuiz(input: Record<string, unknown>) {
     type: "quiz.start" as const,
     courseId,
     chapterId,
-    frameId,
+    frameId: typeof frameId === "string" ? frameId : standaloneFrame(quiz.id),
     title: quiz.title,
     questions,
   };

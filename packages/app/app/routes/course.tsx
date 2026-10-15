@@ -17,6 +17,7 @@ import {
   Unterricht,
   readViewer,
 } from "../../src/modules/classroom";
+import { LessonStart, OpenSlides } from "../../src/modules/lessons";
 import type { SummaryRule } from "../../src/modules/catalog";
 import { action as planAction } from "./control";
 
@@ -25,6 +26,7 @@ const releaseIntents = [
   "lockSummary",
   "summaryRule",
   "releaseSolutions",
+  "unlockSheet",
 ];
 
 export async function action(args: ActionFunctionArgs) {
@@ -75,6 +77,19 @@ export async function action(args: ActionFunctionArgs) {
       rule: rule as SummaryRule,
     });
     return { rule };
+  }
+  if (form.get("intent") === "unlockSheet") {
+    const sheetId = String(form.get("sheetId") ?? "");
+    if (
+      !bundle.worksheets.some(
+        (item) => item.id === sheetId && item.chapterId === chapterId,
+      )
+    ) {
+      throw new Response(null, { status: 400 });
+    }
+    const released = form.get("released") === "true";
+    await actInSession(request, { type: "release.sheet", sheetId, released });
+    return { released };
   }
   if (form.get("intent") === "releaseSolutions") {
     const sheetId = String(form.get("sheetId") ?? "");
@@ -137,9 +152,24 @@ export default function Course() {
       course={course}
       teacher={viewer === "teacher"}
       currentLesson={<CurrentLesson course={course} />}
-      teachingControls={<Unterricht course={course} />}
+      teachingControls={
+        <Unterricht
+          course={course}
+          start={
+            <LessonStart
+              course={course}
+              chapterId={course.currentChapterId ?? ""}
+            />
+          }
+        />
+      }
       structureControls={<LernwegControl course={course} />}
-      contents={<Inhalte course={course} />}
+      contents={
+        <Inhalte
+          course={course}
+          openSlides={(target) => <OpenSlides course={course} {...target} />}
+        />
+      }
       activeTab={activeTab}
     />
   );

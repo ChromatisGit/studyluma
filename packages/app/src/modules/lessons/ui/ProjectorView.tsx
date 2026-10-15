@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useTeacherQuiz } from "../../classroom";
 import { useProjectorFeed } from "../application/useLessonSession";
 import type { Deck } from "../domain/deck";
@@ -6,6 +8,8 @@ import { ScrollSyncContext } from "./FrameBlocks";
 import { LiveQuizContext } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
+import { JoinView } from "./JoinView";
+import { SheetEmbed } from "./SheetEmbed";
 import { InkStrokes } from "./InkLayer";
 import TEXT from "./lessons.de.json";
 import "./lessons.css";
@@ -17,14 +21,35 @@ import "./lessons.css";
 export function ProjectorView({
   courseId,
   deck,
+  chapterPath,
 }: {
   courseId: string;
   deck: Deck;
+  chapterPath: string;
 }) {
-  const { session, laser, scroll } = useProjectorFeed(deck.id);
+  const { feed, join, laser, scroll } = useProjectorFeed();
+  const navigate = useNavigate();
   const { view } = useTeacherQuiz(courseId);
   const quiz =
     view && !view.ended && view.chapterId === deck.chapterId ? view : null;
+  // The teacher moved to another deck of the unit: follow to its page.
+  const elsewhere = !!feed && feed.presentationId !== deck.id;
+  const target = feed?.projectorPath;
+  useEffect(() => {
+    if (elsewhere && target) {
+      void navigate(target, { replace: true });
+    }
+  }, [elsewhere, target, navigate]);
+  if (join) {
+    return (
+      <div className="lp">
+        <FrameStage>
+          <JoinView join={join} />
+        </FrameStage>
+      </div>
+    );
+  }
+  const session = feed && !elsewhere ? feed.deck : null;
   if (!session) {
     return (
       <div className="lp">
@@ -43,21 +68,35 @@ export function ProjectorView({
     return <div className="lp" />;
   }
   const id = entryId(entry);
+  const slide = entrySlide(entry);
+  const showSheet =
+    entry.kind === "slide" &&
+    !!slide.worksheet &&
+    display.sheetShown === slide.id;
   return (
     <div className="lp">
       <LiveQuizContext.Provider value={{ view: quiz, teacher: false }}>
         <ScrollSyncContext.Provider value={{ follow: scroll }}>
           <FrameStage>
-            <FrameView
-              entry={entry}
-              deckTitle={deck.title}
-              sent={display.sent.includes(entrySlide(entry).id)}
-            >
-              <InkStrokes
-                strokes={display.ink.filter((stroke) => stroke.frameId === id)}
-                laser={laser}
+            {showSheet && slide.worksheet ? (
+              <SheetEmbed
+                src={`${chapterPath}/lesson/sheets/${encodeURIComponent(slide.worksheet.slug)}`}
+                slideId={slide.id}
+                interactive={false}
               />
-            </FrameView>
+            ) : (
+              <FrameView
+                entry={entry}
+                sent={display.sent.includes(entrySlide(entry).id)}
+              >
+                <InkStrokes
+                  strokes={display.ink.filter(
+                    (stroke) => stroke.frameId === id,
+                  )}
+                  laser={laser}
+                />
+              </FrameView>
+            )}
           </FrameStage>
         </ScrollSyncContext.Provider>
       </LiveQuizContext.Provider>

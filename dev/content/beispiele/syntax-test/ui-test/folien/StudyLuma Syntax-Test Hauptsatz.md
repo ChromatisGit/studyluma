@@ -39,6 +39,6 @@ Zusätzlicher Testtext unter der Merkkarte.
 
 Die importierte Sequenz ist beendet.
 
-::schreiben
+::platz
 
 ::bis 30:00

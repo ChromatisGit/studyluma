@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import type { Course } from "../../courses";
 import type { ViewerRole } from "../domain/viewer";
+import type { Target } from "../domain/session";
 import type { PublicCatalog, SummaryRule } from "../../catalog";
 
 /** What every page knows: the catalog for this reader and the courses. */
@@ -14,6 +15,10 @@ export type SiteData = {
   summaryRules: Record<string, SummaryRule>;
   /** Tasks whose solution the teacher released. */
   releasedSolutions: string[];
+  /** With a Classroom Session: its decision per worksheet; otherwise null (the browser decides). */
+  sessionSheets: Record<string, boolean> | null;
+  /** With a Classroom Session: the sheet the teacher sent to the class; otherwise null. */
+  sessionTarget: Target | null;
   /** The Classroom Session this browser belongs to, if one is running. */
   classroom: {
     code: string;

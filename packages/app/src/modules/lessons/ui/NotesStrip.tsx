@@ -26,6 +26,8 @@ export interface NotesStripProps {
   /** On a quiz frame: start it and move it on. */
   quiz?: QuizActionsProps | undefined;
   actions?: ReactNode;
+  /** More for the open panel besides the notes, e.g. the questions of a quiz. */
+  extra?: ReactNode;
 }
 
 function notePreview(nodes: RichNode[]): string {
@@ -41,8 +43,10 @@ function notePreview(nodes: RichNode[]): string {
 }
 
 /**
- * One line above the stage: the frame's note, its action and "Nächster".
- * Opened, the same strip grows down over the stage with the whole note.
+ * Two parts in one line above the stage: the note, which gives way when
+ * space is short, and the controls (action, back, "Nächster"), which never
+ * move. Opened, the note grows down over the stage and leaves the controls,
+ * the arrows and the toolbar uncovered.
  */
 export function NotesStrip(props: NotesStripProps) {
   const [open, setOpen] = useState(false);
@@ -78,55 +82,57 @@ export function NotesStrip(props: NotesStripProps) {
             <ChevronDown className="lt-notes__chevron" aria-hidden="true" />
           )}
         </button>
-        {!props.visible && (
-          <button
-            type="button"
-            className="lt-btn lt-btn--quiet"
-            onClick={props.onShowAnyway}
-          >
-            {TEXT.notes.showAnyway}
-          </button>
-        )}
-        {props.quiz && <QuizActions {...props.quiz} />}
-        {props.actions}
-        {props.sheet &&
-          (props.sheet.sent ? (
-            <span className="lt-notes__sent">
-              <Check aria-hidden="true" />
-              {TEXT.notes.sent}
-            </span>
-          ) : (
-            <button type="button" className="lt-btn" onClick={props.onSend}>
-              {TEXT.notes.send}
-            </button>
-          ))}
-        {props.back && (
-          <button
-            type="button"
-            className="lt-btn lt-btn--back"
-            onClick={props.onBack}
-          >
-            <Undo2 aria-hidden="true" />
-            {fill(TEXT.notes.back, { number: props.back.number })}
-          </button>
-        )}
-        {props.next && (
-          <>
-            <span className="lt-head__sep" />
+        <div className="lt-notes__controls">
+          {!props.visible && (
             <button
               type="button"
-              className="lt-notes__next"
-              aria-label={fill(TEXT.notes.nextAria, {
-                title: props.next.title,
-              })}
-              onClick={props.onNext}
+              className="lt-btn lt-btn--quiet"
+              onClick={props.onShowAnyway}
             >
-              <span className="lt-notes__next-label">{TEXT.notes.next}</span>
-              <span className="lt-notes__next-title">{props.next.title}</span>
-              <ChevronRight aria-hidden="true" />
+              {TEXT.notes.showAnyway}
             </button>
-          </>
-        )}
+          )}
+          {props.quiz && <QuizActions {...props.quiz} />}
+          {props.actions}
+          {props.sheet &&
+            (props.sheet.sent ? (
+              <span className="lt-notes__sent">
+                <Check aria-hidden="true" />
+                {TEXT.notes.sent}
+              </span>
+            ) : (
+              <button type="button" className="lt-btn" onClick={props.onSend}>
+                {TEXT.notes.send}
+              </button>
+            ))}
+          {props.back && (
+            <button
+              type="button"
+              className="lt-btn lt-btn--back"
+              onClick={props.onBack}
+            >
+              <Undo2 aria-hidden="true" />
+              {fill(TEXT.notes.back, { number: props.back.number })}
+            </button>
+          )}
+          {props.next && (
+            <>
+              <span className="lt-head__sep" />
+              <button
+                type="button"
+                className="lt-notes__next"
+                aria-label={fill(TEXT.notes.nextAria, {
+                  title: props.next.title,
+                })}
+                onClick={props.onNext}
+              >
+                <span className="lt-notes__next-label">{TEXT.notes.next}</span>
+                <span className="lt-notes__next-title">{props.next.title}</span>
+                <ChevronRight aria-hidden="true" />
+              </button>
+            </>
+          )}
+        </div>
       </div>
       {expanded && (
         <div className="lt-notes__body">
@@ -135,6 +141,7 @@ export function NotesStrip(props: NotesStripProps) {
           ) : (
             <p className="lt-notes__text">{TEXT.notes.none}</p>
           )}
+          {props.extra}
         </div>
       )}
     </div>

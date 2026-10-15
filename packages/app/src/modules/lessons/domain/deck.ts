@@ -6,6 +6,7 @@ import type {
   Quiz,
   RichNode,
   SlideSegment,
+  SlideTag,
   Summary,
   Worksheet,
 } from "../../catalog";
@@ -26,9 +27,15 @@ export type Slide = {
   from: string[];
   /** Planned end, seconds since the start of the presentation (`::bis`). */
   planUntil?: number;
+  /** Seconds planned for this slide: its `::bis` minus the previous one. */
+  budget?: number;
   segments: SlideSegment[];
   /** Private notes for the teacher, outer inclusions first. */
   notes: RichNode[];
+  /** The tab the author chose (`::tag`); absent on embedded entries. */
+  tag?: SlideTag;
+  /** The Merkkarten placed in the text (`::merkkarte`), by id. */
+  cards: Record<string, Merkkarte>;
   worksheet?: Worksheet;
   quiz?: Quiz;
   merkkarte?: Merkkarte & { chapterId: string };
@@ -80,6 +87,30 @@ export function plannedTimes(
   return times;
 }
 
+/** The Merkkarten a slide's text places, looked up by id. */
+function cardsIn(
+  segments: SlideSegment[],
+  cards: Map<string, Merkkarte>,
+): Record<string, Merkkarte> {
+  const found: Record<string, Merkkarte> = {};
+  const visit = (nodes: RichNode[]) => {
+    for (const node of nodes) {
+      const card = node.type === "merkkarteCard" && cards.get(node.targetId);
+      if (card) {
+        found[card.id] = card;
+      }
+    }
+  };
+  for (const segment of segments) {
+    if (segment.type === "content") {
+      visit(segment.content);
+    } else {
+      segment.columns.forEach((column) => visit(column.content));
+    }
+  }
+  return found;
+}
+
 /** The slides of a presentation, with targets, notes and planned times. */
 export function buildDeck(
   catalog: Catalog,
@@ -108,6 +139,7 @@ export function buildDeck(
       ),
     ),
   );
+  let previousEnd = 0;
   const slides = presentation.placements.flatMap((placement, index) => {
     const entry = entries.get(placement.sourceEntryId);
     if (!entry) {
@@ -134,8 +166,17 @@ export function buildDeck(
       (id) => entries.get(id)?.notes ?? [],
     );
     const planUntil = times.get(placement.inclusionPath.join("/"));
+    const budget =
+      planUntil !== undefined && planUntil > previousEnd
+        ? planUntil - previousEnd
+        : undefined;
+    if (planUntil !== undefined) {
+      previousEnd = planUntil;
+    }
     const slide: Slide = {
       id: placement.id,
+      cards: cardsIn(entry.segments, cards),
+      ...(entry.tag ? { tag: entry.tag } : {}),
       number: index + 1,
       kind: placement.kind,
       title:
@@ -151,6 +192,7 @@ export function buildDeck(
         return set ? [set.title] : [];
       }),
       ...(planUntil !== undefined ? { planUntil } : {}),
+      ...(budget !== undefined ? { budget } : {}),
       segments: entry.segments,
       notes: [...outer, ...(entry.notes ?? [])],
       ...(worksheet ? { worksheet } : {}),

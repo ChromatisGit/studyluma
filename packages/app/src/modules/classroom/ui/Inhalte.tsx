@@ -24,7 +24,14 @@ function ResourceList({ items, empty }: { items: ReactNode[]; empty: string }) {
 
 /** The authored resources of one chapter, in the teacher view's original order. */
 // eslint-disable-next-line max-lines-per-function
-export function Inhalte({ course }: { course: Course }) {
+export function Inhalte({
+  course,
+  openSlides,
+}: {
+  course: Course;
+  /** Opens a deck on the stage, starting a unit if none runs; supplied by the lessons module, which this one does not import. */
+  openSlides: (target: { path: string; presentationId: string }) => ReactNode;
+}) {
   const site = useSite();
   const chapters = chaptersInOrder(course);
   const current = chapters.find((chapter) => chapter.current);
@@ -159,11 +166,10 @@ export function Inhalte({ course }: { course: Course }) {
                 </span>
               </div>
               <div className="teacher-controls-access-actions">
-                <Link
-                  to={`${base}/lesson?presentation=${encodeURIComponent(presentation.id)}`}
-                >
-                  {TEXT.teacher.open}
-                </Link>
+                {openSlides({
+                  path: `${base}/lesson?presentation=${encodeURIComponent(presentation.id)}`,
+                  presentationId: presentation.id,
+                })}
               </div>
             </>
           ))}
@@ -192,11 +198,10 @@ export function Inhalte({ course }: { course: Course }) {
                 </div>
                 {owner && frame && (
                   <div className="teacher-controls-access-actions">
-                    <Link
-                      to={`${base}/lesson?presentation=${encodeURIComponent(owner.id)}&start=${encodeURIComponent(frame.id)}`}
-                    >
-                      {TEXT.teacher.open}
-                    </Link>
+                    {openSlides({
+                      path: `${base}/lesson?presentation=${encodeURIComponent(owner.id)}&start=${encodeURIComponent(frame.id)}`,
+                      presentationId: owner.id,
+                    })}
                   </div>
                 )}
               </>

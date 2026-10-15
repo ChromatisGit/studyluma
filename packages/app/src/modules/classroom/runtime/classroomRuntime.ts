@@ -34,6 +34,11 @@ import {
   type Rejection,
   type SessionInit,
 } from "../domain/session";
+import {
+  controllerSeen,
+  isAbandoned,
+  setControllerPresent,
+} from "../domain/presence";
 
 /**
  * The Classroom Session as a Chromatis Runtime Instance. This file is the
@@ -117,6 +122,8 @@ class ClassroomInstance {
   private readonly actors = new Map<string, Actor>();
   /** Open connections per participant: a reload briefly has two. */
   private readonly connectionCounts = new Map<string, number>();
+  /** Open teacher connections; with none, the teacher counts as away. */
+  private controllerConnections = 0;
 
   constructor(
     private readonly context: RuntimeInstanceContext,
@@ -158,7 +165,7 @@ class ClassroomInstance {
     const snapshot =
       actor.role === "controller"
         ? controllerSnapshot(this.session)
-        : participantSnapshot(this.session, actor.participantId);
+        : participantSnapshot(this.session, actor.participantId, this.now());
     if (!snapshot) {
       throw new NotFoundError("Unknown classroom session");
     }
@@ -196,9 +203,10 @@ class ClassroomInstance {
     }
   }
 
-  /** An expired session ends itself the next time anything touches it. */
+  /** An expired or abandoned session ends itself the next time anything touches it. */
   private liveOrEnd(): void {
-    if (isExpired(this.session, this.now())) {
+    const now = this.now();
+    if (isExpired(this.session, now) || isAbandoned(this.session, now)) {
       this.commit(
         applyIntent(
           this.session,
@@ -238,10 +246,14 @@ class ClassroomInstance {
     switch (command.type) {
       case "join":
         return json(this.join(String(command.name)));
-      case "snapshot":
-        return json(this.snapshotFor(this.actorOrThrow(String(command.token))));
+      case "snapshot": {
+        const actor = this.actorOrThrow(String(command.token));
+        this.noteController(actor);
+        return json(this.snapshotFor(actor));
+      }
       case "act": {
         const actor = this.actorOrThrow(String(command.token));
+        this.noteController(actor);
         this.commit(
           applyIntent(this.session, actor, command.intent, () =>
             crypto.randomUUID(),
@@ -251,6 +263,13 @@ class ClassroomInstance {
       }
       default:
         throw new ValidationError("Unknown classroom command");
+    }
+  }
+
+  /** A teacher who polls instead of holding a socket is seen with every request. */
+  private noteController(actor: Actor): void {
+    if (actor.role === "controller" && this.controllerConnections === 0) {
+      this.session = controllerSeen(this.session, this.now());
     }
   }
 
@@ -273,6 +292,11 @@ class ClassroomInstance {
     this.liveOrEnd();
     const actor = this.actorOrThrow(connection.params.token ?? "");
     this.actors.set(connection.id, actor);
+    if (actor.role === "controller" && this.controllerConnections++ === 0) {
+      this.session = setControllerPresent(this.session, true, this.now());
+      this.publish([]);
+      return;
+    }
     if (
       actor.role === "participant" &&
       this.countConnections(actor.participantId, 1) === 1
@@ -313,6 +337,15 @@ class ClassroomInstance {
   private disconnect(connection: RealtimeConnection): void {
     const actor = this.actors.get(connection.id);
     this.actors.delete(connection.id);
+    if (
+      actor?.role === "controller" &&
+      this.session.status === "open" &&
+      --this.controllerConnections === 0
+    ) {
+      this.session = setControllerPresent(this.session, false, this.now());
+      this.publish([]);
+      return;
+    }
     if (
       actor?.role === "participant" &&
       this.session.status === "open" &&

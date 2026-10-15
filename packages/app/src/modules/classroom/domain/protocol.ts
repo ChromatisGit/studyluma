@@ -15,8 +15,18 @@ import {
   type Placement,
   type Rejection,
   type Releases,
+  type Target,
 } from "./session";
+import { teacherAwayFor } from "./presence";
 import type { QuizStep } from "./quiz";
+import {
+  AMPEL_CAUSES,
+  AMPEL_LEVELS,
+  MAX_SECTION,
+  totals,
+  type SheetTotals,
+} from "./monitoring";
+import type { AmpelCause, AmpelLevel } from "../../worksheets";
 import {
   studentView,
   teacherView,
@@ -29,7 +39,10 @@ type SnapshotBase = {
   courseId: string | null;
   title: string;
   status: ClassroomSession["status"];
+  /** Whether students may join with the code. */
+  inviteOpen: boolean;
   placement: Placement | null;
+  target: Target | null;
   releases: Releases;
 };
 
@@ -37,6 +50,8 @@ export type ControllerSnapshot = SnapshotBase & {
   role: "controller";
   participants: { id: string; name: string; connected: boolean }[];
   quiz: TeacherQuizView | null;
+  /** Anonymous totals per worksheet that has reports. */
+  monitoring: Record<string, SheetTotals>;
 };
 
 export type ParticipantSnapshot = SnapshotBase & {
@@ -44,6 +59,8 @@ export type ParticipantSnapshot = SnapshotBase & {
   you: { id: string; name: string };
   /** Connected participants; names stay with the controller. */
   participantCount: number;
+  /** How long no teacher has been connected (ms, as of this snapshot); null: connected. */
+  teacherAwayForMs: number | null;
   quiz: StudentQuizView | null;
 };
 
@@ -59,6 +76,7 @@ export type ServerMessage =
 export type WireIntent = Exclude<
   Intent,
   | { type: "quiz.start" }
+  | { type: "release.sheet" }
   | { type: "release.summary" }
   | { type: "release.rule" }
   | { type: "release.solutions" }
@@ -66,6 +84,11 @@ export type WireIntent = Exclude<
 
 export type ClientMessage =
   { type: "intent"; intent: WireIntent } | { type: "ping" };
+
+/** The anonymous totals per worksheet for the controller. */
+function monitoringOf(session: ClassroomSession) {
+  return totals(session.progress, session.ampel, new Set(presentIds(session)));
+}
 
 export function controllerSnapshot(
   session: ClassroomSession,
@@ -79,12 +102,14 @@ export function controllerSnapshot(
       connected,
     })),
     quiz: session.quiz && teacherView(session.quiz),
+    monitoring: monitoringOf(session),
   };
 }
 
 export function participantSnapshot(
   session: ClassroomSession,
   participantId: string,
+  now: number,
 ): ParticipantSnapshot | null {
   const me = session.participants.find((item) => item.id === participantId);
   if (!me) {
@@ -95,6 +120,7 @@ export function participantSnapshot(
     role: "participant",
     you: { id: me.id, name: me.name },
     participantCount: presentIds(session).length,
+    teacherAwayForMs: teacherAwayFor(session, now),
     quiz: session.quiz && studentView(session.quiz, participantId),
   };
 }
@@ -105,7 +131,9 @@ function base(session: ClassroomSession): SnapshotBase {
     courseId: session.courseId,
     title: session.title,
     status: session.status,
+    inviteOpen: session.inviteOpen,
     placement: session.placement,
+    target: session.target,
     releases: session.releases,
   };
 }
@@ -153,6 +181,18 @@ function parseWireIntent(input: unknown): WireIntent | null {
           }
         : null;
     }
+    case "target": {
+      if (c.target === null) {
+        return { type: "target", target: null };
+      }
+      const t = c.target as Record<string, unknown> | undefined;
+      return t && t.kind === "sheet" && text(t.id) && text(t.chapterId)
+        ? {
+            type: "target",
+            target: { kind: "sheet", id: t.id, chapterId: t.chapterId },
+          }
+        : null;
+    }
     case "quiz.advance":
       return text(c.runId) && index >= 0 && STEPS.includes(c.step as QuizStep)
         ? {
@@ -160,6 +200,34 @@ function parseWireIntent(input: unknown): WireIntent | null {
             runId: c.runId,
             index,
             step: c.step as QuizStep,
+          }
+        : null;
+    case "progress":
+      return text(c.sheetId) &&
+        Number.isInteger(c.reached) &&
+        (c.reached as number) >= 0 &&
+        (c.reached as number) <= MAX_SECTION &&
+        typeof c.done === "boolean" &&
+        typeof c.challenges === "boolean"
+        ? {
+            type: "progress",
+            sheetId: c.sheetId,
+            reached: c.reached as number,
+            done: c.done,
+            challenges: c.challenges,
+          }
+        : null;
+    case "ampel":
+      return text(c.sheetId) &&
+        AMPEL_LEVELS.includes(c.level as AmpelLevel) &&
+        Array.isArray(c.causes) &&
+        c.causes.length <= AMPEL_CAUSES.length &&
+        c.causes.every((cause) => AMPEL_CAUSES.includes(cause as AmpelCause))
+        ? {
+            type: "ampel",
+            sheetId: c.sheetId,
+            level: c.level as AmpelLevel,
+            causes: c.causes as AmpelCause[],
           }
         : null;
     case "quiz.end":
@@ -177,6 +245,8 @@ function parseWireIntent(input: unknown): WireIntent | null {
             optionIds: c.optionIds as string[],
           }
         : null;
+    case "invite":
+      return { type: "invite" };
     case "end":
       return { type: "end" };
     default:

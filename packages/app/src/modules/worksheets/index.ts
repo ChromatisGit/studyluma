@@ -15,12 +15,12 @@ export {
   openChallenges,
   sheetDone,
 } from "./domain/structure";
-export {
-  chapterStore,
-  sampleClassAmpel,
-} from "./infrastructure/localChapterStore";
+export { chapterStore } from "./infrastructure/localChapterStore";
 export { TaskSample } from "./ui/TaskSample";
 export { AuswahlOptions } from "./ui/AuswahlOptions";
 export type { AuswahlOptionsProps } from "./ui/AuswahlOptions";
 export { typstToRow } from "@studyluma/catalog-contract";
 export { tasksOf } from "./domain/structure";
+export type { TaskToBlankMessage } from "./ui/WorksheetContext";
+export type { SheetReporter } from "./domain/report";
+export { SheetReporterContext } from "./ui/reporting";

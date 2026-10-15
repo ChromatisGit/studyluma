@@ -50,3 +50,20 @@ $g(x) = sqrt(x)$
 ::beispiel
 
 $g(4) = 2$
+
+---
+
+## "Umformungen und Beispiele"
+
+Auf beiden Seiten machen wir dasselbe.
+
+::beispiel
+$0,5 x + 2 = x + 1,5 | *2$
+$0,5 x*2 + 2*2 = x*2 + 1,5*2$
+$x + 4 = 2x + 3$
+
+$|x + 3| = 5 | -5$
+$|x + 3| - 5 = 0$
+
+::beispiel
+Ein zweites Beispiel mit $P(2 | 5)$ im Text.

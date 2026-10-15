@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
@@ -9,34 +10,47 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, Dialog } from "@chromatis/base/ui";
 import { useNavigate, useRevalidator } from "react-router";
 import { fill } from "../../../helper/text";
-import { localReleases, useSite } from "../../classroom";
+import { useSite } from "../../classroom";
 import { sheetsFor } from "../../courses";
-import { targetStore } from "../../classroom";
-import { chapterStore, isUnlocked } from "../../worksheets";
+import {
+  chapterStore,
+  isUnlocked,
+  type TaskToBlankMessage,
+} from "../../worksheets";
 import { useLessonSession } from "../application/useLessonSession";
-import { deviation, type Period } from "../domain/clock";
-import type { Deck, Slide } from "../domain/deck";
+import {
+  beginUnit,
+  finishUnit,
+  useEndedSessionGuard,
+} from "../application/unitLifecycle";
+import { remaining, type Period } from "../domain/clock";
+import type { Deck } from "../domain/deck";
 import {
   entryId,
   entrySlide,
   runningOrder,
   type OrderEntry,
 } from "../domain/layout";
-import type { LessonSession } from "../domain/lesson";
+import type { DeckState } from "../domain/lesson";
 import { openProjectorWindow } from "../infrastructure/projectorChannel";
 import { ScrollSyncContext } from "./FrameBlocks";
-import { LiveQuizContext } from "./FrameQuiz";
+import { SheetEmbed } from "./SheetEmbed";
+import { LiveQuizContext, QuizPreview } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
 import { InkInput, InkStrokes, type InkTool } from "./InkLayer";
+import { JoinView } from "./JoinView";
 import { LessonHeader } from "./LessonHeader";
-import { NotesStrip } from "./NotesStrip";
+import { NoUnit } from "./NoUnit";
+import { SlideNotes } from "./SlideNotes";
+import { planOf, startHeader } from "./startHeader";
 import { Overview } from "./Overview";
-import type { QuizActionsProps } from "./QuizActions";
 import { Toolbar } from "./Toolbar";
 import { WorksheetMonitoring } from "./WorksheetMonitoring";
 import { useFrameQuiz } from "./useFrameQuiz";
-import { useTeacherKeys, type TeacherKey } from "./useTeacherKeys";
+import { useInvitation } from "./useInvitation";
+import { useSlideActions } from "./useSlideActions";
+import { useTeacherControls } from "./useTeacherControls";
 import TEXT from "./lessons.de.json";
 import "./lessons.css";
 
@@ -57,9 +71,10 @@ function TeacherStage({
   onStep,
   sendLaser,
   monitoring,
+  sheet,
 }: {
   deck: Deck;
-  session: LessonSession;
+  session: DeckState;
   entry: OrderEntry;
   tool: InkTool;
   hasPrevious: boolean;
@@ -69,29 +84,36 @@ function TeacherStage({
   dispatch: Dispatch;
   onStep: (by: 1 | -1) => void;
   sendLaser: (point: [number, number] | null) => void;
-  /** On a worksheet slide the teacher sees how the class is doing. */
+  /** On a worksheet slide the teacher can look at how the class is doing. */
   monitoring?: ReactNode;
+  /** The worksheet itself, while it is on the projector. */
+  sheet?: ReactNode;
 }) {
   const id = entryId(entry);
   const slide = entrySlide(entry);
   const strokes = session.ink.filter((stroke) => stroke.frameId === id);
   const order = runningOrder(deck, session.blanks);
+  // The pointer shows on the teacher's own screen too, not only on the projector.
+  const [laser, setLaser] = useState<[number, number] | null>(null);
+  const moveLaser = (point: [number, number] | null) => {
+    setLaser(point);
+    sendLaser(point);
+  };
   return (
     <FrameStage className="lt-stage">
-      {monitoring ?? (
-        <FrameView
-          entry={entry}
-          deckTitle={deck.title}
-          sent={session.sent.includes(slide.id)}
-        >
-          <InkStrokes strokes={strokes} />
+      {monitoring ?? sheet ?? (
+        <FrameView entry={entry} sent={session.sent.includes(slide.id)}>
+          <InkStrokes
+            strokes={strokes}
+            laser={tool === "laser" ? laser : null}
+          />
           <InkInput
             tool={tool}
             frameId={id}
             strokes={strokes}
             onStroke={(stroke) => dispatch({ type: "stroke", stroke })}
             onErase={(strokeId) => dispatch({ type: "erase", strokeId })}
-            onLaser={sendLaser}
+            onLaser={moveLaser}
           />
         </FrameView>
       )}
@@ -139,182 +161,6 @@ function TeacherStage({
   );
 }
 
-/** Tool, overview and menu state, and what each key does. */
-function useTeacherControls(dispatch: Dispatch, onStep: (by: 1 | -1) => void) {
-  const [tool, setTool] = useState<InkTool>("cursor");
-  const [overview, setOverview] = useState(false);
-  const [menu, setMenu] = useState(false);
-
-  const onKey = useCallback(
-    (key: TeacherKey) => {
-      if (key === "escape") {
-        setOverview(false);
-        setMenu(false);
-      } else if (key === "next" || key === "previous") {
-        onStep(key === "next" ? 1 : -1);
-      } else if (key === "hide") {
-        dispatch({ type: "toggleHidden" });
-      } else if (key === "freeze") {
-        dispatch({ type: "toggleFreeze" });
-      } else if (key === "overview") {
-        setOverview((open) => !open);
-      } else {
-        dispatch({ type: "addBlank" });
-        setTool((current) =>
-          current === "graphit" || current === "violett" || current === "signal"
-            ? current
-            : "graphit",
-        );
-      }
-    },
-    [dispatch, onStep],
-  );
-  useTeacherKeys(onKey);
-
-  return { tool, setTool, overview, setOverview, menu, setMenu, onKey };
-}
-
-/** What the notes strip offers on this slide besides the notes. */
-function useSlideActions(
-  deck: Deck,
-  courseId: string,
-  slide: Slide | undefined,
-  sheetOpen: boolean,
-  dispatch: Dispatch,
-) {
-  const site = useSite();
-  const revalidator = useRevalidator();
-  const target = targetStore(courseId);
-  const active = useSyncExternalStore(
-    target.subscribe,
-    target.getSnapshot,
-    target.getServerSnapshot,
-  );
-  const store = chapterStore(deck.chapterId);
-  const worksheet = slide?.worksheet;
-  const targetHere =
-    !!worksheet && active?.kind === "sheet" && active.id === worksheet.id;
-  const released = site.releasedSummaries.includes(deck.chapterId);
-  if (worksheet) {
-    return (
-      <>
-        {!sheetOpen && (
-          <button
-            type="button"
-            className="lt-btn lt-btn--quiet"
-            onClick={() => store.setUnlocked(worksheet.id, true)}
-          >
-            Freischalten
-          </button>
-        )}
-        <button
-          type="button"
-          className="lt-btn"
-          onClick={() => {
-            if (!sheetOpen) {
-              store.setUnlocked(worksheet.id, true);
-            }
-            target.set(
-              targetHere
-                ? null
-                : {
-                    kind: "sheet",
-                    id: worksheet.id,
-                    chapterId: deck.chapterId,
-                  },
-            );
-            if (slide) {
-              dispatch({ type: "send", frameId: slide.id });
-            }
-          }}
-        >
-          {targetHere
-            ? TEXT.teacher.stopSending
-            : sheetOpen
-              ? TEXT.teacher.sendStudents
-              : TEXT.teacher.unlockAndSend}
-        </button>
-      </>
-    );
-  }
-  if (slide?.kind === "summary") {
-    return released ? (
-      <span className="lt-notes__sent">{TEXT.frame.summaryReleased}</span>
-    ) : (
-      <button
-        type="button"
-        className="lt-btn"
-        onClick={() => {
-          if (site.localReleases) {
-            localReleases.setSummary(deck.chapterId, true);
-            return;
-          }
-          const data = new FormData();
-          data.set("intent", "releaseSummary");
-          data.set("chapterId", deck.chapterId);
-          void fetch(`/courses/${encodeURIComponent(courseId)}/overview`, {
-            method: "POST",
-            body: data,
-          }).then((response) => {
-            if (response.ok) {
-              void revalidator.revalidate();
-            }
-          });
-        }}
-      >
-        {TEXT.teacher.releaseSummary}
-      </button>
-    );
-  }
-  return undefined;
-}
-
-/** The notes strip for the current slide or blank surface. */
-function SlideNotes({
-  entry,
-  next,
-  visible,
-  onShowAnyway,
-  dispatch,
-  quiz,
-  actions,
-  onNext,
-}: {
-  entry: OrderEntry;
-  next: OrderEntry | undefined;
-  visible: boolean;
-  onShowAnyway: () => void;
-  dispatch: Dispatch;
-  quiz: QuizActionsProps | undefined;
-  actions: ReactNode;
-  onNext: () => void;
-}) {
-  const slide = entrySlide(entry);
-  const number = entry.kind === "slide" ? String(slide.number) : entry.label;
-  const nextTitle = next
-    ? next.kind === "slide"
-      ? next.slide.title
-      : TEXT.frame.blank
-    : undefined;
-  return (
-    <NotesStrip
-      number={number}
-      notes={entry.kind === "slide" ? slide.notes : []}
-      visible={visible}
-      onShowAnyway={onShowAnyway}
-      next={nextTitle ? { title: nextTitle } : undefined}
-      onNext={onNext}
-      back={
-        entry.kind === "blank" ? { number: String(slide.number) } : undefined
-      }
-      onBack={() => dispatch({ type: "go", frameId: slide.id })}
-      onSend={() => undefined}
-      quiz={quiz}
-      actions={actions}
-    />
-  );
-}
-
 /** "Folie 3 von 12 · Baustein" or "Freie Fläche 5a". */
 function positionText(deck: Deck, entry: OrderEntry): string {
   if (entry.kind === "blank") {
@@ -332,10 +178,18 @@ function positionText(deck: Deck, entry: OrderEntry): string {
 export interface TeacherViewProps {
   /** The course whose students take part in the quiz. */
   courseId: string;
+  /** The deck on the stage. */
   deck: Deck;
+  /** The unit's main deck, whose plan the clock follows; the same deck outside a detour. */
+  mainDeck: Deck;
   periods: Period[];
+  /** The other decks of the course the unit can visit. */
+  targets: { id: string; title: string; path: string }[];
+  /** This page, to come back to. */
+  lessonPath: string;
   projectorPath: string;
   chapterPath: string;
+  overviewPath: string;
   initialFrameId?: string | undefined;
 }
 
@@ -348,27 +202,55 @@ export interface TeacherViewProps {
 export function TeacherView({
   courseId,
   deck,
+  mainDeck,
   periods,
+  targets,
+  lessonPath,
   projectorPath,
   chapterPath,
+  overviewPath,
   initialFrameId,
 }: TeacherViewProps) {
   const site = useSite();
   const {
+    unit,
     session,
     dispatch,
     sendLaser,
     sendScroll,
-    endLesson,
+    sendJoin,
+    setClockStart,
     clock,
     projectorConnected,
-  } = useLessonSession(deck, periods, initialFrameId);
+  } = useLessonSession(
+    { deck, path: lessonPath, projectorPath },
+    periods,
+    initialFrameId,
+  );
+  useEndedSessionGuard(unit);
+  const invite = useInvitation(sendJoin);
   const quiz = useFrameQuiz(courseId, deck, session, dispatch);
+  // While the invitation is on the stage there is no slide to move away from.
+  const inviting = !!invite?.join;
+  const { onStep } = quiz;
+  const step = useCallback(
+    (by: 1 | -1) => {
+      if (!inviting) {
+        onStep(by);
+      }
+    },
+    [inviting, onStep],
+  );
   const { tool, setTool, overview, setOverview, menu, setMenu, onKey } =
-    useTeacherControls(dispatch, quiz.onStep);
+    useTeacherControls(dispatch, step);
   const [notesForced, setNotesForced] = useState(false);
+  const [classView, setClassView] = useState(false);
   const [endConfirm, setEndConfirm] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [startFailed, setStartFailed] = useState(false);
+  useEffect(() => setReady(true), []);
   const navigate = useNavigate();
+  const revalidator = useRevalidator();
   const access = chapterStore(deck.chapterId);
   const state = useSyncExternalStore(
     access.subscribe,
@@ -390,10 +272,63 @@ export function TeacherView({
     !!sheets &&
     !!slide?.worksheet &&
     isUnlocked(sheets, slide.worksheet, state);
-  const actions = useSlideActions(deck, courseId, slide, sheetOpen, dispatch);
+  const sheetShown =
+    !!slide?.worksheet && session?.sheetShown === slide.id && !classView;
+  const actions = useSlideActions(deck, courseId, slide, sheetOpen, dispatch, {
+    shown: !!slide?.worksheet && session?.sheetShown === slide.id,
+    classView,
+    onClassView: setClassView,
+  });
+  const currentId = session?.currentFrameId;
+  // The class view belongs to the slide it was opened on.
+  useEffect(() => setClassView(false), [currentId]);
+  // A task taken from the shown worksheet becomes a blank surface after the slide.
+  useEffect(() => {
+    const onMessage = (event: MessageEvent<TaskToBlankMessage>) => {
+      const message = event.data;
+      if (
+        event.origin === window.location.origin &&
+        message?.source === "studyluma-sheet" &&
+        message.type === "task-to-blank"
+      ) {
+        dispatch({
+          type: "addBlank",
+          task: { sheetId: message.sheetId, taskId: message.taskId },
+        });
+        setTool("graphit");
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [dispatch, setTool]);
   const scrollSync = useMemo(() => ({ report: sendScroll }), [sendScroll]);
-  const target = targetStore(courseId);
 
+  if (!unit) {
+    return ready ? (
+      <NoUnit
+        failed={startFailed}
+        overviewPath={overviewPath}
+        onStart={() =>
+          void beginUnit({
+            courseId,
+            presentationId: deck.id,
+            path: lessonPath,
+            periods,
+            classroom: site.classroomEnabled,
+            existingCode:
+              site.classroom?.role === "controller"
+                ? site.classroom.code
+                : null,
+            refresh: async () => {
+              await revalidator.revalidate();
+            },
+          }).then((started) => setStartFailed(!started))
+        }
+      />
+    ) : (
+      <div className="lt" />
+    );
+  }
   if (!session || !entry || !slide) {
     return <div className="lt" />;
   }
@@ -403,14 +338,27 @@ export function TeacherView({
   const previous = order[index - 1];
   const number = entry.kind === "slide" ? String(slide.number) : entry.label;
   const monitoring =
-    entry.kind === "slide" && slide.worksheet ? (
+    entry.kind === "slide" && slide.worksheet && classView ? (
       <WorksheetMonitoring sheet={slide.worksheet} unlocked={sheetOpen} />
     ) : undefined;
-  const inkSlide = !monitoring && slide.kind !== "quiz";
+  const sheet =
+    entry.kind === "slide" && slide.worksheet && sheetShown ? (
+      <SheetEmbed
+        src={`${chapterPath}/lesson/sheets/${encodeURIComponent(slide.worksheet.slug)}`}
+        slideId={slide.id}
+        interactive
+      />
+    ) : undefined;
+  const invitation = invite?.join ? <JoinView join={invite.join} /> : undefined;
+  const inkSlide =
+    !invitation && !monitoring && !sheet && slide.kind !== "quiz";
   const openProjector = () => {
     setMenu(false);
     void openProjectorWindow(projectorPath);
   };
+
+  const { planDeck, planSlide, detour } = planOf(unit, deck, mainDeck);
+  const { startLabel, choices } = startHeader(unit, periods, setClockStart);
 
   return (
     <div className="lt">
@@ -418,7 +366,28 @@ export function TeacherView({
         title={deck.title}
         position={positionText(deck, entry)}
         seconds={clock.seconds}
-        deviation={deviation(deck, slide, session.enteredAt, clock.seconds)}
+        remaining={
+          planSlide ? remaining(planDeck, planSlide.id, clock.seconds) : null
+        }
+        startLabel={startLabel}
+        startChoices={choices}
+        detour={
+          detour && planSlide
+            ? {
+                slideNumber: planSlide.number,
+                onReturn: () => void navigate(unit.mainPath),
+              }
+            : null
+        }
+        decks={targets.map((target) => ({
+          id: target.id,
+          title: target.title,
+          href:
+            target.id === unit.mainPresentationId
+              ? unit.mainPath
+              : `${target.path}&main=${encodeURIComponent(unit.mainPresentationId)}`,
+        }))}
+        invite={invite}
         projector={{
           connected: projectorConnected,
           hidden: session.hidden,
@@ -436,7 +405,7 @@ export function TeacherView({
           setMenu(false);
           setEndConfirm(true);
         }}
-        chapterPath={chapterPath}
+        overviewPath={overviewPath}
       />
       <SlideNotes
         entry={entry}
@@ -446,7 +415,15 @@ export function TeacherView({
         dispatch={dispatch}
         quiz={quiz.actions}
         actions={actions}
-        onNext={() => quiz.onStep(1)}
+        extra={
+          slide.quiz && entry.kind === "slide" ? (
+            <>
+              <p className="lt-notes__sub">{TEXT.quiz.prepared}</p>
+              <QuizPreview quiz={slide.quiz} />
+            </>
+          ) : undefined
+        }
+        onNext={() => step(1)}
       />
       <main className="lt-main">
         <LiveQuizContext.Provider value={{ view: quiz.live, teacher: true }}>
@@ -456,13 +433,14 @@ export function TeacherView({
               session={session}
               entry={entry}
               tool={inkSlide ? tool : "cursor"}
-              monitoring={monitoring}
-              hasPrevious={!!previous}
-              hasNext={!!next}
-              overview={overview}
+              monitoring={invitation ?? monitoring}
+              sheet={sheet}
+              hasPrevious={!!previous && !invitation}
+              hasNext={!!next && !invitation}
+              overview={overview && !invitation}
               onCloseOverview={() => setOverview(false)}
               dispatch={dispatch}
-              onStep={quiz.onStep}
+              onStep={step}
               sendLaser={sendLaser}
             />
           </ScrollSyncContext.Provider>
@@ -472,7 +450,13 @@ export function TeacherView({
             tool={tool}
             onTool={setTool}
             onUndo={() => dispatch({ type: "undo" })}
-            undoRemovesBlank={entry.kind === "blank" && strokes.length === 0}
+            onClear={() => dispatch({ type: "clear" })}
+            canClear={strokes.length > 0}
+            undoRemovesBlank={
+              entry.kind === "blank" &&
+              strokes.length === 0 &&
+              !session.cleared?.some((item) => item.frameId === id)
+            }
             onBlank={() => onKey("blank")}
           />
         )}
@@ -489,10 +473,7 @@ export function TeacherView({
             </Button>
             <Button
               onClick={() => {
-                target.set(null);
-                void quiz.endActive();
-                endLesson();
-                void navigate(chapterPath);
+                void finishUnit(unit).then(() => navigate(overviewPath));
               }}
             >
               {TEXT.teacher.end}

@@ -27,10 +27,14 @@ import {
   CATALOG_FORMAT_VERSION,
   CATALOG_META_FILE,
   computeCatalogBuildId,
+  decimalCommas,
+  germanDecimals,
   prepareTypstMath,
   serializeCatalogMeta,
+  splitOperation,
   typstToRow,
   type CatalogArtifactMeta,
+  type SlideTag,
 } from "@studyluma/catalog-contract";
 import compilerPackage from "../package.json" with { type: "json" };
 import {
@@ -51,6 +55,7 @@ import type {
   ChallengePool,
   Chapter,
   Course,
+  DerivationStep,
   Diagnostic,
   Foliensatz,
   GraphicSpec,
@@ -138,6 +143,14 @@ export function compileContent(
   const gapCounters = new Map<string, number>();
   const chapters = new Map<string, Chapter>();
   const pendingLinks: { node: Inline; file: string; line: number }[] = [];
+  /** `::merkkarte` blocks on slides; the target is resolved once all chapters are parsed. */
+  const pendingCards: {
+    node: { type: "merkkarteCard"; targetId: string };
+    file: string;
+    line: number;
+    name?: string;
+    url?: string;
+  }[] = [];
   const nextFilenames = new Map<string, { name: string; file: string }>();
   const foliensatzByFile = new Map<string, Foliensatz>();
   let recognizedDocuments = 0;
@@ -286,6 +299,12 @@ export function compileContent(
     line: number,
     displayMode = false,
   ): { source: string; display: string } {
+    if (/\bdot(?:\.op)?\b/.test(source.replace(/"[^"]*"/g, "")))
+      error(
+        "MATH_SYNTAX",
+        `Use * for multiplication instead of dot: ${source}`,
+        loc(file, line),
+      );
     const stack: string[] = [];
     const pairs: Record<string, string> = { "(": ")", "[": "]", "{": "}" };
     for (const c of source) {
@@ -306,10 +325,12 @@ export function compileContent(
       error("MATH_SYNTAX", `Malformed Typst math: ${source}`, loc(file, line));
     let display = "";
     try {
-      display = renderToString(prepareTypstMath(source), {
-        output: "mathml",
-        displayMode,
-      });
+      display = germanDecimals(
+        renderToString(prepareTypstMath(source), {
+          output: "mathml",
+          displayMode,
+        }),
+      );
     } catch (e) {
       error(
         "MATH_SYNTAX",
@@ -319,8 +340,29 @@ export function compileContent(
     }
     return { source, display };
   }
+  /** One formula line; `equation | operation` keeps both parts apart. */
+  function derivationStep(
+    source: string,
+    file: string,
+    line: number,
+  ): DerivationStep {
+    const split = splitOperation(source);
+    if (!split) return { equation: math(source, file, line) };
+    return {
+      equation: math(split.equation, file, line),
+      operation: math(split.operation, file, line),
+    };
+  }
   /** One number or term: the exact value, a prepared row and an allowed rounding. */
-  function single(value: string, file: string, line: number): Answer {
+  function single(written: string, file: string, line: number): Answer {
+    if (/\bdot(?:\.op)?\b/.test(written.replace(/"[^"]*"/g, "")))
+      error(
+        "ANSWER_MATH",
+        `Use * for multiplication instead of dot: ${written}`,
+        loc(file, line),
+      );
+    // Authors may write the decimal comma; answers are kept with a point.
+    const value = decimalCommas(written);
     const pieces = value
       .split(/\s+~\s*|^~\s*/)
       .filter(Boolean)
@@ -359,15 +401,15 @@ export function compileContent(
         : {}),
     };
   }
-  /** Splits at commas outside brackets: `1, (2, 3), 4` has three parts. */
-  function splitArguments(text: string): string[] {
+  /** Splits at semicolons outside brackets: `1; (2; 3); 4` has three parts. */
+  function splitElements(text: string): string[] {
     const parts: string[] = [];
     let depth = 0,
       current = "";
     for (const c of text) {
       if ("([{".includes(c)) depth++;
       else if (")]}".includes(c)) depth--;
-      if (c === "," && depth === 0) {
+      if (c === ";" && depth === 0) {
         parts.push(current.trim());
         current = "";
       } else current += c;
@@ -375,9 +417,20 @@ export function compileContent(
     if (current.trim() || parts.length) parts.push(current.trim());
     return parts;
   }
+  /** A comma outside brackets that is not a decimal comma: `1, 2` or `1,2,3`. */
+  function hasSeparatorComma(text: string): boolean {
+    let depth = 0;
+    for (const c of decimalCommas(text)) {
+      if ("([{".includes(c)) depth++;
+      else if (")]}".includes(c)) depth--;
+      else if (c === "," && depth === 0) return true;
+    }
+    return false;
+  }
   /**
-   * A task's expected answer: a number or term, a solution set `{1, 5}`
-   * (`{}` for no solution) or a vector `vec(1, 2)`. `f(x) = …` labels the field.
+   * A task's expected answer: a number or term, a solution set `{1; 5}`
+   * (`{}` for no solution) or a vector `vec(1; 2)`. `f(x) = …` labels the
+   * field. Elements are separated by `;`, so `,` is always a decimal comma.
    */
   function answer(raw: string, file: string, line: number): Answer {
     let value = raw.trim(),
@@ -392,10 +445,16 @@ export function compileContent(
     const inner = group ?? vector;
     if (!inner)
       return { ...single(value, file, line), ...(label ? { label } : {}) };
-    const elements = splitArguments(inner[1]!).map((part) =>
-      single(part, file, line),
-    );
-    if (vector && elements.length < 2)
+    const parts = splitElements(inner[1]!);
+    const wrong = parts.some(hasSeparatorComma);
+    if (wrong)
+      error(
+        "ANSWER_SEPARATOR",
+        `Separate the elements of a set or vector with ";", not ",": ${value} should be written ${value.replace(/,\s*/g, "; ")}`,
+        loc(file, line),
+      );
+    const elements = wrong ? [] : parts.map((part) => single(part, file, line));
+    if (vector && !wrong && elements.length < 2)
       error(
         "ANSWER_VECTOR",
         "A vector needs at least two components",
@@ -410,7 +469,7 @@ export function compileContent(
   }
   /** One expected function of a Graph: `y = 2x + 3` or just `2x + 3`, in x only. */
   function graphAnswer(raw: string, file: string, line: number): Answer {
-    const parsed = functionRow(raw);
+    const parsed = functionRow(decimalCommas(raw));
     if ("problem" in parsed) {
       error("ANSWER_MATH", parsed.problem, loc(file, line));
       return {};
@@ -554,26 +613,59 @@ export function compileContent(
         i++;
         continue;
       }
-      if (/^::schreibflaeche\b/.test(s)) {
+      if (/^::schreib(?:flaeche|en)\b/.test(s)) {
         obsolete(
-          "::schreibflaeche was renamed to ::schreiben",
+          "::schreiben and ::schreibflaeche were replaced by ::platz (free space; ::platz 2 for more)",
           file,
           line.line,
         );
         i++;
         continue;
       }
-      if (/^::schreiben(?:\s+.*)?$/.test(s)) {
+      if (/^::platz(?:\s+\d+)?$/.test(s)) {
         if (!slide)
           error(
             "MARKER_CONTEXT",
-            "::schreiben is only allowed on slides",
+            "::platz is only allowed on slides",
             loc(file, line.line),
           );
-        out.push({
-          type: "writingArea",
-          label: s.slice(11).trim() || undefined,
-        });
+        const size = Number(s.slice(7).trim() || 1);
+        if (size < 1 || size > 9)
+          error(
+            "SPACE_VALUE",
+            "::platz takes a number from 1 to 9",
+            loc(file, line.line),
+          );
+        out.push({ type: "space", size: Math.min(9, Math.max(1, size)) });
+        i++;
+        continue;
+      }
+      if (/^::merkkarte\b/.test(s)) {
+        if (!slide)
+          error(
+            "MARKER_CONTEXT",
+            "::merkkarte is only allowed on slides",
+            loc(file, line.line),
+          );
+        const value = s.slice(11).trim(),
+          link = /^\[([^\]]+)\]\(([^)]+)\)$/.exec(value),
+          name = quoted(value)?.trim();
+        if (!link && !name)
+          error(
+            "MERKKARTE_SYNTAX",
+            'Expected ::merkkarte "Name" or ::merkkarte [Name](../kapitel/inhalt.md#name)',
+            loc(file, line.line),
+          );
+        else {
+          const node = { type: "merkkarteCard" as const, targetId: "" };
+          pendingCards.push({
+            node,
+            file,
+            line: line.line,
+            ...(link ? { url: link[2]! } : { name: name! }),
+          });
+          out.push(node);
+        }
         i++;
         continue;
       }
@@ -706,6 +798,23 @@ export function compileContent(
         paragraph.push(lines[i++]!);
       if (!paragraph.length) {
         i++;
+        continue;
+      }
+      // Formula lines directly below each other: with an `| operation` in
+      // one of them they are a derivation whose operations align.
+      const formulas = paragraph.map(
+        (x) => /^\$([^$]+)\$$/.exec(x.text.trim())?.[1],
+      );
+      if (
+        formulas.every((x) => x !== undefined) &&
+        formulas.some((x) => splitOperation(x))
+      ) {
+        out.push({
+          type: "derivation",
+          steps: formulas.map((x, n) =>
+            derivationStep(x, file, paragraph[n]!.line),
+          ),
+        });
         continue;
       }
       out.push({
@@ -1557,11 +1666,42 @@ export function compileContent(
         current: Line[];
       } | null = null;
     const flushNormal = () => {
-      if (normal.some((x) => x.text.trim()))
-        summary.content.push({
-          type: "content",
-          content: rich(normal, doc.file),
-        });
+      // Outside a Merkkarte, `::beispiel` opens an example that reaches to
+      // the next `::beispiel`, a `---` or a heading.
+      let part: { example: boolean; line: number; lines: Line[] } = {
+        example: false,
+        line: 0,
+        lines: [],
+      };
+      const settle = () => {
+        if (part.example) {
+          const content = rich(part.lines, doc.file);
+          if (content.length)
+            summary.content.push({ type: "example", content });
+          else
+            error(
+              "EXAMPLE_EMPTY",
+              "::beispiel needs content",
+              loc(doc.file, part.line),
+            );
+        } else if (part.lines.some((x) => x.text.trim()))
+          summary.content.push({
+            type: "content",
+            content: rich(part.lines, doc.file),
+          });
+        part = { example: false, line: 0, lines: [] };
+      };
+      for (const x of normal) {
+        const s = x.text.trim();
+        if (s === "::beispiel") {
+          settle();
+          part = { example: true, line: x.line, lines: [] };
+        } else if (part.example && (s === "---" || /^#{1,6} /.test(s))) {
+          settle();
+          if (s !== "---") part.lines.push(x);
+        } else part.lines.push(x);
+      }
+      settle();
       normal = [];
     };
     const flushCard = () => {
@@ -1623,11 +1763,11 @@ export function compileContent(
       } else if (card) card.current.push(x);
       else if (
         x.text.trim().startsWith("::") &&
-        !/^::grafik\b/.test(x.text.trim())
+        !/^::(?:grafik|beispiel)\b/.test(x.text.trim())
       )
         error(
           "MARKER_INVALID",
-          "::beispiel requires a Merkkarte",
+          `Invalid marker ${x.text.trim()}`,
           loc(doc.file, x.line),
         );
       else normal.push(x);
@@ -1639,6 +1779,24 @@ export function compileContent(
     doc.chapter.title = summary.title;
   }
   const LINK = /^\[([^\]]+)\]\(([^)]+)\)$/;
+  const TAG_TONES = ["neutral", "hinweis", "wichtig", "merke"] as const;
+  /** `::tag Erklären`, `::tag Einstieg hinweis`: the label of the slide's tab and its color. */
+  function parseTag(value: string): SlideTag | undefined {
+    const words = value.trim().split(/\s+/).filter(Boolean);
+    const last = words.at(-1)?.toLowerCase();
+    const tone = TAG_TONES.find((item) => item === last);
+    const label = (tone && words.length > 1 ? words.slice(0, -1) : words)
+      .join(" ")
+      .trim();
+    if (!label) return undefined;
+    const function_ =
+      label.toLowerCase() === "erklären"
+        ? "erklaeren"
+        : label.toLowerCase() === "aufgabe"
+          ? "aufgabe"
+          : undefined;
+    return { label, tone: tone ?? function_ ?? "neutral" };
+  }
   function parseFoliensatz(doc: Document) {
     const front = readFront(doc, foliensatzFrontSchema);
     const fs: Foliensatz = {
@@ -1767,7 +1925,18 @@ export function compileContent(
             "Expected ::bis m:ss",
             loc(doc.file, line.line),
           );
-        else if (value === "::notiz") {
+        else if (/^::tag\b/.test(value)) {
+          const tag = parseTag(value.slice(5));
+          if (!tag || entry.tag)
+            error(
+              "TAG_SYNTAX",
+              entry.tag
+                ? "Duplicate ::tag"
+                : "Expected ::tag Text or ::tag Text neutral|hinweis|wichtig|merke",
+              loc(doc.file, line.line),
+            );
+          else entry.tag = tag;
+        } else if (value === "::notiz") {
           if (inNote)
             error(
               "NOTES_DUPLICATE",
@@ -1777,9 +1946,10 @@ export function compileContent(
           inNote = true;
         } else if (
           value.startsWith("::") &&
-          !/^::schreiben(?:\s|$)/.test(value) &&
-          !/^::grafik\b/.test(value) &&
-          !/^::schreibflaeche\b/.test(value)
+          !/^::platz(?:\s|$)/.test(value) &&
+          !/^::merkkarte\b/.test(value) &&
+          !/^::schreib(?:flaeche|en)\b/.test(value) &&
+          !/^::grafik\b/.test(value)
         )
           error(
             "MARKER_INVALID",
@@ -1802,10 +1972,10 @@ export function compileContent(
       if (["slide", "worksheet", "merkkarte"].includes(kind)) {
         if (kind !== "slide")
           for (const line of current)
-            if (/^::schreiben(?:\s|$)/.test(line.text.trim()))
+            if (/^::(?:platz|merkkarte)\b/.test(line.text.trim()))
               error(
                 "MARKER_CONTEXT",
-                '::schreiben requires a slide (# "Title")',
+                '::platz and ::merkkarte require a slide (# "Title")',
                 loc(doc.file, line.line),
               );
         let plain: Line[] = [];
@@ -2029,6 +2199,17 @@ export function compileContent(
     for (const key of Object.keys(node))
       delete (node as Record<string, unknown>)[key];
     Object.assign(node, { type: "merkkarteRef", targetId, title });
+  }
+  for (const card of pendingCards) {
+    const where = loc(card.file, card.line);
+    let targetId: string | undefined;
+    if (card.url) targetId = cardByLink(card.url, card.file, where);
+    else {
+      const m = /^([^/]+)\/([^/]+)\/([^/]+)\//.exec(card.file);
+      const chapter = m && chapters.get(`${m[1]}/${m[2]}/${m[3]}`);
+      if (chapter) targetId = cardByName(card.name!, chapter, where);
+    }
+    if (targetId) card.node.targetId = targetId;
   }
   function reference(
     list: { id: string; chapterId: string; filename: string }[],
@@ -2360,7 +2541,7 @@ export function compileContent(
   if (diagnostics.some((x) => x.severity === "error"))
     throw new CompileFailure(diagnostics);
   const base = {
-    schemaVersion: 1 as const,
+    schemaVersion: CATALOG_FORMAT_VERSION,
     timetable,
     topics,
     courses,
@@ -2410,7 +2591,11 @@ export function writeCatalogFiles(
   writeFileSync(
     join(directory, "asset-manifest.json"),
     JSON.stringify(
-      { schemaVersion: 1, buildId: bundle.buildId, assets: bundle.assets },
+      {
+        schemaVersion: CATALOG_FORMAT_VERSION,
+        buildId: bundle.buildId,
+        assets: bundle.assets,
+      },
       null,
       2,
     ) + "\n",

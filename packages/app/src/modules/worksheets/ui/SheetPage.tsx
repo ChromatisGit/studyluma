@@ -18,6 +18,7 @@ import { SectionTabs } from "./SectionTabs";
 import { SheetHeader } from "./SheetHeader";
 import { ReleasedNotice } from "./ReleasedNotice";
 import { TeacherLockNotice } from "./TeacherLockNotice";
+import { useProgressReporting } from "./reporting";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
 
@@ -67,6 +68,7 @@ function SectionView({
 export function SheetPage({ sheet }: { sheet: Sheet }) {
   const { chapter, state, store, teacher, ui, deactivate } = useWorksheet();
   const unlocked = isUnlocked(chapter, sheet, state);
+  useProgressReporting(sheet, unlocked && !teacher);
 
   useEffect(() => {
     if (unlocked && !teacher) {

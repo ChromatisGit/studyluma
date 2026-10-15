@@ -12,23 +12,37 @@ export type { ActiveTarget } from "./infrastructure/targetStore";
 export { SiteContext, canReadSummary, useSite } from "./ui/SiteContext";
 export type { SiteData } from "./ui/SiteContext";
 export { SiteProvider } from "./ui/SiteProvider";
+export { ClassroomConnection } from "./ui/ClassroomConnection";
 export { CurrentLesson } from "./ui/CurrentLesson";
 
 // Teacher controls.
 export { LernwegControl } from "./ui/LernwegControl";
 export { Unterricht } from "./ui/Unterricht";
+export type { UnterrichtProps } from "./ui/Unterricht";
 export { Inhalte } from "./ui/Inhalte";
 
 // Joining and running a Classroom Session.
 export { JoinPage } from "./ui/JoinPage";
-export { ClassroomStart } from "./ui/ClassroomStart";
+export {
+  createClassroom,
+  endClassroom,
+  readClassroom,
+  useSharedClassroom,
+} from "./application/useClassroom";
+export type { ClassroomConnection as ClassroomConnectionState } from "./application/useClassroom";
 export { normalizeJoinCode } from "./domain/joinCode";
 export type {
   ControllerSnapshot,
   ParticipantSnapshot,
   Snapshot,
 } from "./domain/protocol";
-export type { Placement } from "./domain/session";
+export type { Placement, Target } from "./domain/session";
+
+// Sending worksheets to the class.
+export { useSheetAccess, useSentTarget } from "./application/useSheetAccess";
+
+// Worksheet monitoring.
+export { useTeacherMonitoring } from "./application/useMonitoring";
 
 // Live quiz.
 export type {

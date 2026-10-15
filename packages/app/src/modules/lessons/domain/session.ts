@@ -1,28 +1,22 @@
-import { entryId, runningOrder } from "./layout";
+import { entryId, runningOrder, type OrderEntry } from "./layout";
 import type { Deck } from "./deck";
-import type { InkStroke, LessonSession } from "./lesson";
+import type { Blank, InkStroke, DeckState } from "./lesson";
 
 export type SessionAction =
   | { type: "go"; frameId: string; now: number }
   | { type: "step"; by: 1 | -1; now: number }
-  | { type: "addBlank"; now: number }
+  | { type: "addBlank"; now: number; task?: Blank["task"] }
+  | { type: "toggleSheet"; frameId: string }
   | { type: "undo"; now: number }
+  | { type: "clear" }
   | { type: "stroke"; stroke: InkStroke }
   | { type: "erase"; strokeId: string }
   | { type: "toggleHidden" }
   | { type: "toggleFreeze" }
   | { type: "send"; frameId: string };
 
-export function newSession(
-  deck: Deck,
-  openedAt: number,
-  id: string,
-): LessonSession {
+export function newDeckState(deck: Deck): DeckState {
   return {
-    id,
-    chapterId: deck.chapterId,
-    presentationId: deck.id,
-    openedAt,
     currentFrameId: deck.slides[0]?.id ?? "",
     enteredAt: 0,
     blanks: [],
@@ -32,21 +26,68 @@ export function newSession(
   };
 }
 
-const enter = (
-  session: LessonSession,
-  frameId: string,
-  now: number,
-): LessonSession =>
+const enter = (session: DeckState, frameId: string, now: number): DeckState =>
   frameId === session.currentFrameId
     ? session
     : { ...session, currentFrameId: frameId, enteredAt: now };
 
-/** What happens to a session; ink belongs to the session, never to the chapter. */
+const ownInk = (session: DeckState) =>
+  session.ink.filter((stroke) => stroke.frameId === session.currentFrameId);
+
+/** Takes back the last stroke, then wiped ink, then an empty blank. */
+function undoInk(
+  session: DeckState,
+  current: OrderEntry | undefined,
+  now: number,
+): DeckState {
+  const last = ownInk(session).at(-1);
+  if (last) {
+    return { ...session, ink: session.ink.filter((stroke) => stroke !== last) };
+  }
+  const cleared = session.cleared ?? [];
+  const wiped = cleared
+    .filter((entry) => entry.frameId === session.currentFrameId)
+    .at(-1);
+  if (wiped) {
+    return {
+      ...session,
+      ink: [...session.ink, ...wiped.strokes],
+      cleared: cleared.filter((entry) => entry !== wiped),
+    };
+  }
+  // Undo on an empty blank takes the blank back and returns to its frame.
+  if (current?.kind === "blank") {
+    return {
+      ...session,
+      blanks: session.blanks.filter((blank) => blank.id !== current.blank.id),
+      currentFrameId: current.parent.id,
+      enteredAt: now,
+    };
+  }
+  return session;
+}
+
+/** Wipes the ink of the current frame; undo brings it back. */
+function clearInk(session: DeckState): DeckState {
+  const own = ownInk(session);
+  return own.length
+    ? {
+        ...session,
+        ink: session.ink.filter((stroke) => !own.includes(stroke)),
+        cleared: [
+          ...(session.cleared ?? []),
+          { frameId: session.currentFrameId, strokes: own },
+        ],
+      }
+    : session;
+}
+
+/** What happens to a deck in the lesson; ink belongs to the lesson, never to the chapter. */
 export function reduceSession(
   deck: Deck,
-  session: LessonSession,
+  session: DeckState,
   action: SessionAction,
-): LessonSession {
+): DeckState {
   const order = runningOrder(deck, session.blanks);
   const index = order.findIndex(
     (entry) => entryId(entry) === session.currentFrameId,
@@ -69,35 +110,32 @@ export function reduceSession(
         return session;
       }
       const id = `${parent.id}~${session.blanks.filter((b) => b.afterFrameId === parent.id).length + 1}`;
-      const blanks = [...session.blanks, { id, afterFrameId: parent.id }];
+      const blanks = [
+        ...session.blanks,
+        {
+          id,
+          afterFrameId: parent.id,
+          ...(action.task ? { task: action.task } : {}),
+        },
+      ];
       return { ...session, blanks, currentFrameId: id, enteredAt: action.now };
     }
-    case "undo": {
-      const own = session.ink.filter(
-        (stroke) => stroke.frameId === session.currentFrameId,
-      );
-      // Undo on an empty blank takes the blank back and returns to its frame.
-      if (!own.length && current?.kind === "blank") {
-        return {
-          ...session,
-          blanks: session.blanks.filter(
-            (blank) => blank.id !== current.blank.id,
-          ),
-          currentFrameId: current.parent.id,
-          enteredAt: action.now,
-        };
-      }
-      const last = own.at(-1);
-      return last
-        ? { ...session, ink: session.ink.filter((stroke) => stroke !== last) }
-        : session;
-    }
+    case "undo":
+      return undoInk(session, current, action.now);
+    case "clear":
+      return clearInk(session);
     case "stroke":
       return { ...session, ink: [...session.ink, action.stroke] };
     case "erase":
       return {
         ...session,
         ink: session.ink.filter((stroke) => stroke.id !== action.strokeId),
+      };
+    case "toggleSheet":
+      return {
+        ...session,
+        sheetShown:
+          session.sheetShown === action.frameId ? null : action.frameId,
       };
     case "toggleHidden":
       return { ...session, hidden: !session.hidden };
@@ -112,6 +150,7 @@ export function reduceSession(
               ink: structuredClone(session.ink),
               sent: [...session.sent],
               hidden: session.hidden,
+              sheetShown: session.sheetShown ?? null,
             },
           };
     case "send":
@@ -119,6 +158,25 @@ export function reduceSession(
         ? session
         : { ...session, sent: [...session.sent, action.frameId] };
   }
+}
+
+/** Distance from a point to the segment between two stroke points. */
+function distanceToSegment(
+  [px, py]: [number, number],
+  [ax, ay]: [number, number],
+  [bx, by]: [number, number],
+): number {
+  const length = (bx - ax) ** 2 + (by - ay) ** 2;
+  const along = length
+    ? Math.max(
+        0,
+        Math.min(1, ((px - ax) * (bx - ax) + (py - ay) * (by - ay)) / length),
+      )
+    : 0;
+  return Math.hypot(
+    px - (ax + along * (bx - ax)),
+    py - (ay + along * (by - ay)),
+  );
 }
 
 /** The stroke under a point: whole strokes are erased, not pixels. */
@@ -132,7 +190,9 @@ export function strokeAt(
     .reverse()
     .find((stroke) =>
       stroke.points.some(
-        ([px, py]) => (px - x) ** 2 + (py - y) ** 2 <= radius ** 2,
+        (point, i) =>
+          distanceToSegment([x, y], stroke.points[i - 1] ?? point, point) <=
+          radius,
       ),
     );
 }

@@ -4,7 +4,12 @@
  */
 
 /** A blank surface inserted during the lesson after a slide (5 → 5a). */
-export type Blank = { id: string; afterFrameId: string };
+export type Blank = {
+  id: string;
+  afterFrameId: string;
+  /** A task of the slide's worksheet that was taken onto this surface. */
+  task?: { sheetId: string; taskId: string };
+};
 
 export type InkColor = "graphit" | "violett" | "signal";
 
@@ -17,19 +22,16 @@ export type InkStroke = {
   points: [number, number][];
 };
 
-export type LessonSession = {
-  id: string;
-  chapterId: string;
-  /** The deck this session runs; slide ids are its placement ids. */
-  presentationId: string;
-  /** When the session was opened (ms), for the archive. */
-  openedAt: number;
+/** What the teacher does with one deck during a lesson. */
+export type DeckState = {
   currentFrameId: string;
   /** Lesson time (s) when the current slide was entered. */
   enteredAt: number;
   blanks: Blank[];
   ink: InkStroke[];
   hidden: boolean;
+  /** The slide whose worksheet the projector shows instead of the slide. */
+  sheetShown?: string | null;
   /** The exact image the projector keeps while the teacher navigates. */
   frozen?: {
     currentFrameId: string;
@@ -37,9 +39,12 @@ export type LessonSession = {
     ink: InkStroke[];
     sent: string[];
     hidden: boolean;
+    sheetShown?: string | null;
   } | null;
   /** Slides whose sheet the class was sent to. */
   sent: string[];
+  /** Ink taken off a frame by "clear", newest last, so undo can bring it back. */
+  cleared?: { frameId: string; strokes: InkStroke[] }[];
 };
 
 /** The logical size every slide is laid out in. */

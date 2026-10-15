@@ -1,4 +1,4 @@
-import { Eraser, MousePointer2, SquarePlus, Undo2 } from "lucide-react";
+import { Eraser, MousePointer2, SquarePlus, Trash2, Undo2 } from "lucide-react";
 import type { InkTool } from "./InkLayer";
 import TEXT from "./lessons.de.json";
 
@@ -31,18 +31,22 @@ function ToolIcon({ tool }: { tool: InkTool }) {
 
 /**
  * Exactly one active tool decides whether the teacher operates, points,
- * writes or erases. Undo and a new blank surface are actions, not tools.
+ * writes or erases. Clear, undo and a new blank surface are actions, not tools.
  */
 export function Toolbar({
   tool,
   onTool,
   onUndo,
+  onClear,
+  canClear,
   undoRemovesBlank,
   onBlank,
 }: {
   tool: InkTool;
   onTool: (tool: InkTool) => void;
   onUndo: () => void;
+  onClear: () => void;
+  canClear: boolean;
   undoRemovesBlank: boolean;
   onBlank: () => void;
 }) {
@@ -70,6 +74,16 @@ export function Toolbar({
         </div>
       ))}
       <span className="lt-tools__fill" />
+      <button
+        type="button"
+        className="lt-tool lt-tool--action"
+        aria-label={TEXT.tools.clear}
+        title={TEXT.tools.clear}
+        disabled={!canClear}
+        onClick={onClear}
+      >
+        <Trash2 aria-hidden="true" />
+      </button>
       <button
         type="button"
         className="lt-tool lt-tool--action"

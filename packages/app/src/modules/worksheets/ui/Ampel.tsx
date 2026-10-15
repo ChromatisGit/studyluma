@@ -1,7 +1,9 @@
+import { useContext } from "react";
 import { Button, Choice, ChoiceGroup } from "@chromatis/base/ui";
 import type { Worksheet as Sheet } from "../../catalog";
 import type { AmpelCause, AmpelLevel } from "../domain/contract";
 import { checkpointChecked } from "../domain/structure";
+import { SheetReporterContext } from "./reporting";
 import { useWorksheet } from "./WorksheetContext";
 import { TEXT } from "./texts";
 
@@ -47,7 +49,8 @@ function AmpelDone({ sheet }: { sheet: Sheet }) {
  * totals. Yellow and red ask for at least one cause.
  */
 export function Ampel({ sheet }: { sheet: Sheet }) {
-  const { state, store, ui, setUi } = useWorksheet();
+  const { state, store, ui, setUi, teacher } = useWorksheet();
+  const reporter = useContext(SheetReporterContext);
   if (!checkpointChecked(sheet, state)) {
     return (
       <div className="ampel ampel--waiting">
@@ -126,6 +129,13 @@ export function Ampel({ sheet }: { sheet: Sheet }) {
               ? { level: "green" }
               : { level: draft.level, causes },
           );
+          if (!teacher) {
+            reporter?.ampel({
+              sheetId: sheet.id,
+              level: draft.level,
+              causes: draft.level === "green" ? [] : causes,
+            });
+          }
           setUi((current) => ({
             ...current,
             ampelEdit: { ...current.ampelEdit, [sheet.id]: false },

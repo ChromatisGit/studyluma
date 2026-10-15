@@ -31,7 +31,24 @@
   );
 }
 
-/* Tab and color bar: always in the same spot, also over images */
+/* Tab and color bar: the color says what happens on the slide */
+.lf--tone-erklaeren,
+.lf--tone-inhalt,
+.lf--tone-merke,
+.lf--tone-neutral {
+  --lf-family: var(--frame-family-standard);
+}
+.lf--tone-aufgabe,
+.lf--tone-arbeitsblatt {
+  --lf-family: var(--frame-family-arbeit);
+}
+.lf--tone-quiz {
+  --lf-family: var(--frame-family-quiz);
+}
+.lf--tone-hinweis,
+.lf--tone-wichtig {
+  --lf-family: var(--frame-family-achtung);
+}
 .lf__bar {
   position: absolute;
   z-index: 2;
@@ -43,11 +60,12 @@
   position: absolute;
   z-index: 2;
   top: 0;
-  left: 72px;
+  left: 44px;
   display: flex;
   align-items: center;
-  height: 44px;
-  padding: 0 20px;
+  gap: 14px;
+  height: 40px;
+  padding: 0 8px 0 18px;
   border-radius: 0 0 8px 8px;
   background: var(--lf-family);
   color: var(--lf-family-fg);
@@ -55,32 +73,46 @@
   font-weight: 700;
   box-shadow: 0 2px 6px rgb(29 24 48 / 0.18);
 }
-.lf__foot {
-  position: absolute;
-  inset: auto 40px 20px 72px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 16px;
-  color: var(--frame-muted);
+.lf__tab-label {
+  max-width: 420px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-.lf__number {
-  font-weight: 500;
+.lf__tab-number {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.22);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
 }
 
-/* Body: content on top, as much as needed; the rest stays free to write */
+/* Body: a slide to read is centered and grows; a slide with ::platz keeps
+   its text on top and leaves the rest free for writing */
 .lf__body {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 76px 72px 60px;
+  padding: 64px 48px 36px;
   font-size: calc(28px * var(--lf-scale));
+}
+.lf--slide:not(.lf--writing) .lf__blocks,
+.lf--sheet .lf__blocks {
+  justify-content: center;
+}
+.lf--writing .lf__blocks {
+  justify-content: flex-start;
 }
 .lf__title {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: calc(44px * var(--lf-scale));
+  font-size: calc(46px * var(--lf-scale));
   line-height: 1.1;
   letter-spacing: -0.01em;
 }
@@ -90,7 +122,10 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 18px;
+  margin-top: 14px;
+}
+.lf-space {
+  flex: none;
 }
 .lf-md {
   max-width: none;
@@ -113,30 +148,15 @@
   padding-left: 1.1em;
 }
 .lf-md li::marker {
-  color: var(--frame-family-sicherung);
+  color: var(--frame-family-standard);
 }
 .lf-md li + li {
   margin-top: 0.35em;
 }
 
-/* Writing zones: white with a 28px grid; labels sit on top as a sign */
-.lf-zone {
-  position: relative;
-  flex: 1;
-  min-height: 120px;
-  border: 1.5px solid var(--frame-zone-border);
-  border-radius: 8px;
-  background-color: var(--frame-zone-bg);
-  background-image:
-    linear-gradient(var(--frame-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--frame-grid) 1px, transparent 1px);
-  background-size: 28px 28px;
-  background-position: -1px -1px;
-}
+/* The label of a blank surface */
 .lf-zone__label {
   position: absolute;
-  top: 12px;
-  left: 14px;
   padding: 4px 10px;
   border-radius: 4px;
   background: #efe8f6;
@@ -168,140 +188,141 @@
   background: var(--frame-zone-bg);
 }
 
-/* Merksatz: the Merkkarte large in a violet box; the card carries the title */
-.lf--merkkarte {
-  background: var(--frame-sicherung-bg);
+/* Merkkarten on a slide: built like the cards of the Inhalt, at most two
+   side by side */
+.lf-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(42%, 1fr));
+  gap: 24px;
+  align-items: start;
 }
-.lf__center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 64px 72px;
-  box-sizing: border-box;
+.lf-cards--single {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 860px;
 }
-.lf-merkkarte {
+.lf-card {
   box-sizing: border-box;
-  width: 920px;
-  padding: 48px 60px 36px;
-  border: 3px solid var(--frame-family-sicherung);
+  min-width: 0;
+  border: 1.5px solid var(--frame-zone-border);
   border-radius: 12px;
   background: var(--frame-zone-bg);
+  overflow: hidden;
 }
-.lf-merkkarte__title {
+.lf-card__title {
   margin: 0;
+  padding: 16px 28px 12px;
+  border-bottom: 3px solid var(--frame-family-standard);
   font-family: var(--font-display);
+  font-size: 1.1em;
   font-weight: 600;
-  font-size: 48px;
-  line-height: 1.1;
+  line-height: 1.15;
 }
-.lf-merkkarte__rule {
-  margin-top: 26px;
-  font-family: var(--font-display);
-  font-size: 40px;
-  line-height: 1.45;
+.lf-card__rule {
+  padding: 18px 28px;
+  font-size: 0.95em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
-.lf-merkkarte__hint {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 34px 0 0;
-  padding-top: 18px;
+.lf-card__examples {
+  margin: 0 18px 18px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  background: var(--frame-sicherung-bg);
+  font-size: 0.9em;
+}
+.lf-card__example + .lf-card__example {
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1.5px solid #e6dcf1;
-  color: #592388;
-  font-size: 19px;
-  font-weight: 500;
 }
-.lf-merkkarte__hint svg {
-  width: 22px;
-  height: 22px;
+.lf-card .math-block math {
+  font-size: 1.15em;
 }
 
-/* Work phase: the worksheet card */
+/* Work phase: what the class sees before the worksheet is shown */
 .lf-sheet {
   box-sizing: border-box;
-  width: 780px;
-  padding: 40px 48px 34px;
-  border: 1.5px solid var(--frame-grid);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px 36px;
+  padding: 28px 36px;
+  border: 1.5px solid var(--frame-zone-border);
+  border-left: 8px solid var(--lf-family);
   border-radius: 12px;
   background: var(--frame-zone-bg);
 }
-.lf-sheet p {
+.lf-sheet p,
+.lf-sheet ul {
   margin: 0;
 }
-.lf-sheet__kind {
+.lf-sheet__icon {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  color: var(--lf-family);
+}
+.lf-sheet__title {
+  flex: 1 1 320px;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 1.1;
+}
+.lf-sheet__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+  font-size: 24px;
+}
+.lf-sheet__facts li {
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #4b4263;
-  font-size: 20px;
-  font-weight: 500;
 }
-.lf-sheet__kind svg {
+.lf-sheet__facts svg {
+  flex: none;
   width: 28px;
   height: 28px;
-}
-.lf-sheet__title {
-  margin-top: 14px !important;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 52px;
-  line-height: 1.1;
-}
-.lf-sheet__topic {
-  margin-top: 8px !important;
   color: var(--frame-muted);
-  font-size: 22px;
 }
-.lf-sheet__state {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 30px !important;
-  padding-top: 22px;
-  border-top: 1.5px solid #ece5f3;
-  font-size: 26px;
-}
-.lf-sheet__state svg {
-  width: 30px;
-  height: 30px;
-  color: #4b4263;
-}
-.lf-sheet__state.is-sent svg {
-  color: var(--frame-family-uebung);
+.lf-sheet__facts .is-sent svg {
+  color: var(--frame-family-arbeit);
 }
 
-/* Quiz frame: the prepared questions */
-.lf-quiz {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-  gap: 28px;
-  margin-top: 12px;
+/* Quiz frame before it starts: only the title, calm and centered */
+.lf__body.is-waiting {
+  justify-content: center;
 }
-.lf-quiz__question {
-  padding: 24px 28px;
-  border: 1.5px solid var(--frame-grid);
-  border-radius: 10px;
-  background: var(--frame-zone-bg);
+.lf__body.is-waiting .lf__blocks {
+  flex: none;
+  margin: 0;
 }
+.lf-quiz-wait {
+  text-align: center;
+}
+.lf-quiz-wait__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.lf-quiz-wait__line {
+  margin: 20px 0 0;
+  color: var(--frame-muted);
+  font-size: 34px;
+}
+
 .lf-quiz__number {
   margin: 0 0 8px;
   color: var(--frame-family-quiz);
   font-size: 20px;
   font-weight: 700;
-}
-.lf-quiz__options {
-  margin: 16px 0 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.lf-quiz__options li {
-  display: flex;
-  align-items: center;
-  gap: 14px;
 }
 .lf-quiz__letter {
   display: inline-grid;
@@ -411,10 +432,7 @@
 }
 
 /* Blank surface: squared from edge to edge */
-.lf--flaeche > .lf-zone,
 .lf.lf--flaeche {
-  border: 0;
-  border-radius: 0;
   background-color: var(--frame-zone-bg);
   background-image:
     linear-gradient(var(--frame-grid) 1px, transparent 1px),
@@ -422,18 +440,56 @@
   background-size: 28px 28px;
   background-position: -1px -1px;
 }
-.lf--flaeche > .lf-zone {
-  position: absolute;
-  inset: 0;
-}
 .lf__blank-label {
   top: 22px;
   left: 32px;
+}
+/* A task taken from the worksheet: the prompt on top of the surface */
+.lf-blanktask {
+  position: absolute;
+  z-index: 1;
+  inset: 22px 32px auto 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 40%;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 1px 6px rgb(29 24 48 / 0.15);
+  font-size: 26px;
+  overflow: hidden;
+}
+.lf-blanktask__label {
+  margin: 0;
+  color: var(--frame-family-standard);
+  font-size: 18px;
+  font-weight: 700;
+}
+.lf-blanktask__part {
+  display: flex;
+  gap: 12px;
+}
+.lf-blanktask__gap {
+  display: inline-block;
+  min-width: 4.5em;
+}
+.lf-blanktask__letter {
+  font-weight: 700;
+}
+.lf-blanktask__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
 }
 
 /* Ink: prepared content and handwriting stay clearly apart */
 .lf-ink {
   position: absolute;
+  z-index: 2; /* above a task card on a blank, below the input layer */
   inset: 0;
   width: 100%;
   height: 100%;
@@ -502,6 +558,7 @@
   position: fixed;
   inset: 0;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 44px 40px minmax(0, 1fr);
   gap: 8px 0;
   padding-bottom: 8px;
@@ -534,10 +591,16 @@
   min-width: 0;
 }
 .lt-head__name {
+  min-width: 0;
+  overflow: hidden;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 17px;
   white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lt-head__position {
+  flex: none;
 }
 .lt-head__position,
 .lt-head__clock-label,
@@ -547,27 +610,25 @@
   white-space: nowrap;
 }
 .lt-head__clock {
+  flex: none;
   display: flex;
   align-items: baseline;
   gap: 8px;
   padding: 0 8px;
 }
 .lt-head__time {
+  font-family: var(--font-mono);
   font-size: 17px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
 }
 .lt-head__deviation {
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
   color: var(--color-text-muted);
 }
 .lt-head__deviation--late {
   color: var(--color-status-warning);
-}
-.lt-head__deviation--early {
-  color: var(--color-status-success);
 }
 .lt-head__sep {
   flex: none;
@@ -582,7 +643,7 @@
   height: 34px;
   padding: 0 8px 0 12px;
   border: 1px solid var(--color-border-subtle);
-  border-radius: 17px;
+  border-radius: 6px;
   background: transparent;
   color: var(--color-text);
   font: 500 13px/1 var(--font-body);
@@ -626,7 +687,7 @@
 }
 .lt-pill__open {
   height: 26px;
-  border-radius: 13px;
+  border-radius: 6px;
 }
 .lt-btn--quiet {
   border: 1px solid var(--color-border-subtle);
@@ -709,6 +770,49 @@
   cursor: default;
 }
 
+.lt-menu__group {
+  margin: 6px 0 2px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.lt-menu__item--end {
+  margin-top: 4px;
+  border-top: 1px solid var(--color-border-subtle);
+  border-radius: 0 0 6px 6px;
+  color: var(--color-status-danger, var(--color-text));
+}
+.lt-menu [aria-checked="true"] {
+  font-weight: 700;
+  background: var(--color-bg-hover);
+}
+.lt-detour {
+  flex: none;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--color-status-warning);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--color-status-warning) 14%, transparent);
+  color: var(--color-text);
+  font: 600 13px/1 var(--font-body);
+  cursor: pointer;
+}
+.lt-pill__icon {
+  width: 15px;
+  height: 15px;
+}
+.lt-pill__code {
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+}
+.lt-pill[aria-pressed="true"] {
+  border-color: var(--color-action-primary-bg);
+  background: var(--color-bg-subtle);
+}
+
 /* Notes strip: one line above the stage, opens down over it */
 .lt-notes {
   position: relative;
@@ -766,6 +870,20 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.lt-notes__controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  min-width: 0;
+}
+/* On a narrow window the next slide shows as an arrow alone; the controls never overflow. */
+@media (max-width: 1100px) {
+  .lt-notes__next-label,
+  .lt-notes__next-title {
+    display: none;
+  }
+}
 .lt-notes__sent {
   display: inline-flex;
   align-items: center;
@@ -817,16 +935,29 @@
 }
 .lt-notes__body {
   position: absolute;
-  top: 40px;
-  left: 0;
-  right: 0;
-  max-height: 60vh;
+  top: 44px;
+  left: 72px;
+  right: 132px;
+  max-height: min(50vh, 460px);
   overflow-y: auto;
   padding: 4px 16px 18px 34px;
   border-top: 1px solid var(--color-border-subtle);
   border-radius: 0 0 8px 8px;
   background: var(--color-bg-subtle);
   box-shadow: 0 14px 30px rgb(10 6 22 / 0.5);
+}
+.lt-quiz-preview {
+  margin: 12px 0 0;
+  padding-left: 1.4em;
+  font-size: 15px;
+}
+.lt-quiz-preview ol {
+  margin: 4px 0 10px;
+  color: var(--color-text-muted);
+}
+.lt-quiz-preview .is-correct {
+  color: var(--color-status-success);
+  font-weight: 700;
 }
 .lt-notes__text {
   max-width: 70ch;
@@ -939,6 +1070,10 @@
 }
 .lt-tool--action {
   border: 1px dashed var(--color-border-subtle);
+}
+.lt-tool:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 .lt-tool__laser {
   width: 10px;
@@ -1061,63 +1196,146 @@
   color: #ccc;
   font-family: var(--font-body);
 }
-.lt-monitoring {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-500);
-  width: 100%;
-  height: 100%;
-  padding: var(--space-700);
-  overflow: auto;
-}
-.lt-monitoring .card {
-  height: max-content;
-}
-.lt-monitoring h2 {
-  margin-top: 0;
-}
-.lt-monitoring h2 small {
-  font-size: 0.7rem;
-  font-weight: 400;
-}
-.lt-monitoring table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.lt-monitoring th,
-.lt-monitoring td {
-  padding: var(--space-200);
-  border-bottom: 1px solid var(--color-border-subtle);
-  text-align: left;
-}
-.lt-monitoring__bar,
-.lt-monitoring__ampel {
+/* Class overview: paper like the slides, sized for the 1280 × 720 stage */
+.lm {
+  box-sizing: border-box;
   display: flex;
-  width: 100%;
-  height: 0.7rem;
+  flex-direction: column;
+  gap: 24px;
+  width: 1280px;
+  height: 720px;
+  padding: 40px 48px;
+  background: var(--frame-paper);
+  color: var(--frame-ink);
+  font-family: var(--font-body);
+}
+.lm__head {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+}
+.lm__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.lm__demo {
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: #efe8f6;
+  color: #4b4263;
+  font-size: 16px;
+  font-weight: 700;
+}
+.lm__locked {
+  margin: 0;
+  max-width: 760px;
+  color: var(--frame-muted);
+  font-size: 28px;
+}
+.lm__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.lm__stat {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 28px;
+  border: 1.5px solid var(--frame-zone-border);
+  border-radius: 12px;
+  background: var(--frame-zone-bg);
+}
+.lm__stat strong {
+  font-size: 56px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.lm__stat span {
+  color: var(--frame-muted);
+  font-size: 22px;
+}
+.lm__panels {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 24px;
+}
+.lm__panel {
+  min-height: 0;
+  padding: 24px 28px;
+  border: 1.5px solid var(--frame-zone-border);
+  border-radius: 12px;
+  background: var(--frame-zone-bg);
   overflow: hidden;
-  border-radius: 999px;
-  background: var(--color-border-subtle);
 }
-.lt-monitoring__bar {
-  min-width: 4rem;
+.lm__heading {
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid var(--frame-family-standard);
+  font-size: 26px;
 }
-.lt-monitoring__bar span {
-  background: var(--color-status-success);
+.lm__sub {
+  margin: 18px 0 6px;
+  color: var(--frame-muted);
+  font-size: 20px;
 }
-.lt-monitoring__ampel {
-  height: 1.3rem;
+.lm__note,
+.lm__empty {
+  margin: 0 0 12px;
+  color: var(--frame-muted);
+  font-size: 22px;
 }
-.lt-monitoring__green {
+.lm__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lm__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+  font-size: 22px;
+}
+.lm__label {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.lm__bar,
+.lm__ampel {
+  display: flex;
+  height: 16px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--frame-quiz-track);
+}
+.lm__bar span {
+  background: var(--frame-family-arbeit);
+}
+.lm__ampel {
+  height: 28px;
+}
+.lm__count {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.lm__green {
   background: #529c72;
 }
-.lt-monitoring__yellow {
+.lm__yellow {
   background: #d9ad55;
 }
-.lt-monitoring__red {
+.lm__red {
   background: #c96969;
 }
-.lt-monitoring__open {
+.lm__open {
   background: repeating-linear-gradient(
     45deg,
     transparent,
@@ -1125,22 +1343,6 @@
     #8885 4px,
     #8885 8px
   );
-}
-.lt-monitoring__cause {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(3rem, 1fr) 2rem;
-  align-items: center;
-  gap: var(--space-200);
-  margin-block: var(--space-200);
-}
-.lt-monitoring__cause meter {
-  width: 100%;
-}
-@media (max-width: 767px) {
-  .lt-monitoring {
-    grid-template-columns: 1fr;
-    padding: var(--space-300);
-  }
 }
 .lf-live__teacher-answer {
   margin-left: auto;
@@ -1194,19 +1396,141 @@
   font-size: calc(36px * var(--lf-scale));
   line-height: 1.15;
 }
-.lf__center--stack {
-  flex-direction: column;
-  gap: 24px;
-}
 .lf-summary {
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   padding-right: 12px;
 }
-.lf-merkkarte__example {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1.5px solid #e6dcf1;
-  font-size: 30px;
+/* On the slide the Inhalt is never wider than two cards, whatever the text size */
+.lf-summary .merkkarten-gruppe {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.lf-summary .merkkarte {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.lf-summary img,
+.lf-summary table,
+.lf-summary pre {
+  max-width: 100%;
+}
+
+/* The worksheet as the class sees it, in a frame on stage and projector */
+/* The page lays out at 960 × 540 and is enlarged by a third, so it reads from the back of the room */
+.lf-sheetframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 960px;
+  height: 540px;
+  transform: scale(1.3333);
+  transform-origin: 0 0;
+  border: 0;
+  background: var(--frame-paper);
+}
+
+.lt-notes__sub {
+  margin: 14px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+/* Slide, worksheet or class: what the projector shows, and one view for the teacher alone */
+.lt-seg {
+  display: inline-flex;
+  flex: none;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.lt-seg__item {
+  height: 30px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  font: 500 13px/1 var(--font-body);
+  cursor: pointer;
+}
+.lt-seg__item + .lt-seg__item {
+  border-left: 1px solid var(--color-border-subtle);
+}
+.lt-seg__item[aria-pressed="true"] {
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg, #fff);
+}
+
+/* The header gives up its words before it lets the clock and buttons collide */
+@media (max-width: 1000px) {
+  .lt-head__clock-label,
+  .lt-head__position {
+    display: none;
+  }
+}
+
+/* Invitation as a slide: the address students type is the code, so it is the
+   one thing set large, below the QR code */
+.lj__body {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  height: 100%;
+  padding: 56px 48px 36px;
+  text-align: center;
+}
+.lj__body p {
+  margin: 0;
+}
+.lj__qr {
+  flex: none;
+  width: 380px;
+  height: 380px;
+  border: 1.5px solid var(--frame-grid);
+  border-radius: 10px;
+}
+.lj__address {
+  max-width: 100%;
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 700;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.lj__count {
+  font-size: 28px;
+  color: var(--frame-muted);
+}
+
+/* No unit runs in this browser */
+.lt--none {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+}
+.lt--none h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+.lt--none p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+.lt-none__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.lt-none__back {
+  color: var(--color-text);
 }

@@ -1,4 +1,4 @@
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Link, useFetcher } from "react-router";
 import { useSite } from "./SiteContext";
 import { Settings } from "lucide-react";
@@ -6,7 +6,6 @@ import {
   Alert,
   Badge,
   Button,
-  Dialog,
   Switch,
   buttonClassName,
 } from "@chromatis/base/ui";
@@ -19,9 +18,9 @@ import {
 } from "../../courses";
 import { ChapterHeading } from "./ChapterHeading";
 import { ResourceSection } from "./ResourceSection";
-import { ClassroomStart } from "./ClassroomStart";
-import { targetStore } from "../infrastructure/targetStore";
+import { ChapterQuizzes } from "./ChapterQuizzes";
 import { localReleases } from "../infrastructure/localReleases";
+import { useSentTarget, useSheetAccess } from "../application/useSheetAccess";
 import {
   chapterStore,
   isUnlocked,
@@ -56,12 +55,8 @@ function SheetRow({
   const [open, setOpen] = useState(false);
   const [confirmLock, setConfirmLock] = useState(false);
   const releaseFetcher = useFetcher();
-  const target = targetStore(courseId);
-  const active = useSyncExternalStore(
-    target.subscribe,
-    target.getSnapshot,
-    target.getServerSnapshot,
-  );
+  const { active, send } = useSentTarget(courseId);
+  const setUnlocked = useSheetAccess(courseId, chapterId);
   const targetHere = active?.kind === "sheet" && active.id === sheet.id;
   const unlocked = isUnlocked(data, sheet, state);
   const solutions = sheet.sections
@@ -90,7 +85,7 @@ function SheetRow({
       </div>
       <div className="teacher-controls-access-actions">
         {!unlocked && (
-          <Button size="sm" onClick={() => store.setUnlocked(sheet.id, true)}>
+          <Button size="sm" onClick={() => setUnlocked(sheet.id, true)}>
             {TEXT.teacher.unlock}
           </Button>
         )}
@@ -113,7 +108,7 @@ function SheetRow({
               if (!event.target.checked && targetHere) {
                 setConfirmLock(true);
               } else {
-                store.setUnlocked(sheet.id, event.target.checked);
+                setUnlocked(sheet.id, event.target.checked);
               }
             }}
           />
@@ -132,8 +127,8 @@ function SheetRow({
                   role="destructive"
                   size="sm"
                   onClick={() => {
-                    store.setUnlocked(sheet.id, false);
-                    target.set(null);
+                    setUnlocked(sheet.id, false);
+                    send(null);
                     setConfirmLock(false);
                   }}
                 >
@@ -300,73 +295,14 @@ function InhaltRow({
   );
 }
 
-/** Starting a presentation of the chapter: the ones the overview lists. */
-function StartPresentation({
-  course,
-  chapterId,
-}: {
+export type UnterrichtProps = {
   course: Course;
-  chapterId: string;
-}) {
-  const { catalog } = useSite();
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState("");
-  const presentations = catalog.presentations.filter((item) => {
-    const set = catalog.foliensaetze.find(
-      (candidate) => candidate.id === item.rootFoliensatzId,
-    );
-    return item.chapterId === chapterId && !!set?.inOverview;
-  });
-  const chosen =
-    presentations.find((item) => item.id === selected) ?? presentations[0];
-  if (!presentations.length) {
-    return <Alert status="info">{TEXT.teacher.noPresentation}</Alert>;
-  }
-  return (
-    <>
-      <Button size="lg" onClick={() => setOpen(true)}>
-        {TEXT.teacher.startLesson}
-      </Button>
-      <Dialog
-        open={open}
-        onOpenChange={setOpen}
-        closeLabel={TEXT.teacher.close}
-        title={TEXT.teacher.startLesson}
-      >
-        <div className="teacher-controls-start-options">
-          {presentations.map((item) => (
-            <label key={item.id}>
-              <input
-                type="radio"
-                name="presentation"
-                value={item.id}
-                checked={chosen?.id === item.id}
-                onChange={() => setSelected(item.id)}
-              />
-              {item.title}
-            </label>
-          ))}
-        </div>
-        <div className="teacher-controls-actions">
-          <Button role="secondary" onClick={() => setOpen(false)}>
-            {TEXT.teacher.cancel}
-          </Button>
-          {chosen && (
-            <Link
-              className={buttonClassName({})}
-              to={`${chapterPathById(course, chapterId)}/lesson?presentation=${encodeURIComponent(chosen.id)}`}
-            >
-              {TEXT.teacher.startLesson}
-            </Link>
-          )}
-        </div>
-      </Dialog>
-    </>
-  );
-}
+  /** Starting or resuming the unit; supplied by the lessons module, which this one does not import. */
+  start: ReactNode;
+};
 
-/** The class's current chapter: starting a presentation, releasing the Inhalt and the sheets. */
-export function Unterricht({ course }: { course: Course }) {
+/** The class's current chapter: starting a unit, releasing the Inhalt and the sheets. */
+export function Unterricht({ course, start }: UnterrichtProps) {
   const site = useSite();
   const current = chaptersInOrder(course).find((chapter) => chapter.current);
   const data = useMemo(
@@ -395,16 +331,20 @@ export function Unterricht({ course }: { course: Course }) {
           </Link>
         </div>
       </div>
-      {site.classroomEnabled && <ClassroomStart courseId={course.id} />}
       <ResourceSection
         id="overview-teaching"
         title={TEXT.teacher.teachingTitle}
       >
-        <StartPresentation course={course} chapterId={current.id} />
+        {start}
       </ResourceSection>
       <ResourceSection id="overview-summary" title={TEXT.teacher.summaryTitle}>
         <InhaltRow course={course} chapterId={current.id} />
       </ResourceSection>
+      {site.classroomEnabled && (
+        <ResourceSection id="overview-quizzes" title={TEXT.quizzes.title}>
+          <ChapterQuizzes courseId={course.id} chapterId={current.id} />
+        </ResourceSection>
+      )}
       <ResourceSection id="overview-sheets" title={TEXT.teacher.worksheets}>
         {data?.sheets.length ? (
           <ul className="teacher-controls-access-list">

@@ -45,4 +45,4 @@ print("Code in einer Spalte")
 
 ---
 
-::schreiben Notizen
+::platz

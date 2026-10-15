@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSite, useTeacherQuiz } from "../../classroom";
 import type { useLessonSession } from "../application/useLessonSession";
 import type { Deck } from "../domain/deck";
-import type { LessonSession } from "../domain/lesson";
+import type { DeckState } from "../domain/lesson";
 import type { QuizActionsProps } from "./QuizActions";
 
 /**
@@ -13,7 +13,7 @@ import type { QuizActionsProps } from "./QuizActions";
 export function useFrameQuiz(
   courseId: string,
   deck: Deck,
-  session: LessonSession | null,
+  session: DeckState | null,
   dispatch: ReturnType<typeof useLessonSession>["dispatch"],
 ) {
   const { classroomEnabled } = useSite();

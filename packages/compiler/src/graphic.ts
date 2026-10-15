@@ -40,6 +40,8 @@ export function functionRow(
   const expression = m?.[1]?.trim();
   if (!expression)
     return { problem: `Expected a function like y = x^2, got "${source}"` };
+  if (/\bdot(?:\.op)?\b/.test(expression))
+    return { problem: `Use * for multiplication instead of dot: "${source}"` };
   try {
     const row = typstToRow(expression);
     if (!row.length) return { problem: `Empty function: "${source}"` };

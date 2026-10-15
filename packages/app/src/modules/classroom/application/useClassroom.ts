@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import type { ServerMessage, Snapshot, WireIntent } from "../domain/protocol";
 
 /** The resource route: snapshots over HTTP and the commands that need the server. */
@@ -24,7 +31,46 @@ export async function postClassroom(body: unknown): Promise<boolean> {
   }
 }
 
+/** Starts a session for the teacher's unit; the join code, or null if it failed. */
+export async function createClassroom(
+  courseId: string,
+): Promise<string | null> {
+  try {
+    const response = await fetch(CLASSROOM_PATH, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ intent: "create", courseId }),
+    });
+    if (!response.ok) {
+      return null;
+    }
+    const body = (await response.json()) as { code?: unknown };
+    return typeof body.code === "string" ? body.code : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The browser's session as the server sees it: null if there is none, undefined if unreachable. */
+export async function readClassroom(): Promise<Snapshot | null | undefined> {
+  try {
+    const response = await fetch(CLASSROOM_PATH, { cache: "no-store" });
+    const body = (await response.json()) as { snapshot: Snapshot | null };
+    return body.snapshot;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Ends the browser's session for everybody and drops its cookie. */
+export async function endClassroom(): Promise<void> {
+  await postClassroom({ intent: "act", payload: { type: "end" } });
+  await postClassroom({ intent: "leave" });
+}
+
 export type ClassroomConnection = {
+  /** Whether this connection follows a session at all. */
+  enabled: boolean;
   /** `undefined` until the first answer, `null` when there is no session. */
   snapshot: Snapshot | null | undefined;
   /** Sends over the socket, or over HTTP while there is none. */
@@ -140,5 +186,18 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
     return sent;
   }, []);
 
-  return { snapshot: enabled ? snapshot : undefined, send };
+  return { enabled, snapshot: enabled ? snapshot : undefined, send };
+}
+
+/** One connection that all hooks below it share, so a page opens a single socket. */
+export const SharedClassroomContext = createContext<ClassroomConnection | null>(
+  null,
+);
+
+/** The shared connection when a provider offers an active one, otherwise a connection of its own. */
+export function useSharedClassroom(enabled: boolean): ClassroomConnection {
+  const shared = useContext(SharedClassroomContext);
+  const sharing = shared?.enabled === true;
+  const own = useClassroom(enabled && !sharing);
+  return sharing && shared ? shared : own;
 }

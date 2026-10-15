@@ -2,18 +2,19 @@
  * Prepares Typst math for kern-typ, which renders MathML but differs from
  * Typst in a few places:
  *
+ * - A comma between digits (`0,5`) is the German decimal comma and becomes a
+ *   decimal point. Inside function calls, vectors and sets (`f(1,2)`,
+ *   `{1,5}`) it still separates.
  * - `a/b` must bind like Typst: the operands are single atoms (number,
  *   identifier, call, group, each with attached `^`, `_` and primes), and
  *   parentheses around an operand disappear. kern-typ would read
  *   `1/2500 x^4` as `1/(2500 x^4)` and keep the parentheses in `(a+b)/c`.
  * - A bare colon is rejected; the ratio sign looks the same.
- * - `dot` is the multiplication dot in Typst; kern-typ needs `dot.op`.
  * - `*` is typed for multiplication; it is shown as the same dot.
  */
 export function prepareTypstMath(source: string): string {
-  return rewrite(source)
+  return rewrite(decimalCommas(source))
     .replace(/:/g, "∶")
-    .replace(/\bdot\b(?!\.)/g, "dot.op")
     .replace(
       /("[^"]*")|\s*\*\s*/g,
       (whole, text?: string) => text ?? " dot.op ",
@@ -21,6 +22,97 @@ export function prepareTypstMath(source: string): string {
 }
 
 const OPEN: Record<string, string> = { "(": ")", "[": "]", "{": "}" };
+
+/** `0,5` → `0.5`, except where a comma separates arguments or elements. */
+export function decimalCommas(source: string): string {
+  if (!source.includes(",")) {
+    return source;
+  }
+  // true: a bracket whose commas separate (call arguments, vectors, sets).
+  const separating: boolean[] = [];
+  let out = "";
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index] ?? "";
+    if (char === '"') {
+      const close = source.indexOf('"', index + 1);
+      const end = close < 0 ? source.length : close + 1;
+      out += source.slice(index, end);
+      index = end - 1;
+      continue;
+    }
+    if (OPEN[char]) {
+      const call = /[\p{L}']/u.test(source[index - 1] ?? "");
+      separating.push(char !== "(" || call);
+    } else if (char === ")" || char === "]" || char === "}") {
+      separating.pop();
+    } else if (
+      char === "," &&
+      !separating.at(-1) &&
+      /(?<![\d,.])\d+$/.test(out) &&
+      /^\d+(?!\d|,\d)/.test(source.slice(index + 1))
+    ) {
+      out += ".";
+      continue;
+    }
+    out += char;
+  }
+  return out;
+}
+
+/**
+ * Splits a transformation `5x = 2x + 6 | -2x` into the equation and what is
+ * done to both sides. An odd number of bars means the last one separates:
+ * `|x + 3| = 5 | -5` has three, `|x + 3| = 5` has two and stays whole.
+ */
+export function splitOperation(
+  source: string,
+): { equation: string; operation: string } | null {
+  let last = -1;
+  let count = 0;
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index];
+    if (char === '"') {
+      const close = source.indexOf('"', index + 1);
+      index = close < 0 ? source.length : close;
+    } else if (char === "|" && !source.startsWith("|->", index)) {
+      last = index;
+      count++;
+    }
+  }
+  if (count % 2 === 0) {
+    return null;
+  }
+  const equation = source.slice(0, last).trim();
+  const operation = source.slice(last + 1).trim();
+  // A bar inside brackets belongs to the formula: `P(2 | 5)`, `{x | x > 2}`.
+  return equation && operation && balanced(equation) && balanced(operation)
+    ? { equation, operation }
+    : null;
+}
+
+function balanced(source: string): boolean {
+  const stack: string[] = [];
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index] ?? "";
+    if (char === '"') {
+      const close = source.indexOf('"', index + 1);
+      index = close < 0 ? source.length : close;
+    } else if (OPEN[char]) {
+      stack.push(OPEN[char]);
+    } else if (")]}".includes(char) && stack.pop() !== char) {
+      return false;
+    }
+  }
+  return stack.length === 0;
+}
+
+/** kern-typ prints decimal points; German text uses the comma: 7.5 → 7,5. */
+export function germanDecimals(mathml: string): string {
+  return mathml.replace(
+    /<mn>([^<]+)<\/mn>/g,
+    (_, value: string) => `<mn>${value.replace(/(\d)\.(\d)/g, "$1,$2")}</mn>`,
+  );
+}
 
 type Unit = { text: string; atom: boolean; group?: string };
 

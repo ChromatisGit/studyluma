@@ -80,11 +80,7 @@ export function Overview({
                   onClick={() => onGo(id)}
                 >
                   <FrameThumb width={243}>
-                    <FrameView
-                      entry={entry}
-                      deckTitle={deck.title}
-                      sent={sent.includes(id)}
-                    >
+                    <FrameView entry={entry} sent={sent.includes(id)}>
                       <InkStrokes
                         strokes={ink.filter((stroke) => stroke.frameId === id)}
                       />

@@ -14,6 +14,7 @@ export function sheetsData(
     number: string;
     viewer: SheetsData["viewer"];
     releasedSolutions: string[];
+    sessionSheets: SheetsData["sessionSheets"];
     /** Where a chapter's Inhalt can be read, for Merkkarte links. */
     describeChapter: (chapterId: string) => { origin: string; href: string };
   },
@@ -41,6 +42,7 @@ export function sheetsData(
       catalog.challengePools.find((p) => p.id === chapter.challengePoolId)
         ?.challenges ?? [],
     releasedSolutions: context.releasedSolutions,
+    sessionSheets: context.sessionSheets,
     cards,
   };
 }

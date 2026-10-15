@@ -3,37 +3,68 @@ import type { Deck, Slide } from "./deck";
 /** A school period, in minutes after midnight. */
 export type Period = { number: number; start: number; end: number };
 
+/** Where lesson time counts from, fixed when the lesson starts. */
+export type ClockStart = {
+  /** Epoch ms of the start of the period, or of the lesson ("ab jetzt"). */
+  startsAt: number;
+  /** The period it counts from; null: from the moment the lesson started. */
+  periodNumber: number | null;
+};
+
+const minutesOf = (date: Date) =>
+  date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
+
 /**
- * Lesson time counts from the start of the period, not from opening the
- * presentation. During a break it refers to the next period (negative
- * until it starts). Outside the timetable it counts from `openedAt`.
+ * The period a lesson started at `now` belongs to: the start nearest in
+ * time, switching exactly midway between two starts (the break included).
+ * Before the first period it is the first one; after the last one has
+ * ended, or without a timetable, there is none.
  */
-export function lessonStart(
-  now: Date,
+export function nearestPeriod(now: Date, periods: Period[]): Period | null {
+  const first = periods[0];
+  const last = periods.at(-1);
+  if (!first || !last) {
+    return null;
+  }
+  const minutes = minutesOf(now);
+  if (minutes < first.start) {
+    return first;
+  }
+  if (minutes >= last.end) {
+    return null;
+  }
+  const started = periods.filter((period) => period.start <= minutes);
+  const current = started.at(-1) ?? first;
+  const next = periods[started.length];
+  return next && minutes >= (current.start + next.start) / 2 ? next : current;
+}
+
+/** The clock start for a period, or for "ab jetzt" (`null`) from `now`. */
+export function clockStartFor(now: Date, period: Period | null): ClockStart {
+  if (!period) {
+    return { startsAt: now.getTime(), periodNumber: null };
+  }
+  const start = new Date(now);
+  start.setHours(Math.floor(period.start / 60), period.start % 60, 0, 0);
+  return { startsAt: start.getTime(), periodNumber: period.number };
+}
+
+/** The clock start of a lesson that begins now; chosen once, not recomputed. */
+export function lessonStart(now: Date, periods: Period[]): ClockStart {
+  return clockStartFor(now, nearestPeriod(now, periods));
+}
+
+/** What the teacher may correct to: the period before, the chosen one, "ab jetzt". */
+export function startChoices(
   periods: Period[],
-  openedAt: Date,
-): { start: Date; period: Period | null } {
-  const minutes =
-    now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
-  const at = (minute: number) => {
-    const date = new Date(now);
-    date.setHours(Math.floor(minute / 60), minute % 60, 0, 0);
-    return date;
-  };
-  const current = periods.find(
-    (period) => minutes >= period.start && minutes < period.end,
-  );
-  if (current) {
-    return { start: at(current.start), period: current };
-  }
-  const next = periods.find((period) => period.start > minutes);
-  const previous = [...periods]
-    .reverse()
-    .find((period) => period.end <= minutes);
-  if (next && previous) {
-    return { start: at(next.start), period: next };
-  }
-  return { start: openedAt, period: null };
+  chosen: number | null,
+): (Period | null)[] {
+  const index = periods.findIndex((period) => period.number === chosen);
+  const around =
+    index < 0
+      ? periods.slice(-2)
+      : periods.slice(Math.max(0, index - 1), index + 1);
+  return [...around, null];
 }
 
 /** The planned end of a frame; frames without `::bis` keep the previous plan. */
@@ -70,6 +101,19 @@ export function deviation(
     enteredAt - plannedStart(deck, frame),
     now - plannedEnd(deck, frame.id),
   );
+}
+
+/**
+ * Time left until the planned end of a frame, negative once it is over; null
+ * where the deck has no plan up to this frame.
+ */
+export function remaining(
+  deck: Deck,
+  frameId: string,
+  now: number,
+): number | null {
+  const end = plannedEnd(deck, frameId);
+  return end > 0 ? end - now : null;
 }
 
 /** "10:20", "−1:40" */

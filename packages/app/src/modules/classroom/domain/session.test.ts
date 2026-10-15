@@ -15,6 +15,14 @@ import {
   type Intent,
   type Outcome,
 } from "./session";
+import {
+  controllerSeen,
+  isAbandoned,
+  setControllerPresent,
+  teacherAwayFor,
+  TEACHER_AWAY_END_MS,
+  TEACHER_AWAY_NOTICE_MS,
+} from "./presence";
 import type { QuizQuestion } from "./quiz";
 
 const limits = { maxParticipants: 120, maxNameLength: 40 };
@@ -30,12 +38,17 @@ const question: QuizQuestion = {
   ],
 };
 
-function fresh(): ClassroomSession {
+function started(): ClassroomSession {
   return createSession(
     { code: "ABCD", buildId: "b", courseId: null, title: "T" },
     1000,
     5000,
   );
+}
+
+/** A session the teacher has invited students to. */
+function fresh(): ClassroomSession {
+  return { ...started(), inviteOpen: true };
 }
 
 function ok(outcome: Outcome): ClassroomSession {
@@ -176,9 +189,46 @@ describe("released content", () => {
     release({ type: "release.rule", chapterId: "c1", rule: "abschluss" });
     expect(session.releases).toEqual({
       summaries: ["c1"],
+      sheets: {},
       solutions: ["t2"],
       rules: { c1: "abschluss" },
     });
+  });
+
+  test("a sheet keeps the teacher's last decision, locking included", () => {
+    let session = fresh();
+    const release = (intent: Intent) =>
+      (session = ok(applyIntent(session, controller, intent, ids)));
+    release({ type: "release.sheet", sheetId: "s1", released: true });
+    release({ type: "release.sheet", sheetId: "s2", released: true });
+    release({ type: "release.sheet", sheetId: "s1", released: false });
+    expect(session.releases.sheets).toEqual({ s1: false, s2: true });
+  });
+
+  test("the sent sheet is set and withdrawn by the controller only", () => {
+    const target = { kind: "sheet", id: "s1", chapterId: "c1" } as const;
+    const sent = ok(
+      applyIntent(fresh(), controller, { type: "target", target }, ids),
+    );
+    expect(sent.target).toEqual(target);
+    expect(
+      ok(applyIntent(sent, controller, { type: "target", target: null }, ids))
+        .target,
+    ).toBeNull();
+    const student = joined(fresh(), "p1");
+    for (const intent of [
+      { type: "target", target },
+      { type: "release.sheet", sheetId: "s1", released: true },
+    ] as const) {
+      expect(
+        applyIntent(
+          student,
+          { role: "participant", participantId: "p1" },
+          intent,
+          ids,
+        ),
+      ).toEqual({ ok: false, reason: "forbidden" });
+    }
   });
 });
 
@@ -231,5 +281,88 @@ describe("expiry", () => {
     const session = fresh();
     expect(isExpired(session, 5999)).toBe(false);
     expect(isExpired(session, 6000)).toBe(true);
+  });
+});
+
+describe("inviting", () => {
+  test("until the teacher invites, the code finds nobody", () => {
+    expect(
+      addParticipant(started(), { id: "p", name: "P" }, 2000, limits),
+    ).toEqual({ ok: false, reason: "not-found" });
+  });
+
+  test("inviting opens the session for students, once or twice", () => {
+    const invited = ok(
+      applyIntent(started(), controller, { type: "invite" }, ids),
+    );
+    expect(invited.inviteOpen).toBe(true);
+    expect(ok(applyIntent(invited, controller, { type: "invite" }, ids))).toBe(
+      invited,
+    );
+    expect(joined(invited, "p").participants).toHaveLength(1);
+  });
+
+  test("a participant cannot invite", () => {
+    expect(
+      applyIntent(
+        joined(fresh(), "p"),
+        { role: "participant", participantId: "p" },
+        { type: "invite" },
+        ids,
+      ),
+    ).toEqual({ ok: false, reason: "forbidden" });
+  });
+});
+
+describe("teacher presence", () => {
+  // A session whose teacher is connected.
+  const connected = (): ClassroomSession => ({
+    ...fresh(),
+    controllerAbsentSince: null,
+  });
+
+  test("the teacher counts as away from the moment the last connection closes", () => {
+    const away = setControllerPresent(connected(), false, 10_000);
+    expect(teacherAwayFor(away, 10_000)).toBe(0);
+    expect(teacherAwayFor(away, 70_000)).toBe(60_000);
+    expect(setControllerPresent(away, false, 50_000)).toBe(away);
+  });
+
+  test("a returning teacher is present again", () => {
+    const back = setControllerPresent(
+      setControllerPresent(connected(), false, 10_000),
+      true,
+      20_000,
+    );
+    expect(teacherAwayFor(back, 99_999)).toBeNull();
+    expect(isAbandoned(back, 99_999_999)).toBe(false);
+  });
+
+  test("the unit ends only after the long absence", () => {
+    const away = setControllerPresent(connected(), false, 0);
+    expect(TEACHER_AWAY_NOTICE_MS).toBeLessThan(TEACHER_AWAY_END_MS);
+    expect(isAbandoned(away, TEACHER_AWAY_NOTICE_MS)).toBe(false);
+    expect(isAbandoned(away, TEACHER_AWAY_END_MS - 1)).toBe(false);
+    expect(isAbandoned(away, TEACHER_AWAY_END_MS)).toBe(true);
+  });
+
+  test("a unit whose teacher never left is never abandoned", () => {
+    expect(isAbandoned(connected(), Number.MAX_SAFE_INTEGER)).toBe(false);
+  });
+});
+
+describe("a new session", () => {
+  test("counts its teacher as away from the start", () => {
+    const session = started();
+    expect(teacherAwayFor(session, 1000 + TEACHER_AWAY_END_MS)).toBe(
+      TEACHER_AWAY_END_MS,
+    );
+    expect(isAbandoned(session, 1000 + TEACHER_AWAY_END_MS)).toBe(true);
+  });
+
+  test("a teacher seen over HTTP is not away for long", () => {
+    const seen = controllerSeen(started(), 500_000);
+    expect(teacherAwayFor(seen, 500_000)).toBe(0);
+    expect(isAbandoned(seen, 500_000 + TEACHER_AWAY_END_MS - 1)).toBe(false);
   });
 });

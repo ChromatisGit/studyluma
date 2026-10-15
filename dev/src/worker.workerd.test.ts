@@ -58,16 +58,23 @@ test("framework-generated Worker boots with the Classroom Durable Object", async
     });
     expect(created.status).toBe(200);
     const code = ((await created.json()) as { code: string }).code;
+    const cookie = (created as unknown as Response).headers
+      .get("set-cookie")
+      ?.match(/studyluma-classroom=[^;]+/)?.[0];
+    expect(cookie).toBeDefined();
+    // Students find the session only once the teacher has invited them.
+    const invited = await worker.dispatchFetch("http://worker/classroom", {
+      method: "POST",
+      headers: { "content-type": "application/json", cookie: cookie ?? "" },
+      body: JSON.stringify({ intent: "act", payload: { type: "invite" } }),
+    });
+    expect(invited.status).toBe(204);
     const joined = await worker.dispatchFetch("http://worker/classroom", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ intent: "join", code, name: "Second client" }),
     });
     expect(joined.status).toBe(200);
-    const cookie = (created as unknown as Response).headers
-      .get("set-cookie")
-      ?.match(/studyluma-classroom=[^;]+/)?.[0];
-    expect(cookie).toBeDefined();
     const upgraded = await worker.dispatchFetch("http://worker/classroom/ws", {
       headers: { upgrade: "websocket", cookie: cookie ?? "" },
     });

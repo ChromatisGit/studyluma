@@ -10,8 +10,12 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 import {
+  classroom,
+  classroomEnabled,
+  clearClassroomCookie,
   clearTeacherCookie,
   clientKey,
+  readClassroomAuth,
   createFailureLimiter,
   passwordMatches,
   readViewer,
@@ -32,11 +36,28 @@ export async function loader({ request }: LoaderFunctionArgs) {
   };
 }
 
+/** Signing out ends the unit this browser leads; students are disconnected. */
+async function endUnitOf(request: Request) {
+  const auth = classroomEnabled() ? readClassroomAuth(request) : null;
+  if (!auth) {
+    return;
+  }
+  try {
+    await classroom().act(auth, { type: "end" });
+  } catch {
+    // Already ended, expired, or the cookie belongs to a student: nothing to end.
+  }
+}
+
 export async function action({ request }: ActionFunctionArgs) {
   const form = await request.formData();
   if (form.get("intent") === "logout") {
+    await endUnitOf(request);
     return redirect("/login", {
-      headers: { "Set-Cookie": clearTeacherCookie(request) },
+      headers: [
+        ["Set-Cookie", clearTeacherCookie(request)],
+        ["Set-Cookie", clearClassroomCookie(request)],
+      ],
     });
   }
   const password = teacherPassword();

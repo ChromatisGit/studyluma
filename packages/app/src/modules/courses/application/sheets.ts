@@ -9,6 +9,8 @@ export type SheetsSource = {
   courses: Course[];
   viewer: SheetsData["viewer"];
   releasedSolutions: string[];
+  /** The Classroom Session's unlocked sheets; null without one. */
+  sessionSheets: SheetsData["sessionSheets"];
 };
 
 /**
@@ -31,6 +33,7 @@ export function sheetsFor(
     number: entry.number,
     viewer: site.viewer,
     releasedSolutions: site.releasedSolutions,
+    sessionSheets: site.sessionSheets,
     describeChapter: (id) => {
       const other = chaptersInOrder(course).find(
         (chapter) => chapter.id === id,

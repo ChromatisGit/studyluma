@@ -8,6 +8,14 @@
  */
 
 import type { SummaryRule } from "../../catalog";
+import type { ClassroomEvent, Intent } from "./intents";
+import {
+  sheetFits,
+  withProgress,
+  withRating,
+  type AmpelMap,
+  type ProgressMap,
+} from "./monitoring";
 import {
   advanceRun,
   answerRun,
@@ -16,9 +24,7 @@ import {
   leaveRun,
   startRun,
   validQuestions,
-  type QuizQuestion,
   type QuizRun,
-  type QuizStep,
 } from "./quiz";
 
 /** What a session takes: how many participants, and how long a name may be. */
@@ -36,9 +42,14 @@ export type Participant = {
   joinedAt: number;
 };
 
+/** The worksheet the teacher sent to the class; students are led to it. */
+export type Target = { kind: "sheet"; id: string; chapterId: string };
+
 export type Releases = {
   /** Chapters whose Inhalt students may read. */
   summaries: string[];
+  /** The teacher's explicit decision per worksheet; absent: the default applies. */
+  sheets: Record<string, boolean>;
   /** Tasks whose solution students may read. */
   solutions: string[];
   /** How each chapter's Inhalt opens; default manual. */
@@ -55,10 +66,22 @@ export type ClassroomSession = {
   startedAt: number;
   expiresAt: number;
   status: "open" | "ended";
+  /** Students may join with the code; set when the teacher first invites. */
+  inviteOpen: boolean;
+  /**
+   * Since when no teacher connection exists (or when the teacher was last
+   * seen, for a teacher without a socket); null while a connection is open.
+   */
+  controllerAbsentSince: number | null;
   placement: Placement | null;
+  /** The sheet sent to the class, if any. */
+  target: Target | null;
   releases: Releases;
   participants: Participant[];
   quiz: QuizRun | null;
+  /** What each participant reported per worksheet; only totals leave. */
+  progress: ProgressMap;
+  ampel: AmpelMap;
 };
 
 export type SessionInit = {
@@ -78,66 +101,23 @@ export function createSession(
     startedAt: now,
     expiresAt: now + ttlMs,
     status: "open",
+    inviteOpen: false,
+    // Nobody has connected yet: the unit ends if the teacher never shows up.
+    controllerAbsentSince: now,
     placement: null,
-    releases: { summaries: [], solutions: [], rules: {} },
+    target: null,
+    releases: { summaries: [], sheets: {}, solutions: [], rules: {} },
     participants: [],
     quiz: null,
+    progress: {},
+    ampel: {},
   };
 }
 
 export type Actor =
   { role: "controller" } | { role: "participant"; participantId: string };
 
-export type QuizStart = {
-  courseId: string;
-  chapterId: string;
-  frameId: string;
-  title: string;
-  questions: QuizQuestion[];
-};
-
-/** Everything a client may ask for. */
-export type Intent =
-  | { type: "place"; placement: Placement | null }
-  | { type: "release.summary"; chapterId: string; released: boolean }
-  | { type: "release.rule"; chapterId: string; rule: SummaryRule }
-  | { type: "release.solutions"; taskIds: string[]; released: boolean }
-  | ({ type: "quiz.start" } & QuizStart)
-  | {
-      type: "quiz.advance";
-      runId: string;
-      index: number;
-      step: QuizStep;
-    }
-  | { type: "quiz.end"; runId: string }
-  | {
-      type: "quiz.answer";
-      runId: string;
-      index: number;
-      optionIds: string[];
-    }
-  | { type: "end" };
-
-export type ClassroomEvent =
-  | { kind: "participant-joined"; participantId: string; name: string }
-  | { kind: "participant-left"; participantId: string; name: string }
-  | { kind: "placement-changed"; placement: Placement | null }
-  | {
-      kind: "content-released";
-      what: "summary" | "solutions";
-      ids: string[];
-      released: boolean;
-    }
-  | { kind: "quiz-started"; runId: string }
-  | {
-      kind: "response-submitted";
-      runId: string;
-      answered: number;
-      participants: number;
-    }
-  | { kind: "quiz-revealed"; runId: string; index: number }
-  | { kind: "quiz-ended"; runId: string }
-  | { kind: "session-ended" };
+export type { ClassroomEvent, Intent, QuizStart } from "./intents";
 
 /** Why an intent was not applied. The runtime maps these to protocol errors. */
 export type Rejection =
@@ -187,6 +167,10 @@ export function addParticipant(
 ): Outcome {
   if (session.status === "ended") {
     return reject("ended");
+  }
+  // Until the teacher invites, the code finds nobody.
+  if (!session.inviteOpen) {
+    return reject("not-found");
   }
   if (session.participants.length >= limits.maxParticipants) {
     return reject("full");
@@ -242,13 +226,23 @@ export function setConnected(
   );
 }
 
-type ControllerIntent = Exclude<Intent, { type: "quiz.answer" }>;
+type ParticipantIntent = Extract<
+  Intent,
+  { type: "quiz.answer" | "progress" | "ampel" }
+>;
+type ControllerIntent = Exclude<Intent, ParticipantIntent>;
 
 function release(
   session: ClassroomSession,
   intent: Extract<
     ControllerIntent,
-    { type: "release.summary" | "release.rule" | "release.solutions" }
+    {
+      type:
+        | "release.sheet"
+        | "release.summary"
+        | "release.rule"
+        | "release.solutions";
+    }
   >,
 ): Outcome {
   const { releases } = session;
@@ -257,6 +251,20 @@ function release(
     releases: { ...releases, ...next },
   });
   switch (intent.type) {
+    case "release.sheet":
+      return accept(
+        change({
+          sheets: { ...releases.sheets, [intent.sheetId]: intent.released },
+        }),
+        [
+          {
+            kind: "content-released",
+            what: "sheet",
+            ids: [intent.sheetId],
+            released: intent.released,
+          },
+        ],
+      );
     case "release.summary":
       return accept(
         change({
@@ -377,10 +385,19 @@ function controllerIntent(
   newRunId: () => string,
 ): Outcome {
   switch (intent.type) {
+    case "invite":
+      return accept(
+        session.inviteOpen ? session : { ...session, inviteOpen: true },
+      );
     case "place":
       return accept({ ...session, placement: intent.placement }, [
         { kind: "placement-changed", placement: intent.placement },
       ]);
+    case "target":
+      return accept({ ...session, target: intent.target }, [
+        { kind: "target-changed", target: intent.target },
+      ]);
+    case "release.sheet":
     case "release.summary":
     case "release.rule":
     case "release.solutions":
@@ -396,7 +413,7 @@ function controllerIntent(
   }
 }
 
-function participantIntent(
+function answerQuiz(
   session: ClassroomSession,
   participantId: string,
   intent: Extract<Intent, { type: "quiz.answer" }>,
@@ -415,6 +432,54 @@ function participantIntent(
   ]);
 }
 
+/** A sheet the teacher locked takes no reports; one never decided on does. */
+function reportable(session: ClassroomSession, sheetId: string): boolean {
+  return (
+    session.releases.sheets[sheetId] !== false &&
+    sheetFits([session.progress, session.ampel], sheetId)
+  );
+}
+
+function reportProgress(
+  session: ClassroomSession,
+  participantId: string,
+  intent: Extract<Intent, { type: "progress" }>,
+): Outcome {
+  const progress = reportable(session, intent.sheetId)
+    ? withProgress(session.progress, participantId, intent)
+    : null;
+  return progress ? accept({ ...session, progress }) : reject("invalid");
+}
+
+function rateAmpel(
+  session: ClassroomSession,
+  participantId: string,
+  intent: Extract<Intent, { type: "ampel" }>,
+): Outcome {
+  const ampel = reportable(session, intent.sheetId)
+    ? withRating(session.ampel, participantId, intent)
+    : null;
+  return ampel ? accept({ ...session, ampel }) : reject("invalid");
+}
+
+function participantIntent(
+  session: ClassroomSession,
+  participantId: string,
+  intent: ParticipantIntent,
+): Outcome {
+  if (!session.participants.some((item) => item.id === participantId)) {
+    return reject("not-found");
+  }
+  switch (intent.type) {
+    case "quiz.answer":
+      return answerQuiz(session, participantId, intent);
+    case "progress":
+      return reportProgress(session, participantId, intent);
+    case "ampel":
+      return rateAmpel(session, participantId, intent);
+  }
+}
+
 /**
  * Applies a client's intent. Authorization is part of the domain: the
  * controller steers the lesson, a participant can only answer.
@@ -428,7 +493,11 @@ export function applyIntent(
   if (session.status === "ended") {
     return reject("ended");
   }
-  if (intent.type === "quiz.answer") {
+  if (
+    intent.type === "quiz.answer" ||
+    intent.type === "progress" ||
+    intent.type === "ampel"
+  ) {
     return actor.role === "participant"
       ? participantIntent(session, actor.participantId, intent)
       : reject("forbidden");

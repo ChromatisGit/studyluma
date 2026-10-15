@@ -1,10 +1,13 @@
 {
   "frame": {
     "blank": "Freie Fläche",
+    "slide": "Folie",
     "merkkarteHint": "Steht in deiner Zusammenfassung",
     "sheet": "Arbeitsblatt",
-    "sheetWaiting": "Gleich geht es auf deinem Gerät weiter.",
+    "sheetWaiting": "Das Blatt öffnet gleich auf deinem Gerät.",
     "sheetSent": "Das Blatt ist auf deinem Gerät geöffnet.",
+    "sheetMinutes": "{minutes} Minuten",
+    "taskOnBlank": "Aufgabe {number}",
     "question": "Frage {number}",
     "kinds": {
       "worksheet": "Arbeitsblatt",
@@ -19,7 +22,9 @@
     "position": "Folie {number} von {total}",
     "branch": "Freie Fläche {label}",
     "clock": "Unterricht",
-    "clockTitle": "Unterrichtszeit und Abweichung vom Plan",
+    "clockTitle": "Unterrichtszeit und Restzeit der Folie laut Plan",
+    "remaining": "noch {time}",
+    "over": "über {time}",
     "projector": "Projektor",
     "projectorShows": "zeigt {number}",
     "projectorHidden": "Ausgeblendet",
@@ -28,19 +33,26 @@
     "projectorShowAria": "Projektor wieder einblenden (B)",
     "noProjector": "Kein Projektor",
     "openProjector": "Öffnen",
+    "startPeriod": "{number}. Stunde · ab {time}",
+    "startNow": "ab jetzt · {time}",
+    "choosePeriod": "{number}. Stunde (ab {time})",
+    "chooseNow": "ab jetzt",
+    "detour": "Exkurs · zurück zu Folie {number}",
+    "invite": "Schüler einladen",
+    "inviteShow": "Einladung {code} auf dem Projektor zeigen",
+    "inviteHide": "Einladung {code} vom Projektor nehmen",
+    "joined": "{count} da",
     "overview": "Übersicht aller Folien (G)",
     "menu": "Weitere Einstellungen"
   },
   "menu": {
     "period": "{number}. Stunde, {start} bis {end} Uhr",
-    "noPeriod": "Außerhalb der Stundenzeiten, Zeit ab Öffnen",
-    "single": "Einzelstunde, 45 Minuten",
-    "double": "Als Doppelstunde planen (später)",
-    "openProjector": "Projektorfenster öffnen",
+    "noPeriod": "Die Unterrichtszeit zählt ab dem Start",
+    "switchDeck": "Foliensatz wechseln",
+    "clockStart": "Unterrichtszeit zählt ab",
     "closeProjector": "Projektorfenster schließen",
-    "end": "Unterricht beenden",
-    "endConfirm": "Unterricht beenden?",
-    "back": "Zum Kapitel"
+    "closeSlides": "Folien schließen (Unterricht läuft weiter)",
+    "end": "Unterricht beenden"
   },
   "notes": {
     "heading": "Notiz {number}",
@@ -78,20 +90,30 @@
     "violett": "Stift Violett",
     "signal": "Stift Signalfarbe",
     "eraser": "Radierer",
+    "clear": "Folie leeren (rückgängig machbar)",
     "undo": "Rückgängig",
     "undoBlank": "Rückgängig: freie Fläche entfernen",
     "blank": "Freie Fläche einfügen (N)"
+  },
+  "none": {
+    "title": "Es läuft kein Unterricht",
+    "description": "Dieser Unterricht ist beendet oder wurde in einem anderen Browser gestartet.",
+    "start": "Unterricht starten",
+    "back": "Zur Übersicht",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal."
+  },
+  "join": {
+    "title": "Mach mit",
+    "qrLabel": "QR-Code zum Beitreten",
+    "count": "{count} dabei"
   },
   "projector": {
     "title": "Projektor",
     "waiting": "Warte auf die Lehrkraft-Ansicht …"
   },
-  "start": {
-    "teacher": "Unterricht",
-    "open": "Folien öffnen",
-    "description": "{count} Folien"
-  },
   "quiz": {
+    "soon": "Das Quiz startet gleich.",
+    "prepared": "Fragen im Quiz",
     "correct": "Richtig",
     "position": "Frage {number} von {total}",
     "multiple": "Mehrere Antworten möglich",
@@ -110,8 +132,9 @@
     "progress": "Fortschritt",
     "demo": "Demodaten",
     "locked": "Das Blatt ist noch gesperrt. Sobald du es freischaltest, siehst du hier, wo die Klasse arbeitet.",
-    "registered": "angemeldet:",
-    "working": "arbeiten gerade an diesem Blatt",
+    "noSession": "Hier siehst du, wo die Klasse arbeitet, sobald Schüler beigetreten sind.",
+    "registered": "angemeldet",
+    "working": "arbeiten gerade am Blatt",
     "section": "Abschnitt",
     "share": "Anteil",
     "hereTitle": "Gerade in diesem Abschnitt",
@@ -121,8 +144,8 @@
     "done": "Fertig",
     "challenges": "Challenges",
     "ampel": "CfU-Ampel",
-    "anonymousDemo": "anonym · Demodaten",
     "rated": "haben bewertet",
+    "ratedOf": "{answered} von {total} haben bewertet",
     "green": "Grün",
     "yellow": "Gelb",
     "red": "Rot",
@@ -143,11 +166,34 @@
     "stopSending": "Nicht mehr schicken",
     "sendStudents": "Schüler senden",
     "unlockAndSend": "Freischalten & Schüler senden",
+    "view": "Ansicht",
+    "viewSlide": "Folie",
+    "viewSheet": "Arbeitsblatt",
+    "viewClass": "Klasse",
+    "sheetOnProjector": "Arbeitsblatt auf dem Projektor",
+    "taskToBlank": "Auf freie Fläche",
+    "showSheet": "Arbeitsblatt zeigen",
+    "hideSheet": "Folie zeigen",
     "releaseSummary": "Inhalt für die Klasse freigeben",
     "close": "Schließen",
-    "endTitle": "Unterrichtsmodus beenden",
+    "endTitle": "Unterricht beenden",
     "cancel": "Abbrechen",
-    "end": "Unterrichtsmodus beenden",
-    "endDescription": "Freigeschaltete Inhalte bleiben verfügbar. Schüler:innen werden danach nicht mehr weitergeleitet."
+    "end": "Unterricht beenden",
+    "endDescription": "Alle Schüler werden getrennt und der Code wird frei. Freigeschaltete Inhalte bleiben verfügbar."
+  },
+  "unit": {
+    "open": "Öffnen",
+    "start": "Unterricht starten",
+    "starting": "Wird gestartet …",
+    "running": "Unterricht läuft",
+    "invited": "Schüler können mit dem Code {code} beitreten · {count} verbunden",
+    "resume": "Zurück zur Präsentation",
+    "end": "Beenden",
+    "endTitle": "Unterricht beenden",
+    "endDescription": "Alle Schüler werden getrennt und der Code wird frei. Freigeschaltete Inhalte bleiben verfügbar.",
+    "cancel": "Abbrechen",
+    "close": "Schließen",
+    "noPresentation": "Für dieses Kapitel ist kein Foliensatz in der Übersicht.",
+    "failed": "Das hat nicht geklappt. Versuch es noch einmal."
   }
 }

@@ -8,7 +8,7 @@ import {
   useWorksheetController,
   type WorksheetLinks,
 } from "./useWorksheetController";
-import { WorksheetContext } from "./WorksheetContext";
+import { EmbedContext, WorksheetContext } from "./WorksheetContext";
 import { TEXT } from "./texts";
 import "./worksheets.css";
 
@@ -17,6 +17,8 @@ export interface WorksheetChapterProps {
   viewer: Viewer;
   view: CurrentView;
   links: WorksheetLinks;
+  /** Inside the lesson: no navigation, tasks can go onto a blank surface. */
+  embed?: boolean;
 }
 
 /**
@@ -27,6 +29,7 @@ export function WorksheetChapter({
   viewer,
   view,
   links,
+  embed = false,
 }: WorksheetChapterProps) {
   const revalidator = useRevalidator();
   useEffect(() => {
@@ -50,19 +53,21 @@ export function WorksheetChapter({
   }
   return (
     <WorksheetContext.Provider value={controller}>
-      <div className="kapitel-app">
-        <div className="kapitel-main" id="blatt">
-          {view.kind === "challenges" ? (
-            <ChallengesPage />
-          ) : sheet ? (
-            <SheetPage key={sheet.id} sheet={sheet} />
-          ) : (
-            <p className="ws">{TEXT.sheet.notFound}</p>
-          )}
+      <EmbedContext.Provider value={embed}>
+        <div className="kapitel-app">
+          <div className="kapitel-main" id="blatt">
+            {view.kind === "challenges" ? (
+              <ChallengesPage />
+            ) : sheet ? (
+              <SheetPage key={sheet.id} sheet={sheet} />
+            ) : (
+              <p className="ws">{TEXT.sheet.notFound}</p>
+            )}
+          </div>
+          <Keypad />
+          {!embed && <Pult current={view} />}
         </div>
-        <Keypad />
-        <Pult current={view} />
-      </div>
+      </EmbedContext.Provider>
     </WorksheetContext.Provider>
   );
 }

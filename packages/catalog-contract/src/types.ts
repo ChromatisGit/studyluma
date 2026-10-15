@@ -44,13 +44,24 @@ export type RichInline =
     }
   | { type: "merkkarteRef"; targetId: string; title: string };
 
+/** A formula as written and as rendered MathML. */
+export type MathPart = { source: string; display: string };
+
+/** One line of a transformation: the equation and what is done to both sides. */
+export type DerivationStep = { equation: MathPart; operation?: MathPart };
+
 export type RichNode =
   | { type: "paragraph" | "heading"; children: RichInline[]; depth?: number }
   | { type: "list"; ordered: boolean; items: RichNode[][] }
   | { type: "table"; rows: RichInline[][][] }
   | { type: "code"; value: string; language?: string }
   | { type: "math"; source: string; display: string }
-  | { type: "writingArea"; label?: string }
+  /** Formula lines of which some end in `| operation`; the operations align. */
+  | { type: "derivation"; steps: DerivationStep[] }
+  /** `::platz N`: N blocks of free space between two parts of a slide. */
+  | { type: "space"; size: number }
+  /** `::merkkarte`: a Merkkarte placed inside a slide's text. */
+  | { type: "merkkarteCard"; targetId: string }
   | { type: "graphic"; title: string; graphic: Graphic };
 
 export type Answer = {
@@ -59,7 +70,7 @@ export type Answer = {
   rounded?: string;
   decimals?: number;
   label?: string;
-  /** A solution set `{1, 5}` or a vector `vec(1, 2)`; `elements` are its members. */
+  /** A solution set `{1; 5}` or a vector `vec(1; 2)`; `elements` are its members. */
   kind?: "set" | "vector";
   elements?: Answer[];
 };
@@ -151,7 +162,10 @@ export type Summary = {
   chapterId: string;
   title: string;
   content: (
-    { type: "content"; content: RichNode[] } | { type: "merkkarte"; id: string }
+    | { type: "content"; content: RichNode[] }
+    | { type: "merkkarte"; id: string }
+    /** An example outside a Merkkarte (`::beispiel`), shown on demand. */
+    | { type: "example"; content: RichNode[] }
   )[];
   merkkarten: Merkkarte[];
 };
@@ -175,6 +189,10 @@ export type SlideSegment =
       type: "columns";
       columns: { width: number; title?: string; content: RichNode[] }[];
     };
+/** `::tag`: the tab of a slide. `erklaeren` and `aufgabe` carry a function; the rest are presets. */
+export type SlideTone =
+  "erklaeren" | "aufgabe" | "neutral" | "hinweis" | "wichtig" | "merke";
+export type SlideTag = { label: string; tone: SlideTone };
 export type EntryKind =
   "slide" | "worksheet" | "quiz" | "merkkarte" | "summary" | "foliensatz";
 export type SourceEntry = {
@@ -187,6 +205,8 @@ export type SourceEntry = {
   referenceUrl?: string;
   targetId?: string;
   segments: SlideSegment[];
+  /** The tab of a slide (`::tag`). */
+  tag?: SlideTag;
   /** Seconds since the start of the Foliensatz (`::bis`). */
   until?: number;
   /** Teacher only. */

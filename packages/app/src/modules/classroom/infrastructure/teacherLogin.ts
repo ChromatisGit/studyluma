@@ -1,3 +1,4 @@
+import { devOpen } from "@chromatis/base/dev";
 /**
  * The teacher's one shared password (`TEACHER_PASSWORD`) and the signed
  * cookie a correct login earns. Nothing is stored on the server: the cookie
@@ -25,6 +26,10 @@ export function configureTeacherPassword(value: string | undefined): void {
  * environment is the fallback for the Vite dev server, which runs no hook.
  */
 export function teacherPassword(): string | undefined {
+  // `chromatis dev --open`: no login on this development server.
+  if (devOpen()) {
+    return undefined;
+  }
   if (registry.password) {
     return registry.password;
   }

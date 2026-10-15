@@ -34,6 +34,7 @@
   },
   "aufgabe": {
     "check": "Prüfen",
+    "toBlank": "Auf freie Fläche",
     "saved": "Gespeichert",
     "optional": "Optional",
     "result": "Ergebnis",
