@@ -81,7 +81,7 @@ function useTeacherAway(snapshot: Snapshot | null | undefined): boolean {
 /** A student device: the quiz of the session the student joined. */
 export function useStudentQuizzes(enabled: boolean) {
   const { classroom } = useSite();
-  const { snapshot, send } = useSharedClassroom(
+  const { snapshot, send, ended } = useSharedClassroom(
     enabled && classroom?.role === "participant",
   );
   const views: StudentQuizView[] | undefined =
@@ -114,5 +114,10 @@ export function useStudentQuizzes(enabled: boolean) {
     [send],
   );
   const teacherAway = useTeacherAway(snapshot);
-  return { views, answer, sync, reporter, teacherAway };
+  /** The sent sheet; undefined until the first snapshot, null: nothing sent. */
+  const sent =
+    snapshot?.role === "participant"
+      ? { target: snapshot.target, courseId: snapshot.courseId }
+      : undefined;
+  return { views, answer, sync, reporter, teacherAway, sent, ended };
 }

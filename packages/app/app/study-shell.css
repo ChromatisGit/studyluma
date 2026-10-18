@@ -18,6 +18,13 @@
 .study-shell .site-header {
   display: none;
 }
+.study-shell {
+  /* Where sticky notices stick: below the sticky mobile header (its bar plus
+     its bottom border); the desktop shell has no header. */
+  --study-sticky-top: calc(
+    env(safe-area-inset-top, 0px) + var(--header-height) + var(--border-1)
+  );
+}
 .study-mobile-header {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
@@ -201,6 +208,7 @@
 @media (min-width: 768px) {
   .study-shell {
     --study-sidebar-current-width: var(--sidebar-width);
+    --study-sticky-top: 0px;
   }
   .study-shell--collapsed {
     --study-sidebar-current-width: var(--sidebar-rail-width);

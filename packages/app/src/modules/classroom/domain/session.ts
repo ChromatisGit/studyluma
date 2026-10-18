@@ -42,8 +42,15 @@ export type Participant = {
   joinedAt: number;
 };
 
-/** The worksheet the teacher sent to the class; students are led to it. */
-export type Target = { kind: "sheet"; id: string; chapterId: string };
+/** A worksheet the teacher wants to send to the class. */
+export type TargetInput = { kind: "sheet"; id: string; chapterId: string };
+
+/**
+ * The worksheet the teacher sent to the class; students are led to it. Every
+ * send gets its own `sendId` (also a re-send of the same sheet), so a device
+ * can tell a send it has already followed from a new one.
+ */
+export type Target = TargetInput & { sendId: string };
 
 export type Releases = {
   /** Chapters whose Inhalt students may read. */
@@ -393,10 +400,12 @@ function controllerIntent(
       return accept({ ...session, placement: intent.placement }, [
         { kind: "placement-changed", placement: intent.placement },
       ]);
-    case "target":
-      return accept({ ...session, target: intent.target }, [
-        { kind: "target-changed", target: intent.target },
+    case "target": {
+      const target = intent.target && { ...intent.target, sendId: newRunId() };
+      return accept({ ...session, target }, [
+        { kind: "target-changed", target },
       ]);
+    }
     case "release.sheet":
     case "release.summary":
     case "release.rule":
