@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, Delete } from "lucide-react";
+import type { FunctionName } from "../../content-renderer";
 import type { KeyAction } from "./keyboard";
 import { TEXT } from "./texts";
 
@@ -35,6 +36,15 @@ const later = (id: keyof typeof LATER, label: ReactNode): KeyDef => ({
   aria: LATER[id],
   className: "later",
   later: LATER[id],
+});
+
+/** A function key: types the name with brackets, the cursor between them. */
+const fn = (name: FunctionName): KeyDef => ({
+  id: name,
+  label: <span className="m-f">{name}</span>,
+  aria: A.function[name],
+  className: "fn",
+  action: { kind: "function", name },
 });
 
 const page = (to: KeypadPage, label: string, aria: string): KeyDef => ({
@@ -216,10 +226,10 @@ export const letterKeys: KeyDef[] = [
 const box = <span className="kp-box" />;
 
 export const functionKeys: KeyDef[] = [
-  later("sin", "sin"),
-  later("cos", "cos"),
+  fn("sin"),
+  fn("cos"),
   later("tan", "tan"),
-  later("ln", "ln"),
+  fn("ln"),
   later(
     "log",
     <>

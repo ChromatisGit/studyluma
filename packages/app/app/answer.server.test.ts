@@ -38,7 +38,7 @@ describe("checking answers on the server", () => {
     );
   });
 
-  test("a Rechenweg step checks its own gaps", () => {
+  test("a step checks its own gaps", () => {
     expect(
       checkSubmittedStep(buildId, "p-answer", "st1", { sg: typstToRow("3") })
         ?.state,

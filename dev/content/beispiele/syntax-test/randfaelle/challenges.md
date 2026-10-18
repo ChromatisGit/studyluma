@@ -24,6 +24,6 @@ Schritte erscheinen hier nur auf Nachfrage.
 ::antwort
 w = 8
 
-::schritte 2
-- Starte mit $4$.
+::schritte
+- Starte mit $4$: ((4))
 - Verdopple: ((8))

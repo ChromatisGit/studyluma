@@ -59,7 +59,7 @@ export function checkSubmitted(
   return checkPart(part, value, checkMessages) ?? { state: "nochNicht" };
 }
 
-/** Checks the gaps of one Rechenweg step. */
+/** Checks the gaps of one step of `::schritte`. */
 export function checkSubmittedStep(
   buildId: string,
   partId: string,

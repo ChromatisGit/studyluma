@@ -14,6 +14,8 @@ export const speechWords: SpeechWords = {
   root: (radicand) => fill(TEXT.speech.root, { radicand }),
   squared: TEXT.speech.squared,
   power: (exponent) => fill(TEXT.speech.power, { exponent }),
+  functions: TEXT.speech.functions,
+  of: TEXT.speech.of,
 };
 
 /** "Aufgabe 3", "Checkpoint 1", "Challenge 2". */

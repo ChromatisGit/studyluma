@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "./linie.css";
 
 /**
  * Linie: the shared "one line" primitive behind the Lernweg (course view)

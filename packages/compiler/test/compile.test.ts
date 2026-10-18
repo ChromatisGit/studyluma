@@ -249,61 +249,39 @@ describe("compiler (new authoring syntax)", () => {
     edit(root, "aufgaben/Steigung.md", (s) => s.replace("::mehrfach\n\n", ""));
     expect(codes(root)).toContain("SELECTION_RULE");
   });
-  test("::schritte levels derive the initial support and kind", () => {
+  test("::schritte holds the steps of a part, each with a gap", () => {
     const { bundle } = compileContent(fixture);
     const sheet = bundle.worksheets.find((w) => w.filename === "Steigung")!;
     const group = tasksOf(sheet)[0]!;
     const steps = group.items.flatMap((x) =>
       x.type === "part" && x.part.steps ? [x.part.steps] : [],
     )[0]!;
-    expect(steps.level).toBe(2);
-    expect(steps.kind).toBe("rechenweg");
     expect(steps.items).toHaveLength(2);
-    expect(group.struktur).toEqual({
-      unterstuetzung: "rechenweg",
-      uebung: "plan",
-    });
+    expect(group).not.toHaveProperty("struktur");
     const challenge = bundle.challengePools[0]!.challenges[1]!;
-    const challengeSteps = challenge.items.flatMap((x) =>
-      x.type === "part" && x.part.steps ? [x.part.steps] : [],
-    )[0]!;
-    expect(challengeSteps.level).toBe(0);
-    expect(challenge.struktur).toBeUndefined();
+    expect(challenge.items.some((x) => x.type === "part" && x.part.steps)).toBe(
+      true,
+    );
     const root = make();
     edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace(
-        "::schritte 2\n- Differenzen bestimmen: ((4)) und ((2))\n- Quotient bilden",
-        "::schritte 1\n- Differenzen bestimmen\n- Quotient bilden",
-      ),
+      s.replace("- Quotient bilden: ((2))", "- Quotient bilden"),
     );
-    const plan = compileContent(root).bundle.worksheets.find(
-      (w) => w.filename === "Steigung",
-    )!;
-    expect(tasksOf(plan)[0]!.struktur).toEqual({
-      unterstuetzung: "plan",
-      uebung: "none",
-    });
-    edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("::schritte 1", "::schritte"),
-    );
-    expect(
-      tasksOf(
-        compileContent(root).bundle.worksheets.find(
-          (w) => w.filename === "Steigung",
-        )!,
-      )[0]!.struktur,
-    ).toEqual({ unterstuetzung: "none", uebung: "none" });
-    edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("::schritte", "::schritte 4"),
-    );
-    expect(codes(root)).toContain("STEPS_LEVEL");
+    expect(codes(root)).toContain("STEPS_NO_GAP");
     edit(root, "aufgaben/Steigung.md", (s) =>
       s.replace(
-        "::schritte 4\n- Differenzen bestimmen\n- Quotient bilden",
-        "::schritte 2\n1. Differenzen\n2. Quotient",
+        "::schritte\n- Differenzen bestimmen: ((4)) und ((2))\n- Quotient bilden",
+        "::schritte\n1. Differenzen\n2. Quotient",
       ),
     );
     expect(codes(root)).toContain("STEPS_FORMAT");
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace("::schritte\n1. Differenzen\n2. Quotient", "::schritte 2\n"),
+    );
+    expect(codes(root)).toContain("STEPS_FORMAT");
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace("::schritte 2\n", "::schritte\n"),
+    );
+    expect(codes(root)).toContain("STEPS_EMPTY");
   });
   test("solution sets and vectors are recognised in answers", () => {
     const root = make();
@@ -380,6 +358,59 @@ describe("compiler (new authoring syntax)", () => {
     expect(all.find((a) => a.exact === "2.5")).toMatchObject({ label: "x" });
     const set = all.find((a) => a.kind === "set" && a.elements?.length === 2);
     expect(set?.elements?.[1]).toMatchObject({ rounded: "0.5", decimals: 1 });
+  });
+  test("::fehler answers drop a label like ::antwort does", () => {
+    const root = make();
+    edit(
+      root,
+      "aufgaben/Folgeblatt.md",
+      (s) =>
+        s +
+        "\n## Antwort\n\nLöse.\n\n::antwort\nx = 4\n\n::fehler\n" +
+        "x = 3: Hinweis eins\nx = -7/3: Hinweis zwei\n5: Ohne Label\n" +
+        "f(x) = 2x: Mit Funktion\nx = 1: Mit: Doppelpunkt\n",
+    );
+    const part = compileContent(root)
+      .bundle.worksheets.find((w) => w.filename === "Folgeblatt")!
+      .sections.flatMap((x) => x.items)
+      .flatMap((x) => (x.type === "task" ? x.task.items : []))
+      .flatMap((x) => (x.type === "part" ? [x.part] : []))
+      .find((p) => p.markers.fehler);
+    expect(part?.answer).toMatchObject({ exact: "4", label: "x" });
+    expect(part?.markers.fehler).toEqual([
+      { answer: "3", feedback: "Hinweis eins" },
+      { answer: "-7/3", feedback: "Hinweis zwei" },
+      { answer: "5", feedback: "Ohne Label" },
+      { answer: "2x", feedback: "Mit Funktion" },
+      { answer: "1", feedback: "Mit: Doppelpunkt" },
+    ]);
+  });
+  test("a term that is defined at too few comparison points is warned about", () => {
+    const warned = (answer: string) => {
+      const root = make();
+      edit(
+        root,
+        "aufgaben/Folgeblatt.md",
+        (s) => s + `\n## Antwort\n\nGib an.\n\n::antwort\n${answer}\n`,
+      );
+      return compileContent(root)
+        .diagnostics.filter((d) => d.code === "ANSWER_DOMAIN")
+        .map((d) => d.message);
+    };
+    for (const answer of ["sqrt(x - 15)", "f(x) = ln(x - 20)", "sqrt(x - 10)"])
+      expect(warned(answer)).toHaveLength(1);
+    expect(warned("sqrt(x - 15)")[0]).toContain("sqrt(x - 15)");
+    // Enough points, a constant, a number, a set and a word are fine.
+    for (const answer of [
+      "sqrt(x - 5)",
+      "ln(x)",
+      "2x + 1",
+      "sqrt(2)",
+      "4",
+      "{1; 5}",
+      "Parabel",
+    ])
+      expect(warned(answer)).toEqual([]);
   });
   test("sets and vectors are separated by semicolons, not commas", () => {
     const root = make();
@@ -991,7 +1022,9 @@ anzahl = 1
       codes(base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::tipp\nHm\n")),
     ).toContain("CHECKPOINT_MARKER");
     expect(
-      codes(base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::schritte 1\n- a\n")),
+      codes(
+        base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::schritte\n- a: ((1))\n"),
+      ),
     ).toContain("CHECKPOINT_MARKER");
     expect(
       codes(base("## Antwort\n\n::optional\n\n$1$\n\n::antwort\n1\n")),
@@ -1101,7 +1134,7 @@ anzahl = 1
       [
         "::struktur",
         "aufgaben/Steigung.md",
-        (s) => s.replace("::schritte 2", "::struktur plan\n::schritte 2"),
+        (s) => s.replace("::schritte", "::struktur plan\n::schritte"),
         "OBSOLETE_SYNTAX",
       ],
       [

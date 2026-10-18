@@ -45,6 +45,23 @@ export type MathAnswer =
 
 export type CheckState = "richtig" | "fast" | "nochNicht";
 
+/** Feedback texts; the UI fills them from its `*.de.json`. */
+export interface CheckMessages {
+  simplify: string;
+  preferFraction: string;
+  exact: (form: "pi" | "root" | "fraction" | null) => string;
+  places: (places: number) => string;
+  rounding: string;
+  incomplete: string;
+  /** A function name without brackets: "Setze Klammern: sin(…)". */
+  functionBrackets: (name: string) => string;
+  /** A function that does not exist here: "tan gibt es hier nicht". */
+  functionMissing: (name: string) => string;
+  missingSolution: string;
+  freeGaps: (count: number) => string;
+  inCell: (cell: { row: string; column: string }, message: string) => string;
+}
+
 export type CheckResult = {
   state: CheckState;
   /** Z. B. "Das ist gerundet. Gib das Ergebnis exakt an, mit π." oder eine `::fehler`-Rückfrage. */
@@ -60,7 +77,7 @@ export type PartResponse = {
   wrongChecks: number;
   lastCheck?: CheckResult;
   lastCheckedValue?: unknown;
-  /** Antworten in den Rechenweg-Lücken, nach Schritt-Id. */
+  /** Antworten in den Lücken der Schritte, nach Schritt-Id. */
   steps?: Record<string, { value: unknown; lastCheck?: CheckResult }>;
 };
 

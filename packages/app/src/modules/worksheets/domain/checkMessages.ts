@@ -17,6 +17,8 @@ export const checkMessages: CheckMessages = {
   places: (count) => plural(TEXT.check.places, count),
   rounding: TEXT.check.rounding,
   incomplete: TEXT.check.incomplete,
+  functionBrackets: (name) => fill(TEXT.check.functionBrackets, { name }),
+  functionMissing: (name) => fill(TEXT.check.functionMissing, { name }),
   missingSolution: TEXT.check.missingSolution,
   freeGaps: (count) => plural(TEXT.check.freeGaps, count),
   inCell: (cell, message) =>

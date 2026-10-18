@@ -69,10 +69,9 @@ Nutze bei Bedarf die Merkkarte:
 
 [Testregel Eins](../inhalt.md#testregel-eins)
 
-::schritte 2
+::schritte
 - Lies den Testwert $a$ ab: ((3))
 - Bestimme den Nenner: ((3))
-- Gib das Ergebnis an
 
 ::loesung
 $y = 1/3$
@@ -84,10 +83,8 @@ Berechne einen Testwert und runde.
 ::antwort
 ~ 0.33
 
-::schritte 1
-- Starte mit $1/3$.
-- Runde auf zwei Nachkommastellen.
-- Gib das Ergebnis an
+::schritte
+- Starte mit $1/3$ und runde: ((0.33))
 
 ::loesung
 $0.33$
@@ -99,9 +96,8 @@ Gib entweder den exakten oder den gerundeten Wert ein. Diese Aufgabe hat keinen 
 ::antwort
 z = 1/3 ~ 0.33
 
-::schritte 3
+::schritte
 - Bestimme den exakten Wert: ((1/3))
-- Gib das Ergebnis an
 
 ::loesung
 $z = 1/3$
@@ -126,9 +122,8 @@ Bestimme einen Testwert.
 ::antwort
 a = 2
 
-::schritte 1
-- Lies die Zahl ab.
-- Gib das Ergebnis an
+::schritte
+- Lies die Zahl ab: ((2))
 
 ::loesung
 $a = 2$

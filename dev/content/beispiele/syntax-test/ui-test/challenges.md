@@ -14,10 +14,9 @@ x = 6
 ::tipp
 Verdopple 3.
 
-::schritte 3
-- Starte mit $3$.
-- Verdopple den Wert.
-- Gib das Ergebnis an.
+::schritte
+- Starte mit $3$: ((3))
+- Verdopple den Wert: ((6))
 
 ::loesung
 $x = 6$

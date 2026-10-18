@@ -82,6 +82,8 @@ export type TypstTree =
 
 const CLOSE: Record<string, string> = { "(": ")", "{": "}", "[": "]" };
 const EMPTY: TypstTree = { t: "row", items: [] };
+/** Functions of the answer evaluator; their call is one unit, e.g. as a numerator. */
+const FUNCTIONS = new Set(["sin", "cos", "ln"]);
 
 export function parseTypst(source: string): TypstTree {
   const tokens = tokenize(source);
@@ -93,6 +95,9 @@ export function parseTypst(source: string): TypstTree {
       : node.t === "group" && node.open === "("
         ? { t: "row", items: node.items }
         : node;
+
+  const isFunction = (node: TypstTree) =>
+    node.t === "id" && FUNCTIONS.has(node.v);
 
   function sequence(stop: string | null, commaStops = false): TypstTree[] {
     const items: TypstTree[] = [];
@@ -123,6 +128,10 @@ export function parseTypst(source: string): TypstTree {
         const kind = isOp("^") ? "sup" : "sub";
         p++;
         base = { t: kind, base, e: strip(atom()) };
+        if (kind === "sup" && isOp("(") && isFunction(base.base)) {
+          // sin^2(x): the exponent sits between the name and its call.
+          base = { t: "row", items: [base, atom() as TypstTree] };
+        }
       } else if (isOp("'")) {
         p++;
         base = { t: "prime", base };
@@ -161,6 +170,9 @@ export function parseTypst(source: string): TypstTree {
         p++;
         const [a = EMPTY, b = EMPTY] = args();
         return token.v === "sqrt" ? { t: "sqrt", a } : { t: "frac", a, b };
+      }
+      if (FUNCTIONS.has(token.v) && isOp("(")) {
+        return { t: "row", items: [{ t: "id", v: token.v }, atom()!] };
       }
       const symbol = SYMBOLS[token.v];
       return symbol ? { t: "sym", v: symbol } : { t: "id", v: token.v };

@@ -16,6 +16,8 @@ export interface GapInputProps {
   stepId?: string | undefined;
   value: unknown;
   state?: CheckState | undefined;
+  /** Right and done: shown, but no longer editable. */
+  locked?: boolean;
 }
 
 /** One gap: a dropdown, a text field or a small math field. */
@@ -26,6 +28,7 @@ export function GapInput({
   stepId,
   value,
   state,
+  locked = false,
 }: GapInputProps) {
   const { setInput, checkAufgabe, checkStep, index } = useWorksheet();
   const label = fill(TEXT.aufgabe.gap, { number });
@@ -57,6 +60,7 @@ export function GapInput({
         <select
           aria-label={label}
           required
+          disabled={locked}
           value={typeof value === "string" ? value : ""}
           onChange={(event) => save(event.target.value)}
         >
@@ -79,6 +83,7 @@ export function GapInput({
           autoComplete="off"
           autoCapitalize="off"
           spellCheck={false}
+          readOnly={locked}
           value={typeof value === "string" ? value : ""}
           onChange={(event) => save(event.target.value)}
           onKeyDown={(event) => {
@@ -97,6 +102,7 @@ export function GapInput({
         field={fieldRef(partId, stepId, gap.id)}
         label={label}
         small
+        locked={locked}
         state={state}
       />
       {state === "fast" && (

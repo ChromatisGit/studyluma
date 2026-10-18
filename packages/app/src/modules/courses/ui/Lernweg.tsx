@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { ChevronDown } from "lucide-react";
 import { Badge, Tabs } from "@chromatis/base/ui";
 import { fill } from "../../../helper/text";
-import { Linie, LinieStop, trackFor, type TrackState } from "./Linie";
+import { Linie, LinieStop, trackFor, type TrackState } from "../../linie";
 import {
   lernwegPosition,
   lernwegRows,

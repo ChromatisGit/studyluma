@@ -26,7 +26,6 @@ export type {
   SlideTone,
   SourceEntry,
   Steps,
-  StructureLevel,
   Summary,
   Task,
   TaskPart,

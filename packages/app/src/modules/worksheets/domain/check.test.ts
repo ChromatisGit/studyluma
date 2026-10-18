@@ -6,25 +6,12 @@ import {
   checkPart,
   mathAnswerOf,
   optionId,
-  type CheckMessages,
 } from "./check";
 import type { MathAnswer } from "./contract";
+
 import { gapsOf } from "../../content-renderer";
-import { typstToRow } from "@studyluma/catalog-contract";
+import { m, row } from "../../../test/check";
 
-const m: CheckMessages = {
-  simplify: "simplify",
-  preferFraction: "fraction",
-  exact: (form) => `exact:${form}`,
-  places: (n) => `places:${n}`,
-  rounding: "rounding",
-  incomplete: "incomplete",
-  missingSolution: "missing",
-  freeGaps: (n) => `free:${n}`,
-  inCell: (cell, message) => `${cell.row}/${cell.column}: ${message}`,
-};
-
-const row = (typst: string) => typstToRow(typst);
 const check = (entered: string, answer: MathAnswer) =>
   checkMath(row(entered), answer, m);
 const summary = (entered: string, answer: MathAnswer) => {

@@ -39,3 +39,11 @@ Zeichne zwei Geraden: eine mit Steigung 2 durch $(0, 1)$ und eine mit Steigung $
 ::antwort
 y = 2x + 1
 y = -x + 4
+
+# "Trigonometrische Funktionen"
+
+## Auftrag: "Sinus verschieben"
+
+Verschiebe die Sinuskurve mit $a$ und beobachte den Hochpunkt $H$.
+
+::grafik [Sinuskurve mit Verschiebung](../grafiken/sinus-raster.toml)

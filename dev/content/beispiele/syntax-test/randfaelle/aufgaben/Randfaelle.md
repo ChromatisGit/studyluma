@@ -4,34 +4,32 @@ titel = "Randfälle"
 
 # "Hilfestufen"
 
-## Antwort: "Schritte Stufe 0"
-
-::schritte 0
-- Nur auf Nachfrage.
-- Zweiter Schritt.
+## Antwort: "Schritte mit Lücken"
 
 ::antwort
 a = 1
 
-## Antwort: "Schritte ohne Zahl"
+::schritte
+- Erster Schritt: ((1))
+- Zweiter Schritt: ((1))
 
-Ohne Zahl entspricht `::schritte` der Stufe 0.
+## Antwort: "Schritt mit zwei Lücken"
+
+Ein Schritt ist erst richtig, wenn alle seine Lücken stimmen.
 
 ::antwort
 b = 2
 
 ::schritte
-- Erster Schritt: ((2))
-- Zweiter Schritt
+- Beide Zahlen ablesen: ((1)) und ((2))
 
-## Antwort: "Schritte Stufe 1"
+## Antwort: "Ein einzelner Schritt"
 
 ::antwort
 c = 3
 
-::schritte 1
-- Lies ab.
-- Rechne.
+::schritte
+- Lies ab: ((3))
 
 ## Gruppe: "Optionale Gruppe"
 

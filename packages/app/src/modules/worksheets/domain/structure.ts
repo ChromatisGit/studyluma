@@ -1,7 +1,6 @@
 import type {
   Merkkarte,
   RichNode,
-  StructureLevel,
   Task,
   TaskPart,
   Worksheet,
@@ -176,29 +175,23 @@ function validatedAnswer(part: TaskPart, response: PartResponse | undefined) {
   return true;
 }
 
-const LEVEL: Record<StructureLevel, number> = {
-  none: 0,
-  plan: 1,
-  rechenweg: 2,
-};
-
 /**
- * `::schritte N` sets what a task shows from the start in "Mehr
- * Unterstützung" and "Mehr Übung"; "Mehr Challenges", the checkpoint and
- * challenges never show steps unasked.
+ * Whether a part's steps are open from the start: only in "Mehr
+ * Unterstützung". In the other modes, in the checkpoint and in challenges
+ * they stay the last rung of the help.
  */
-export function baseLevel(info: AufgabeInfo, state: ChapterState): number {
-  const { aufgabe, sheet } = info;
-  if (
-    !sheet ||
-    info.inCheckpoint ||
-    !aufgabe.struktur ||
-    !info.parts.some((p) => p.part.steps)
-  ) {
-    return 0;
-  }
-  const mode = modeOf(sheet, state) ?? "uebung";
-  return mode === "challenges" ? 0 : LEVEL[aufgabe.struktur[mode]];
+export function stepsOpenFromStart(
+  part: TaskPart,
+  info: AufgabeInfo,
+  state: ChapterState,
+): boolean {
+  const { sheet } = info;
+  return (
+    !!part.steps &&
+    !!sheet &&
+    !info.inCheckpoint &&
+    (modeOf(sheet, state) ?? "uebung") === "unterstuetzung"
+  );
 }
 
 /** A part's tip: its text without the Merkkarte link, and the Merkkarte. */
@@ -231,18 +224,15 @@ export function tipOf(
 }
 
 export type HelpStep = {
-  kind: "tip" | "rule" | "example" | "plan" | "rechenweg";
-  /** How much of the Merkkarte this step shows: 1 title, 2 rule, 3 example. */
-  merkkarte?: 1 | 2 | 3;
-  /** The structure this step adds: 1 plan, 2 Rechenweg. */
-  level?: 1 | 2;
+  kind: "tip" | "rule" | "steps";
+  /** How much of the Merkkarte this step shows: 1 title, 2 rule and examples. */
+  merkkarte?: 1 | 2;
 };
 
 /**
  * One help button per task, always in the same order: Tipp, Merkkarte,
- * Beispiel, Plan, Rechenweg. Pieces that don't exist or that the task
- * already shows are left out. The steps stay available on demand whatever
- * their initial level was.
+ * Schritte. Pieces that don't exist or that the task already shows are left
+ * out. The steps stay available on demand whatever the mode.
  */
 export function helpLadder(
   part: TaskPart,
@@ -253,45 +243,55 @@ export function helpLadder(
   if (info.inCheckpoint) {
     return [];
   }
-  const base = baseLevel(info, state);
+  const open = stepsOpenFromStart(part, info, state);
   const tip = tipOf(part, data.cards);
   const card = tip?.card;
   const steps: HelpStep[] = [];
   if (tip?.content.length || card) {
     steps.push(
-      card ? { kind: "tip", merkkarte: base === 0 ? 1 : 2 } : { kind: "tip" },
+      card ? { kind: "tip", merkkarte: open ? 2 : 1 } : { kind: "tip" },
     );
   }
-  if (card && base === 0) {
+  if (card && !open) {
     steps.push({ kind: "rule", merkkarte: 2 });
   }
-  if (card?.examples.length) {
-    steps.push({ kind: "example", merkkarte: 3 });
-  }
-  if (part.steps && base === 0) {
-    steps.push({ kind: "plan", level: 1 });
-  }
-  // A Plan has no gaps: there is no Rechenweg to ask for.
-  if (part.steps?.kind === "rechenweg" && base < 2) {
-    steps.push({ kind: "rechenweg", level: 2 });
+  if (part.steps && !open) {
+    steps.push({ kind: "steps" });
   }
   return steps;
 }
 
-/** The structure a task shows now: its base level or what help added. */
-export function structureLevel(
+/** Whether a part shows its steps now: from the start or once help opened them. */
+export function stepsShown(
+  part: TaskPart,
   info: AufgabeInfo,
   state: ChapterState,
   helpShown: Record<string, number>,
   data: SheetsData,
-): number {
-  const added = info.parts.flatMap(({ part }) =>
-    helpLadder(part, info, state, data)
-      .slice(0, helpShown[part.id] ?? 0)
-      .map((step) => step.level ?? 0),
+): boolean {
+  return (
+    !!part.steps &&
+    (stepsOpenFromStart(part, info, state) ||
+      helpLadder(part, info, state, data)
+        .slice(0, helpShown[part.id] ?? 0)
+        .some((step) => step.kind === "steps"))
   );
-  return Math.max(baseLevel(info, state), ...added);
 }
+
+/** A step is done once its gaps were checked and are all right. */
+export const stepDone = (response: PartResponse, stepId: string): boolean =>
+  response.steps?.[stepId]?.lastCheck?.state === "richtig";
+
+/** The step to work on: the first one not done; the step count when all are. */
+export function activeStep(part: TaskPart, response: PartResponse): number {
+  const items = part.steps?.items ?? [];
+  const at = items.findIndex((step) => !stepDone(response, step.id));
+  return at < 0 ? items.length : at;
+}
+
+/** A part with steps whose answer is right: nothing left to edit. */
+export const answerLocked = (part: TaskPart, response: PartResponse): boolean =>
+  !!part.steps && response.lastCheck?.state === "richtig";
 
 /** Optional tasks are folded in "Mehr Challenges" until opened. */
 export function isFoldedOptional(

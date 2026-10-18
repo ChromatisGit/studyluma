@@ -1,0 +1,22 @@
+#:schema ../../../../../.chromatis/schemas/catalog.graphic.schema.json
+# x axis in multiples of π with a phase slider shown as a multiple of π.
+[achsen]
+x = [-7, 7]
+y = [-2, 2]
+x-raster = "pi/2"
+
+[[graph]]
+term = "y = sin(x - a)"
+name = "f"
+
+[[punkt]]
+position = ["pi/2", 1]
+name = "H"
+
+[[parameter]]
+name = "a"
+von = "-pi"
+bis = "pi"
+schritt = "pi/12"
+start = 0
+einheit = "pi"

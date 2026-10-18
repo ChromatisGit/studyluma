@@ -1,6 +1,7 @@
 import { InlineMath, splitTop } from "../../content-renderer";
 import { fill } from "../../../helper/text";
 import type { TaskPart } from "../../catalog";
+import { answerLocked } from "../domain/structure";
 
 import { MathField } from "./MathField";
 import { useWorksheet } from "./WorksheetContext";
@@ -14,6 +15,7 @@ import { TEXT } from "./texts";
 function SetAnswer({ part, refText }: { part: TaskPart; refText: string }) {
   const { response, setResponseValue, active } = useWorksheet();
   const current = response(part.id);
+  const locked = answerLocked(part, current);
   const check = current.lastCheck;
   const field = fieldRef(part.id);
   const set = readSet(current.value);
@@ -38,6 +40,7 @@ function SetAnswer({ part, refText }: { part: TaskPart; refText: string }) {
             label={fill(TEXT.aufgabe.setFor, { ref: refText })}
             state={check?.state}
             className="mfield--set"
+            locked={locked}
             segments={segments}
           />
         )}
@@ -53,6 +56,7 @@ function SetAnswer({ part, refText }: { part: TaskPart; refText: string }) {
           type="button"
           className="link-btn"
           aria-pressed={!!set.none}
+          disabled={locked}
           onClick={toggleNone}
         >
           {set.none ? TEXT.set.enterSolutions : TEXT.set.noSolution}
@@ -77,7 +81,8 @@ export function Answer({
   refText: string;
 }) {
   const { response } = useWorksheet();
-  const check = response(part.id).lastCheck;
+  const current = response(part.id);
+  const check = current.lastCheck;
   if (part.answerKind === "set") {
     return <SetAnswer part={part} refText={refText} />;
   }
@@ -98,6 +103,7 @@ export function Answer({
         label={fill(TEXT.aufgabe.resultFor, {
           ref: `${refText}${letter ?? ""}`,
         })}
+        locked={answerLocked(part, current)}
         state={check?.state}
       />
       {vector && (

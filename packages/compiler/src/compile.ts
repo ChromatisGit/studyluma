@@ -26,6 +26,7 @@ import {
   CATALOG_FILE,
   CATALOG_FORMAT_VERSION,
   CATALOG_META_FILE,
+  CHECK_POINTS,
   computeCatalogBuildId,
   decimalCommas,
   germanDecimals,
@@ -46,7 +47,14 @@ import {
   topicSchema,
   worksheetFrontSchema,
 } from "./config";
-import { functionRow, letters, parseGraphic } from "./graphic";
+import {
+  functionProblem,
+  functionProblems,
+  functionRow,
+  letters,
+  parseGraphic,
+} from "./graphic";
+import { finitePoints } from "./constant";
 import { parseToml, type TomlOptions } from "./toml";
 import type {
   Answer,
@@ -65,7 +73,6 @@ import type {
   Quiz,
   RichNode,
   SourceEntry,
-  StructureLevel,
   Summary,
   Task,
   TaskPart,
@@ -106,6 +113,9 @@ const imageTypes: Record<string, string> = {
   ".gif": "image/gif",
   ".svg": "image/svg+xml",
 };
+
+/** A function name followed by a variable, a number or π: `sin x`, `ln 2`. */
+const BARE_CALL = /(?<!\p{L})(sin|cos|ln)\s+(?:pi(?!\p{L})|\p{L}(?!\p{L})|\d)/u;
 
 export class CompileFailure extends Error {
   constructor(readonly diagnostics: Diagnostic[]) {
@@ -288,8 +298,10 @@ export function compileContent(
       );
       return undefined;
     }
-    const spec = parseGraphic(readFileSync(absolute, "utf8"), (code, message) =>
-      error(code, `${path}: ${message}`, loc(file, line)),
+    const spec = parseGraphic(
+      readFileSync(absolute, "utf8"),
+      (code, message) => error(code, `${path}: ${message}`, loc(file, line)),
+      (code, message) => warn(code, `${path}: ${message}`, loc(file, line)),
     );
     return spec;
   }
@@ -376,6 +388,12 @@ export function compileContent(
       math(exact, file, line);
       try {
         checkRow = typstToRow(exact);
+        for (const problem of functionProblems(checkRow))
+          error(
+            "ANSWER_MATH",
+            `${problem} (in the answer ${exact})`,
+            loc(file, line),
+          );
       } catch (e) {
         error(
           "ANSWER_MATH",
@@ -384,6 +402,14 @@ export function compileContent(
         );
       }
     }
+    // A word answer stays text, but `sin x` is math that lacks its brackets.
+    const bare = !checkRow && exact ? BARE_CALL.exec(exact)?.[1] : undefined;
+    if (bare)
+      error(
+        "ANSWER_MATH",
+        `${bare} ${functionProblem(bare)} (in the answer ${exact})`,
+        loc(file, line),
+      );
     if (rounded) {
       math(rounded, file, line);
       if (!/^-?\d+(?:\.\d+)?$/.test(rounded))
@@ -427,19 +453,21 @@ export function compileContent(
     }
     return false;
   }
+  /** `x = 3` splits into the label `x` and the value `3`; without `=` there is no label. */
+  function splitLabel(raw: string): { label?: string; value: string } {
+    const value = raw.trim();
+    const eq = value.indexOf("=");
+    return eq < 0
+      ? { value }
+      : { label: value.slice(0, eq).trim(), value: value.slice(eq + 1).trim() };
+  }
   /**
    * A task's expected answer: a number or term, a solution set `{1; 5}`
    * (`{}` for no solution) or a vector `vec(1; 2)`. `f(x) = …` labels the
    * field. Elements are separated by `;`, so `,` is always a decimal comma.
    */
   function answer(raw: string, file: string, line: number): Answer {
-    let value = raw.trim(),
-      label: string | undefined;
-    const eq = value.indexOf("=");
-    if (eq >= 0) {
-      label = value.slice(0, eq).trim();
-      value = value.slice(eq + 1).trim();
-    }
+    const { label, value } = splitLabel(raw);
     const group = /^\{([\s\S]*)\}$/.exec(value) ?? undefined;
     const vector = /^vec\(([\s\S]*)\)$/.exec(value) ?? undefined;
     const inner = group ?? vector;
@@ -475,12 +503,19 @@ export function compileContent(
       return {};
     }
     math(parsed.expression, file, line);
-    for (const name of letters(parsed.row))
+    for (const problem of functionProblems(parsed.row))
       error(
-        "ANSWER_VARIABLE",
-        `A Graph answer may only use x, found "${name}"`,
+        "ANSWER_MATH",
+        `${problem} (in the Graph answer ${parsed.expression})`,
         loc(file, line),
       );
+    for (const name of letters(parsed.row))
+      if (name.length === 1)
+        error(
+          "ANSWER_VARIABLE",
+          `A Graph answer may only use x, found "${name}"`,
+          loc(file, line),
+        );
     return { exact: parsed.expression, checkRow: parsed.row };
   }
   function gapAnswer(raw: string, file: string, line: number): Answer {
@@ -919,14 +954,6 @@ export function compileContent(
     Lückentext: "Einsetzen",
     Ergebnis: "Antwort",
   };
-  /** Initially visible support per `::schritte` level. */
-  const SUPPORT: { unterstuetzung: StructureLevel; uebung: StructureLevel }[] =
-    [
-      { unterstuetzung: "none", uebung: "none" },
-      { unterstuetzung: "plan", uebung: "none" },
-      { unterstuetzung: "rechenweg", uebung: "plan" },
-      { unterstuetzung: "rechenweg", uebung: "rechenweg" },
-    ];
   type Head =
     | { kind: "task"; type: TaskPart["type"]; title?: string }
     | { kind: "group"; title?: string };
@@ -1007,12 +1034,10 @@ export function compileContent(
     file: string,
     line: number,
     checkpoint: boolean,
-    challenge: boolean,
   ): TaskPart {
     const blocks: Record<string, Line[]> = { main: [] };
     const flags = new Set<string>();
-    let current = "main",
-      stepsArg: string | undefined;
+    let current = "main";
     const counts = new Map<string, number>();
     for (const x of body) {
       const marker = /^::([\p{L}-]+)(?:\s+(.*))?$/u.exec(x.text.trim());
@@ -1044,8 +1069,7 @@ export function compileContent(
         }
         current = name;
         blocks[name] = [];
-        if (name === "schritte") stepsArg = arg;
-        else if (arg) blocks[name]!.push({ text: arg, line: x.line });
+        if (arg) blocks[name]!.push({ text: arg, line: x.line });
       } else if (x.text.trim() === "---") {
         current = "main";
       } else blocks[current]!.push(x);
@@ -1102,16 +1126,6 @@ export function compileContent(
       error("FEEDBACK_CONTEXT", "::fehler requires ::antwort", loc(file, line));
     let steps: TaskPart["steps"];
     if (blocks.schritte) {
-      let level: 0 | 1 | 2 | 3 = 0;
-      if (stepsArg !== undefined) {
-        if (/^[0-3]$/.test(stepsArg)) level = Number(stepsArg) as 0 | 1 | 2 | 3;
-        else
-          error(
-            "STEPS_LEVEL",
-            `::schritte expects a level from 0 to 3, got "${stepsArg}"`,
-            loc(file, line),
-          );
-      }
       const items: NonNullable<TaskPart["steps"]>["items"] = [];
       for (const x of blocks.schritte) {
         const t = x.text.trim();
@@ -1125,21 +1139,18 @@ export function compileContent(
           );
           continue;
         }
-        items.push({
-          id: id("step", `${file}:${x.line}`),
-          content: inline(m[1]!, file, x.line, true),
-        });
+        const content = inline(m[1]!, file, x.line, true);
+        if (!content.some((node) => node.type === "gap"))
+          error(
+            "STEPS_NO_GAP",
+            `A step needs a gap to fill in: ${t}`,
+            loc(file, x.line),
+          );
+        items.push({ id: id("step", `${file}:${x.line}`), content });
       }
       if (!items.length)
         error("STEPS_EMPTY", "::schritte has no steps", loc(file, line));
-      steps = {
-        // Challenges only offer steps on demand.
-        level: challenge ? 0 : level,
-        kind: JSON.stringify(items).includes('"type":"gap"')
-          ? "rechenweg"
-          : "plan",
-        items,
-      };
+      steps = { items };
     }
     const markers: TaskPart["markers"] = {};
     for (const [k, v] of Object.entries(blocks)) {
@@ -1155,7 +1166,8 @@ export function compileContent(
                 loc(file, x.line),
               );
             return {
-              answer: x.text.slice(0, p).trim(),
+              // Like ::antwort, a label (`x = 3`) is not part of the value.
+              answer: splitLabel(x.text.slice(0, p)).value,
               feedback: x.text.slice(p + 1).trim(),
             };
           });
@@ -1229,6 +1241,17 @@ export function compileContent(
             blocks.antwort[0]?.line ?? line,
           )
         : undefined;
+    // A term that is undefined almost everywhere cannot be compared.
+    const points =
+      expected?.checkRow && !expected.kind
+        ? finitePoints(expected.checkRow)
+        : undefined;
+    if (points !== undefined && points < 2)
+      warn(
+        "ANSWER_DOMAIN",
+        `The answer ${expected?.exact} is defined at only ${points} of the ${CHECK_POINTS.length} points between x = ${Math.min(...CHECK_POINTS)} and x = ${Math.max(...CHECK_POINTS)} where entries are compared, so entries may never count as correct. Use a term that is defined on more of that range.`,
+        loc(file, blocks.antwort?.[0]?.line ?? line),
+      );
     return {
       id: id("part", `${file}:${line}`),
       type,
@@ -1265,7 +1288,7 @@ export function compileContent(
         error("MARKER_DUPLICATE", `Duplicate ::${name}`, loc(file, line));
     if (count("struktur"))
       obsolete(
-        "::struktur was replaced by ::schritte 0 to ::schritte 3",
+        "::struktur was removed; steps are written with ::schritte",
         file,
         body.find((x) => x.text.trim().startsWith("::struktur"))?.line ?? line,
       );
@@ -1327,7 +1350,6 @@ export function compileContent(
           file,
           line,
           checkpoint,
-          challenge,
         ),
       });
     else {
@@ -1349,7 +1371,6 @@ export function compileContent(
               file,
               part.line,
               checkpoint,
-              challenge,
             ),
           });
           part = null;
@@ -1374,19 +1395,6 @@ export function compileContent(
           `Gruppe${info.title ? ` "${info.title}"` : ""} has no parts`,
           loc(file, line),
         );
-    }
-    const stepped = task.items.flatMap((x) =>
-      x.type === "part" && x.part.steps ? [x.part.steps] : [],
-    );
-    if (stepped.length && !checkpoint && !challenge) {
-      const support = SUPPORT[Math.max(...stepped.map((s) => s.level))]!;
-      const hasRechenweg = stepped.some((s) => s.kind === "rechenweg");
-      const cap = (v: StructureLevel): StructureLevel =>
-        v === "rechenweg" && !hasRechenweg ? "plan" : v;
-      task.struktur = {
-        unterstuetzung: cap(support.unterstuetzung),
-        uebung: cap(support.uebung),
-      };
     }
     return task;
   }

@@ -1,146 +1,44 @@
+import { CHECK_POINTS } from "@studyluma/catalog-contract";
 import type { Answer, TaskPart } from "../../catalog";
 import {
-  decimalPlaces,
+  bareFunction,
   evaluate,
   gapsOf,
-  hasDecimal,
   isMathRow,
-  parseRow,
   relativelyEqual,
   splitTop,
   tryParse,
   unsimplified,
+  unsupportedFunction,
+  variablesIn,
   type Ast,
   type GapNode,
   type MathRow,
 } from "../../content-renderer";
+import { checkNumber, parseExpected, result } from "./checkNumber";
 import type {
+  CheckMessages,
   CheckResult,
   CheckState,
   MathAnswer,
   NumberAnswer,
 } from "./contract";
 
-import { typstToRow } from "@studyluma/catalog-contract";
-
-/** Feedback texts; the UI fills them from its `*.de.json`. */
-export interface CheckMessages {
-  simplify: string;
-  preferFraction: string;
-  exact: (form: "pi" | "root" | "fraction" | null) => string;
-  places: (places: number) => string;
-  rounding: string;
-  incomplete: string;
-  missingSolution: string;
-  freeGaps: (count: number) => string;
-  inCell: (cell: { row: string; column: string }, message: string) => string;
-}
+export type { CheckMessages } from "./contract";
+export { checkNumber } from "./checkNumber";
 
 /** A solution set's value: one row with ";" between solutions, or none. */
 export type SetValue = { row: MathRow; none?: boolean };
 
-const result = (
-  state: CheckState,
-  message?: string,
-  note?: string,
-): CheckResult => ({
-  state,
-  ...(message ? { message } : {}),
-  ...(note ? { note } : {}),
-});
-
-function exactForm(exact: string): "pi" | "root" | "fraction" | null {
-  if (/pi/.test(exact)) {
-    return "pi";
+/** The hint for an entry that fails because of a function name, if that is why. */
+function functionHint(row: MathRow, m: CheckMessages): string | null {
+  const bare = bareFunction(row);
+  if (bare) {
+    return m.functionBrackets(bare);
   }
-  if (/sqrt/.test(exact)) {
-    return "root";
-  }
-  return /\//.test(exact) ? "fraction" : null;
+  const missing = unsupportedFunction(row);
+  return missing ? m.functionMissing(missing) : null;
 }
-
-const valueOf = (typst: string) => evaluate(parseRow(typstToRow(typst)));
-
-function checkRounded(
-  ast: Ast,
-  value: number,
-  exact: number | null,
-  rounded: NonNullable<NumberAnswer["rounded"]>,
-  m: CheckMessages,
-): CheckResult {
-  const target = Number.parseFloat(rounded.value);
-  const scale = 10 ** rounded.places;
-  const places = decimalPlaces(ast);
-  const decimal = hasDecimal(ast);
-  if (
-    decimal &&
-    places >= rounded.places &&
-    Math.abs(Math.round(value * scale) / scale - target) < 1e-9
-  ) {
-    return result("richtig");
-  }
-  const ownScale = 10 ** places;
-  if (
-    decimal &&
-    places < rounded.places &&
-    exact !== null &&
-    Math.abs(Math.round(exact * ownScale) / ownScale - value) < 1e-9
-  ) {
-    return result("fast", m.places(rounded.places));
-  }
-  const reference = exact ?? target;
-  if (
-    Math.abs(value - reference) <=
-    Math.max(0.01 * Math.abs(reference), 5 / scale)
-  ) {
-    return result("fast", m.rounding);
-  }
-  return result("nochNicht");
-}
-
-/** The number rules: equal value, exact required, rounding allowed, close. */
-export function checkNumber(
-  ast: Ast,
-  answer: NumberAnswer,
-  m: CheckMessages,
-): CheckResult {
-  const value = evaluate(ast);
-  if (!Number.isFinite(value)) {
-    return result("nochNicht");
-  }
-  const exact = answer.exactRow
-    ? evaluate(parseRow(answer.exactRow))
-    : answer.exact !== undefined
-      ? valueOf(answer.exact)
-      : null;
-  const decimal = hasDecimal(ast);
-  if (exact !== null && relativelyEqual(value, exact)) {
-    if (unsimplified(ast)) {
-      return result("fast", m.simplify);
-    }
-    if (decimal && answer.exact && /\//.test(answer.exact)) {
-      return result("richtig", undefined, m.preferFraction);
-    }
-    return result("richtig");
-  }
-  if (answer.rounded) {
-    return checkRounded(ast, value, exact, answer.rounded, m);
-  }
-  if (exact !== null && answer.exact) {
-    const close =
-      Math.abs(value - exact) <= Math.max(0.01 * Math.abs(exact), 1e-9);
-    const form = exactForm(answer.exact);
-    if (close && decimal && form) {
-      return result("fast", m.exact(form));
-    }
-    if (close) {
-      return result("fast", m.rounding);
-    }
-  }
-  return result("nochNicht");
-}
-
-const POINTS = [0.73, 1.37, -1.91, 2.44, -0.58, 3.1, -2.6, 0.29, -1.13];
 
 function checkTerm(
   ast: Ast,
@@ -149,9 +47,12 @@ function checkTerm(
   variables: string[],
   m: CheckMessages,
 ): CheckResult {
-  const target = parseRow(expectedRow ?? typstToRow(expected));
+  const target = parseExpected(expectedRow, expected);
+  if (!target) {
+    return result("nochNicht");
+  }
   let used = 0;
-  for (const x of POINTS) {
+  for (const x of CHECK_POINTS) {
     const env = Object.fromEntries(
       variables.map((name, k) => [name, x + k * 0.31]),
     );
@@ -166,6 +67,9 @@ function checkTerm(
     if (++used === 5) {
       break;
     }
+  }
+  if (!used) {
+    return result("nochNicht");
   }
   return unsimplified(ast) ? result("fast", m.simplify) : result("richtig");
 }
@@ -273,7 +177,7 @@ export function checkMath(
   }
   const ast = tryParse(row);
   if (!ast) {
-    return result("nochNicht", m.incomplete);
+    return result("nochNicht", functionHint(row, m) ?? m.incomplete);
   }
   return answer.kind === "number"
     ? checkNumber(ast, answer, m)
@@ -292,10 +196,11 @@ export function mathAnswerOf(answer: Answer | undefined): MathAnswer {
       : { kind: "vector", components: members };
   }
   const exact = answer?.exact;
-  const variables = [
-    ...new Set((exact ?? "").match(/\b[a-z]\b/g) ?? []),
-  ].filter((name) => name !== "e");
   const row = answer?.checkRow as MathRow | undefined;
+  // The variables come from the parsed answer: a word boundary misses the x
+  // in `2x` or `cos(2x)`, and function names are no variables.
+  const parsed = exact || row ? parseExpected(row, exact) : null;
+  const variables = parsed ? variablesIn(parsed) : [];
   return variables.length
     ? {
         kind: "term",
@@ -365,6 +270,7 @@ export function checkGaps(
   let filled = 0;
   let wrong = 0;
   let almost: CheckResult | null = null;
+  let hint: string | undefined;
   for (const gap of gaps) {
     const own = checkGap(gap, values?.[gap.id], m);
     if (!own) {
@@ -374,6 +280,10 @@ export function checkGaps(
     items[gap.id] = own.state;
     if (own.state === "nochNicht") {
       wrong++;
+      const entered = values?.[gap.id];
+      hint ??= isMathRow(entered)
+        ? (functionHint(entered, m) ?? undefined)
+        : undefined;
     }
     if (own.state === "fast" && !almost) {
       almost = own;
@@ -385,7 +295,7 @@ export function checkGaps(
   const free = gaps.length - filled;
   if (wrong || free) {
     return {
-      ...result("nochNicht", free ? m.freeGaps(free) : undefined),
+      ...result("nochNicht", hint ?? (free ? m.freeGaps(free) : undefined)),
       items,
     };
   }
@@ -408,6 +318,7 @@ function checkGraph(
   const items: Record<string, CheckState> = {};
   let filled = 0;
   let wrong = 0;
+  const hints: string[] = [];
   answers.forEach((answer, index) => {
     const row = entered[String(index)];
     if (!isMathRow(row) || !row.length) {
@@ -415,6 +326,10 @@ function checkGraph(
     }
     filled++;
     const ast = tryParse(row);
+    const hint = ast ? null : functionHint(row, m);
+    if (hint) {
+      hints.push(hint);
+    }
     const target = answer.checkRow
       ? tryParse(answer.checkRow as MathRow)
       : null;
@@ -429,17 +344,15 @@ function checkGraph(
   }
   const free = answers.length - filled;
   if (wrong || free) {
-    return {
-      ...result("nochNicht", !wrong && free ? m.freeGaps(free) : undefined),
-      items,
-    };
+    const message = hints[0] ?? (!wrong && free ? m.freeGaps(free) : undefined);
+    return { ...result("nochNicht", message), items };
   }
   return { ...result("richtig"), items };
 }
 
 function sameFunction(ast: Ast, target: Ast): boolean {
   let used = 0;
-  for (const x of POINTS) {
+  for (const x of CHECK_POINTS) {
     const want = evaluate(target, { x });
     if (!Number.isFinite(want)) {
       continue;

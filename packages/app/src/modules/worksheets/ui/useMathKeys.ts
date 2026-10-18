@@ -30,6 +30,8 @@ export function useMathKeys(onMessage?: (message: string) => void) {
           return run((editor) => editor.char(action.value));
         case "frac":
           return run((editor) => editor.frac(action.fromKeyboard));
+        case "function":
+          return run((editor) => editor.fn(action.name));
         case "sqrt":
           return run((editor) => editor.sqrt());
         case "squared":

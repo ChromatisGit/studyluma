@@ -16,15 +16,22 @@ export type { DrawnFunction } from "./ui/Graphic";
 export { gapsOf, inputGraphicOf, walkInlines } from "./domain/rich";
 export type { GapNode } from "./domain/rich";
 export {
+  bareFunction,
+  callHead,
   decimalPlaces,
   evaluate,
+  FUNCTION_NAMES,
+  functionAt,
+  functionLetters,
   hasDecimal,
   parseRow,
   relativelyEqual,
   tryParse,
   unsimplified,
+  unsupportedFunction,
+  variablesIn,
 } from "./domain/evaluate";
-export type { Ast } from "./domain/evaluate";
+export type { Ast, FunctionName } from "./domain/evaluate";
 export {
   boxKeys,
   char,
