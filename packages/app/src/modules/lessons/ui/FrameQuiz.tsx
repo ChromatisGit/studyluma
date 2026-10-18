@@ -49,12 +49,15 @@ function LiveQuestion({
           return (
             <li key={option.id} className={correct ? "is-correct" : undefined}>
               <span className="lf-quiz__letter">{LETTERS[i]}</span>
-              <RichInlineContent nodes={option.content} />
-              {teacher && !revealed && option.correct && (
-                <span className="lf-live__teacher-answer">
-                  {TEXT.quiz.correct}
-                </span>
-              )}
+              {/* The tag lives in the label cell, so every row keeps its grid. */}
+              <span className="lf-live__label">
+                <RichInlineContent nodes={option.content} />
+                {teacher && !revealed && option.correct && (
+                  <span className="lf-live__teacher-answer">
+                    {TEXT.quiz.correct}
+                  </span>
+                )}
+              </span>
               {counted && count && (
                 <span className="lf-live__result">
                   <span className="lf-live__track">

@@ -1,3 +1,4 @@
+import { useCallback, type ReactNode } from "react";
 import type { loader } from "./routes/shell";
 import {
   Link,
@@ -9,10 +10,16 @@ import {
 import { House, Map, UserRound } from "lucide-react";
 import type { NavigationItem } from "@chromatis/base/ui";
 import { shellLinks } from "../src/modules/shell";
-import { courseOverviewPath, coursePath } from "../src/modules/courses";
+import {
+  courseOverviewPath,
+  coursePath,
+  findChapter,
+  sheetsFor,
+} from "../src/modules/courses";
 import {
   LiveQuizProvider,
   useSite,
+  type Target,
   type ViewerRole,
 } from "../src/modules/classroom";
 import {
@@ -25,6 +32,50 @@ import { worksheetLinks } from "./worksheetLinks";
 import TEXT from "./app.de.json";
 
 const quizPath = (courseId: string) => `${coursePath(courseId)}/quiz`;
+
+/** Where the worksheet the teacher sent lives: in the session's course, else in any that teaches it. */
+function useSheetPath() {
+  const site = useSite();
+  return useCallback(
+    (target: Target, courseId: string | null) => {
+      const teaching = site.courses.filter((course) =>
+        findChapter(course, target.chapterId),
+      );
+      const course =
+        teaching.find((item) => item.id === courseId) ?? teaching[0];
+      const chapter = course && findChapter(course, target.chapterId);
+      const sheet = course
+        ? sheetsFor(site, course.id, target.chapterId)?.sheets.find(
+            (item) => item.id === target.id,
+          )
+        : undefined;
+      return course && chapter && sheet
+        ? worksheetLinks(course.id, chapter.slug).sheet(sheet.slug)
+        : null;
+    },
+    [site],
+  );
+}
+
+/** The live quiz and the worksheets the teacher sends, for students. */
+function StudentLive({
+  enabled,
+  children,
+}: {
+  enabled: boolean;
+  children: ReactNode;
+}) {
+  const sheetPath = useSheetPath();
+  return (
+    <LiveQuizProvider
+      enabled={enabled}
+      quizPath={quizPath}
+      sheetPath={sheetPath}
+    >
+      {children}
+    </LiveQuizProvider>
+  );
+}
 
 function ChapterNavigation({
   chapter,
@@ -187,9 +238,9 @@ export default function ShellLayout() {
         compact: <AccountLink label={accountLabel} to={accountTo} compact />,
       }}
     >
-      <LiveQuizProvider enabled={viewer === "student"} quizPath={quizPath}>
+      <StudentLive enabled={viewer === "student"}>
         <Outlet />
-      </LiveQuizProvider>
+      </StudentLive>
     </StudyShell>
   );
 }

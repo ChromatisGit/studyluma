@@ -210,7 +210,7 @@ describe("released content", () => {
     const sent = ok(
       applyIntent(fresh(), controller, { type: "target", target }, ids),
     );
-    expect(sent.target).toEqual(target);
+    expect(sent.target).toEqual({ ...target, sendId: "run-1" });
     expect(
       ok(applyIntent(sent, controller, { type: "target", target: null }, ids))
         .target,
@@ -229,6 +229,47 @@ describe("released content", () => {
         ),
       ).toEqual({ ok: false, reason: "forbidden" });
     }
+  });
+});
+
+describe("sending a sheet", () => {
+  test("every send has its own id, a re-send of the same sheet included", () => {
+    let n = 0;
+    const next = () => `send-${++n}`;
+    const target = { kind: "sheet", id: "s1", chapterId: "c1" } as const;
+    const send = (session: ClassroomSession, value: typeof target | null) =>
+      ok(
+        applyIntent(
+          session,
+          controller,
+          { type: "target", target: value },
+          next,
+        ),
+      );
+    const first = send(fresh(), target);
+    const withdrawn = send(first, null);
+    const again = send(withdrawn, target);
+    const sendIds = [first.target?.sendId, again.target?.sendId];
+    expect(sendIds).toEqual(["send-1", "send-2"]);
+    expect(send(again, target).target?.sendId).toBe("send-3");
+  });
+
+  test("the event carries the send id students follow", () => {
+    const outcome = applyIntent(
+      fresh(),
+      controller,
+      {
+        type: "target",
+        target: { kind: "sheet", id: "s1", chapterId: "c1" },
+      },
+      ids,
+    );
+    expect(outcome.ok && outcome.events).toEqual([
+      {
+        kind: "target-changed",
+        target: { kind: "sheet", id: "s1", chapterId: "c1", sendId: "run-1" },
+      },
+    ]);
   });
 });
 

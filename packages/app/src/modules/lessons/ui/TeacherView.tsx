@@ -215,7 +215,7 @@ export function TeacherView({
   const {
     unit,
     session,
-    dispatch,
+    dispatch: sessionDispatch,
     sendLaser,
     sendScroll,
     sendJoin,
@@ -229,7 +229,9 @@ export function TeacherView({
   );
   useEndedSessionGuard(unit);
   const invite = useInvitation(sendJoin);
-  const quiz = useFrameQuiz(courseId, deck, session, dispatch);
+  const quiz = useFrameQuiz(courseId, deck, session, sessionDispatch);
+  // Moves off a running quiz's slide are confirmed first.
+  const { dispatch } = quiz;
   // While the invitation is on the stage there is no slide to move away from.
   const inviting = !!invite?.join;
   const { onStep } = quiz;
@@ -461,6 +463,28 @@ export function TeacherView({
           />
         )}
       </main>
+      <Dialog
+        open={quiz.leave !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            quiz.leave?.cancel();
+          }
+        }}
+        closeLabel={TEXT.teacher.close}
+        title={TEXT.teacher.quizLeaveTitle}
+        actions={
+          <>
+            <Button role="secondary" onClick={() => quiz.leave?.cancel()}>
+              {TEXT.teacher.cancel}
+            </Button>
+            <Button onClick={() => quiz.leave?.confirm()}>
+              {TEXT.teacher.quizLeaveConfirm}
+            </Button>
+          </>
+        }
+      >
+        <p>{TEXT.teacher.quizLeaveDescription}</p>
+      </Dialog>
       <Dialog
         open={endConfirm}
         onOpenChange={setEndConfirm}

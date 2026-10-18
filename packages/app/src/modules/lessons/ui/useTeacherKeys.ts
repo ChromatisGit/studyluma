@@ -24,8 +24,20 @@ const KEYS: Record<string, TeacherKey> = {
   Escape: "escape",
 };
 
-function keyFor(event: KeyboardEvent): TeacherKey | undefined {
-  if (event.altKey) {
+type KeyInput = Pick<
+  KeyboardEvent,
+  "key" | "altKey" | "ctrlKey" | "metaKey" | "shiftKey"
+>;
+
+/**
+ * The presenter key a press stands for, if any. While a dialog is open the
+ * dialog owns the keyboard (Escape closes it, Space presses its button).
+ */
+export function keyFor(
+  event: KeyInput,
+  dialogOpen = false,
+): TeacherKey | undefined {
+  if (dialogOpen || event.altKey) {
     return undefined;
   }
   if (event.metaKey || event.ctrlKey) {
@@ -35,6 +47,8 @@ function keyFor(event: KeyboardEvent): TeacherKey | undefined {
   }
   return KEYS[event.key.length === 1 ? event.key.toLowerCase() : event.key];
 }
+
+const dialogIsOpen = () => document.querySelector("dialog[open]") !== null;
 
 const isTyping = (target: HTMLElement) =>
   target.closest("input, textarea, select, [contenteditable]") !== null;
@@ -47,7 +61,7 @@ export function useTeacherKeys(onKey: (key: TeacherKey) => void) {
       if (isTyping(target)) {
         return;
       }
-      const key = keyFor(event);
+      const key = keyFor(event, dialogIsOpen());
       if (!key) {
         return;
       }
@@ -58,6 +72,7 @@ export function useTeacherKeys(onKey: (key: TeacherKey) => void) {
     const swallowSpaceUp = (event: KeyboardEvent) => {
       if (
         event.key === " " &&
+        !dialogIsOpen() &&
         !isTyping(event.target as HTMLElement) &&
         !event.ctrlKey &&
         !event.metaKey &&

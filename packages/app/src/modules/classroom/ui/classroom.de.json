@@ -103,5 +103,7 @@
     "teachingTitle": "Unterricht",
     "summaryTitle": "Inhalt"
   },
-  "teacherAway": "Die Lehrkraft ist gerade nicht verbunden."
+  "teacherAway": "Die Lehrkraft ist gerade nicht verbunden.",
+  "unitEnded": "Der Unterricht ist beendet.",
+  "quizRunning": "Quiz läuft – hier mitmachen"
 }

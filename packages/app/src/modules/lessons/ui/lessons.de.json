@@ -179,7 +179,10 @@
     "endTitle": "Unterricht beenden",
     "cancel": "Abbrechen",
     "end": "Unterricht beenden",
-    "endDescription": "Alle Schüler werden getrennt und der Code wird frei. Freigeschaltete Inhalte bleiben verfügbar."
+    "endDescription": "Alle Schüler werden getrennt und der Code wird frei. Freigeschaltete Inhalte bleiben verfügbar.",
+    "quizLeaveTitle": "Quiz läuft noch",
+    "quizLeaveDescription": "Quiz läuft noch. Trotzdem weiter? (Das Quiz wird beendet.)",
+    "quizLeaveConfirm": "Beenden und weiter"
   },
   "unit": {
     "open": "Öffnen",

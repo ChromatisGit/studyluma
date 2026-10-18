@@ -1,7 +1,7 @@
 import type { SummaryRule } from "../../catalog";
 import type { AmpelCause, AmpelLevel } from "../../worksheets";
 import type { QuizQuestion, QuizStep } from "./quiz";
-import type { Placement, Target } from "./session";
+import type { Placement, Target, TargetInput } from "./session";
 
 export type QuizStart = {
   courseId: string;
@@ -15,7 +15,7 @@ export type QuizStart = {
 export type Intent =
   | { type: "invite" }
   | { type: "place"; placement: Placement | null }
-  | { type: "target"; target: Target | null }
+  | { type: "target"; target: TargetInput | null }
   | { type: "release.sheet"; sheetId: string; released: boolean }
   | { type: "release.summary"; chapterId: string; released: boolean }
   | { type: "release.rule"; chapterId: string; rule: SummaryRule }

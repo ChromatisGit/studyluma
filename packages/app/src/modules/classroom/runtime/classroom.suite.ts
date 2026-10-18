@@ -234,7 +234,7 @@ const releasesScenario: Scenario = async (ctx) => {
   const last = snapshots(student).at(-1);
   expect(last).toMatchObject({
     placement: { chapterId: "c1", frameId: "f2" },
-    target,
+    target: { ...target, sendId: expect.any(String) },
     releases: {
       summaries: ["c1"],
       sheets: { s1: true },
@@ -250,7 +250,7 @@ const releasesScenario: Scenario = async (ctx) => {
   );
   // Only the controller steers: a student's attempt changes nothing.
   student.send({ type: "intent", intent: { type: "target", target: null } });
-  expect((await service.snapshot(controller)).target).toEqual(target);
+  expect((await service.snapshot(controller)).target).toMatchObject(target);
 
   const viaToken = await service.snapshot(joined);
   expect(viaToken.releases.summaries).toEqual(["c1"]);

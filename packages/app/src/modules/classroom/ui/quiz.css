@@ -15,6 +15,11 @@
   margin: 0;
   color: var(--color-status-error);
 }
+.quiz-answer__pending {
+  flex: 1 1 18rem;
+  margin: 0;
+  font-weight: var(--weight-bold);
+}
 .quiz-hint {
   margin: 0;
   font-size: var(--text-sm);
@@ -26,6 +31,30 @@
   padding-block: var(--space-900);
 }
 
+/* The way back to a running quiz, above every page of the student shell. */
+.quiz-running {
+  position: sticky;
+  top: var(--study-sticky-top, 0px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-300);
+  padding: var(--space-300) var(--space-400);
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
+  font-weight: var(--weight-bold);
+  text-decoration: none;
+}
+.quiz-running:hover {
+  background: var(--color-action-primary-bg-hover);
+}
+.quiz-running svg {
+  flex: none;
+  width: var(--size-icon-md);
+  height: var(--size-icon-md);
+}
+
 /* Classroom start and join. */
 .classroom-join {
   display: grid;
@@ -34,7 +63,7 @@
 }
 .teacher-away {
   position: sticky;
-  top: 0;
+  top: var(--study-sticky-top, 0px);
   z-index: 50;
   margin: 0;
   padding: var(--space-200, 0.5rem) var(--space-400, 1rem);
@@ -44,4 +73,12 @@
   color: var(--color-text);
   text-align: center;
   font-weight: 600;
+}
+
+/* From 768px the sidebar's toggle sticks out over the content's left edge. */
+@media (min-width: 768px) {
+  .quiz-running,
+  .teacher-away {
+    margin-left: var(--space-400);
+  }
 }

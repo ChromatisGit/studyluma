@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import type { ServerMessage, Snapshot, WireIntent } from "../domain/protocol";
+import { observe, WATCH_START, type Watch } from "../domain/watch";
 
 /** The resource route: snapshots over HTTP and the commands that need the server. */
 export const CLASSROOM_PATH = "/classroom";
@@ -73,6 +74,8 @@ export type ClassroomConnection = {
   enabled: boolean;
   /** `undefined` until the first answer, `null` when there is no session. */
   snapshot: Snapshot | null | undefined;
+  /** The session is over (ended by the teacher or expired); the connection has stopped. */
+  ended: boolean;
   /** Sends over the socket, or over HTTP while there is none. */
   send(intent: WireIntent): Promise<boolean>;
 };
@@ -90,29 +93,58 @@ function socketUrl(): string {
  * open (a proxy that blocks WebSockets, the Vite dev server) the same
  * snapshot is polled every `POLL_MS`, whatever the reconnect backoff is.
  */
+// Socket, poll and the end of the session belong to one connection.
+// eslint-disable-next-line max-lines-per-function
 export function useClassroom(enabled: boolean): ClassroomConnection {
   const [snapshot, setSnapshot] = useState<Snapshot | null | undefined>(
     undefined,
   );
+  const [gone, setGone] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const refreshRef = useRef<() => void>(() => undefined);
 
   useEffect(() => {
+    // The end stays for as long as the connection is off (the page data
+    // follows the end and drops the session); only a new session clears it.
     if (!enabled || typeof WebSocket === "undefined") {
       return;
     }
+    setGone(false);
     let stopped = false;
     let attempt = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    const polling: { id?: ReturnType<typeof setInterval> } = {};
     /** Snapshots from the socket are newer than any poll in flight. */
     let live = false;
+    let watch: Watch = WATCH_START;
+
+    /** The session is over: keep what was shown and stop asking for more. */
+    const finish = () => {
+      stopped = true;
+      clearInterval(polling.id);
+      clearTimeout(timer);
+      socketRef.current?.close();
+      socketRef.current = null;
+      setGone(true);
+    };
+
+    const receive = (next: Snapshot | null) => {
+      const seen = observe(watch, next);
+      watch = seen.watch;
+      if (seen.adopt) {
+        setSnapshot(next);
+      }
+      if (seen.over) {
+        finish();
+      }
+    };
 
     const poll = async () => {
       try {
         const response = await fetch(CLASSROOM_PATH, { cache: "no-store" });
         const body = (await response.json()) as { snapshot: Snapshot | null };
         if (!stopped && !live) {
-          setSnapshot(body.snapshot);
+          receive(body.snapshot);
         }
       } catch {
         // offline: the next attempt tries again
@@ -135,7 +167,7 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
           const message = JSON.parse(event.data) as ServerMessage;
           if (message.type === "snapshot") {
             live = true;
-            setSnapshot(message.snapshot);
+            receive(message.snapshot);
           }
         } catch {
           // a broken frame is replaced by the next snapshot
@@ -158,7 +190,7 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
     // The first snapshot does not wait for the socket.
     void poll();
     refreshRef.current = () => void poll();
-    const poller = setInterval(() => {
+    polling.id = setInterval(() => {
       if (!live) {
         void poll();
       }
@@ -166,7 +198,7 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
     open();
     return () => {
       stopped = true;
-      clearInterval(poller);
+      clearInterval(polling.id);
       refreshRef.current = () => undefined;
       clearTimeout(timer);
       socketRef.current?.close();
@@ -186,7 +218,12 @@ export function useClassroom(enabled: boolean): ClassroomConnection {
     return sent;
   }, []);
 
-  return { enabled, snapshot: enabled ? snapshot : undefined, send };
+  return {
+    enabled,
+    snapshot: enabled ? snapshot : undefined,
+    ended: gone,
+    send,
+  };
 }
 
 /** One connection that all hooks below it share, so a page opens a single socket. */
