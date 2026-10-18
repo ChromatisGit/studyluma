@@ -23,7 +23,6 @@ export type {
   Placement,
   Quiz,
   RichNode,
-  StructureLevel,
   Summary,
   Task,
   TaskPart,

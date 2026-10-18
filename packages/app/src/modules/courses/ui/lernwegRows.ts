@@ -1,5 +1,5 @@
 import type { TopicIcon } from "../../catalog";
-import type { StopStatus } from "./Linie";
+import type { StopStatus } from "../../linie";
 
 export type LernwegChapter = {
   id: string;

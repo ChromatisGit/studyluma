@@ -14,9 +14,7 @@ import { TEXT } from "./texts";
 const BUTTON: Record<string, string> = {
   tip: TEXT.help.tip,
   rule: TEXT.help.rule,
-  example: TEXT.help.example,
-  plan: TEXT.help.plan,
-  rechenweg: TEXT.help.rechenweg,
+  steps: TEXT.help.steps,
 };
 
 /** One help button per task; each press shows the next step of the ladder. */
@@ -62,10 +60,10 @@ export function HelpContent({
   info: AufgabeInfo;
 }) {
   const { chapter, state, ui } = useWorksheet();
-  const shown = helpLadder(part, info, state, chapter).slice(
-    0,
-    ui.help[part.id] ?? 0,
-  );
+  // The steps are drawn by the part itself, not here.
+  const shown = helpLadder(part, info, state, chapter)
+    .slice(0, ui.help[part.id] ?? 0)
+    .filter((step) => step.kind !== "steps");
   if (!shown.length) {
     return null;
   }
@@ -84,11 +82,10 @@ export function HelpContent({
         <Merkkarte
           title={card.title}
           origin={fill(TEXT.help.merkkarteFrom, { origin: card.origin })}
-          defaultExampleOpen={level >= 3}
           className="tipp__karte"
         >
           {level >= 2 && <RichContent nodes={card.rule} />}
-          {level >= 3 &&
+          {level >= 2 &&
             card.examples.map((example, i) => (
               <MerkkarteBeispiel key={i}>
                 <RichContent nodes={example} />

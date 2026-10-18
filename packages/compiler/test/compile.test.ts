@@ -249,61 +249,39 @@ describe("compiler (new authoring syntax)", () => {
     edit(root, "aufgaben/Steigung.md", (s) => s.replace("::mehrfach\n\n", ""));
     expect(codes(root)).toContain("SELECTION_RULE");
   });
-  test("::schritte levels derive the initial support and kind", () => {
+  test("::schritte holds the steps of a part, each with a gap", () => {
     const { bundle } = compileContent(fixture);
     const sheet = bundle.worksheets.find((w) => w.filename === "Steigung")!;
     const group = tasksOf(sheet)[0]!;
     const steps = group.items.flatMap((x) =>
       x.type === "part" && x.part.steps ? [x.part.steps] : [],
     )[0]!;
-    expect(steps.level).toBe(2);
-    expect(steps.kind).toBe("rechenweg");
     expect(steps.items).toHaveLength(2);
-    expect(group.struktur).toEqual({
-      unterstuetzung: "rechenweg",
-      uebung: "plan",
-    });
+    expect(group).not.toHaveProperty("struktur");
     const challenge = bundle.challengePools[0]!.challenges[1]!;
-    const challengeSteps = challenge.items.flatMap((x) =>
-      x.type === "part" && x.part.steps ? [x.part.steps] : [],
-    )[0]!;
-    expect(challengeSteps.level).toBe(0);
-    expect(challenge.struktur).toBeUndefined();
+    expect(challenge.items.some((x) => x.type === "part" && x.part.steps)).toBe(
+      true,
+    );
     const root = make();
     edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace(
-        "::schritte 2\n- Differenzen bestimmen: ((4)) und ((2))\n- Quotient bilden",
-        "::schritte 1\n- Differenzen bestimmen\n- Quotient bilden",
-      ),
+      s.replace("- Quotient bilden: ((2))", "- Quotient bilden"),
     );
-    const plan = compileContent(root).bundle.worksheets.find(
-      (w) => w.filename === "Steigung",
-    )!;
-    expect(tasksOf(plan)[0]!.struktur).toEqual({
-      unterstuetzung: "plan",
-      uebung: "none",
-    });
-    edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("::schritte 1", "::schritte"),
-    );
-    expect(
-      tasksOf(
-        compileContent(root).bundle.worksheets.find(
-          (w) => w.filename === "Steigung",
-        )!,
-      )[0]!.struktur,
-    ).toEqual({ unterstuetzung: "none", uebung: "none" });
-    edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("::schritte", "::schritte 4"),
-    );
-    expect(codes(root)).toContain("STEPS_LEVEL");
+    expect(codes(root)).toContain("STEPS_NO_GAP");
     edit(root, "aufgaben/Steigung.md", (s) =>
       s.replace(
-        "::schritte 4\n- Differenzen bestimmen\n- Quotient bilden",
-        "::schritte 2\n1. Differenzen\n2. Quotient",
+        "::schritte\n- Differenzen bestimmen: ((4)) und ((2))\n- Quotient bilden",
+        "::schritte\n1. Differenzen\n2. Quotient",
       ),
     );
     expect(codes(root)).toContain("STEPS_FORMAT");
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace("::schritte\n1. Differenzen\n2. Quotient", "::schritte 2\n"),
+    );
+    expect(codes(root)).toContain("STEPS_FORMAT");
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace("::schritte 2\n", "::schritte\n"),
+    );
+    expect(codes(root)).toContain("STEPS_EMPTY");
   });
   test("solution sets and vectors are recognised in answers", () => {
     const root = make();
@@ -1044,7 +1022,9 @@ anzahl = 1
       codes(base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::tipp\nHm\n")),
     ).toContain("CHECKPOINT_MARKER");
     expect(
-      codes(base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::schritte 1\n- a\n")),
+      codes(
+        base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::schritte\n- a: ((1))\n"),
+      ),
     ).toContain("CHECKPOINT_MARKER");
     expect(
       codes(base("## Antwort\n\n::optional\n\n$1$\n\n::antwort\n1\n")),
@@ -1154,7 +1134,7 @@ anzahl = 1
       [
         "::struktur",
         "aufgaben/Steigung.md",
-        (s) => s.replace("::schritte 2", "::struktur plan\n::schritte 2"),
+        (s) => s.replace("::schritte", "::struktur plan\n::schritte"),
         "OBSOLETE_SYNTAX",
       ],
       [

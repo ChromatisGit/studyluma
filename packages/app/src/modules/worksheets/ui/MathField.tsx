@@ -1,4 +1,10 @@
-import { useCallback, type ClipboardEvent, type KeyboardEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  type ClipboardEvent,
+  type KeyboardEvent,
+} from "react";
 import type { CheckState } from "../domain/contract";
 import { speak } from "../domain/editor";
 import { typstToRow } from "@studyluma/catalog-contract";
@@ -13,9 +19,22 @@ export interface MathFieldProps {
   field: FieldRef;
   label: string;
   small?: boolean;
+  /** Right and done: shown, but no longer editable. */
+  locked?: boolean;
   state?: CheckState | undefined;
   className?: string;
   segments?: (CheckState | undefined)[] | undefined;
+}
+
+/** A field that just became right lets go of the cursor and the keypad. */
+function useReleaseWhenLocked(locked: boolean) {
+  const element = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (locked && element.current?.contains(document.activeElement)) {
+      (document.activeElement as HTMLElement).blur();
+    }
+  }, [locked]);
+  return element;
 }
 
 const isMathTarget = (element: Element | null) =>
@@ -29,6 +48,7 @@ export function MathField({
   field,
   label,
   small,
+  locked = false,
   state,
   className,
   segments,
@@ -36,7 +56,8 @@ export function MathField({
   const worksheet = useWorksheet();
   const { active, activate, deactivate, index, response, edit } = worksheet;
   const runKey = useMathKeys();
-  const isActive = active?.ref.key === field.key;
+  const isActive = !locked && active?.ref.key === field.key;
+  const element = useReleaseWhenLocked(locked);
   const kind = index.parts.get(field.partId)?.part.answerKind;
   const stored = readField(response(field.partId), field, kind);
   const row = isActive && active ? active.editor.root : stored;
@@ -76,20 +97,26 @@ export function MathField({
 
   return (
     <span
+      ref={element}
       className={[
         "mfield",
         small && "mfield--sm",
+        locked && "is-locked",
         isActive && "is-active",
         className,
       ]
         .filter(Boolean)
         .join(" ")}
       data-state={state}
-      tabIndex={0}
+      tabIndex={locked ? -1 : 0}
       role="textbox"
       aria-label={label}
+      aria-readonly={locked || undefined}
       inputMode="none"
       onFocus={(event) => {
+        if (locked) {
+          return;
+        }
         activate(field);
         const element = event.currentTarget;
         requestAnimationFrame(() =>
@@ -103,8 +130,8 @@ export function MathField({
           }
         }, 0)
       }
-      onKeyDown={onKeyDown}
-      onPaste={onPaste}
+      onKeyDown={locked ? undefined : onKeyDown}
+      onPaste={locked ? undefined : onPaste}
     >
       <span className="mfield__val" aria-hidden="true">
         <MathView

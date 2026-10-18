@@ -185,7 +185,7 @@ export function TaskView({
   part: TaskPart;
   letter?: string | undefined;
   refText: string;
-  /** With a plan above it, an Antwort shows only its answer field. */
+  /** With steps above it, an Antwort shows only its answer field. */
   answerOnly?: boolean;
 }) {
   switch (part.type) {

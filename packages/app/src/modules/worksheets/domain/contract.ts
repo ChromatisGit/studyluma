@@ -77,7 +77,7 @@ export type PartResponse = {
   wrongChecks: number;
   lastCheck?: CheckResult;
   lastCheckedValue?: unknown;
-  /** Antworten in den Rechenweg-Lücken, nach Schritt-Id. */
+  /** Antworten in den Lücken der Schritte, nach Schritt-Id. */
   steps?: Record<string, { value: unknown; lastCheck?: CheckResult }>;
 };
 

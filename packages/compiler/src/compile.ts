@@ -73,7 +73,6 @@ import type {
   Quiz,
   RichNode,
   SourceEntry,
-  StructureLevel,
   Summary,
   Task,
   TaskPart,
@@ -955,14 +954,6 @@ export function compileContent(
     Lückentext: "Einsetzen",
     Ergebnis: "Antwort",
   };
-  /** Initially visible support per `::schritte` level. */
-  const SUPPORT: { unterstuetzung: StructureLevel; uebung: StructureLevel }[] =
-    [
-      { unterstuetzung: "none", uebung: "none" },
-      { unterstuetzung: "plan", uebung: "none" },
-      { unterstuetzung: "rechenweg", uebung: "plan" },
-      { unterstuetzung: "rechenweg", uebung: "rechenweg" },
-    ];
   type Head =
     | { kind: "task"; type: TaskPart["type"]; title?: string }
     | { kind: "group"; title?: string };
@@ -1043,12 +1034,10 @@ export function compileContent(
     file: string,
     line: number,
     checkpoint: boolean,
-    challenge: boolean,
   ): TaskPart {
     const blocks: Record<string, Line[]> = { main: [] };
     const flags = new Set<string>();
-    let current = "main",
-      stepsArg: string | undefined;
+    let current = "main";
     const counts = new Map<string, number>();
     for (const x of body) {
       const marker = /^::([\p{L}-]+)(?:\s+(.*))?$/u.exec(x.text.trim());
@@ -1080,8 +1069,7 @@ export function compileContent(
         }
         current = name;
         blocks[name] = [];
-        if (name === "schritte") stepsArg = arg;
-        else if (arg) blocks[name]!.push({ text: arg, line: x.line });
+        if (arg) blocks[name]!.push({ text: arg, line: x.line });
       } else if (x.text.trim() === "---") {
         current = "main";
       } else blocks[current]!.push(x);
@@ -1138,16 +1126,6 @@ export function compileContent(
       error("FEEDBACK_CONTEXT", "::fehler requires ::antwort", loc(file, line));
     let steps: TaskPart["steps"];
     if (blocks.schritte) {
-      let level: 0 | 1 | 2 | 3 = 0;
-      if (stepsArg !== undefined) {
-        if (/^[0-3]$/.test(stepsArg)) level = Number(stepsArg) as 0 | 1 | 2 | 3;
-        else
-          error(
-            "STEPS_LEVEL",
-            `::schritte expects a level from 0 to 3, got "${stepsArg}"`,
-            loc(file, line),
-          );
-      }
       const items: NonNullable<TaskPart["steps"]>["items"] = [];
       for (const x of blocks.schritte) {
         const t = x.text.trim();
@@ -1161,21 +1139,18 @@ export function compileContent(
           );
           continue;
         }
-        items.push({
-          id: id("step", `${file}:${x.line}`),
-          content: inline(m[1]!, file, x.line, true),
-        });
+        const content = inline(m[1]!, file, x.line, true);
+        if (!content.some((node) => node.type === "gap"))
+          error(
+            "STEPS_NO_GAP",
+            `A step needs a gap to fill in: ${t}`,
+            loc(file, x.line),
+          );
+        items.push({ id: id("step", `${file}:${x.line}`), content });
       }
       if (!items.length)
         error("STEPS_EMPTY", "::schritte has no steps", loc(file, line));
-      steps = {
-        // Challenges only offer steps on demand.
-        level: challenge ? 0 : level,
-        kind: JSON.stringify(items).includes('"type":"gap"')
-          ? "rechenweg"
-          : "plan",
-        items,
-      };
+      steps = { items };
     }
     const markers: TaskPart["markers"] = {};
     for (const [k, v] of Object.entries(blocks)) {
@@ -1313,7 +1288,7 @@ export function compileContent(
         error("MARKER_DUPLICATE", `Duplicate ::${name}`, loc(file, line));
     if (count("struktur"))
       obsolete(
-        "::struktur was replaced by ::schritte 0 to ::schritte 3",
+        "::struktur was removed; steps are written with ::schritte",
         file,
         body.find((x) => x.text.trim().startsWith("::struktur"))?.line ?? line,
       );
@@ -1375,7 +1350,6 @@ export function compileContent(
           file,
           line,
           checkpoint,
-          challenge,
         ),
       });
     else {
@@ -1397,7 +1371,6 @@ export function compileContent(
               file,
               part.line,
               checkpoint,
-              challenge,
             ),
           });
           part = null;
@@ -1422,19 +1395,6 @@ export function compileContent(
           `Gruppe${info.title ? ` "${info.title}"` : ""} has no parts`,
           loc(file, line),
         );
-    }
-    const stepped = task.items.flatMap((x) =>
-      x.type === "part" && x.part.steps ? [x.part.steps] : [],
-    );
-    if (stepped.length && !checkpoint && !challenge) {
-      const support = SUPPORT[Math.max(...stepped.map((s) => s.level))]!;
-      const hasRechenweg = stepped.some((s) => s.kind === "rechenweg");
-      const cap = (v: StructureLevel): StructureLevel =>
-        v === "rechenweg" && !hasRechenweg ? "plan" : v;
-      task.struktur = {
-        unterstuetzung: cap(support.unterstuetzung),
-        uebung: cap(support.uebung),
-      };
     }
     return task;
   }

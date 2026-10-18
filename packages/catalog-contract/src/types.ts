@@ -84,17 +84,10 @@ export type Answer = {
   kind?: "set" | "vector";
   elements?: Answer[];
 };
-export type StructureLevel = "none" | "plan" | "rechenweg";
 export type TaskType =
   "Einsetzen" | "Auswahl" | "Antwort" | "Graph" | "Auftrag";
 export type Steps = {
-  /**
-   * `::schritte N`: the support visible from the start (0-3). The steps stay
-   * available on demand. A Plan has no gaps, a Rechenweg has gaps. Challenges
-   * always have level 0.
-   */
-  level: 0 | 1 | 2 | 3;
-  kind: "plan" | "rechenweg";
+  /** `::schritte`: the way to the answer, one step at a time. Every step has a gap. */
   items: { id: string; content: RichInline[] }[];
 };
 export type TaskPart = {
@@ -127,8 +120,6 @@ export type Task = {
   /** Only named tasks (`## Antwort: "Title"`) and groups have a title. */
   title?: string;
   optional?: boolean;
-  /** Initially visible support, derived from the highest `::schritte` level of the parts. Absent in Checkpoints and Challenges. */
-  struktur?: { unterstuetzung: StructureLevel; uebung: StructureLevel };
   /** Challenges: ids of the worksheets that must be done first. */
   prerequisites?: string[];
   items: (

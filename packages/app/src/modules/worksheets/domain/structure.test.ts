@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, test } from "bun:test";
 import type { Worksheet } from "../../catalog";
-import { gap, inline, para, part, task } from "../../../test/catalog";
+import { gap, para, part, task } from "../../../test/catalog";
 import { emptyChapterState } from "./chapterState";
 import type { PartResponse } from "./contract";
 import {
-  baseLevel,
+  activeStep,
+  answerLocked,
   challengeOpen,
   helpLadder,
   indexChapter,
@@ -17,7 +18,8 @@ import {
   recordCheck,
   sectionDone,
   sheetDone,
-  structureLevel,
+  stepsOpenFromStart,
+  stepsShown,
   tipOf,
   type SheetsData,
 } from "./structure";
@@ -36,14 +38,15 @@ const withTip = (tipp = para("Denk an die Regel.")): ReturnType<typeof part> =>
   part("p-steps", "Antwort", {
     answer: { exact: "4 x^3" },
     steps: {
-      level: 2,
-      kind: "rechenweg",
       items: [
         {
           id: "s1",
           content: [{ type: "text", value: "Exponent: " }, gap("g1", "4")],
         },
-        { id: "s2", content: inline("Ableitung angeben") },
+        {
+          id: "s2",
+          content: [{ type: "text", value: "Faktor: " }, gap("g2", "4")],
+        },
       ],
     },
     markers: {
@@ -60,9 +63,7 @@ const withTip = (tipp = para("Denk an die Regel.")): ReturnType<typeof part> =>
     },
   });
 
-const stepsTask = task("t-steps", [withTip()], {
-  struktur: { unterstuetzung: "rechenweg", uebung: "plan" },
-});
+const stepsTask = task("t-steps", [withTip()]);
 const gapsPart = part("p-gaps", "Einsetzen", {
   content: [
     {
@@ -162,56 +163,98 @@ describe("index", () => {
   });
 });
 
-describe("support levels (::schritte)", () => {
-  test("the mode picks the visible support from the task's struktur", () => {
+describe("steps (::schritte)", () => {
+  const stepsPart = () => info("t-steps").parts[0]!.part;
+
+  test("only Mehr Unterstützung opens the steps from the start", () => {
     const state = emptyChapterState();
     state.modes.A = "unterstuetzung";
-    expect(baseLevel(info("t-steps"), state)).toBe(2);
+    expect(stepsOpenFromStart(stepsPart(), info("t-steps"), state)).toBe(true);
     state.modes.A = "uebung";
-    expect(baseLevel(info("t-steps"), state)).toBe(1);
+    expect(stepsOpenFromStart(stepsPart(), info("t-steps"), state)).toBe(false);
     state.modes.A = "challenges";
-    expect(baseLevel(info("t-steps"), state)).toBe(0);
+    expect(stepsOpenFromStart(stepsPart(), info("t-steps"), state)).toBe(false);
+    // A part without steps has nothing to open.
+    expect(
+      stepsOpenFromStart(
+        info("t-gaps").parts[0]!.part,
+        info("t-gaps"),
+        Object.assign(emptyChapterState(), { modes: { A: "unterstuetzung" } }),
+      ),
+    ).toBe(false);
   });
 
-  test("steps stay available on demand: the ladder leaves out only what is shown", () => {
+  test("steps are the last rung of the help, left out where they are already open", () => {
     const state = emptyChapterState();
-    const [entry] = info("t-steps").parts;
-    state.modes.A = "challenges";
-    expect(
-      helpLadder(entry!.part, info("t-steps"), state, data).map((s) => s.kind),
-    ).toEqual(["tip", "rule", "example", "plan", "rechenweg"]);
+    const kinds = () =>
+      helpLadder(stepsPart(), info("t-steps"), state, data).map((s) => s.kind);
     state.modes.A = "uebung";
-    expect(
-      helpLadder(entry!.part, info("t-steps"), state, data).map((s) => s.kind),
-    ).toEqual(["tip", "example", "rechenweg"]);
+    expect(kinds()).toEqual(["tip", "rule", "steps"]);
+    state.modes.A = "challenges";
+    expect(kinds()).toEqual(["tip", "rule", "steps"]);
+    state.modes.A = "unterstuetzung";
+    expect(kinds()).toEqual(["tip"]);
   });
 
-  test("a Plan has no Rechenweg to ask for", () => {
-    const plan = part("p-plan", "Antwort", {
-      steps: {
-        level: 0,
-        kind: "plan",
-        items: [{ id: "x", content: inline("a") }],
-      },
+  test("the Merkkarte shows its rule at once where the steps are open", () => {
+    const state = emptyChapterState();
+    const tipStep = () =>
+      helpLadder(stepsPart(), info("t-steps"), state, data)[0];
+    state.modes.A = "unterstuetzung";
+    expect(tipStep()?.merkkarte).toBe(2);
+    state.modes.A = "uebung";
+    expect(tipStep()?.merkkarte).toBe(1);
+  });
+
+  test("the steps appear once the help reaches them", () => {
+    const state = emptyChapterState();
+    state.modes.A = "uebung";
+    const id = stepsPart().id;
+    const shown = (count: number) =>
+      stepsShown(stepsPart(), info("t-steps"), state, { [id]: count }, data);
+    expect(shown(0)).toBe(false);
+    expect(shown(2)).toBe(false);
+    expect(shown(3)).toBe(true);
+    state.modes.A = "unterstuetzung";
+    expect(shown(0)).toBe(true);
+  });
+
+  test("the active step is the first one not yet right", () => {
+    const part = stepsPart();
+    const response = (states: Record<string, "richtig" | "nochNicht">) => ({
+      value: undefined,
+      wrongChecks: 0,
+      steps: Object.fromEntries(
+        Object.entries(states).map(([id, state]) => [
+          id,
+          { value: {}, lastCheck: { state } },
+        ]),
+      ),
     });
-    const planTask = task("t-plan", [plan]);
-    const local = indexChapter({ ...data, challenges: [planTask] });
-    expect(
-      helpLadder(
-        plan,
-        local.aufgaben.get("t-plan")!,
-        emptyChapterState(),
-        data,
-      ).map((s) => s.kind),
-    ).toEqual(["plan"]);
+    expect(activeStep(part, response({}))).toBe(0);
+    expect(activeStep(part, response({ s1: "nochNicht" }))).toBe(0);
+    expect(activeStep(part, response({ s1: "richtig" }))).toBe(1);
+    expect(activeStep(part, response({ s1: "richtig", s2: "richtig" }))).toBe(
+      2,
+    );
   });
 
-  test("help raises the structure level", () => {
-    const state = emptyChapterState();
-    state.modes.A = "challenges";
-    const id = info("t-steps").parts[0]!.part.id;
-    expect(structureLevel(info("t-steps"), state, { [id]: 4 }, data)).toBe(1);
-    expect(structureLevel(info("t-steps"), state, { [id]: 5 }, data)).toBe(2);
+  test("a right answer locks the answer field of a part with steps", () => {
+    const right = {
+      value: [1],
+      wrongChecks: 0,
+      lastCheck: { state: "richtig" },
+    };
+    expect(answerLocked(stepsPart(), right as PartResponse)).toBe(true);
+    expect(
+      answerLocked(stepsPart(), {
+        ...right,
+        lastCheck: { state: "nochNicht" },
+      } as PartResponse),
+    ).toBe(false);
+    expect(
+      answerLocked(info("t-check").parts[0]!.part, right as PartResponse),
+    ).toBe(false);
   });
 
   test("the checkpoint has no help", () => {

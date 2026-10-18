@@ -29,13 +29,13 @@ export { CoursePage } from "./ui/CoursePage";
 export type { CoursePageProps } from "./ui/CoursePage";
 export { ChapterPage } from "./ui/ChapterPage";
 export type { ChapterPageProps } from "./ui/ChapterPage";
-export { Linie, LinieStop, trackFor } from "./ui/Linie";
+export { Linie, LinieStop, trackFor } from "../linie";
 export type {
   LinieProps,
   LinieStopProps,
   StopStatus,
   TrackState,
-} from "./ui/Linie";
+} from "../linie";
 export { Pictogram, hasPictogram } from "./ui/Pictogram";
 export type { PictogramProps } from "./ui/Pictogram";
 export { LinkCard } from "./ui/LinkCard";

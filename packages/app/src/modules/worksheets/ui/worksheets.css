@@ -1782,65 +1782,83 @@
   font-size: var(--text-sm);
 }
 
-/* ---- Plan and Rechenweg: one panel, the plan gains its gaps -------------- */
-.weg {
+/* ---- Steps: the Lernweg line, one step at a time -------------------------
+   The line language comes from Linie (courses' Lernweg): rings for finished
+   steps, a filled dot for the active one, a pale dashed trail that runs on to
+   the answer field, the last station. */
+.linie.weg {
+  --lw-track: 1.75rem;
+  --lw-width: 0.25rem;
   max-width: var(--measure);
-  border-radius: var(--radius-md);
-  background: var(--color-bg-subtle);
-  padding: var(--space-300) var(--space-400) var(--space-400);
+  margin-block: var(--space-300);
 }
-.weg__label {
-  margin: 0 0 var(--space-200);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  color: var(--ink);
+.weg .linie__row {
+  --lw-y: 1.4rem;
+  column-gap: var(--space-200);
 }
-.weg__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-300);
+.weg .linie__content {
+  padding-block: var(--space-100);
+}
+.weg .linie__station--current {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+/* The dashed trail needs room to read as "more follows" */
+.weg__row--trail .linie__content {
+  padding-bottom: var(--space-600);
 }
 .weg__step {
-  display: grid;
-  grid-template-columns: 1.75rem minmax(0, 1fr);
-  column-gap: var(--space-300);
-  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-100) var(--space-200);
+  min-height: 2.5rem;
 }
-.weg__num {
-  grid-row: span 2;
-  width: 1.75rem;
-  height: 1.75rem;
-  display: grid;
-  place-items: center;
-  align-self: start;
-  border-radius: 50%;
-  background: var(--color-bg);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: var(--text-sm);
-}
-.weg__name {
-  line-height: 1.75rem;
-}
-.weg--rechenweg .weg__name {
+/* Finished steps rest quietly on the line */
+.weg__row:not(.weg__row--active):not(.weg__row--answer) .weg__step {
+  min-height: 2rem;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  font-weight: var(--weight-bold);
 }
-.weg__line {
-  grid-column: 2;
-  line-height: 2.6;
+.weg__go {
+  display: inline-grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 0;
+  border-radius: var(--radius-round);
+  background: var(--color-action-primary-bg);
+  color: var(--color-action-primary-fg);
+  cursor: pointer;
 }
-.weg__line--answer {
-  line-height: var(--leading-body);
-  padding-top: var(--space-100);
+.weg__go:hover:not(:disabled) {
+  background: var(--color-action-primary-bg-hover);
 }
-.weg__line--answer .set,
-.weg__line--answer .antwort {
+.weg__go:disabled {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-muted);
+  cursor: default;
+}
+.weg__go:focus-visible {
+  outline: var(--focus-width) solid var(--color-border-focus);
+  outline-offset: var(--focus-offset);
+}
+.weg__mark {
+  margin-top: var(--space-100);
+}
+.weg__mark .mark__sym {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+.weg__row--answer .set,
+.weg__row--answer .antwort {
   margin-top: 0;
+}
+.mfield.is-locked {
+  cursor: default;
+}
+.mfield.is-locked:hover {
+  border-bottom-color: var(--color-border-control);
 }
 
 /* ---- Check: the end of the learning step --------------------------------- */
@@ -1959,9 +1977,6 @@
 
 .kapitel-main {
   overflow-x: clip;
-}
-.weg__line--answer .antwort__label--text {
-  display: none;
 }
 
 /* ---- Optional tasks in "Mehr Challenges": one dashed head, closed or open */
@@ -2148,13 +2163,6 @@ button.opt-box__head:hover {
   margin: 0;
   padding: var(--space-500) 0;
   color: var(--color-text-muted);
-}
-.weg__mark {
-  grid-column: 2;
-}
-.weg__mark .mark__sym {
-  width: 1.4rem;
-  height: 1.4rem;
 }
 .md-table .table td:first-child {
   font-weight: 400;

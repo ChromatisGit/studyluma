@@ -60,9 +60,9 @@ Berechne $m$.
 ::antwort
 m = 2
 
-::schritte 2
+::schritte
 - Differenzen bestimmen: ((4)) und ((2))
-- Quotient bilden
+- Quotient bilden: ((2))
 
 ::tipp
 Welche Formel? [Steigung bestimmen](../inhalt.md#steigung-bestimmen)
@@ -132,7 +132,7 @@ Berechne $3 + 3$.
 ::antwort
 6
 
-::schritte 3
+::schritte
 - Rechnen: ((6))
 `,
   "quiz/Steigung erkennen.md": `# "Steigung erkennen"

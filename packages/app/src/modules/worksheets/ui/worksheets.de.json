@@ -64,17 +64,15 @@
   "help": {
     "tip": "Tipp",
     "rule": "Merkkarte anzeigen",
-    "example": "Beispiel anzeigen",
-    "plan": "Plan zeigen",
-    "rechenweg": "Rechenweg zeigen",
+    "steps": "Schritt für Schritt",
     "tipLabel": "Tipp",
     "merkkarteFrom": "Merkkarte aus {origin}",
     "exampleLabel": "Beispiel",
     "toSummary": "Im Inhalt ansehen"
   },
   "steps": {
-    "plan": "Plan",
-    "rechenweg": "Rechenweg",
+    "label": "Schritte zur Lösung",
+    "check": "Schritt prüfen",
     "step": "Schritt {number}"
   },
   "solution": {
@@ -114,7 +112,7 @@
   "checkpoint": {
     "kicker": "Checkpoint",
     "title": "Kannst du es allein?",
-    "lead": "Ohne Plan, Rechenweg und Tipps. In dein Heft darfst du schauen, und korrigieren darfst du auch."
+    "lead": "Ohne Schritte und Tipps. In dein Heft darfst du schauen, und korrigieren darfst du auch."
   },
   "ampel": {
     "question": "Wie gut kamst du mit den Aufgaben zurecht?",

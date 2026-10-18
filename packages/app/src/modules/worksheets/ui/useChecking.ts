@@ -78,9 +78,13 @@ async function checkParts(
       const next = recordCheck(current, checked);
       result.responses[part.id] = next;
       result.marked.push(part.id);
+      // Two wrong checks open the first rung of help, but never the steps:
+      // those stay a conscious choice.
+      const first = helpLadder(part, info, store.getSnapshot(), data)[0];
       if (
         next.wrongChecks >= 2 &&
-        helpLadder(part, info, store.getSnapshot(), data).length &&
+        first &&
+        first.kind !== "steps" &&
         !help[part.id]
       ) {
         result.openHelp.push(part.id);
@@ -93,7 +97,7 @@ async function checkParts(
 }
 
 /**
- * Prüfen: asks the server to check an Aufgabe or a Rechenweg line and
+ * Prüfen: asks the server to check an Aufgabe or one step and
  * records the result. The expected answers never reach the browser.
  */
 export function useChecking(

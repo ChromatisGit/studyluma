@@ -1,0 +1,135 @@
+/* ---------------------------------------------------------------------
+   Linie: the shared "one line" primitive behind the Lernweg and the
+   roadmap. Every row draws its own two track halves (above and below its
+   station), so the line stays continuous whatever is open.
+   --------------------------------------------------------------------- */
+.linie {
+  --lw-line: var(--color-action-primary-bg);
+  --lw-line-ahead: color-mix(
+    in srgb,
+    var(--color-action-primary-bg) 28%,
+    var(--color-bg)
+  );
+  --lw-track: 2.25rem;
+  --lw-width: 0.375rem;
+}
+.linie__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.linie__row {
+  --lw-y: 1.75rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--lw-track) minmax(0, 1fr);
+  column-gap: var(--space-300);
+}
+.linie__row--topic.linie__row--current {
+  --lw-y: 2rem;
+}
+.linie__row--chapter,
+.linie__row--stub {
+  --lw-y: 1.375rem;
+}
+.linie__row--step {
+  --lw-y: 1.25rem;
+}
+.linie__row--step.linie__row--current {
+  --lw-y: 1.5rem;
+}
+.linie__content {
+  min-width: 0;
+}
+.linie__track {
+  position: relative;
+}
+.linie__track::before,
+.linie__track::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: var(--lw-width);
+  transform: translateX(-50%);
+}
+.linie__track::before {
+  top: 0;
+  height: var(--lw-y);
+}
+.linie__track::after {
+  top: var(--lw-y);
+  bottom: 0;
+}
+/* Last stop without a station: the line ends in a rounded cap */
+.lw-end::before {
+  border-radius: 0 0 calc(var(--lw-width) / 2) calc(var(--lw-width) / 2);
+}
+.lw-up-done::before,
+.lw-down-done::after {
+  background: var(--lw-line);
+}
+.lw-up-ahead::before,
+.lw-down-ahead::after {
+  background: var(--lw-line-ahead);
+}
+/* Dashed: the line continues off-screen (other school year, open future) */
+.lw-stub.lw-up-done::before,
+.lw-stub.lw-down-done::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--lw-line) 0 0.375rem,
+    transparent 0.375rem 0.75rem
+  );
+}
+.lw-stub.lw-up-ahead::before,
+.lw-stub.lw-down-ahead::after,
+.lw-down-trail::after {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--lw-line-ahead) 0 0.375rem,
+    transparent 0.375rem 0.75rem
+  );
+}
+.linie__station {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: var(--lw-y);
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-round);
+}
+.linie__station--done,
+.linie__station--ahead {
+  width: 1rem;
+  height: 1rem;
+  background: var(--color-bg);
+  border: 3px solid var(--lw-line);
+}
+.linie__station--ahead {
+  border-color: var(--lw-line-ahead);
+}
+.linie__station--current {
+  width: 1.375rem;
+  height: 1.375rem;
+  background: var(--lw-line);
+  border: 3px solid var(--color-bg);
+  outline: 3px solid var(--lw-line);
+}
+/* Chapters are minor stops: a tick on the line */
+.linie__station--tick,
+.linie__station--tick-ahead {
+  width: 0.875rem;
+  height: var(--lw-width);
+  border-radius: 0;
+  transform: translate(0, -50%);
+  background: var(--lw-line);
+}
+.linie__station--tick-ahead {
+  background: var(--lw-line-ahead);
+}
+.linie__station--here {
+  width: 1rem;
+  height: 1rem;
+  background: var(--color-bg);
+  border: 4px solid var(--lw-line);
+}

@@ -9,7 +9,8 @@ import {
   isCheckable,
   isFoldedOptional,
   modeOf,
-  structureLevel,
+  stepsOpenFromStart,
+  stepsShown,
   type AufgabeInfo,
   type PartInfo,
 } from "../domain/structure";
@@ -29,18 +30,16 @@ function PartView({
   entry,
   info,
   multi,
-  level,
 }: {
   entry: PartInfo;
   info: AufgabeInfo;
   multi: boolean;
-  level: number;
 }) {
   const { part, letter } = entry;
-  const { response, ui } = useWorksheet();
+  const { chapter, state, response, ui } = useWorksheet();
   const result = response(part.id).lastCheck;
   const refText = refLabel(info);
-  const withSteps = !!part.steps && level > 0;
+  const withSteps = stepsShown(part, info, state, ui.help, chapter);
   return (
     <div className="part" id={multi ? part.id : undefined}>
       <div className="part__main">
@@ -54,18 +53,15 @@ function PartView({
               </div>
               <StepsPanel
                 part={part}
-                letter={letter}
-                level={level}
-                refText={refText}
-              />
-              {level === 1 && (
+                focusFirst={!stepsOpenFromStart(part, info, state)}
+              >
                 <TaskView
                   part={part}
                   letter={letter}
                   refText={refText}
                   answerOnly
                 />
-              )}
+              </StepsPanel>
             </>
           ) : (
             <TaskView part={part} letter={letter} refText={refText} />
@@ -129,10 +125,8 @@ function Foot({
 }
 
 function AufgabeBody({ info }: { info: AufgabeInfo }) {
-  const { chapter, state, ui } = useWorksheet();
   const { aufgabe } = info;
   const multi = info.parts.length > 1;
-  const level = structureLevel(info, state, ui.help, chapter);
   // The row sits right after the last checkable part; an Auftrag after it isn't checked.
   const lastCheckable = info.parts
     .map((entry) => isCheckable(entry.part))
@@ -154,7 +148,7 @@ function AufgabeBody({ info }: { info: AufgabeInfo }) {
         const entry = info.parts[position];
         return entry ? (
           <div key={item.part.id} className="part-wrap">
-            <PartView entry={entry} info={info} multi={multi} level={level} />
+            <PartView entry={entry} info={info} multi={multi} />
             {position === at && (
               <Foot
                 info={info}

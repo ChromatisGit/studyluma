@@ -40,8 +40,6 @@ const antwort = part("p-answer", "Antwort", {
     ],
   },
   steps: {
-    level: 1,
-    kind: "rechenweg",
     items: [{ id: "st1", content: [gap("sg", "3", { math: true })] }],
   },
 });
