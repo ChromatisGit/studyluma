@@ -13,7 +13,15 @@ export type Location = { file: string; line: number; column: number };
 
 /** A compiled Grafik file (`::grafik`); curves are rows evaluated in x and the parameters. */
 export type Graphic = {
-  axes: { x: [number, number]; y: [number, number] };
+  axes: {
+    x: [number, number];
+    y: [number, number];
+    /**
+     * Grid and labels of the x axis in multiples of π (`x-raster`); absent for
+     * a numeric axis. Older artifacts lack it and draw a numeric axis.
+     */
+    xGrid?: "pi" | "pi/2" | "pi/4";
+  };
   graphs: { source: string; row: MathRow; name?: string }[];
   points: { position: [number, number]; name?: string }[];
   parameters: {
@@ -22,6 +30,8 @@ export type Graphic = {
     to: number;
     step: number;
     start: number;
+    /** `"pi"`: the value is shown as a multiple of π (it stays a number). */
+    unit?: "pi";
   }[];
   /** Makes the Grafik the workspace of a Graph task. */
   input?: { type: "function"; count: number };

@@ -1,7 +1,11 @@
 import type { MouseEvent, ReactNode } from "react";
 import type { CheckState } from "../domain/contract";
 import type { Cursor } from "../domain/editor";
-import type { MathNode, MathRow } from "../../content-renderer";
+import {
+  functionLetters,
+  type MathNode,
+  type MathRow,
+} from "../../content-renderer";
 
 type Place = (row: MathRow, i: number) => void;
 
@@ -32,6 +36,7 @@ function nodeView(
   node: MathNode,
   i: number,
   props: RowProps,
+  names: Set<number>,
 ): ReactNode {
   const onClick = hit(row, i, props.place);
   switch (node.t) {
@@ -67,7 +72,11 @@ function nodeView(
           ;
         </span>
       ) : (
-        <span key={i} className={charClass(node.v)} onClick={onClick}>
+        <span
+          key={i}
+          className={names.has(i) ? "m-f" : charClass(node.v)}
+          onClick={onClick}
+        >
           {node.v}
         </span>
       );
@@ -98,6 +107,8 @@ function RowView({ row, cursor, place, segments }: RowProps) {
     );
   }
   const props = { row, cursor, place };
+  // sin, cos and ln are upright: they are names, not products of letters.
+  const names = functionLetters(row);
   const out: ReactNode[] = [];
   let current: ReactNode[] = [];
   let segment = 0;
@@ -124,9 +135,9 @@ function RowView({ row, cursor, place, segments }: RowProps) {
     }
     if (segments && node.t === "c" && node.v === ";") {
       flush();
-      out.push(nodeView(row, node, i, props));
+      out.push(nodeView(row, node, i, props, names));
     } else {
-      current.push(nodeView(row, node, i, props));
+      current.push(nodeView(row, node, i, props, names));
     }
   });
   if (here && cursor?.i === row.length) {

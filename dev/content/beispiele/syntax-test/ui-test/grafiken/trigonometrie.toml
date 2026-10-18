@@ -1,0 +1,15 @@
+#:schema ../../../../../.chromatis/schemas/catalog.graphic.schema.json
+[achsen]
+x = [-4, 4]
+y = [-3, 3]
+
+[[graph]]
+term = "y = sin(x)"
+name = "f"
+
+[[graph]]
+term = "y = cos(x)"
+name = "g"
+
+[eingabe]
+typ = "funktion"

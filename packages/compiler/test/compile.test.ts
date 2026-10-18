@@ -381,6 +381,59 @@ describe("compiler (new authoring syntax)", () => {
     const set = all.find((a) => a.kind === "set" && a.elements?.length === 2);
     expect(set?.elements?.[1]).toMatchObject({ rounded: "0.5", decimals: 1 });
   });
+  test("::fehler answers drop a label like ::antwort does", () => {
+    const root = make();
+    edit(
+      root,
+      "aufgaben/Folgeblatt.md",
+      (s) =>
+        s +
+        "\n## Antwort\n\nLöse.\n\n::antwort\nx = 4\n\n::fehler\n" +
+        "x = 3: Hinweis eins\nx = -7/3: Hinweis zwei\n5: Ohne Label\n" +
+        "f(x) = 2x: Mit Funktion\nx = 1: Mit: Doppelpunkt\n",
+    );
+    const part = compileContent(root)
+      .bundle.worksheets.find((w) => w.filename === "Folgeblatt")!
+      .sections.flatMap((x) => x.items)
+      .flatMap((x) => (x.type === "task" ? x.task.items : []))
+      .flatMap((x) => (x.type === "part" ? [x.part] : []))
+      .find((p) => p.markers.fehler);
+    expect(part?.answer).toMatchObject({ exact: "4", label: "x" });
+    expect(part?.markers.fehler).toEqual([
+      { answer: "3", feedback: "Hinweis eins" },
+      { answer: "-7/3", feedback: "Hinweis zwei" },
+      { answer: "5", feedback: "Ohne Label" },
+      { answer: "2x", feedback: "Mit Funktion" },
+      { answer: "1", feedback: "Mit: Doppelpunkt" },
+    ]);
+  });
+  test("a term that is defined at too few comparison points is warned about", () => {
+    const warned = (answer: string) => {
+      const root = make();
+      edit(
+        root,
+        "aufgaben/Folgeblatt.md",
+        (s) => s + `\n## Antwort\n\nGib an.\n\n::antwort\n${answer}\n`,
+      );
+      return compileContent(root)
+        .diagnostics.filter((d) => d.code === "ANSWER_DOMAIN")
+        .map((d) => d.message);
+    };
+    for (const answer of ["sqrt(x - 15)", "f(x) = ln(x - 20)", "sqrt(x - 10)"])
+      expect(warned(answer)).toHaveLength(1);
+    expect(warned("sqrt(x - 15)")[0]).toContain("sqrt(x - 15)");
+    // Enough points, a constant, a number, a set and a word are fine.
+    for (const answer of [
+      "sqrt(x - 5)",
+      "ln(x)",
+      "2x + 1",
+      "sqrt(2)",
+      "4",
+      "{1; 5}",
+      "Parabel",
+    ])
+      expect(warned(answer)).toEqual([]);
+  });
   test("sets and vectors are separated by semicolons, not commas", () => {
     const root = make();
     const write = (answer: string) =>

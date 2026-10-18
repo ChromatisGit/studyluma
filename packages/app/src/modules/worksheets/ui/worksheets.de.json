@@ -19,6 +19,8 @@
     },
     "rounding": "Das sieht nach einem Rundungsfehler aus. Hast du Zwischenergebnisse gerundet?",
     "incomplete": "Die Eingabe ist noch nicht vollständig.",
+    "functionBrackets": "Setze Klammern: {name}(…)",
+    "functionMissing": "{name} gibt es hier nicht. Du kannst sin, cos und ln benutzen.",
     "missingSolution": "Es fehlt noch eine Lösung.",
     "freeGaps": {
       "one": "Eine Lücke ist noch frei.",
@@ -181,10 +183,7 @@
     "close": "Schließen",
     "check": "Prüfen",
     "later": {
-      "sin": "Sinus",
-      "cos": "Kosinus",
       "tan": "Tangens",
-      "ln": "natürlicher Logarithmus",
       "log": "Logarithmus zur Basis",
       "exp": "e hoch",
       "asin": "Arkussinus",
@@ -228,7 +227,12 @@
       "letters": "Buchstaben",
       "functions": "Funktionen",
       "digits": "Zahlen",
-      "collapse": "Tasten einklappen"
+      "collapse": "Tasten einklappen",
+      "function": {
+        "sin": "Sinus, setzt Klammern",
+        "cos": "Kosinus, setzt Klammern",
+        "ln": "natürlicher Logarithmus, setzt Klammern"
+      }
     },
     "step": "{ref} · Schritt {number}",
     "at": "{row} bei {column}",
@@ -251,7 +255,13 @@
     "fraction": "Bruch, {numerator} durch {denominator}, Ende Bruch",
     "root": "Wurzel aus {radicand}, Ende Wurzel",
     "squared": "Quadrat",
-    "power": "hoch {exponent}"
+    "power": "hoch {exponent}",
+    "functions": {
+      "sin": "Sinus",
+      "cos": "Kosinus",
+      "ln": "natürlicher Logarithmus"
+    },
+    "of": "von"
   },
   "cards": {
     "locked": "Gesperrt",

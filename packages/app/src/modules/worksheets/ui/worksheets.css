@@ -429,6 +429,10 @@
   font-style: italic;
   padding-inline: 0.02em;
 }
+.m-f {
+  font-style: normal;
+  padding-inline: 0.01em;
+}
 .m-o {
   padding-inline: 0.18em;
 }
@@ -987,6 +991,7 @@
 .kp-key--right,
 .kp-key--op,
 .kp-key--var,
+.kp-key--fn,
 .kp-key--sign {
   background: transparent;
   font-family: var(--font-math);

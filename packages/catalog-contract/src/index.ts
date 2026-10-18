@@ -36,6 +36,14 @@ export type {
   MathSqrt,
   MathSup,
 } from "./mathNodes";
+export {
+  FUNCTION_NAMES,
+  UNSUPPORTED_FUNCTIONS,
+  classifyLetterRun,
+  isInverseExponent,
+} from "./mathFunctions";
+export type { FunctionName, LetterRun } from "./mathFunctions";
+export { CHECK_POINTS } from "./checkPoints";
 export { typstToRow } from "./typstToRow";
 export {
   decimalCommas,

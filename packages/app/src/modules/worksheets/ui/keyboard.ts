@@ -1,9 +1,11 @@
 import type { KeyboardEvent } from "react";
+import type { FunctionName } from "../../content-renderer";
 
 /** What a key on the keypad or keyboard does in a math field. */
 export type KeyAction =
   | { kind: "char"; value: string }
   | { kind: "frac"; fromKeyboard: boolean }
+  | { kind: "function"; name: FunctionName }
   | {
       kind:
         | "sqrt"

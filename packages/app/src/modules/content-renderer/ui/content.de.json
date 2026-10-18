@@ -5,6 +5,9 @@
     "showExamples": "Beispiele zeigen",
     "hideExamples": "Beispiele ausblenden"
   },
+  "graphic": {
+    "over": "durch"
+  },
   "code": {
     "copy": "Kopieren",
     "copied": "Kopiert"

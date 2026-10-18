@@ -26,6 +26,7 @@ import {
   CATALOG_FILE,
   CATALOG_FORMAT_VERSION,
   CATALOG_META_FILE,
+  CHECK_POINTS,
   computeCatalogBuildId,
   decimalCommas,
   germanDecimals,
@@ -46,7 +47,14 @@ import {
   topicSchema,
   worksheetFrontSchema,
 } from "./config";
-import { functionRow, letters, parseGraphic } from "./graphic";
+import {
+  functionProblem,
+  functionProblems,
+  functionRow,
+  letters,
+  parseGraphic,
+} from "./graphic";
+import { finitePoints } from "./constant";
 import { parseToml, type TomlOptions } from "./toml";
 import type {
   Answer,
@@ -106,6 +114,9 @@ const imageTypes: Record<string, string> = {
   ".gif": "image/gif",
   ".svg": "image/svg+xml",
 };
+
+/** A function name followed by a variable, a number or π: `sin x`, `ln 2`. */
+const BARE_CALL = /(?<!\p{L})(sin|cos|ln)\s+(?:pi(?!\p{L})|\p{L}(?!\p{L})|\d)/u;
 
 export class CompileFailure extends Error {
   constructor(readonly diagnostics: Diagnostic[]) {
@@ -288,8 +299,10 @@ export function compileContent(
       );
       return undefined;
     }
-    const spec = parseGraphic(readFileSync(absolute, "utf8"), (code, message) =>
-      error(code, `${path}: ${message}`, loc(file, line)),
+    const spec = parseGraphic(
+      readFileSync(absolute, "utf8"),
+      (code, message) => error(code, `${path}: ${message}`, loc(file, line)),
+      (code, message) => warn(code, `${path}: ${message}`, loc(file, line)),
     );
     return spec;
   }
@@ -376,6 +389,12 @@ export function compileContent(
       math(exact, file, line);
       try {
         checkRow = typstToRow(exact);
+        for (const problem of functionProblems(checkRow))
+          error(
+            "ANSWER_MATH",
+            `${problem} (in the answer ${exact})`,
+            loc(file, line),
+          );
       } catch (e) {
         error(
           "ANSWER_MATH",
@@ -384,6 +403,14 @@ export function compileContent(
         );
       }
     }
+    // A word answer stays text, but `sin x` is math that lacks its brackets.
+    const bare = !checkRow && exact ? BARE_CALL.exec(exact)?.[1] : undefined;
+    if (bare)
+      error(
+        "ANSWER_MATH",
+        `${bare} ${functionProblem(bare)} (in the answer ${exact})`,
+        loc(file, line),
+      );
     if (rounded) {
       math(rounded, file, line);
       if (!/^-?\d+(?:\.\d+)?$/.test(rounded))
@@ -427,19 +454,21 @@ export function compileContent(
     }
     return false;
   }
+  /** `x = 3` splits into the label `x` and the value `3`; without `=` there is no label. */
+  function splitLabel(raw: string): { label?: string; value: string } {
+    const value = raw.trim();
+    const eq = value.indexOf("=");
+    return eq < 0
+      ? { value }
+      : { label: value.slice(0, eq).trim(), value: value.slice(eq + 1).trim() };
+  }
   /**
    * A task's expected answer: a number or term, a solution set `{1; 5}`
    * (`{}` for no solution) or a vector `vec(1; 2)`. `f(x) = …` labels the
    * field. Elements are separated by `;`, so `,` is always a decimal comma.
    */
   function answer(raw: string, file: string, line: number): Answer {
-    let value = raw.trim(),
-      label: string | undefined;
-    const eq = value.indexOf("=");
-    if (eq >= 0) {
-      label = value.slice(0, eq).trim();
-      value = value.slice(eq + 1).trim();
-    }
+    const { label, value } = splitLabel(raw);
     const group = /^\{([\s\S]*)\}$/.exec(value) ?? undefined;
     const vector = /^vec\(([\s\S]*)\)$/.exec(value) ?? undefined;
     const inner = group ?? vector;
@@ -475,12 +504,19 @@ export function compileContent(
       return {};
     }
     math(parsed.expression, file, line);
-    for (const name of letters(parsed.row))
+    for (const problem of functionProblems(parsed.row))
       error(
-        "ANSWER_VARIABLE",
-        `A Graph answer may only use x, found "${name}"`,
+        "ANSWER_MATH",
+        `${problem} (in the Graph answer ${parsed.expression})`,
         loc(file, line),
       );
+    for (const name of letters(parsed.row))
+      if (name.length === 1)
+        error(
+          "ANSWER_VARIABLE",
+          `A Graph answer may only use x, found "${name}"`,
+          loc(file, line),
+        );
     return { exact: parsed.expression, checkRow: parsed.row };
   }
   function gapAnswer(raw: string, file: string, line: number): Answer {
@@ -1155,7 +1191,8 @@ export function compileContent(
                 loc(file, x.line),
               );
             return {
-              answer: x.text.slice(0, p).trim(),
+              // Like ::antwort, a label (`x = 3`) is not part of the value.
+              answer: splitLabel(x.text.slice(0, p)).value,
               feedback: x.text.slice(p + 1).trim(),
             };
           });
@@ -1229,6 +1266,17 @@ export function compileContent(
             blocks.antwort[0]?.line ?? line,
           )
         : undefined;
+    // A term that is undefined almost everywhere cannot be compared.
+    const points =
+      expected?.checkRow && !expected.kind
+        ? finitePoints(expected.checkRow)
+        : undefined;
+    if (points !== undefined && points < 2)
+      warn(
+        "ANSWER_DOMAIN",
+        `The answer ${expected?.exact} is defined at only ${points} of the ${CHECK_POINTS.length} points between x = ${Math.min(...CHECK_POINTS)} and x = ${Math.max(...CHECK_POINTS)} where entries are compared, so entries may never count as correct. Use a term that is defined on more of that range.`,
+        loc(file, blocks.antwort?.[0]?.line ?? line),
+      );
     return {
       id: id("part", `${file}:${line}`),
       type,

@@ -1,0 +1,26 @@
+#:schema ../../../../../.chromatis/schemas/catalog.graphic.schema.json
+[achsen]
+x = [-4, 4]
+y = [-3, 3]
+
+[[graph]]
+term = "y = a sin(b x)"
+name = "f"
+
+[[graph]]
+term = "y = ln(x)"
+name = "g"
+
+[[parameter]]
+name = "a"
+von = 1
+bis = 3
+schritt = 0.5
+start = 1
+
+[[parameter]]
+name = "b"
+von = 1
+bis = 4
+schritt = 1
+start = 1

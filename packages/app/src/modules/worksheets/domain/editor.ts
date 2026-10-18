@@ -1,7 +1,10 @@
 import {
+  callHead,
   char,
   childRows,
+  functionAt,
   isBox,
+  type FunctionName,
   type MathNode,
   type MathRow,
 } from "../../content-renderer";
@@ -41,6 +44,40 @@ function findParent(
   return null;
 }
 
+/**
+ * A function name is one unit for the cursor and for deleting, as soon as
+ * its `(` follows (typed or from the keypad): the cursor never rests inside
+ * `sin`, and Backspace never leaves `si(` behind.
+ *
+ * - Left/right jump over the whole name.
+ * - Backspace right after the name deletes it, with an exponent box that
+ *   follows it (`sin|(x)` → `(x)`, `sin|²(x)` → `(x)`).
+ * - Backspace right after its `(` removes name, `(` and the matching `)` and
+ *   keeps the argument (`sin(|2x)` → `2x`, `sin(|)` → empty).
+ * - Clicking inside a name puts the cursor at the nearer end.
+ */
+function nameEndingAt(row: MathRow, i: number) {
+  const open = row[i]?.t === "sup" ? i + 1 : i;
+  const head = callHead(row, open);
+  return head?.end === i ? head : null;
+}
+
+/** The index of the `)` that closes the `(` before `from`, in the same row. */
+function closingBracket(row: MathRow, from: number): number {
+  let depth = 1;
+  for (let k = from; k < row.length; k++) {
+    const node = row[k];
+    if (node?.t !== "c") {
+      continue;
+    }
+    depth += node.v === "(" ? 1 : node.v === ")" ? -1 : 0;
+    if (!depth) {
+      return k;
+    }
+  }
+  return -1;
+}
+
 const isEmptyBox = (node: MathNode) =>
   childRows(node).every((row) => !row.length);
 
@@ -78,6 +115,17 @@ export class MathEditor {
       this.cursor.i -= 4;
       this.sqrt();
     }
+  }
+
+  /** A function: its name and brackets, the cursor between them. */
+  fn(name: FunctionName) {
+    this.insert(char(name[0] as string));
+    for (const letter of name.slice(1)) {
+      this.insert(char(letter));
+    }
+    this.insert(char("("));
+    this.insert(char(")"));
+    this.cursor.i--;
   }
 
   /** A fraction; typed `/` takes the preceding number or term as numerator. */
@@ -124,7 +172,10 @@ export class MathEditor {
     const { row, i } = this.cursor;
     if (i > 0) {
       const previous = row[i - 1];
-      if (isBox(previous)) {
+      const head = nameEndingAt(row, i);
+      if (head) {
+        this.cursor.i = head.start;
+      } else if (isBox(previous)) {
         const last = childRows(previous).at(-1) as MathRow;
         this.cursor = { row: last, i: last.length };
       } else {
@@ -147,7 +198,10 @@ export class MathEditor {
     const { row, i } = this.cursor;
     if (i < row.length) {
       const next = row[i];
-      if (isBox(next)) {
+      const name = functionAt(row, i);
+      if (name) {
+        this.cursor.i = name.end;
+      } else if (isBox(next)) {
         this.cursor = { row: childRows(next)[0] as MathRow, i: 0 };
       } else {
         this.cursor.i++;
@@ -168,6 +222,24 @@ export class MathEditor {
     const { row, i } = this.cursor;
     if (i > 0) {
       const previous = row[i - 1] as MathNode;
+      const name = nameEndingAt(row, i);
+      if (name) {
+        // An exponent box after the name belongs to the head and goes with it.
+        const exponent = row[name.end]?.t === "sup" ? 1 : 0;
+        row.splice(name.start, name.end - name.start + exponent);
+        this.cursor.i = name.start;
+        return;
+      }
+      const head = callHead(row, i - 1);
+      if (head) {
+        const close = closingBracket(row, i);
+        if (close >= 0) {
+          row.splice(close, 1);
+        }
+        row.splice(head.start, i - head.start);
+        this.cursor.i = head.start;
+        return;
+      }
       if (isBox(previous) && !isEmptyBox(previous)) {
         this.left();
         return;
@@ -205,7 +277,18 @@ export class MathEditor {
 
   /** Places the cursor, e.g. where a formula was tapped. */
   place(row: MathRow, i: number) {
-    this.cursor = { row, i: Math.max(0, Math.min(i, row.length)) };
+    const at = Math.max(0, Math.min(i, row.length));
+    for (let start = at - 2; start < at; start++) {
+      const name = start >= 0 ? functionAt(row, start) : null;
+      if (name && name.end > at) {
+        this.cursor = {
+          row,
+          i: at - start <= (name.end - start) / 2 ? start : name.end,
+        };
+        return;
+      }
+    }
+    this.cursor = { row, i: at };
   }
 }
 
@@ -217,6 +300,9 @@ export interface SpeechWords {
   root: (radicand: string) => string;
   squared: string;
   power: (exponent: string) => string;
+  /** The spoken names of sin, cos, ln, and the word that joins one to its argument. */
+  functions: Record<FunctionName, string>;
+  of: string;
 }
 
 /** A spoken form for screen readers: "12 mal x hoch 3". */
@@ -225,9 +311,26 @@ export function speak(row: MathRow | undefined, words: SpeechWords): string {
     return words.empty;
   }
   const out: string[] = [];
+  const exponent = (node: Extract<MathNode, { t: "sup" }>) => {
+    const only = node.e[0];
+    return node.e.length === 1 && only?.t === "c" && only.v === "2"
+      ? words.squared
+      : words.power(speak(node.e, words));
+  };
   for (let i = 0; i < row.length; i++) {
     const node = row[i] as MathNode;
-    if (node.t === "c" && /[0-9,]/.test(node.v)) {
+    const name = functionAt(row, i);
+    if (name) {
+      // "Sinus von", "Sinus Quadrat von": the name, its exponent, then the argument.
+      out.push(words.functions[name.name]);
+      i = name.end - 1;
+      const next = row[i + 1];
+      if (next?.t === "sup") {
+        out.push(exponent(next));
+        i++;
+      }
+      out.push(words.of);
+    } else if (node.t === "c" && /[0-9,]/.test(node.v)) {
       let number = node.v;
       for (
         let next = row[i + 1];
@@ -245,12 +348,7 @@ export function speak(row: MathRow | undefined, words: SpeechWords): string {
     } else if (node.t === "sqrt") {
       out.push(words.root(speak(node.b, words)));
     } else {
-      const only = node.e[0];
-      out.push(
-        node.e.length === 1 && only?.t === "c" && only.v === "2"
-          ? words.squared
-          : words.power(speak(node.e, words)),
-      );
+      out.push(exponent(node));
     }
   }
   return out.join(" ");
