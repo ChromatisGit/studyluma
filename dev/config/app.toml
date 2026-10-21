@@ -2,3 +2,7 @@
 [deployment]
 target = "bun"
 domain = "dev.studyluma.localhost"
+
+# The gateway runs only on studyluma.org; here `/CODE` is the classroom's join page.
+[modules]
+disabled = ["directory"]

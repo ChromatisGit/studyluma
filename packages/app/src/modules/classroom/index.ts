@@ -31,6 +31,7 @@ export {
 } from "./application/useClassroom";
 export type { ClassroomConnection as ClassroomConnectionState } from "./application/useClassroom";
 export { normalizeJoinCode } from "./domain/joinCode";
+export { createFailureLimiter } from "./application/rateLimit";
 export type {
   ControllerSnapshot,
   ParticipantSnapshot,

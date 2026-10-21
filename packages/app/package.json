@@ -12,6 +12,8 @@
     "./app/routes/*.server": "./app/routes/*.server.ts",
     "./app/routes/*": "./app/routes/*.tsx",
     "./app/routes/classroom": "./app/routes/classroom.ts",
+    "./app/routes/classroomSocket": "./app/routes/classroomSocket.ts",
+    "./app/routes/gatewaySessions": "./app/routes/gatewaySessions.ts",
     "./app/routes/sessionProbe": "./app/routes/sessionProbe.ts",
     "./app/StudyShell": "./app/StudyShell.tsx",
     "./app/StudyShellLayout": "./app/StudyShellLayout.tsx",

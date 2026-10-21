@@ -40,6 +40,13 @@ export default defineModule({
       api: true,
       file: "@studyluma/app/app/routes/classroom",
     },
+    // Server entries answer the socket before the router; declaring it puts
+    // it in front of the static files on Cloudflare.
+    {
+      path: "classroom/ws",
+      api: true,
+      file: "@studyluma/app/app/routes/classroomSocket",
+    },
     {
       path: ".well-known/studyluma-session/:code",
       api: true,
