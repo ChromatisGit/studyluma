@@ -1,14 +1,6 @@
-import { useLoaderData, type LoaderFunctionArgs } from "react-router";
+import { useLoaderData } from "react-router";
+import type { loader } from "./home.server";
 import { CourseList } from "../../src/modules/courses";
-import { loadCourses } from "../site.server";
-import { readViewer } from "../../src/modules/classroom";
-
-export async function loader({ request }: LoaderFunctionArgs) {
-  return {
-    courses: loadCourses(request),
-    viewer: await readViewer(request),
-  };
-}
 
 export default function Home() {
   const { courses, viewer } = useLoaderData<typeof loader>();

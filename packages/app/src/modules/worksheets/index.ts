@@ -1,6 +1,7 @@
 export type * from "./domain/contract";
 export { sheetsData } from "./domain/sheetsData";
 export type { SheetsData, MerkkarteCard, Viewer } from "./domain/structure";
+export type { SheetsShown } from "./domain/outline";
 export { WorksheetChapter } from "./ui/WorksheetChapter";
 export type { WorksheetChapterProps } from "./ui/WorksheetChapter";
 export type { CurrentView } from "./ui/ChapterNav";
@@ -10,6 +11,7 @@ export { SheetCards } from "./ui/SheetCards";
 export { TeacherLockNotice } from "./ui/TeacherLockNotice";
 export {
   isReleased,
+  isSheetUnlocked,
   isUnlocked,
   newestSheet,
   openChallenges,

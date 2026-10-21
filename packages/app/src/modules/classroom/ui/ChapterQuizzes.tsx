@@ -3,7 +3,7 @@ import { Alert, Badge, Button } from "@chromatis/base/ui";
 import { RichContent, RichInlineContent } from "../../content-renderer";
 import { fill } from "../../../helper/text";
 import { useTeacherQuiz } from "../application/useLiveQuiz";
-import { useSite } from "./SiteContext";
+import { useCatalog } from "../../catalog";
 import type { TeacherQuizView } from "../domain/views";
 import TEXT from "./classroom.de.json";
 
@@ -88,7 +88,7 @@ export function ChapterQuizzes({
   courseId: string;
   chapterId: string;
 }) {
-  const { catalog } = useSite();
+  const catalog = useCatalog();
   const { view, startAlone, advance, end, running } = useTeacherQuiz(courseId);
   const [failed, setFailed] = useState(false);
   const quizzes = catalog.quizzes.filter(

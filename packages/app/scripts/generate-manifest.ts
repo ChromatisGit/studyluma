@@ -32,7 +32,13 @@ import {
   type RouteDeclaration,
 } from "@chromatis/base/module";
 import { exportedFile } from "./exports";
-import { root as productRoot, routes as productRoutes } from "./routes";
+import {
+  document as productDocument,
+  publicDirectory as productPublic,
+  root as productRoot,
+  routes as productRoutes,
+  server as productServer,
+} from "./routes";
 
 export const MODULES_DIRECTORY = "src/modules";
 export const MODULE_FILE = "module.ts";
@@ -99,12 +105,15 @@ async function loadModule(
   return { declaration, problems };
 }
 
-export type AppDeclaration = {
-  root?: string;
-  routes?: readonly RouteDeclaration[];
-};
+export type AppDeclaration = Parameters<typeof createManifest>[1] & {};
 
-const PRODUCT: AppDeclaration = { root: productRoot, routes: productRoutes };
+const PRODUCT: AppDeclaration = {
+  root: productRoot,
+  server: productServer,
+  document: productDocument,
+  public: productPublic,
+  routes: productRoutes,
+};
 
 /**
  * Declared files that do not exist: './' paths next to `base`, and
@@ -128,6 +137,7 @@ function missingFiles(
 function routeFiles(routes: readonly RouteDeclaration[]): string[] {
   return routes.flatMap((route) => [
     route.file,
+    ...(route.server ? [route.server] : []),
     ...routeFiles(route.children ?? []),
   ]);
 }
@@ -171,7 +181,11 @@ export async function buildManifest(
   }
   problems.push(
     ...missingFiles(
-      [...(app.root ? [app.root] : []), ...routeFiles(app.routes ?? [])],
+      [
+        ...(app.root ? [app.root] : []),
+        ...(app.server ? [app.server] : []),
+        ...routeFiles(app.routes ?? []),
+      ],
       manifestDirectory,
       packageRoot,
       "scripts/routes.ts",

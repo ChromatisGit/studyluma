@@ -46,13 +46,6 @@ export const studyColorModeKey = colorModeKey;
  */
 const dockedQuery = "(min-width: 1100px)";
 
-/**
- * Sets the collapsed class while the HTML is parsed, so the first paint
- * already shows the right sidebar. The hooks below reach the same state
- * before the browser paints again. Mirrors `useSidebarState`.
- */
-const sidebarInitScript = `(function(){var shell=document.currentScript.parentElement;var closed=!matchMedia(${JSON.stringify(dockedQuery)}).matches;try{closed=closed||localStorage.getItem(${JSON.stringify(sidebarStorageKey)})==="closed"}catch(e){}if(closed)shell.classList.add("study-shell--collapsed")})()`;
-
 function useDocked(): boolean {
   const [docked, setDocked] = useState(true);
   useLayoutEffect(() => {
@@ -428,9 +421,7 @@ export function StudyShell({
     <div
       className={`study-shell${collapsed ? " study-shell--collapsed" : ""}${animateSidebar ? " study-shell--animate-sidebar" : ""}`}
       data-page-width={pageWidth}
-      suppressHydrationWarning
     >
-      <script dangerouslySetInnerHTML={{ __html: sidebarInitScript }} />
       <DesktopSidebar
         navigation={navigation}
         chapterSection={chapterSection}

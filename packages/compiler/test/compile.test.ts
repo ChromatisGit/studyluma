@@ -612,6 +612,9 @@ anzahl = 1
       expect(derivations[0]!.steps[0]!.equation.display).toContain(
         "<mn>0,5</mn>",
       );
+      // HTML puts <math> in the MathML namespace; the attribute is dropped.
+      expect(derivations[0]!.steps[0]!.equation.display).toStartWith("<math");
+      expect(derivations[0]!.steps[0]!.equation.display).not.toContain("xmlns");
       // Formula lines without an operation stay a plain paragraph.
       const plain = nodes.filter(
         (x) => x.type === "paragraph" && JSON.stringify(x).includes('"e = f"'),

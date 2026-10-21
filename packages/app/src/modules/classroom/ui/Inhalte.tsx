@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 import { ChevronDown } from "lucide-react";
 import { Badge } from "@chromatis/base/ui";
+import { useCatalog } from "../../catalog";
 import { chapterPath, chaptersInOrder, type Course } from "../../courses";
 import { useSite } from "./SiteContext";
 import { ChapterHeading } from "./ChapterHeading";
@@ -33,6 +34,8 @@ export function Inhalte({
   openSlides: (target: { path: string; presentationId: string }) => ReactNode;
 }) {
   const site = useSite();
+  // The course route loads the chapter chosen here (`?kapitel=`).
+  const catalog = useCatalog();
   const chapters = chaptersInOrder(course);
   const current = chapters.find((chapter) => chapter.current);
   const [params, setParams] = useSearchParams();
@@ -72,7 +75,6 @@ export function Inhalte({
       menu.current.open = false;
     }
   };
-  const catalog = site.catalog;
   const base = chapterPath(course.id, viewed.slug);
   const presentations = catalog.presentations.filter(
     (item) => item.chapterId === viewed.id,

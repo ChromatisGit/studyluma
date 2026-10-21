@@ -1,21 +1,7 @@
-import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData, useParams } from "react-router";
-import { loadSite } from "../site.server";
-import { findChapterBySlug, sheetsFor } from "../../src/modules/courses";
+import type { loader } from "./challenges.server";
 import { WorksheetChapter } from "../../src/modules/worksheets";
 import { worksheetLinks } from "../worksheetLinks";
-
-export async function loader({ params, request }: LoaderFunctionArgs) {
-  const { chapterSlug = "", courseId = "" } = params;
-  const site = await loadSite(request);
-  const course = site.courses.find((item) => item.id === courseId);
-  const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
-  const chapter = chapterId ? sheetsFor(site, courseId, chapterId) : undefined;
-  if (!chapter) {
-    throw new Response(null, { status: 404 });
-  }
-  return { chapter, viewer: site.viewer };
-}
 
 export default function ChallengesRoute() {
   const { chapter, viewer } = useLoaderData<typeof loader>();

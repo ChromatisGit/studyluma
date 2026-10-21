@@ -1,8 +1,8 @@
-import type { ActionFunctionArgs } from "react-router";
+import type { ApiContext } from "@chromatis/base/api";
 import { checkSubmitted, checkSubmittedStep } from "../answer.server";
 
 /** Checks one answer against the private catalog; only its answer travels. */
-export async function action({ request }: ActionFunctionArgs) {
+export async function POST({ request }: ApiContext) {
   const form = await request.formData();
   const buildId = form.get("buildId"),
     partId = form.get("partId"),

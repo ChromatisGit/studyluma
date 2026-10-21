@@ -14,17 +14,14 @@ const teaches = (course: Course, chapterId: string) =>
 /** Where each Merkkarte can be read, in the course being read. */
 function merkkarteHrefs(site: SiteData, courseId?: string) {
   const hrefs: Record<string, string> = {};
-  for (const summary of site.catalog.summaries) {
+  for (const card of site.index.merkkarten) {
     const course =
       site.courses.find(
-        (item) => item.id === courseId && teaches(item, summary.chapterId),
-      ) ?? site.courses.find((item) => teaches(item, summary.chapterId));
-    if (!course) {
-      continue;
-    }
-    for (const card of summary.merkkarten) {
+        (item) => item.id === courseId && teaches(item, card.chapterId),
+      ) ?? site.courses.find((item) => teaches(item, card.chapterId));
+    if (course) {
       hrefs[card.id] =
-        `${chapterPathById(course, summary.chapterId)}#${card.anchor}`;
+        `${chapterPathById(course, card.chapterId)}#${card.anchor}`;
     }
   }
   return hrefs;

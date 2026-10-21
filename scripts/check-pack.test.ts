@@ -72,6 +72,7 @@ describe("missingRouteFiles", () => {
   const manifest = {
     app: {
       root: "../app/root.tsx",
+      public: "../public",
       routes: [
         {
           file: "../app/routes/shell.tsx",
@@ -93,12 +94,23 @@ describe("missingRouteFiles", () => {
     "app/routes/home.tsx",
     "src/modules/join/routes/join.tsx",
     "app/x.ts",
+    "public/favicon.svg",
   ];
 
   test("accepts a package that packs every declared file", () => {
     expect(
       missingRouteFiles(manifest, "dist/chromatis.manifest.json", all),
     ).toEqual([]);
+  });
+
+  test("reports a static directory with no packed file", () => {
+    expect(
+      missingRouteFiles(
+        manifest,
+        "dist/chromatis.manifest.json",
+        all.filter((f) => !f.startsWith("public/")),
+      ),
+    ).toEqual(["public/"]);
   });
 
   test("reports the root, nested and module route files that are left out", () => {

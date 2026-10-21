@@ -38,6 +38,8 @@ import {
   type SlideTag,
 } from "@studyluma/catalog-contract";
 import compilerPackage from "../package.json" with { type: "json" };
+
+const MATHML_NAMESPACE = ' xmlns="http://www.w3.org/1998/Math/MathML"';
 import {
   courseSchema,
   definitionsSchema,
@@ -350,12 +352,14 @@ export function compileContent(
       error("MATH_SYNTAX", `Malformed Typst math: ${source}`, loc(file, line));
     let display = "";
     try {
+      // Pages insert the MathML into HTML, which puts <math> in its namespace
+      // anyway; the attribute was a quarter of all MathML bytes.
       display = germanDecimals(
         renderToString(prepareTypstMath(source), {
           output: "mathml",
           displayMode,
         }),
-      );
+      ).replace(MATHML_NAMESPACE, "");
     } catch (e) {
       error(
         "MATH_SYNTAX",

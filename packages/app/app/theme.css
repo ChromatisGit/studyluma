@@ -1,8 +1,10 @@
 /* StudyLuma theme: warm paper, Fraunces for headings, lavender as the
    brand and the highlighter as its "light". Dark mode is the "Tafel".
-   Layered as "theme" by app.css, so the framework derives the rest. */
+   Layered as "theme" by app.css, so the framework derives the rest.
+   Lesson frames carry data-theme="light": the projector has no dark mode. */
 
-:root[data-brand="studyluma"] {
+:root[data-brand="studyluma"],
+:root[data-brand="studyluma"] [data-theme="light"] {
   --theme-color-modes: light dark;
   color-scheme: light;
   --font-body: "DM Sans", system-ui, sans-serif;

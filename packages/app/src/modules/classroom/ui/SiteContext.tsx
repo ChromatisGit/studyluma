@@ -2,12 +2,15 @@ import { createContext, useContext } from "react";
 import type { Course } from "../../courses";
 import type { ViewerRole } from "../domain/viewer";
 import type { Target } from "../domain/session";
-import type { PublicCatalog, SummaryRule } from "../../catalog";
+import type { CatalogIndex, SummaryRule } from "../../catalog";
 
-/** What every page knows: the catalog for this reader and the courses. */
+/**
+ * What every page knows: the reader, the courses, what is released and the
+ * catalog's index. Content comes from each page's own route (`useCatalog`).
+ */
 export type SiteData = {
   viewer: ViewerRole;
-  catalog: PublicCatalog;
+  index: CatalogIndex;
   courses: Course[];
   /** Chapters whose Inhalt the teacher released. */
   releasedSummaries: string[];

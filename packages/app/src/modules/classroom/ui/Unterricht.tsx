@@ -27,7 +27,7 @@ import {
   tasksOf,
   type SheetsData,
 } from "../../worksheets";
-import type { SummaryRule, Worksheet } from "../../catalog";
+import { useCatalog, type SummaryRule, type Worksheet } from "../../catalog";
 import TEXT from "./classroom.de.json";
 
 // The row keeps access, solutions and active-target confirmation together.
@@ -227,12 +227,10 @@ function InhaltRow({
   const site = useSite();
   const fetcher = useFetcher();
   const [settings, setSettings] = useState(false);
-  const summary = site.catalog.summaries.find(
-    (item) => item.chapterId === chapterId,
-  );
+  const summaryTitle = site.index.summaryTitles[chapterId];
   const released = site.releasedSummaries.includes(chapterId);
   const rule = site.summaryRules[chapterId] ?? "manuell";
-  if (!summary) {
+  if (summaryTitle === undefined) {
     return <p>{TEXT.teacher.noSummary}</p>;
   }
   const send = (values: Record<string, string>) => {
@@ -253,7 +251,7 @@ function InhaltRow({
     <ul className="teacher-controls-access-list">
       <li className="teacher-controls-access-row">
         <div>
-          <strong>{summary.title}</strong>{" "}
+          <strong>{summaryTitle}</strong>{" "}
           <Badge status={released ? "success" : "neutral"}>
             {released ? TEXT.teacher.released : TEXT.teacher.locked}
           </Badge>
@@ -304,10 +302,14 @@ export type UnterrichtProps = {
 /** The class's current chapter: starting a unit, releasing the Inhalt and the sheets. */
 export function Unterricht({ course, start }: UnterrichtProps) {
   const site = useSite();
+  const catalog = useCatalog();
   const current = chaptersInOrder(course).find((chapter) => chapter.current);
   const data = useMemo(
-    () => (current ? sheetsFor(site, course.id, current.id) : undefined),
-    [site, course.id, current],
+    () =>
+      current
+        ? sheetsFor({ ...site, catalog }, course.id, current.id)
+        : undefined,
+    [site, catalog, course.id, current],
   );
   if (!current) {
     return <Alert status="info">{TEXT.teacher.noCurrentChapter}</Alert>;

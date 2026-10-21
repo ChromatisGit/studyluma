@@ -56,11 +56,12 @@ describe("declared routes", () => {
     expect(urls).toContain("/api/check");
   });
 
-  test("the classroom module owns the join, session and probe routes", () => {
+  test("the classroom module owns the join, session, socket and probe routes", () => {
     expect(byModule("classroom").map((route) => route.url)).toEqual([
       "/join",
       "/:code",
       "/classroom",
+      "/classroom/ws",
       "/.well-known/studyluma-session/:code",
     ]);
     const classroomUrls = new Set(byModule("classroom").map((r) => r.url));
@@ -70,12 +71,29 @@ describe("declared routes", () => {
   });
 
   test("route ids and URLs are unique across the package and its modules", () => {
+    // `/:code` is the classroom's join page or the gateway's redirect; an
+    // instance disables one of the two modules.
+    const shared = all.filter(
+      (route) => route.owner === "directory" && route.url === "/:code",
+    );
+    expect(shared).toHaveLength(1);
+    const rest = all.filter((route) => !shared.includes(route));
     for (const key of ["id", "url"] as const) {
-      const values = all.flatMap((route) =>
+      const values = rest.flatMap((route) =>
         route[key] === undefined ? [] : [route[key]],
       );
       expect(values.length).toBe(new Set(values).size);
     }
+    expect(all.map((route) => route.id)).toHaveLength(
+      new Set(all.map((route) => route.id)).size,
+    );
+  });
+
+  test("the directory module owns the gateway routes", () => {
+    expect(byModule("directory").map((route) => route.url)).toEqual([
+      "/:code",
+      "/sessions/:code",
+    ]);
   });
 
   test("no static top-level route can be mistaken for a join code", () => {

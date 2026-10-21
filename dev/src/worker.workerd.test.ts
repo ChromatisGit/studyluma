@@ -23,6 +23,10 @@ async function checkAssets(): Promise<void> {
     }
     const staticFile = await fetch(new URL(`/assets/${asset}`, worker.baseUrl));
     expect(staticFile.status).toBe(200);
+    // Pages are the browser app's document, served as a static file.
+    const page = await fetch(new URL("/", worker.baseUrl));
+    expect(page.status).toBe(200);
+    expect(await page.text()).toContain('<div id="root"></div>');
   } finally {
     await worker.dispose();
   }
@@ -46,8 +50,14 @@ test("framework-generated Worker boots with the Classroom Durable Object", async
     );
     expect(health.status).toBe(200);
     expect(await health.text()).toBe("ok");
-    const page = await worker.dispatchFetch("http://worker/");
-    expect(page.status).toBe(200);
+    // The Worker answers data requests; pages come from the static assets.
+    const data = await worker.dispatchFetch(
+      "http://worker/_chromatis/data/courses?_routes=root",
+    );
+    expect(data.status).toBe(200);
+    expect(await data.json()).toMatchObject({
+      results: { root: { data: { classroomEnabled: true } } },
+    });
     await checkAssets();
     const socket = await worker.dispatchFetch("http://worker/classroom/ws");
     expect(socket.status).toBe(426);

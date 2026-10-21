@@ -21,8 +21,19 @@ export function exportedFile(
       continue;
     }
     const star = key.indexOf("*");
-    if (star < 0 ? key === subpath : subpath.startsWith(key.slice(0, star))) {
-      const match = star < 0 ? "" : subpath.slice(star);
+    const prefix = star < 0 ? key : key.slice(0, star);
+    const suffix = star < 0 ? "" : key.slice(star + 1);
+    if (
+      star < 0
+        ? key === subpath
+        : subpath.startsWith(prefix) &&
+          subpath.endsWith(suffix) &&
+          subpath.length >= prefix.length + suffix.length
+    ) {
+      const match =
+        star < 0
+          ? ""
+          : subpath.slice(prefix.length, subpath.length - suffix.length);
       const file = target.replace("*", match);
       if (existsSync(join(packageRoot, file))) {
         return file;

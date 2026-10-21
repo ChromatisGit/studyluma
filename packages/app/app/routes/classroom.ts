@@ -1,4 +1,4 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
+import type { ApiContext } from "@chromatis/base/api";
 import { getCatalog } from "../../src/modules/catalog/server/catalog.server";
 import { quizQuestions } from "../../src/modules/lessons";
 import {
@@ -20,7 +20,7 @@ import {
 const cookieSeconds = () => classroomSettings().sessionTtlMs / 1000;
 
 /** The browser's session as a snapshot; students poll it where no socket exists. */
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function GET({ request }: ApiContext) {
   if (request.headers.get("upgrade")?.toLowerCase() === "websocket") {
     // Sockets are accepted by the server entry; getting here means the
     // runtime has none (the Vite dev server).
@@ -82,7 +82,7 @@ function startQuiz(input: Record<string, unknown>) {
 }
 
 /** Starting, joining and steering a Classroom Session over plain HTTP. */
-export async function action({ request }: ActionFunctionArgs) {
+export async function POST({ request }: ApiContext) {
   const body = (await request.json().catch(() => null)) as Record<
     string,
     unknown

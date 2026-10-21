@@ -1,27 +1,8 @@
-import type { LoaderFunctionArgs, MetaArgs } from "react-router";
+import type { MetaArgs } from "@chromatis/base/client";
 import { useLoaderData, useParams } from "react-router";
-import { loadSite } from "../site.server";
-import { findChapterBySlug, sheetsFor } from "../../src/modules/courses";
+import type { loader } from "./sheet.server";
 import { WorksheetChapter } from "../../src/modules/worksheets";
 import { worksheetLinks } from "../worksheetLinks";
-
-export async function loader({ params, request }: LoaderFunctionArgs) {
-  const { chapterSlug = "", courseId = "", sheetSlug = "" } = params;
-  const site = await loadSite(request);
-  const course = site.courses.find((item) => item.id === courseId);
-  const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
-  const chapter = chapterId ? sheetsFor(site, courseId, chapterId) : undefined;
-  const sheet = chapter?.sheets.find((item) => item.slug === sheetSlug);
-  if (!chapter || !sheet) {
-    throw new Response(null, { status: 404 });
-  }
-  return {
-    chapter,
-    sheetId: sheet.id,
-    viewer: site.viewer,
-    title: `${chapter.number} ${chapter.title}`,
-  };
-}
 
 export function meta({ data }: MetaArgs<typeof loader>) {
   return data ? [{ title: data.title }] : [];

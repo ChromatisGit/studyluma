@@ -11,6 +11,7 @@ import { Button, Dialog } from "@chromatis/base/ui";
 import { useNavigate, useRevalidator } from "react-router";
 import { fill } from "../../../helper/text";
 import { useSite } from "../../classroom";
+import { useCatalog } from "../../catalog";
 import { sheetsFor } from "../../courses";
 import {
   chapterStore,
@@ -38,6 +39,7 @@ import { SheetEmbed } from "./SheetEmbed";
 import { LiveQuizContext, QuizPreview } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
+import { GraphicSlideContext, useGraphicSlides } from "./GraphicSlide";
 import { InkInput, InkStrokes, type InkTool } from "./InkLayer";
 import { JoinView } from "./JoinView";
 import { LessonHeader } from "./LessonHeader";
@@ -58,6 +60,7 @@ type Dispatch = ReturnType<typeof useLessonSession>["dispatch"];
 
 /** The stage: the slide with ink, the arrows, the blanked note, the overview. */
 // Stage overlays share navigation and ink state.
+// eslint-disable-next-line max-lines-per-function
 function TeacherStage({
   deck,
   session,
@@ -99,23 +102,26 @@ function TeacherStage({
     setLaser(point);
     sendLaser(point);
   };
+  const graphics = useGraphicSlides(session.graphics, dispatch);
   return (
     <FrameStage className="lt-stage">
       {monitoring ?? sheet ?? (
-        <FrameView entry={entry} sent={session.sent.includes(slide.id)}>
-          <InkStrokes
-            strokes={strokes}
-            laser={tool === "laser" ? laser : null}
-          />
-          <InkInput
-            tool={tool}
-            frameId={id}
-            strokes={strokes}
-            onStroke={(stroke) => dispatch({ type: "stroke", stroke })}
-            onErase={(strokeId) => dispatch({ type: "erase", strokeId })}
-            onLaser={moveLaser}
-          />
-        </FrameView>
+        <GraphicSlideContext.Provider value={graphics}>
+          <FrameView entry={entry} sent={session.sent.includes(slide.id)}>
+            <InkStrokes
+              strokes={strokes}
+              laser={tool === "laser" ? laser : null}
+            />
+            <InkInput
+              tool={tool}
+              frameId={id}
+              strokes={strokes}
+              onStroke={(stroke) => dispatch({ type: "stroke", stroke })}
+              onErase={(strokeId) => dispatch({ type: "erase", strokeId })}
+              onLaser={moveLaser}
+            />
+          </FrameView>
+        </GraphicSlideContext.Provider>
       )}
       {tool === "cursor" && hasPrevious && (
         <button
@@ -259,9 +265,10 @@ export function TeacherView({
     access.getSnapshot,
     access.getServerSnapshot,
   );
+  const catalog = useCatalog();
   const sheets = useMemo(
-    () => sheetsFor(site, courseId, deck.chapterId),
-    [site, courseId, deck.chapterId],
+    () => sheetsFor({ ...site, catalog }, courseId, deck.chapterId),
+    [site, catalog, courseId, deck.chapterId],
   );
   const order = runningOrder(deck, session?.blanks ?? []);
   const index = Math.max(

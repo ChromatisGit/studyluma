@@ -19,11 +19,14 @@ import {
 
 const settings = classroomSettings();
 
+// An unusable catalog stops the server at startup, not at the first request.
+// Loading it here, while the module is evaluated, also keeps decoding and
+// parsing it out of the first request's CPU budget (10 ms on Workers Free).
+verifyCatalog();
+
 const hook: ServerHook<ReturnType<typeof configureClassroom>> = {
   definitions: classroomDefinitions(settings),
   createService(host, env) {
-    // An unusable catalog stops the server at startup, not at the first request.
-    verifyCatalog();
     configureTeacherPassword(env.TEACHER_PASSWORD);
     if (devOpen(env)) {
       console.info(

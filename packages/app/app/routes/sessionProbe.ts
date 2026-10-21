@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "react-router";
+import type { ApiContext } from "@chromatis/base/api";
 import {
   classroom,
   classroomError,
@@ -11,7 +11,7 @@ import {
  * more than the join page does and is rate-limited like it: per caller, so
  * that nobody can use up the allowance the Directory itself needs.
  */
-export async function loader({ params, request }: LoaderFunctionArgs) {
+export async function GET({ params, request }: ApiContext) {
   try {
     await classroom().lookup(params.code ?? "", `probe:${clientKey(request)}`);
     return new Response(null, {
