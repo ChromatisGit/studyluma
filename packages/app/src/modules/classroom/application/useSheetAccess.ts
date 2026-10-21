@@ -1,5 +1,5 @@
 import { useCallback, useSyncExternalStore } from "react";
-import { useRevalidator } from "react-router";
+import { useRevalidator, useSubmit } from "react-router";
 import { chapterStore } from "../../worksheets";
 import { targetStore, type ActiveTarget } from "../infrastructure/targetStore";
 import { useSite } from "../ui/SiteContext";
@@ -12,7 +12,7 @@ import { postClassroom } from "./useClassroom";
  */
 export function useSheetAccess(courseId: string, chapterId: string) {
   const { sessionSheets } = useSite();
-  const revalidator = useRevalidator();
+  const submit = useSubmit();
   const store = chapterStore(chapterId);
   return useCallback(
     (sheetId: string, released: boolean) => {
@@ -25,16 +25,16 @@ export function useSheetAccess(courseId: string, chapterId: string) {
       data.set("chapterId", chapterId);
       data.set("sheetId", sheetId);
       data.set("released", String(released));
-      void fetch(`/courses/${encodeURIComponent(courseId)}/overview`, {
-        method: "POST",
-        body: data,
-      }).then((response) => {
-        if (response.ok) {
-          void revalidator.revalidate();
-        }
+      // The overview's action, through the router: pages have no server URL
+      // of their own. One fetcher per sheet, so quick clicks don't cancel.
+      void submit(data, {
+        method: "post",
+        action: `/courses/${encodeURIComponent(courseId)}/overview`,
+        navigate: false,
+        fetcherKey: `unlock-sheet:${chapterId}:${sheetId}`,
       });
     },
-    [sessionSheets, store, courseId, chapterId, revalidator],
+    [sessionSheets, store, courseId, chapterId, submit],
   );
 }
 

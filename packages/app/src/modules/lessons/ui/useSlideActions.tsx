@@ -1,4 +1,4 @@
-import { useRevalidator } from "react-router";
+import { useSubmit } from "react-router";
 import {
   localReleases,
   useSentTarget,
@@ -67,7 +67,7 @@ export function useSlideActions(
   view: SlideView,
 ) {
   const site = useSite();
-  const revalidator = useRevalidator();
+  const submit = useSubmit();
   const { active, send } = useSentTarget(courseId);
   const setUnlocked = useSheetAccess(courseId, deck.chapterId);
   const worksheet = slide?.worksheet;
@@ -132,13 +132,12 @@ export function useSlideActions(
           const data = new FormData();
           data.set("intent", "releaseSummary");
           data.set("chapterId", deck.chapterId);
-          void fetch(`/courses/${encodeURIComponent(courseId)}/overview`, {
-            method: "POST",
-            body: data,
-          }).then((response) => {
-            if (response.ok) {
-              void revalidator.revalidate();
-            }
+          // The overview's action, through the router (pages have no server URL).
+          void submit(data, {
+            method: "post",
+            action: `/courses/${encodeURIComponent(courseId)}/overview`,
+            navigate: false,
+            fetcherKey: `release-summary:${deck.chapterId}`,
           });
         }}
       >
