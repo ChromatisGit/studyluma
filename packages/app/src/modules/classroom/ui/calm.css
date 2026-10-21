@@ -1,0 +1,153 @@
+/* The calm view of a student device: one symbol and one word, centred.
+   Green phases take green like their slide tab: green means you act. */
+.calm {
+  --calm-accent: var(--color-action-primary-bg);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  min-height: 100dvh;
+  padding: var(--space-600, 2rem) var(--space-400, 1rem) var(--space-400, 1rem);
+  box-sizing: border-box;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+.calm[data-phase="aufgabe"],
+.calm[data-phase="arbeitsblatt"],
+.calm[data-phase="austausch"] {
+  --calm-accent: var(--color-status-success);
+}
+.calm__phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+  gap: var(--space-400, 1rem);
+  width: min(100%, 28rem);
+  text-align: center;
+  animation: calm-in 450ms ease-out both;
+}
+.calm__icon {
+  display: grid;
+  place-items: center;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--calm-accent) 12%, transparent);
+  color: var(--calm-accent);
+}
+.calm__icon svg {
+  width: 3.25rem;
+  height: 3.25rem;
+  stroke-width: 1.6;
+}
+.calm__text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.calm__hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.calm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-300, 0.75rem);
+}
+.calm__more {
+  width: 100%;
+  margin-top: var(--space-300, 0.75rem);
+  text-align: left;
+}
+.calm__more-title {
+  margin: 0 0 var(--space-200, 0.5rem);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.calm__links {
+  display: grid;
+  gap: var(--space-200, 0.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.calm__links a {
+  display: block;
+  padding: var(--space-300, 0.75rem) var(--space-400, 1rem);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  color: var(--color-text);
+  text-decoration: none;
+}
+.calm__links a:hover {
+  background: var(--color-bg-hover, var(--color-bg-subtle));
+}
+.calm__connection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-200, 0.5rem);
+  margin: var(--space-400, 1rem) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.calm__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+}
+.calm__dot[data-connected] {
+  background: var(--color-status-success);
+}
+@keyframes calm-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+/* Leaving a green phase: the class sees how long it may still finish. */
+.device-return {
+  position: sticky;
+  top: var(--study-sticky-top, 0px);
+  z-index: 50;
+  margin: 0;
+  padding: var(--space-200, 0.5rem) var(--space-400, 1rem)
+    calc(var(--space-200, 0.5rem) + 3px);
+  background: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text);
+  text-align: center;
+  font-weight: var(--weight-bold);
+}
+.device-return__bar {
+  position: absolute;
+  inset: auto 0 0;
+  height: 3px;
+  background: var(--color-status-success);
+  transform-origin: left;
+  animation: device-return var(--return-seconds, 10s) linear both;
+}
+@keyframes device-return {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calm__phase,
+  .device-return__bar {
+    animation: none;
+  }
+}
+.device-return + .calm {
+  min-height: calc(100dvh - 2.75rem);
+}

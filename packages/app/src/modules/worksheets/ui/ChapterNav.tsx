@@ -1,4 +1,10 @@
-import { useEffect, useId, useState, useSyncExternalStore } from "react";
+import {
+  useContext,
+  useEffect,
+  useId,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { Check, ChevronDown, Lock } from "lucide-react";
 import { Link } from "react-router";
 import type { ChapterState } from "../domain/chapterState";
@@ -12,6 +18,7 @@ import {
 import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./uiState";
 import { TEXT } from "./texts";
+import { SheetsPausedContext } from "./reporting";
 import "./chapter-nav.css";
 
 export type CurrentView =
@@ -82,6 +89,7 @@ export function ChapterNav({
     store.getServerSnapshot,
   );
   const teacher = viewer === "teacher";
+  const paused = useContext(SheetsPausedContext) && !teacher;
   const [sheetsOpen, setSheetsOpen] = useState(
     current.kind === "sheet" || current.kind === "course",
   );
@@ -155,10 +163,10 @@ export function ChapterNav({
                     />
                   </>
                 );
-                const className = `kap-nav__item${isCurrent ? " is-current" : ""}${unlocked ? "" : " is-locked"}`;
+                const className = `kap-nav__item${isCurrent ? " is-current" : ""}${unlocked && !paused ? "" : " is-locked"}`;
                 return (
                   <li key={sheet.id} className="kap-nav__row">
-                    {unlocked || teacher ? (
+                    {(unlocked || teacher) && !paused ? (
                       <Link
                         className={className}
                         to={links.sheet(sheet.slug)}
@@ -184,16 +192,21 @@ export function ChapterNav({
         </div>
       </div>
       {(openChallenges(chapter, state).length > 0 ||
-        (teacher && chapter.challenges.length > 0)) && (
-        <Link
-          className={`kap-nav__item${current.kind === "challenges" ? " is-current" : ""}`}
-          to={links.challenges}
-          aria-current={current.kind === "challenges" ? "page" : undefined}
-          onClick={onNavigate}
-        >
-          <span className="kap-nav__t">{TEXT.nav.challenges}</span>
-        </Link>
-      )}
+        (teacher && chapter.challenges.length > 0)) &&
+        (paused ? (
+          <span className="kap-nav__item is-locked" aria-disabled="true">
+            <span className="kap-nav__t">{TEXT.nav.challenges}</span>
+          </span>
+        ) : (
+          <Link
+            className={`kap-nav__item${current.kind === "challenges" ? " is-current" : ""}`}
+            to={links.challenges}
+            aria-current={current.kind === "challenges" ? "page" : undefined}
+            onClick={onNavigate}
+          >
+            <span className="kap-nav__t">{TEXT.nav.challenges}</span>
+          </Link>
+        ))}
     </div>
   );
 }

@@ -104,8 +104,6 @@ Alias für `## Mitte Rechts`.
 
 # "Merkkarten auf einer Folie"
 
-::tag Erklären
-
 Text über den Karten.
 
 ::merkkarte "Testregel Eins"
@@ -116,13 +114,37 @@ Text zwischen den Karten, danach Platz zum Schreiben.
 
 ::bis 12:30
 
-# "Aufgabe mit eigenem Etikett"
+# "Folie mit Etikett"
 
-::tag Einstieg hinweis
+::tag Einstieg
 
-Eine Folie mit einem frei gewählten Etikett in einer der Hinweisfarben.
+Eine Folie mit dem Etikett Einstieg in der Grundfarbe.
 
 ::bis 13:00
+
+# "Aufgabe vorne"
+
+::tag Aufgabe
+
+Grün: Die Geräte zeigen „Aufgabe“ und die freigegebenen Inhalte.
+
+::bis 13:30
+
+# "Austausch"
+
+::tag Austausch
+
+Grün: Die Geräte zeigen „Tausch dich mit deinem Sitznachbarn aus“.
+
+::bis 14:00
+
+# "Das Wichtigste"
+
+::tag Merke
+
+Orange: die Essenz der Stunde.
+
+::bis 14:30
 
 # Quiz: UI-Test Quiz
 

@@ -105,5 +105,22 @@
   },
   "teacherAway": "Die Lehrkraft ist gerade nicht verbunden.",
   "unitEnded": "Der Unterricht ist beendet.",
-  "quizRunning": "Quiz läuft – hier mitmachen"
+  "quizRunning": "Quiz läuft – hier mitmachen",
+  "device": {
+    "unterricht": "Unterricht",
+    "aufgabe": "Aufgabe",
+    "arbeitsblatt": "Arbeitsblatt",
+    "austausch": "Tausch dich mit deinem Sitznachbarn aus",
+    "returnMany": "In {seconds} Sekunden geht's zurück",
+    "returnOne": "In 1 Sekunde geht's zurück",
+    "lookUp": "Zum Nachschlagen",
+    "noSummaries": "Noch keine Inhalte freigegeben.",
+    "toSheet": "Zum Arbeitsblatt",
+    "toCourse": "Alle Arbeitsblätter und Challenges",
+    "connected": "Verbunden als {name}",
+    "connecting": "Verbindung wird hergestellt …",
+    "endedText": "Du kannst dich jetzt frei im Kurs umsehen.",
+    "noSession": "Du bist gerade in keinem Unterricht.",
+    "joined": "Du bist dabei, {name}!"
+  }
 }

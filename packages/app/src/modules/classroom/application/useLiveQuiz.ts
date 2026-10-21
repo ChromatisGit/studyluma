@@ -119,5 +119,18 @@ export function useStudentQuizzes(enabled: boolean) {
     snapshot?.role === "participant"
       ? { target: snapshot.target, courseId: snapshot.courseId }
       : undefined;
-  return { views, answer, sync, reporter, teacherAway, sent, ended };
+  /** What the students do now; undefined until the first snapshot. */
+  const phase = snapshot?.role === "participant" ? snapshot.phase : undefined;
+  const name = snapshot?.role === "participant" ? snapshot.you.name : null;
+  return {
+    views,
+    answer,
+    sync,
+    reporter,
+    teacherAway,
+    sent,
+    ended,
+    phase,
+    name,
+  };
 }

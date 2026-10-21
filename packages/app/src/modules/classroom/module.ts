@@ -30,6 +30,11 @@ export default defineModule({
       server: "@studyluma/app/app/routes/join.server",
       id: "join-form",
     },
+    // The calm view of a student device during a lesson.
+    {
+      path: "unterricht",
+      file: "@studyluma/app/app/routes/unterricht",
+    },
     {
       path: ":code",
       file: "@studyluma/app/app/routes/join",

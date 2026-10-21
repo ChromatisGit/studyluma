@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useContext, useSyncExternalStore } from "react";
 import { ActionCard, Badge, Card, CardBody } from "@chromatis/base/ui";
 import {
   isUnlocked,
@@ -12,6 +12,7 @@ import {
 import { chapterStore } from "../infrastructure/localChapterStore";
 import type { WorksheetLinks } from "./useWorksheetController";
 import { TEXT } from "./texts";
+import { SheetsPausedContext } from "./reporting";
 import { fill } from "../../../helper/text";
 
 /** Worksheets and the chapter's challenge pool in learning order. */
@@ -33,9 +34,23 @@ export function SheetCards({
     store.getServerSnapshot,
   );
   const teacher = viewer === "teacher";
+  const paused = useContext(SheetsPausedContext) && !teacher;
   const open = openChallenges(chapter, state).length;
+  const challenges = (
+    <CardBody>
+      <strong className="card__title">{TEXT.cards.challenges}</strong>
+      <span className="kapitel-blatt__status">
+        <Badge status="info">
+          {fill(TEXT.cards.availableOf, {
+            open,
+            total: chapter.challenges.length,
+          })}
+        </Badge>
+      </span>
+    </CardBody>
+  );
   return (
-    <div className="kapitel-blaetter">
+    <div className="kapitel-blaetter" data-paused={paused || undefined}>
       {chapter.sheets
         .filter((sheet) => !availableOnly || isUnlocked(chapter, sheet, state))
         .map((sheet) => {
@@ -56,8 +71,9 @@ export function SheetCards({
               {badge && <span className="kapitel-blatt__status">{badge}</span>}
             </CardBody>
           );
-          // Locked sheets are only a link for the teacher, who may open them.
-          return !unlocked && !teacher ? (
+          // Locked sheets are only a link for the teacher, who may open them;
+          // outside the worksheet phase none is.
+          return (!unlocked && !teacher) || paused ? (
             <Card key={sheet.id} surface="subtle">
               {body}
             </Card>
@@ -71,21 +87,12 @@ export function SheetCards({
             </ActionCard>
           );
         })}
-      {open > 0 && (
-        <ActionCard to={links.challenges}>
-          <CardBody>
-            <strong className="card__title">{TEXT.cards.challenges}</strong>
-            <span className="kapitel-blatt__status">
-              <Badge status="info">
-                {fill(TEXT.cards.availableOf, {
-                  open,
-                  total: chapter.challenges.length,
-                })}
-              </Badge>
-            </span>
-          </CardBody>
-        </ActionCard>
-      )}
+      {open > 0 &&
+        (paused ? (
+          <Card surface="subtle">{challenges}</Card>
+        ) : (
+          <ActionCard to={links.challenges}>{challenges}</ActionCard>
+        ))}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import type { RichNode, SlideSegment, SlideTone } from "../../catalog";
+import type { Phase } from "../../classroom";
+import type { RichNode, SlideSegment } from "../../catalog";
 import type { Deck, Slide } from "./deck";
 import type { Blank } from "./lesson";
 
@@ -15,26 +16,57 @@ export const slideLayout = (slide: Slide): SlideLayout =>
       ? slide.kind
       : "slide";
 
-/** A tab's color says what happens on the slide. */
-export type TabTone = SlideTone | "arbeitsblatt" | "quiz" | "inhalt";
+/**
+ * A tab's color says what happens on the slide: green means the students
+ * act, orange is the essence of the lesson.
+ */
+export type TabTone = "standard" | "merke" | "arbeit" | "quiz";
 
 /**
  * The tab of a slide: embedded entries carry a fixed function, author
- * slides the tag the author chose, else the neutral tab of their section.
+ * slides their `::tag`, an untagged slide is `Plenum`.
  */
 export function slideTab(slide: Slide): { label: string; tone: TabTone } {
   switch (slide.kind) {
     case "worksheet":
-      return { label: "Arbeitsblatt", tone: "arbeitsblatt" };
+      return { label: "Arbeitsblatt", tone: "arbeit" };
     case "quiz":
       return { label: "Quiz", tone: "quiz" };
     case "summary":
-      return { label: "Inhalt", tone: "inhalt" };
+      return { label: "Inhalt", tone: "standard" };
     case "merkkarte":
-      return { label: "Merkkarte", tone: "merke" };
-    case "slide":
-      return slide.tag ?? { label: slide.from.at(-1) ?? "", tone: "neutral" };
+      return { label: "Merkkarte", tone: "standard" };
+    case "slide": {
+      const label = slide.tag ?? "Plenum";
+      return {
+        label,
+        tone:
+          label === "Merke"
+            ? "merke"
+            : label === "Aufgabe" || label === "Austausch"
+              ? "arbeit"
+              : "standard",
+      };
+    }
   }
+}
+
+/**
+ * What the students' devices show while this slide is up front. Only the
+ * green slides change it; a quiz takes over on its own once it runs.
+ */
+export function slidePhase(slide: Slide): Phase {
+  if (slide.kind === "worksheet") {
+    return "arbeitsblatt";
+  }
+  if (slide.kind !== "slide") {
+    return "unterricht";
+  }
+  return slide.tag === "Aufgabe"
+    ? "aufgabe"
+    : slide.tag === "Austausch"
+      ? "austausch"
+      : "unterricht";
 }
 
 const hasSpace = (nodes: RichNode[]) =>

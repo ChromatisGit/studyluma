@@ -37,22 +37,17 @@
 }
 
 /* Tab and color bar: the color says what happens on the slide */
-.lf--tone-erklaeren,
-.lf--tone-inhalt,
-.lf--tone-merke,
-.lf--tone-neutral {
+.lf--tone-standard {
   --lf-family: var(--frame-family-standard);
 }
-.lf--tone-aufgabe,
-.lf--tone-arbeitsblatt {
+.lf--tone-arbeit {
   --lf-family: var(--frame-family-arbeit);
 }
 .lf--tone-quiz {
   --lf-family: var(--frame-family-quiz);
 }
-.lf--tone-hinweis,
-.lf--tone-wichtig {
-  --lf-family: var(--frame-family-achtung);
+.lf--tone-merke {
+  --lf-family: var(--frame-family-merke);
 }
 .lf__bar {
   position: absolute;

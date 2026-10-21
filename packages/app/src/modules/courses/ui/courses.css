@@ -274,6 +274,10 @@ a.lernweg__chapter:hover .lernweg__chapter-title {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
   gap: var(--space-400);
 }
+/* Outside the worksheet phase of a lesson: visible, greyed out, not links. */
+.kapitel-blaetter[data-paused] > * {
+  opacity: 0.5;
+}
 .kapitel-blatt__status {
   margin-top: var(--space-200);
 }

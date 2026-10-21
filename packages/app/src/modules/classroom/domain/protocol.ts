@@ -8,10 +8,12 @@
  */
 
 import {
+  PHASES,
   presentIds,
   type ClassroomEvent,
   type ClassroomSession,
   type Intent,
+  type Phase,
   type Placement,
   type Rejection,
   type Releases,
@@ -43,6 +45,8 @@ type SnapshotBase = {
   inviteOpen: boolean;
   placement: Placement | null;
   target: Target | null;
+  /** What the students do now; their devices follow it. */
+  phase: Phase;
   releases: Releases;
 };
 
@@ -134,6 +138,7 @@ function base(session: ClassroomSession): SnapshotBase {
     inviteOpen: session.inviteOpen,
     placement: session.placement,
     target: session.target,
+    phase: session.phase,
     releases: session.releases,
   };
 }
@@ -193,6 +198,10 @@ function parseWireIntent(input: unknown): WireIntent | null {
           }
         : null;
     }
+    case "phase":
+      return PHASES.includes(c.phase as Phase)
+        ? { type: "phase", phase: c.phase as Phase }
+        : null;
     case "quiz.advance":
       return text(c.runId) && index >= 0 && STEPS.includes(c.step as QuizStep)
         ? {

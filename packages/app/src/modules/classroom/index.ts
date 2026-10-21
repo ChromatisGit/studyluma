@@ -37,7 +37,10 @@ export type {
   ParticipantSnapshot,
   Snapshot,
 } from "./domain/protocol";
-export type { Placement, Target } from "./domain/session";
+export type { Phase, Placement, Target } from "./domain/session";
+
+// What the students do now.
+export { useSendPhase } from "./application/usePhase";
 
 // Sending worksheets to the class.
 export { useSheetAccess, useSentTarget } from "./application/useSheetAccess";
@@ -55,8 +58,17 @@ export type {
 } from "./domain/quiz";
 export type { StudentQuizView, TeacherQuizView } from "./domain/views";
 export { useTeacherQuiz } from "./application/useLiveQuiz";
-export { LiveQuizProvider, useLiveQuiz } from "./ui/LiveQuizProvider";
-export type { LiveQuizProviderProps } from "./ui/LiveQuizProvider";
+export {
+  LiveBanners,
+  LiveQuizProvider,
+  useDeviceFocus,
+  useLiveQuiz,
+} from "./ui/LiveQuizProvider";
+export type { DeviceFocus, LiveQuizProviderProps } from "./ui/LiveQuizProvider";
+
+// What a student device shows during a lesson.
+export type { DeviceArea } from "./domain/focus";
+export { CalmView } from "./ui/CalmView";
 export { QuizPage } from "./ui/QuizPage";
 export type { QuizPageProps } from "./ui/QuizPage";
 export { default as quizText } from "./ui/quiz.de.json";

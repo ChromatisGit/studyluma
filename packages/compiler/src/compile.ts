@@ -1804,23 +1804,32 @@ export function compileContent(
     doc.chapter.title = summary.title;
   }
   const LINK = /^\[([^\]]+)\]\(([^)]+)\)$/;
-  const TAG_TONES = ["neutral", "hinweis", "wichtig", "merke"] as const;
-  /** `::tag Erklären`, `::tag Einstieg hinweis`: the label of the slide's tab and its color. */
-  function parseTag(value: string): SlideTag | undefined {
+  const SLIDE_TAGS: readonly SlideTag[] = [
+    "Einstieg",
+    "Wiederholung",
+    "Plenum",
+    "Merke",
+    "Ausblick",
+    "Aufgabe",
+    "Austausch",
+  ];
+  /** Words of the old free tags, with the word that replaces them. */
+  const OLD_TAGS: Record<string, string> = {
+    erklären: "Plenum (or no ::tag)",
+    knobelei: "Aufgabe",
+  };
+  /** `::tag Einstieg`: one word of the fixed list. */
+  function parseTag(value: string): SlideTag | string {
     const words = value.trim().split(/\s+/).filter(Boolean);
-    const last = words.at(-1)?.toLowerCase();
-    const tone = TAG_TONES.find((item) => item === last);
-    const label = (tone && words.length > 1 ? words.slice(0, -1) : words)
-      .join(" ")
-      .trim();
-    if (!label) return undefined;
-    const function_ =
-      label.toLowerCase() === "erklären"
-        ? "erklaeren"
-        : label.toLowerCase() === "aufgabe"
-          ? "aufgabe"
-          : undefined;
-    return { label, tone: tone ?? function_ ?? "neutral" };
+    const tag = SLIDE_TAGS.find(
+      (item) => item.toLowerCase() === words[0]?.toLowerCase(),
+    );
+    const hint = `Expected ::tag ${SLIDE_TAGS.join("|")}`;
+    if (tag && words.length === 1) return tag;
+    if (tag) return `${hint}; colors are fixed, write ::tag ${tag}`;
+    const old = OLD_TAGS[words[0]?.toLowerCase() ?? ""];
+    if (old) return `${hint}; ::tag ${words[0]} is now ::tag ${old}`;
+    return hint;
   }
   /** `::grafikfolie [Text](pfad.toml)`: a slide that is only a Grafik. */
   function readGraphicSlide(
@@ -2002,15 +2011,13 @@ export function compileContent(
           );
         else if (/^::tag\b/.test(value)) {
           const tag = parseTag(value.slice(5));
-          if (!tag || entry.tag)
+          if (entry.tag || !SLIDE_TAGS.includes(tag as SlideTag))
             error(
               "TAG_SYNTAX",
-              entry.tag
-                ? "Duplicate ::tag"
-                : "Expected ::tag Text or ::tag Text neutral|hinweis|wichtig|merke",
+              entry.tag ? "Duplicate ::tag" : tag,
               loc(doc.file, line.line),
             );
-          else entry.tag = tag;
+          else entry.tag = tag as SlideTag;
         } else if (/^::grafikfolie\b/.test(value) && !inNote)
           graphicLines.push(line);
         else if (value === "::notiz") {
