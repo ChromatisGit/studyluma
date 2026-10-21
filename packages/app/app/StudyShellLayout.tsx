@@ -1,5 +1,5 @@
 import { useCallback, type ReactNode } from "react";
-import type { loader } from "./routes/shell";
+import type { loader } from "./routes/shell.server";
 import {
   Link,
   Outlet,

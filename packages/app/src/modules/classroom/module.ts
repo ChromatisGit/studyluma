@@ -24,11 +24,25 @@ export default defineModule({
   // Join links are `<host>/CODE`; the loader answers 404 for anything that is
   // not shaped like a join code, and static routes win over `:code`.
   routes: [
-    { path: "join", file: "@studyluma/app/app/routes/join", id: "join-form" },
-    { path: ":code", file: "@studyluma/app/app/routes/join" },
-    { path: "classroom", file: "@studyluma/app/app/routes/classroom" },
+    {
+      path: "join",
+      file: "@studyluma/app/app/routes/join",
+      server: "@studyluma/app/app/routes/join.server",
+      id: "join-form",
+    },
+    {
+      path: ":code",
+      file: "@studyluma/app/app/routes/join",
+      server: "@studyluma/app/app/routes/join.server",
+    },
+    {
+      path: "classroom",
+      api: true,
+      file: "@studyluma/app/app/routes/classroom",
+    },
     {
       path: ".well-known/studyluma-session/:code",
+      api: true,
       file: "@studyluma/app/app/routes/sessionProbe",
     },
   ],

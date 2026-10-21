@@ -1,11 +1,6 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
-import { redirect } from "react-router";
+import type { DataArgs } from "@chromatis/base/data";
 import { getCatalog } from "../../src/modules/catalog/server/catalog.server";
-import {
-  chaptersInOrder,
-  courseOverviewPath,
-  summariesToRelease,
-} from "../../src/modules/courses";
+import { chaptersInOrder, summariesToRelease } from "../../src/modules/courses";
 import {
   applyCoursePlan,
   coursePlanCookie,
@@ -19,15 +14,6 @@ import {
   currentReleases,
 } from "../../src/modules/classroom/server/classroom.server";
 import TEXT from "../app.de.json";
-
-export async function loader({ params, request }: LoaderFunctionArgs) {
-  const courseId = params.courseId ?? "";
-  const base = loadCourses(request).find((item) => item.id === courseId);
-  if (!base) {
-    throw new Response(null, { status: 404 });
-  }
-  return redirect(courseOverviewPath(courseId));
-}
 
 /** Moving the class forward opens the Inhalte whose rule says so. */
 async function openSummaries(
@@ -59,7 +45,7 @@ async function openSummaries(
   }
 }
 
-export async function action({ params, request }: ActionFunctionArgs) {
+export async function action({ params, request }: DataArgs) {
   if ((await readViewer(request)) !== "teacher") {
     throw new Response(null, { status: 403 });
   }

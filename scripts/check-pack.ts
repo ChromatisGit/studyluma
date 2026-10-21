@@ -72,7 +72,7 @@ export function missingTargets(
 
 type RouteEntry = { file: string; children?: RouteEntry[] };
 type ChromatisManifestJson = {
-  app?: { root?: string; routes?: RouteEntry[] };
+  app?: { root?: string; public?: string; routes?: RouteEntry[] };
   modules?: { entry: string; routes?: RouteEntry[] }[];
 };
 
@@ -80,7 +80,8 @@ const routeFiles = (routes: RouteEntry[] = []): string[] =>
   routes.flatMap((route) => [route.file, ...routeFiles(route.children)]);
 
 /**
- * Route and root files named by a Chromatis manifest that the packed files
+ * Route and root files, and the static directory, named by a Chromatis
+ * manifest that the packed files
  * leave out. `manifestPath` is the manifest's path in the package; './' and
  * '../' files resolve from the manifest (package level) or from the module's
  * directory; bare specifiers are package exports, checked by missingTargets.
@@ -107,7 +108,17 @@ export function missingRouteFiles(
       ),
     ),
   ];
-  return [...new Set(wanted)].filter((file) => !files.includes(file));
+  // The static directory ships as a whole; it needs at least one file.
+  const staticDirectory = manifest.app?.public
+    ? posix.join(manifestDirectory, manifest.app.public)
+    : undefined;
+  return [
+    ...[...new Set(wanted)].filter((file) => !files.includes(file)),
+    ...(staticDirectory &&
+    !files.some((file) => file.startsWith(`${staticDirectory}/`))
+      ? [`${staticDirectory}/`]
+      : []),
+  ];
 }
 
 function packedFiles(dir: string): string[] {

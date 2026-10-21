@@ -1,7 +1,7 @@
-import type { LoaderFunctionArgs } from "react-router";
+import type { ApiContext } from "@chromatis/base/api";
 import { assetBytes } from "../../src/modules/catalog/server/catalog.server";
 
-export function loader({ params }: LoaderFunctionArgs) {
+export function GET({ params }: ApiContext) {
   const asset = assetBytes(params.assetId ?? "");
   if (!asset) {
     throw new Response(null, { status: 404 });

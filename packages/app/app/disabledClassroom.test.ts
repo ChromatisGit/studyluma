@@ -3,7 +3,7 @@ import { injectChromatis } from "@chromatis/base/testing";
 import { fixtureFiles, serveSiteFixture, source } from "../src/test/site";
 import { provideCatalogFiles } from "../src/modules/catalog/server/catalog.server";
 import { loadCatalog, loadSite } from "./site.server";
-import { loader as quizLoader } from "./routes/quiz";
+import { loader as quizLoader } from "./routes/quiz.server";
 
 serveSiteFixture();
 
