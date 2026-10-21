@@ -8,7 +8,7 @@ import {
   courseStructurePath,
 } from "../../src/modules/courses";
 import { getCatalog } from "../../src/modules/catalog/server/catalog.server";
-import { loadCourses } from "../site.server";
+import { loadCatalog, loadCourses, loadSheets } from "../site.server";
 import { actInSession } from "../../src/modules/classroom/server/classroom.server";
 import {
   CurrentLesson,
@@ -18,7 +18,7 @@ import {
   readViewer,
 } from "../../src/modules/classroom";
 import { LessonStart, OpenSlides } from "../../src/modules/lessons";
-import type { SummaryRule } from "../../src/modules/catalog";
+import { CatalogContext, type SummaryRule } from "../../src/modules/catalog";
 import { action as planAction } from "./control";
 
 const releaseIntents = [
@@ -132,11 +132,34 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   if (viewer === "student" && !isStudentOverview) {
     throw redirect(coursePath(courseId));
   }
-  return { course, viewer };
+  // Everyone sees the current chapter's work; the teacher's panels also
+  // show the chapter chosen under Inhalte (`?kapitel=`, which reloads this).
+  const chapters = chaptersInOrder(course);
+  const current = chapters.find((chapter) => chapter.current);
+  const viewed =
+    chapters.find(
+      (chapter) =>
+        chapter.id === new URL(request.url).searchParams.get("kapitel"),
+    ) ??
+    current ??
+    chapters[0];
+  // Students see only the current chapter's sheet cards: its outline, no
+  // content. The teacher's panels read both chapters' content.
+  const catalog = await loadCatalog(
+    request,
+    viewer === "teacher"
+      ? [current, viewed].flatMap((chapter) => (chapter ? [chapter.id] : []))
+      : [],
+  );
+  const currentSheets = current
+    ? ((await loadSheets(request, courseId, current.id, "none")) ?? null)
+    : null;
+  return { course, viewer, catalog, currentSheets };
 }
 
 export default function Course() {
-  const { course, viewer } = useLoaderData<typeof loader>();
+  const { course, viewer, catalog, currentSheets } =
+    useLoaderData<typeof loader>();
   const location = useLocation();
   const path = location.pathname.replace(/\/+$/, "");
   const activeTab =
@@ -148,29 +171,31 @@ export default function Course() {
           ? "content"
           : "overview";
   return (
-    <CoursePage
-      course={course}
-      teacher={viewer === "teacher"}
-      currentLesson={<CurrentLesson course={course} />}
-      teachingControls={
-        <Unterricht
-          course={course}
-          start={
-            <LessonStart
-              course={course}
-              chapterId={course.currentChapterId ?? ""}
-            />
-          }
-        />
-      }
-      structureControls={<LernwegControl course={course} />}
-      contents={
-        <Inhalte
-          course={course}
-          openSlides={(target) => <OpenSlides course={course} {...target} />}
-        />
-      }
-      activeTab={activeTab}
-    />
+    <CatalogContext.Provider value={catalog}>
+      <CoursePage
+        course={course}
+        teacher={viewer === "teacher"}
+        currentLesson={<CurrentLesson course={course} sheets={currentSheets} />}
+        teachingControls={
+          <Unterricht
+            course={course}
+            start={
+              <LessonStart
+                course={course}
+                chapterId={course.currentChapterId ?? ""}
+              />
+            }
+          />
+        }
+        structureControls={<LernwegControl course={course} />}
+        contents={
+          <Inhalte
+            course={course}
+            openSlides={(target) => <OpenSlides course={course} {...target} />}
+          />
+        }
+        activeTab={activeTab}
+      />
+    </CatalogContext.Provider>
   );
 }

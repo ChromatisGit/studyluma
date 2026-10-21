@@ -8,7 +8,6 @@ import {
   Linie,
   LinieStop,
   Pictogram,
-  sheetsFor,
   summariesToRelease,
   trackFor,
   type Course,
@@ -16,7 +15,7 @@ import {
 } from "../../courses";
 import { useSite } from "./SiteContext";
 import { localReleases } from "../infrastructure/localReleases";
-import { chapterStore, isUnlocked } from "../../worksheets";
+import { chapterStore, isSheetUnlocked } from "../../worksheets";
 import { ChapterHeading } from "./ChapterHeading";
 import TEXT from "./classroom.de.json";
 
@@ -271,8 +270,8 @@ export function LernwegControl({ course }: { course: Course }) {
     ? chapters.findIndex((item) => item.id === selected.id)
     : oldIndex;
   const selectedSheets = selected
-    ? sheetsFor(site, course.id, selected.id)
-    : undefined;
+    ? (site.index.worksheets[selected.id] ?? [])
+    : [];
   const summariesToOpen = selected
     ? summariesToRelease({
         order: chapters.map((item) => item.id),
@@ -280,21 +279,21 @@ export function LernwegControl({ course }: { course: Course }) {
         to: selected.id,
         rule: (id) => site.summaryRules[id] ?? "manuell",
         closed: (id) =>
-          site.catalog.summaries.some((item) => item.chapterId === id) &&
+          site.index.summaryTitles[id] !== undefined &&
           !site.releasedSummaries.includes(id),
       })
         .map((id) => chapters.find((item) => item.id === id))
         .flatMap((item) => (item ? [item] : []))
     : [];
-  const lockedSheets =
-    selectedSheets?.sheets.filter(
-      (sheet) =>
-        !isUnlocked(
-          selectedSheets,
-          sheet,
-          chapterStore(selected?.id ?? "").getSnapshot(),
-        ),
-    ).length ?? 0;
+  const lockedSheets = selectedSheets.filter(
+    (sheet) =>
+      !isSheetUnlocked(
+        selectedSheets[0]?.id,
+        site.sessionSheets,
+        sheet.id,
+        chapterStore(selected?.id ?? "").getSnapshot(),
+      ),
+  ).length;
   return (
     <div className="teacher-controls-stack">
       {currentChapter && <ChapterHeading chapter={currentChapter} />}

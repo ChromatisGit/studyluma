@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import type { Worksheet } from "../../catalog";
 import { gap, para, part, task } from "../../../test/catalog";
 import { emptyChapterState } from "./chapterState";
+import { outlineSheet, outlineTask } from "./outline";
 import type { PartResponse } from "./contract";
 import {
   activeStep,
@@ -419,5 +420,50 @@ describe("solutions", () => {
         releasedSolutions: ["t-gaps"],
       }),
     ).toBe(false);
+  });
+});
+
+describe("outlines of sheets a page does not show", () => {
+  test("make the same progress as the sheet, without its text", () => {
+    const outline = outlineSheet(sheetA);
+    const state = emptyChapterState();
+    state.modes.A = "uebung";
+    const progress = () =>
+      [sheetA, outline].map((sheet) => [
+        sectionDone(sheet, sheet.sections[0]!, state),
+        sheetDone(sheet, state),
+      ]);
+    expect(progress()[1]).toEqual(progress()[0]!);
+    state.responses["p-steps"] = recordCheck(
+      { value: [1], wrongChecks: 0 },
+      { state: "richtig" },
+    );
+    state.responses["p-gaps"] = recordCheck(
+      { value: { "g-a": "x" }, wrongChecks: 0 },
+      { state: "nochNicht" },
+    );
+    expect(progress()[1]).toEqual(progress()[0]!);
+    state.responses["p-gaps"] = recordCheck(
+      { value: { "g-a": "x", "g-b": "y" }, wrongChecks: 0 },
+      { state: "nochNicht" },
+    );
+    expect(progress()[1]).toEqual(progress()[0]!);
+    state.ampels.A = { level: "green" };
+    expect(progress()[1]).toEqual(progress()[0]!);
+    expect(JSON.stringify(outline)).not.toContain('"text"');
+    expect(outlineSheet(sheetA)).toBe(outline);
+  });
+
+  test("keep what opens a challenge", () => {
+    const state = emptyChapterState();
+    state.ampels.A = { level: "green" };
+    const outlined = {
+      ...data,
+      sheets: data.sheets.map(outlineSheet),
+      challenges: data.challenges.map(outlineTask),
+    };
+    expect(openChallenges(outlined, state).map((c) => c.id)).toEqual(
+      openChallenges(data, state).map((c) => c.id),
+    );
   });
 });

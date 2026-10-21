@@ -5,6 +5,7 @@ import { fixtureFiles, serveSiteFixture, source } from "../../../test/site";
 import type { PublicCatalog } from "../domain/types";
 import {
   assetBytes,
+  catalogIndex,
   getCatalog,
   loadCatalog,
   nothingReleased,
@@ -15,7 +16,7 @@ import {
 } from "./catalog.server";
 
 serveSiteFixture();
-const publicCatalog = () => releasedCatalog(nothingReleased);
+const publicCatalog = () => releasedCatalog(nothingReleased, ["c1"]);
 
 const parts = (c: PublicCatalog) =>
   c.worksheets[0]!.sections[0]!.items.flatMap((item) =>
@@ -26,7 +27,7 @@ const parts = (c: PublicCatalog) =>
 
 describe("the catalog for the teacher", () => {
   test("keeps answers and notes, and tells the fields their kind", () => {
-    const site = teacherCatalog();
+    const site = teacherCatalog(["c1"]);
     const [, answer, , setPart] = parts(site);
     expect(answer?.answer?.exact).toBe("4 x^3");
     expect(answer?.variable).toBe("x");
@@ -81,7 +82,7 @@ describe("the catalog for browsers", () => {
     walk(publicCatalog(), "catalog");
     expect(found).toEqual([]);
     // The check can tell: the teacher's catalog does carry them.
-    walk(teacherCatalog(), "teacher");
+    walk(teacherCatalog(["c1"]), "teacher");
     expect(found.length).toBeGreaterThan(0);
   });
 
@@ -117,12 +118,51 @@ describe("the catalog for browsers", () => {
   });
 
   test("releasing shows the solution and the Inhalt", () => {
-    const site = releasedCatalog({
-      summary: (id) => id === "c1",
-      solution: (id) => id === "t2",
-    });
+    const site = releasedCatalog(
+      {
+        summary: (id) => id === "c1",
+        solution: (id) => id === "t2",
+      },
+      ["c1"],
+    );
     expect(site.summaries[0]?.content).toHaveLength(1);
     expect(parts(site)[1]?.markers.loesung).toBeDefined();
+  });
+});
+
+describe("the catalog of a page's chapters", () => {
+  test("carries only those chapters' content, the shared parts whole", () => {
+    const none = releasedCatalog(nothingReleased, []);
+    expect(none.worksheets).toEqual([]);
+    expect(none.summaries).toEqual([]);
+    expect(none.quizzes).toEqual([]);
+    expect(none.foliensaetze).toEqual([]);
+    expect(none.tipCards).toEqual({});
+    expect(none.chapters.map((chapter) => chapter.id)).toEqual(["c1"]);
+    expect(teacherCatalog([]).worksheets).toEqual([]);
+  });
+
+  test("is worked out once per reader, chapters and what of them is released", () => {
+    const released = (solution: string) => ({
+      summary: () => false,
+      solution: (id: string) => id === solution,
+    });
+    expect(releasedCatalog(nothingReleased, ["c1"])).toBe(publicCatalog());
+    expect(releasedCatalog(released("elsewhere"), ["c1"])).toBe(
+      publicCatalog(),
+    );
+    expect(releasedCatalog(released("t2"), ["c1"])).not.toBe(publicCatalog());
+    expect(teacherCatalog(["c1"])).toBe(teacherCatalog(["c1"]));
+    expect(teacherCatalog(["c1"])).not.toBe(publicCatalog());
+  });
+
+  test("the index names every chapter's sheets and Merkkarten", () => {
+    expect(catalogIndex()).toMatchObject({
+      buildId: source.buildId,
+      summaryTitles: { c1: "Inhalt" },
+      merkkarten: [{ id: "m1", anchor: "regel", chapterId: "c1" }],
+      worksheets: { c1: [{ id: "w1", slug: "blatt" }] },
+    });
   });
 });
 

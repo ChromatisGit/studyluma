@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate, useRevalidator } from "react-router";
 import { Alert, Button, Dialog, buttonClassName } from "@chromatis/base/ui";
 import { useSharedClassroom, useSite } from "../../classroom";
+import { useCatalog } from "../../catalog";
 import { chapterPathById, type Course } from "../../courses";
 import { fill } from "../../../helper/text";
 import {
@@ -73,7 +74,7 @@ function StartUnit({
   chapterId: string;
 }) {
   const site = useSite();
-  const { catalog } = site;
+  const catalog = useCatalog();
   const navigate = useNavigate();
   const revalidator = useRevalidator();
   const [open, setOpen] = useState(false);
@@ -103,7 +104,7 @@ function StartUnit({
       courseId: course.id,
       presentationId: chosen.id,
       path,
-      periods: catalog.timetable.periods,
+      periods: site.index.timetable.periods,
       classroom: site.classroomEnabled,
       existingCode:
         site.classroom?.role === "controller" ? site.classroom.code : null,

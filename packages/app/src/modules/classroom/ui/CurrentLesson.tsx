@@ -3,26 +3,40 @@ import { fill } from "../../../helper/text";
 import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
 import { useSentTarget } from "../application/useSheetAccess";
-import { isUnlocked, chapterStore } from "../../worksheets";
+import { isUnlocked, chapterStore, type SheetsData } from "../../worksheets";
 import { useSite } from "./SiteContext";
 import {
   ChapterMaterials,
   Pictogram,
   chapterPath,
   findChapter,
-  sheetsFor,
   type Course,
 } from "../../courses";
 import TEXT from "./classroom.de.json";
 
-/** The work students need when they open their course for a lesson. */
-export function CurrentLesson({ course }: { course: Course }) {
+/**
+ * The work students need when they open their course for a lesson.
+ * `sheets` is the current chapter's outline (the loader's); what is unlocked
+ * or released follows the site as it changes.
+ */
+export function CurrentLesson({
+  course,
+  sheets,
+}: {
+  course: Course;
+  sheets: SheetsData | null;
+}) {
   const chapterId = course.currentChapterId ?? "";
   const current = findChapter(course, chapterId);
   const site = useSite();
   const chapter = useMemo(
-    () => sheetsFor(site, course.id, chapterId),
-    [site, course.id, chapterId],
+    () =>
+      sheets && {
+        ...sheets,
+        releasedSolutions: site.releasedSolutions,
+        sessionSheets: site.sessionSheets,
+      },
+    [sheets, site.releasedSolutions, site.sessionSheets],
   );
   const { active } = useSentTarget(course.id);
   const store = chapterStore(chapterId);
@@ -88,7 +102,7 @@ export function CurrentLesson({ course }: { course: Course }) {
       <ChapterMaterials
         courseId={course.id}
         chapterSlug={current.slug}
-        chapter={chapter}
+        chapter={chapter ?? undefined}
         availableOnly
       />
     </section>

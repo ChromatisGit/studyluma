@@ -136,10 +136,17 @@ export const isUnlocked = (
   data: SheetsData,
   sheet: Worksheet,
   state: ChapterState,
+) => isSheetUnlocked(data.sheets[0]?.id, data.sessionSheets, sheet.id, state);
+
+/** `isUnlocked` from ids alone, for views that load no worksheet content. */
+export const isSheetUnlocked = (
+  firstSheetId: string | undefined,
+  sessionSheets: SheetsData["sessionSheets"],
+  sheetId: string,
+  state: ChapterState,
 ) =>
-  (data.sessionSheets
-    ? data.sessionSheets[sheet.id]
-    : state.unlocked[sheet.id]) ?? data.sheets[0]?.id === sheet.id;
+  (sessionSheets ? sessionSheets[sheetId] : state.unlocked[sheetId]) ??
+  firstSheetId === sheetId;
 
 export const isCheckable = (part: TaskPart) => part.type !== "Auftrag";
 

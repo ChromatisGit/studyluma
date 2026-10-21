@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { injectChromatis } from "@chromatis/base/testing";
 import { fixtureFiles, serveSiteFixture, source } from "../src/test/site";
 import { provideCatalogFiles } from "../src/modules/catalog/server/catalog.server";
-import { loadSite } from "./site.server";
+import { loadCatalog, loadSite } from "./site.server";
 import { loader as quizLoader } from "./routes/quiz";
 
 serveSiteFixture();
@@ -24,7 +24,7 @@ describe("without the classroom module", () => {
     expect(site.classroomEnabled).toBe(false);
     expect(site.classroom).toBeNull();
     expect(site.joinOrigin).toBeNull();
-    expect(site.catalog.buildId).toBeDefined();
+    expect(site.index.buildId).toBeDefined();
   });
 
   test("a leftover classroom cookie is ignored", async () => {
@@ -38,10 +38,12 @@ describe("without the classroom module", () => {
   });
 
   test("the demo sends summary content for browser-local release controls", async () => {
-    const site = await loadSite(request("studyluma-viewer=student"));
+    const student = request("studyluma-viewer=student");
+    const site = await loadSite(student);
     expect(site.localReleases).toBe(true);
     expect(site.releasedSummaries).toEqual([]);
-    expect(site.catalog.summaries[0]?.content).toHaveLength(1);
+    const catalog = await loadCatalog(student, ["c1"]);
+    expect(catalog.summaries[0]?.content).toHaveLength(1);
   });
 
   test("the demo starts with the Inhalt of each course's starting chapter released", async () => {

@@ -1,12 +1,8 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { useLoaderData } from "react-router";
-import {
-  ChapterPage,
-  findChapterBySlug,
-  sheetsFor,
-} from "../../src/modules/courses";
+import { ChapterPage, findChapterBySlug } from "../../src/modules/courses";
 import { canReadSummary, useSite } from "../../src/modules/classroom";
-import { loadSite } from "../site.server";
+import { loadCatalog, loadSheets, loadSite } from "../site.server";
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
   const { chapterSlug = "", courseId = "" } = params;
@@ -16,13 +12,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   if (!course || !chapterId) {
     throw new Response(null, { status: 404 });
   }
+  const catalog = await loadCatalog(request, [chapterId]);
   return {
     course,
     chapterId,
-    sheets: sheetsFor(site, courseId, chapterId),
-    summary: site.catalog.summaries.find(
-      (item) => item.chapterId === chapterId,
-    ),
+    sheets: await loadSheets(request, courseId, chapterId, "none"),
+    summary: catalog.summaries.find((item) => item.chapterId === chapterId),
     summaryVisible: canReadSummary(site, chapterId),
   };
 }

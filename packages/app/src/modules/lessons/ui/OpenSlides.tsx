@@ -47,7 +47,7 @@ export function OpenSlides({
             courseId: course.id,
             presentationId,
             path,
-            periods: site.catalog.timetable.periods,
+            periods: site.index.timetable.periods,
             classroom: site.classroomEnabled,
             existingCode:
               site.classroom?.role === "controller"

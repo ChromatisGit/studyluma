@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs, MetaArgs } from "react-router";
 import { useLoaderData, useParams } from "react-router";
-import { loadSite } from "../site.server";
-import { findChapterBySlug, sheetsFor } from "../../src/modules/courses";
+import { loadSheets, loadSite } from "../site.server";
+import { findChapterBySlug } from "../../src/modules/courses";
 import { WorksheetChapter } from "../../src/modules/worksheets";
 import { worksheetLinks } from "../worksheetLinks";
 
@@ -10,8 +10,15 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   const site = await loadSite(request);
   const course = site.courses.find((item) => item.id === courseId);
   const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
-  const chapter = chapterId ? sheetsFor(site, courseId, chapterId) : undefined;
-  const sheet = chapter?.sheets.find((item) => item.slug === sheetSlug);
+  const sheetId = chapterId
+    ? site.index.worksheets[chapterId]?.find((item) => item.slug === sheetSlug)
+        ?.id
+    : undefined;
+  const chapter =
+    chapterId && sheetId
+      ? await loadSheets(request, courseId, chapterId, { sheetId })
+      : undefined;
+  const sheet = chapter?.sheets.find((item) => item.id === sheetId);
   if (!chapter || !sheet) {
     throw new Response(null, { status: 404 });
   }

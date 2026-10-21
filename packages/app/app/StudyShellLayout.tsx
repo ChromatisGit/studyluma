@@ -14,7 +14,6 @@ import {
   courseOverviewPath,
   coursePath,
   findChapter,
-  sheetsFor,
 } from "../src/modules/courses";
 import {
   LiveQuizProvider,
@@ -44,11 +43,9 @@ function useSheetPath() {
       const course =
         teaching.find((item) => item.id === courseId) ?? teaching[0];
       const chapter = course && findChapter(course, target.chapterId);
-      const sheet = course
-        ? sheetsFor(site, course.id, target.chapterId)?.sheets.find(
-            (item) => item.id === target.id,
-          )
-        : undefined;
+      const sheet = site.index.worksheets[target.chapterId]?.find(
+        (item) => item.id === target.id,
+      );
       return course && chapter && sheet
         ? worksheetLinks(course.id, chapter.slug).sheet(sheet.slug)
         : null;

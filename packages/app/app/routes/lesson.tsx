@@ -1,7 +1,8 @@
 import type { LoaderFunctionArgs, MetaArgs } from "react-router";
 import { redirect, useLoaderData, useLocation, useParams } from "react-router";
 import { getCatalog } from "../../src/modules/catalog/server/catalog.server";
-import { loadSite } from "../site.server";
+import { loadCatalog, loadCourses } from "../site.server";
+import { CatalogContext } from "../../src/modules/catalog";
 import {
   chapterPath,
   chapterPathById,
@@ -21,8 +22,7 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
   if ((await readViewer(request)) !== "teacher") {
     throw redirect(chapterPath(courseId, chapterSlug));
   }
-  const site = await loadSite(request);
-  const course = site.courses.find((item) => item.id === courseId);
+  const course = loadCourses(request).find((item) => item.id === courseId);
   const chapterId = course && findChapterBySlug(course, chapterSlug)?.id;
   if (!course || !chapterId) {
     throw new Response(null, { status: 404 });
@@ -53,9 +53,12 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     mainId && mainId !== deck.id && visitable.some((item) => item.id === mainId)
       ? buildDeck(catalog, mainId)
       : null;
+  const mainDeck = main?.slides.length ? main : deck;
   return {
     deck,
-    mainDeck: main?.slides.length ? main : deck,
+    mainDeck,
+    // The worksheets of the decks' chapters, for the sheets on their slides.
+    catalog: await loadCatalog(request, [deck.chapterId, mainDeck.chapterId]),
     periods: catalog.timetable.periods,
     initialFrameId: url.searchParams.get("start") ?? undefined,
     targets: visitable
@@ -73,23 +76,25 @@ export function meta({ data }: MetaArgs<typeof loader>) {
 }
 
 export default function LessonRoute() {
-  const { deck, mainDeck, periods, initialFrameId, targets } =
+  const { deck, mainDeck, periods, initialFrameId, targets, catalog } =
     useLoaderData<typeof loader>();
   const { courseId = "", chapterSlug = "" } = useParams();
   const { search } = useLocation();
   const chapter = chapterPath(courseId, chapterSlug);
   return (
-    <TeacherView
-      courseId={courseId}
-      deck={deck}
-      mainDeck={mainDeck}
-      periods={periods}
-      targets={targets}
-      lessonPath={`${chapter}/lesson${search}`}
-      projectorPath={`${chapter}/lesson/projector?presentation=${encodeURIComponent(deck.id)}`}
-      chapterPath={chapter}
-      overviewPath={courseOverviewPath(courseId)}
-      initialFrameId={initialFrameId}
-    />
+    <CatalogContext.Provider value={catalog}>
+      <TeacherView
+        courseId={courseId}
+        deck={deck}
+        mainDeck={mainDeck}
+        periods={periods}
+        targets={targets}
+        lessonPath={`${chapter}/lesson${search}`}
+        projectorPath={`${chapter}/lesson/projector?presentation=${encodeURIComponent(deck.id)}`}
+        chapterPath={chapter}
+        overviewPath={courseOverviewPath(courseId)}
+        initialFrameId={initialFrameId}
+      />
+    </CatalogContext.Provider>
   );
 }

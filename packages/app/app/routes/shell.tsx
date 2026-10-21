@@ -1,10 +1,6 @@
 import type { LoaderFunctionArgs } from "react-router";
-import { loadSite } from "../site.server";
-import {
-  findChapter,
-  findChapterBySlug,
-  sheetsFor,
-} from "../../src/modules/courses";
+import { loadSheets, loadSite } from "../site.server";
+import { findChapter, findChapterBySlug } from "../../src/modules/courses";
 import { readViewer } from "../../src/modules/classroom";
 import { shellSettings } from "../../src/modules/shell/server/shell.server";
 export { default } from "../StudyShellLayout";
@@ -30,14 +26,12 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     shell: shellSettings(),
     sidebarChapterSlug: sidebarChapter?.slug ?? null,
     courses: site.courses.map(({ id, title }) => ({ id, title })),
+    // The sidebar needs only the outline of the chapter's sheets.
     worksheetChapter:
       chapterId && courseId
-        ? (sheetsFor(site, courseId, chapterId) ?? null)
+        ? ((await loadSheets(request, courseId, chapterId, "none")) ?? null)
         : null,
-    hasSummary: !!(
-      chapterId &&
-      site.catalog.summaries.some((summary) => summary.chapterId === chapterId)
-    ),
+    hasSummary: !!(chapterId && site.index.summaryTitles[chapterId]),
     summaryUnlocked: !!(
       chapterId && site.releasedSummaries.includes(chapterId)
     ),
