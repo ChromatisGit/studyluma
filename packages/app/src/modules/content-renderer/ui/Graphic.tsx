@@ -24,13 +24,14 @@ import {
   type PiGrid,
 } from "../domain/piMultiples";
 import { snapToStep } from "../domain/sliders";
+import { startValues, type PlotFit } from "../domain/graphicView";
 
 /** A function entered by a learner, drawn above the authored curves. */
 export type DrawnFunction = { row: MathRow; slot: number };
 
 export type GraphicProps = {
   graphic: GraphicSpec;
-  /** The description from `::grafik [Beschreibung](…)`. */
+  /** The text from `::grafik [Beschriftung](…)`; empty for `[]`. */
   title: string;
   drawn?: readonly DrawnFunction[];
 };
@@ -42,6 +43,22 @@ const PI_LABEL_SIZE = 14;
 /** Least space between two neighbouring π labels, in px. */
 const PI_LABEL_GAP = 6;
 const number = new Intl.NumberFormat("de-DE", { maximumFractionDigits: 4 });
+
+/** What a screen reader says when the author gave no text. */
+export function describeGraphic(graphic: GraphicSpec): string {
+  const show = (value: number, unit?: string) =>
+    unit === "pi" ? formatPi(value) : number.format(value);
+  const functions = graphic.graphs.map((g) => g.source).join("; ");
+  const ranges = graphic.parameters.map((p) =>
+    TEXT.graphic.range
+      .replace("{name}", p.name)
+      .replace("{from}", show(p.from, p.unit))
+      .replace("{to}", show(p.to, p.unit)),
+  );
+  return [TEXT.graphic.alt.replace("{functions}", functions), ...ranges].join(
+    ", ",
+  );
+}
 
 /** The curve of a row in x and the parameters; `NaN` where it is undefined. */
 function curveOf(row: MathRow, params: Record<string, number>) {
@@ -56,9 +73,11 @@ type Fn = (x: number) => number;
 function Curves({
   curves,
   graphic,
+  weight,
 }: {
   curves: Curve[];
   graphic: GraphicSpec;
+  weight: number;
 }) {
   const [xMin, xMax] = graphic.axes.x;
   const [yMin, yMax] = graphic.axes.y;
@@ -72,6 +91,7 @@ function Curves({
               key={`g${i}`}
               y={curve.y}
               color={`var(--graphic-c${curve.color})`}
+              weight={weight}
             />
           ),
       )}
@@ -186,6 +206,44 @@ function Points({ points }: { points: GraphicSpec["points"] }) {
   );
 }
 
+/** One slider with its name and value. */
+export function SliderRow({
+  parameter: p,
+  value,
+  onChange,
+  fixed,
+}: {
+  parameter: GraphicSpec["parameters"][number];
+  value: number;
+  onChange: (value: number) => void;
+  /** Only shows the value, as on the projector; the slider keeps its look. */
+  fixed?: boolean;
+}): ReactNode {
+  const show = p.unit === "pi" ? formatPi : number.format;
+  return (
+    <label className="graphic__slider">
+      <i className="graphic__name">{p.name}</i>
+      <input
+        type="range"
+        min={p.from}
+        max={p.to}
+        step={p.step}
+        value={value}
+        {...(fixed ? { tabIndex: -1, "aria-readonly": true } : {})}
+        className={fixed ? "is-fixed" : undefined}
+        aria-valuetext={
+          p.unit === "pi" ? spokenPi(value, TEXT.graphic.over) : undefined
+        }
+        onChange={(event) =>
+          !fixed &&
+          onChange(snapToStep(Number(event.target.value), p.from, p.to, p.step))
+        }
+      />
+      <output>{show(value)}</output>
+    </label>
+  );
+}
+
 function Sliders({
   parameters,
   values,
@@ -197,33 +255,91 @@ function Sliders({
 }): ReactNode {
   return (
     <div className="graphic__controls">
-      {parameters.map((p) => {
-        const show = p.unit === "pi" ? formatPi : number.format;
-        return (
-          <label key={p.name} className="graphic__slider">
-            <i className="graphic__name">{p.name}</i>
-            <input
-              type="range"
-              min={p.from}
-              max={p.to}
-              step={p.step}
-              value={values[p.name]}
-              aria-valuetext={
-                p.unit === "pi"
-                  ? spokenPi(values[p.name] ?? p.start, TEXT.graphic.over)
-                  : undefined
-              }
-              onChange={(event) =>
-                onChange(
-                  p.name,
-                  snapToStep(Number(event.target.value), p.from, p.to, p.step),
-                )
-              }
+      {parameters.map((p) => (
+        <SliderRow
+          key={p.name}
+          parameter={p}
+          value={values[p.name] ?? p.start}
+          onChange={(value) => onChange(p.name, value)}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The coordinate system with the curves of a Grafik. `shown` hides single
+ * curves; `fit` fixes the size and the visible y range of a Grafikfolie.
+ */
+export function GraphicPlot({
+  graphic,
+  values,
+  label,
+  shown,
+  drawn = [],
+  fit,
+  weight = 2,
+}: {
+  graphic: GraphicSpec;
+  values: Record<string, number>;
+  label: string;
+  shown?: readonly boolean[];
+  drawn?: readonly DrawnFunction[];
+  fit?: PlotFit;
+  weight?: number;
+}) {
+  const curves = useMemo(
+    () =>
+      graphic.graphs.map((g, index) => ({
+        name: g.name,
+        color: index % COLORS,
+        y: shown && shown[index] === false ? null : curveOf(g.row, values),
+      })),
+    [graphic.graphs, values, shown],
+  );
+  const view = fit
+    ? { ...graphic, axes: { ...graphic.axes, y: fit.y } }
+    : graphic;
+  return (
+    <div
+      className="graphic__plot"
+      role="img"
+      aria-label={label}
+      style={
+        fit ? { width: fit.width, height: fit.height } : { minHeight: HEIGHT }
+      }
+    >
+      <Mafs
+        viewBox={{ x: view.axes.x, y: view.axes.y, padding: 0 }}
+        preserveAspectRatio={false}
+        height={fit ? fit.height : HEIGHT}
+        pan={false}
+        zoom={false}
+      >
+        {graphic.axes.xGrid ? (
+          <>
+            <Coordinates.Cartesian
+              xAxis={{ lines: gridStep(graphic.axes.xGrid), labels: false }}
             />
-            <output>{show(values[p.name] ?? p.start)}</output>
-          </label>
-        );
-      })}
+            <PiLabels grid={graphic.axes.xGrid} />
+          </>
+        ) : (
+          <Coordinates.Cartesian />
+        )}
+        <Curves curves={curves} graphic={view} weight={weight} />
+        {drawn.map(({ row, slot }) => {
+          const y = curveOf(row, {});
+          return y ? (
+            <Plot.OfX
+              key={`d${slot}`}
+              y={y}
+              color={`var(--graphic-d${slot % COLORS})`}
+              weight={weight + 1}
+            />
+          ) : null;
+        })}
+        <Points points={graphic.points} />
+      </Mafs>
     </div>
   );
 }
@@ -234,62 +350,17 @@ function Sliders({
  */
 export function Graphic({ graphic, title, drawn = [] }: GraphicProps) {
   const [values, setValues] = useState<Record<string, number>>(() =>
-    Object.fromEntries(
-      graphic.parameters.map((p) => [
-        p.name,
-        snapToStep(p.start, p.from, p.to, p.step),
-      ]),
-    ),
-  );
-  const curves = useMemo(
-    () =>
-      graphic.graphs.map((g, index) => ({
-        name: g.name,
-        color: index % COLORS,
-        y: curveOf(g.row, values),
-      })),
-    [graphic.graphs, values],
+    startValues(graphic),
   );
   return (
     <figure className="graphic">
-      <div
-        className="graphic__plot"
-        role="img"
-        aria-label={title}
-        style={{ minHeight: HEIGHT }}
-      >
-        <Mafs
-          viewBox={{ x: graphic.axes.x, y: graphic.axes.y, padding: 0 }}
-          preserveAspectRatio={false}
-          height={HEIGHT}
-          pan={false}
-          zoom={false}
-        >
-          {graphic.axes.xGrid ? (
-            <>
-              <Coordinates.Cartesian
-                xAxis={{ lines: gridStep(graphic.axes.xGrid), labels: false }}
-              />
-              <PiLabels grid={graphic.axes.xGrid} />
-            </>
-          ) : (
-            <Coordinates.Cartesian />
-          )}
-          <Curves curves={curves} graphic={graphic} />
-          {drawn.map(({ row, slot }) => {
-            const y = curveOf(row, {});
-            return y ? (
-              <Plot.OfX
-                key={`d${slot}`}
-                y={y}
-                color={`var(--graphic-d${slot % COLORS})`}
-                weight={3}
-              />
-            ) : null;
-          })}
-          <Points points={graphic.points} />
-        </Mafs>
-      </div>
+      <GraphicPlot
+        graphic={graphic}
+        values={values}
+        label={title || describeGraphic(graphic)}
+        drawn={drawn}
+        weight={2}
+      />
       {graphic.parameters.length > 0 && (
         <Sliders
           parameters={graphic.parameters}
@@ -299,7 +370,7 @@ export function Graphic({ graphic, title, drawn = [] }: GraphicProps) {
           }
         />
       )}
-      <figcaption className="graphic__caption">{title}</figcaption>
+      {title && <figcaption className="graphic__caption">{title}</figcaption>}
     </figure>
   );
 }

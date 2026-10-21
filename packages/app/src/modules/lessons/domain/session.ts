@@ -13,7 +13,13 @@ export type SessionAction =
   | { type: "erase"; strokeId: string }
   | { type: "toggleHidden" }
   | { type: "toggleFreeze" }
-  | { type: "send"; frameId: string };
+  | { type: "send"; frameId: string }
+  | { type: "graphic"; slideId: string; change: GraphicChange };
+
+/** One move on a Grafikfolie: a slider, or a curve shown or hidden. */
+export type GraphicChange =
+  | { kind: "value"; name: string; value: number }
+  | { kind: "visible"; index: number; visible: boolean };
 
 export function newDeckState(deck: Deck): DeckState {
   return {
@@ -151,8 +157,32 @@ export function reduceSession(
               sent: [...session.sent],
               hidden: session.hidden,
               sheetShown: session.sheetShown ?? null,
+              graphics: structuredClone(session.graphics ?? {}),
             },
           };
+    case "graphic": {
+      const own = session.graphics?.[action.slideId] ?? {};
+      const changed =
+        action.change.kind === "value"
+          ? {
+              ...own,
+              values: {
+                ...own.values,
+                [action.change.name]: action.change.value,
+              },
+            }
+          : {
+              ...own,
+              visible: {
+                ...own.visible,
+                [action.change.index]: action.change.visible,
+              },
+            };
+      return {
+        ...session,
+        graphics: { ...session.graphics, [action.slideId]: changed },
+      };
+    }
     case "send":
       return session.sent.includes(action.frameId)
         ? session

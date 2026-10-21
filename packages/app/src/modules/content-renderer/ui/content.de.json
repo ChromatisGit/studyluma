@@ -6,7 +6,9 @@
     "hideExamples": "Beispiele ausblenden"
   },
   "graphic": {
-    "over": "durch"
+    "over": "durch",
+    "alt": "Graph von {functions}",
+    "range": "{name} von {from} bis {to}"
   },
   "code": {
     "copy": "Kopieren",

@@ -11,7 +11,19 @@ export { RichContent, RichInlineContent } from "./ui/RichContent";
 export { RichReferenceContext } from "./ui/RichReferenceContext";
 export { SummaryContent } from "./ui/SummaryContent";
 export type { RichNode, RichInline, Graphic } from "./domain/rich";
-export { Graphic as GraphicView } from "./ui/Graphic";
+export {
+  Graphic as GraphicView,
+  GraphicPlot,
+  describeGraphic,
+  SliderRow,
+} from "./ui/Graphic";
+export {
+  fitPlot,
+  shownOf,
+  slidersByGraph,
+  valuesOf,
+} from "./domain/graphicView";
+export type { GraphicChanges, PlotFit } from "./domain/graphicView";
 export type { DrawnFunction } from "./ui/Graphic";
 export { gapsOf, inputGraphicOf, walkInlines } from "./domain/rich";
 export type { GapNode } from "./domain/rich";

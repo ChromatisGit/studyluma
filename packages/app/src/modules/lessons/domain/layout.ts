@@ -48,11 +48,17 @@ export const isWritingSlide = (slide: Slide): boolean =>
       : segment.columns.some((column) => hasSpace(column.content)),
   );
 
-/** The columns of a slide share the width the author chose. */
+/**
+ * The columns of a slide share the width the author chose. The factors add
+ * up to 100: fractions that add up to less than 1 would leave part of the
+ * width unused as soon as one column is as wide as its content.
+ */
 export function columnWidths(
   columns: Extract<SlideSegment, { type: "columns" }>["columns"],
 ): string {
-  return columns.map((column) => `${column.width}fr`).join(" ");
+  return columns
+    .map((column) => `minmax(0, ${column.width * 100}fr)`)
+    .join(" ");
 }
 
 /** An entry in the running order: a planned slide or a blank surface. */

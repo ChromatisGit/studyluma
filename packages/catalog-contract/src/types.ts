@@ -22,7 +22,17 @@ export type Graphic = {
      */
     xGrid?: "pi" | "pi/2" | "pi/4";
   };
-  graphs: { source: string; row: MathRow; name?: string }[];
+  graphs: {
+    source: string;
+    row: MathRow;
+    name?: string;
+    /** A Grafikfolie names its functions: the line shows `f(x) = …`. */
+    function?: string;
+    /** Only `false` is written: the curve starts hidden on a Grafikfolie. */
+    visible?: false;
+    /** The formula of the line on a Grafikfolie, set with `function`. */
+    label?: MathPart;
+  }[];
   points: { position: [number, number]; name?: string }[];
   parameters: {
     name: string;
@@ -188,6 +198,8 @@ export type SlideSegment =
   | { type: "content"; content: RichNode[] }
   | {
       type: "columns";
+      /** A lone `## Mitte`: the content is centred on the slide. */
+      centered?: boolean;
       columns: { width: number; title?: string; content: RichNode[] }[];
     };
 /** `::tag`: the tab of a slide. `erklaeren` and `aufgabe` carry a function; the rest are presets. */
@@ -208,6 +220,8 @@ export type SourceEntry = {
   segments: SlideSegment[];
   /** The tab of a slide (`::tag`). */
   tag?: SlideTag;
+  /** `::grafikfolie`: the slide is one Grafik with its functions and sliders. */
+  graphicSlide?: { title: string; graphic: Graphic };
   /** Seconds since the start of the Foliensatz (`::bis`). */
   until?: number;
   /** Teacher only. */

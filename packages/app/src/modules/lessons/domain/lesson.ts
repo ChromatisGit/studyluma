@@ -1,3 +1,5 @@
+import type { GraphicChanges } from "../../content-renderer";
+
 /**
  * A running lesson: the teacher's position, the ink and the branches,
  * kept apart from the authored deck.
@@ -22,6 +24,9 @@ export type InkStroke = {
   points: [number, number][];
 };
 
+/** What the lesson changed on a Grafikfolie, by slide; see `GraphicChanges`. */
+export type GraphicSlides = Record<string, GraphicChanges>;
+
 /** What the teacher does with one deck during a lesson. */
 export type DeckState = {
   currentFrameId: string;
@@ -40,7 +45,10 @@ export type DeckState = {
     sent: string[];
     hidden: boolean;
     sheetShown?: string | null;
+    graphics?: GraphicSlides;
   } | null;
+  /** Sliders and hidden curves of the Grafikfolien; they stay when the slide changes. */
+  graphics?: GraphicSlides;
   /** Slides whose sheet the class was sent to. */
   sent: string[];
   /** Ink taken off a frame by "clear", newest last, so undo can bring it back. */

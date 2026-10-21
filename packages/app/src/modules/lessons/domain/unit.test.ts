@@ -89,4 +89,38 @@ describe("unit", () => {
     expect(unit.clock).toEqual({ startsAt: 2000, periodNumber: null });
     expect(started().clock.periodNumber).toBe(3);
   });
+
+  test("Grafikfolie changes stay with the slide when the slide changes", () => {
+    let unit = reduceUnit(started(), main, {
+      type: "graphic",
+      slideId: "m2",
+      change: { kind: "value", name: "a", value: 0.5 },
+    });
+    unit = reduceUnit(unit, main, {
+      type: "graphic",
+      slideId: "m2",
+      change: { kind: "visible", index: 1, visible: true },
+    });
+    unit = reduceUnit(unit, main, { type: "go", frameId: "m3", now: 9 });
+    expect(deckState(unit, main).graphics).toEqual({
+      m2: { values: { a: 0.5 }, visible: { "1": true } },
+    });
+  });
+
+  test("the frozen projector image keeps the Grafikfolie as it was", () => {
+    let unit = reduceUnit(started(), main, {
+      type: "graphic",
+      slideId: "m1",
+      change: { kind: "value", name: "a", value: 0.5 },
+    });
+    unit = reduceUnit(unit, main, { type: "toggleFreeze" });
+    unit = reduceUnit(unit, main, {
+      type: "graphic",
+      slideId: "m1",
+      change: { kind: "value", name: "a", value: 1 },
+    });
+    const state = deckState(unit, main);
+    expect(state.frozen?.graphics?.m1?.values?.a).toBe(0.5);
+    expect(state.graphics?.m1?.values?.a).toBe(1);
+  });
 });

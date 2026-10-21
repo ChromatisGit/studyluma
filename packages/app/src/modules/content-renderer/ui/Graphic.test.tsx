@@ -23,11 +23,27 @@ const render = (graphic: GraphicSpec) =>
   renderToStaticMarkup(<Graphic graphic={graphic} title="Sinus" />);
 
 describe("Graphic", () => {
-  test("renders the description as caption and label", () => {
+  test("renders the text as caption and label", () => {
     const html = render(spec());
     expect(html).toContain("<figcaption");
     expect(html).toContain('aria-label="Sinus"');
     expect(html).not.toContain("<input");
+  });
+
+  test("without text there is no caption and the label is generated", () => {
+    const html = renderToStaticMarkup(
+      <Graphic
+        graphic={spec({
+          graphs: [{ source: "y = sin(x) + a * x", row: [] as never }],
+          parameters: [{ name: "a", from: -1, to: 1, step: 0.1, start: 0 }],
+        })}
+        title=""
+      />,
+    );
+    expect(html).not.toContain("<figcaption");
+    expect(html).toContain(
+      'aria-label="Graph von y = sin(x) + a * x, a von -1 bis 1"',
+    );
   });
 
   test("a slider with unit pi shows and announces a multiple of π", () => {

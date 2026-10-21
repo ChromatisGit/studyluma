@@ -8,6 +8,7 @@ import { ScrollSyncContext } from "./FrameBlocks";
 import { LiveQuizContext } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
+import { GraphicSlideContext } from "./GraphicSlide";
 import { JoinView } from "./JoinView";
 import { SheetEmbed } from "./SheetEmbed";
 import { InkStrokes } from "./InkLayer";
@@ -85,17 +86,21 @@ export function ProjectorView({
                 interactive={false}
               />
             ) : (
-              <FrameView
-                entry={entry}
-                sent={display.sent.includes(entrySlide(entry).id)}
+              <GraphicSlideContext.Provider
+                value={{ changes: display.graphics ?? {} }}
               >
-                <InkStrokes
-                  strokes={display.ink.filter(
-                    (stroke) => stroke.frameId === id,
-                  )}
-                  laser={laser}
-                />
-              </FrameView>
+                <FrameView
+                  entry={entry}
+                  sent={display.sent.includes(entrySlide(entry).id)}
+                >
+                  <InkStrokes
+                    strokes={display.ink.filter(
+                      (stroke) => stroke.frameId === id,
+                    )}
+                    laser={laser}
+                  />
+                </FrameView>
+              </GraphicSlideContext.Provider>
             )}
           </FrameStage>
         </ScrollSyncContext.Provider>

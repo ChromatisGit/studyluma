@@ -350,6 +350,9 @@ mark {
   --mafs-line-color: color-mix(in srgb, var(--color-text) 22%, transparent);
   width: 100%;
 }
+.graphic .mafs-axis text {
+  font-size: 14px;
+}
 .graphic__pi-labels text {
   fill: var(--mafs-origin-color);
 }
@@ -368,7 +371,7 @@ mark {
 }
 .graphic__slider {
   display: grid;
-  grid-template-columns: 1.5rem 1fr 4.5rem;
+  grid-template-columns: 1.5rem 1fr 5.5rem;
   align-items: center;
   gap: 0.75rem;
 }
@@ -377,6 +380,7 @@ mark {
   accent-color: var(--color-action-primary-bg);
 }
 .graphic__slider output {
+  font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   text-align: right;

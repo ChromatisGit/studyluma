@@ -303,7 +303,20 @@ export function compileContent(
       (code, message) => error(code, `${path}: ${message}`, loc(file, line)),
       (code, message) => warn(code, `${path}: ${message}`, loc(file, line)),
     );
-    return spec;
+    return spec && withLabels(spec, file, line);
+  }
+  /** Typesets the formula of each named function (`f(x) = …`). */
+  function withLabels(
+    spec: GraphicSpec,
+    file: string,
+    line: number,
+  ): GraphicSpec {
+    return {
+      ...spec,
+      graphs: spec.graphs.map((g) =>
+        g.label ? { ...g, label: math(g.label.source, file, line) } : g,
+      ),
+    };
   }
   function math(
     source: string,
@@ -705,11 +718,11 @@ export function compileContent(
         continue;
       }
       if (/^::grafik\b/.test(s)) {
-        const m = /^::grafik\s+\[([^\]]+)\]\(([^)]+)\)$/.exec(s);
+        const m = /^::grafik\s+\[([^\]]*)\]\(([^)]+)\)$/.exec(s);
         if (!m) {
           error(
             "GRAPHIC_SYNTAX",
-            "Expected ::grafik [Beschreibung](pfad/zur/grafik.toml)",
+            "Expected ::grafik [Beschriftung](pfad/zur/grafik.toml), the brackets may stay empty",
             loc(file, line.line),
           );
         } else {
@@ -1805,6 +1818,55 @@ export function compileContent(
           : undefined;
     return { label, tone: tone ?? function_ ?? "neutral" };
   }
+  /** `::grafikfolie [Text](pfad.toml)`: a slide that is only a Grafik. */
+  function readGraphicSlide(
+    entry: SourceEntry,
+    marks: Line[],
+    body: Line[],
+    file: string,
+  ) {
+    const mark = marks[0]!;
+    const where = loc(file, mark.line);
+    if (entry.kind !== "slide") {
+      error(
+        "MARKER_CONTEXT",
+        '::grafikfolie requires a slide (# "Title")',
+        where,
+      );
+      return;
+    }
+    if (marks.length > 1) {
+      error("GRAPHIC_SLIDE_DUPLICATE", "Duplicate ::grafikfolie", where);
+      return;
+    }
+    if (body.some((x) => x.text.trim())) {
+      error(
+        "GRAPHIC_SLIDE_BODY",
+        "A ::grafikfolie slide has no other content; only ::tag, ::bis and ::notiz may stand beside it",
+        where,
+      );
+    }
+    const m = /^::grafikfolie\s+\[([^\]]*)\]\(([^)]+)\)$/.exec(
+      mark.text.trim(),
+    );
+    if (!m) {
+      error(
+        "GRAPHIC_SYNTAX",
+        "Expected ::grafikfolie [Text](pfad/zur/grafik.toml), the brackets may stay empty",
+        where,
+      );
+      return;
+    }
+    const graphic = readGraphic(m[2]!, file, mark.line);
+    if (!graphic) return;
+    if (graphic.input)
+      error(
+        "GRAPH_INPUT_CONTEXT",
+        "A ::grafik with eingabe is only allowed in a Graph task",
+        where,
+      );
+    entry.graphicSlide = { title: m[1]!.trim(), graphic };
+  }
   function parseFoliensatz(doc: Document) {
     const front = readFront(doc, foliensatzFrontSchema);
     const fs: Foliensatz = {
@@ -1906,7 +1968,8 @@ export function compileContent(
         location: where,
       };
       const current: Line[] = [],
-        note: Line[] = [];
+        note: Line[] = [],
+        graphicLines: Line[] = [];
       let inNote = false;
       for (const line of section.body) {
         const value = line.text.trim(),
@@ -1944,7 +2007,9 @@ export function compileContent(
               loc(doc.file, line.line),
             );
           else entry.tag = tag;
-        } else if (value === "::notiz") {
+        } else if (/^::grafikfolie\b/.test(value) && !inNote)
+          graphicLines.push(line);
+        else if (value === "::notiz") {
           if (inNote)
             error(
               "NOTES_DUPLICATE",
@@ -1968,6 +2033,8 @@ export function compileContent(
         else current.push(line);
       }
       if (note.length) entry.notes = rich(note, doc.file);
+      if (graphicLines.length)
+        readGraphicSlide(entry, graphicLines, current, doc.file);
       if (
         ["quiz", "foliensatz", "summary"].includes(kind) &&
         current.some((x) => x.text.trim())
@@ -2015,6 +2082,7 @@ export function compileContent(
               "Links Mitte,Rechts",
               "Links,Mitte Rechts",
               "Links,Mitte,Rechts",
+              "Mitte",
             ].includes(names.join(","))
           )
             error(
@@ -2023,15 +2091,18 @@ export function compileContent(
               entry.location,
             );
           const widths =
-            names.length === 3
-              ? [1 / 3, 1 / 3, 1 / 3]
-              : names[0] === "Links Mitte"
-                ? [2 / 3, 1 / 3]
-                : names[1] === "Mitte Rechts"
-                  ? [1 / 3, 2 / 3]
-                  : [1 / 2, 1 / 2];
+            names.length === 1
+              ? [1]
+              : names.length === 3
+                ? [1 / 3, 1 / 3, 1 / 3]
+                : names[0] === "Links Mitte"
+                  ? [2 / 3, 1 / 3]
+                  : names[1] === "Mitte Rechts"
+                    ? [1 / 3, 2 / 3]
+                    : [1 / 2, 1 / 2];
           entry.segments.push({
             type: "columns",
+            ...(names.join(",") === "Mitte" ? { centered: true } : {}),
             columns: columns.map((x, i) => ({
               width: widths[i] ?? 1 / 2,
               ...(x.title ? { title: x.title } : {}),

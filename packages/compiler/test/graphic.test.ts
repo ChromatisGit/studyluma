@@ -277,3 +277,33 @@ describe("Grafik in a compile", () => {
     expect(warning?.message).toContain("g.toml");
   });
 });
+
+describe("named functions of a Grafikfolie", () => {
+  test("funktion, anzeige and sichtbar", () => {
+    const { spec, errors } = read(
+      '[[graph]]\nterm = "y = sin(x)"\nfunktion = "f"\n\n[[graph]]\nterm = "y = 2x"\nfunktion = "v"\nanzeige = ""\nsichtbar = false\n\n[[graph]]\nterm = "y = x"\nfunktion = "s"\nanzeige = "f(x) + v(x)"\n',
+    );
+    expect(errors).toEqual([]);
+    expect(spec?.graphs.map((g) => g.label?.source)).toEqual([
+      "f(x) = sin(x)",
+      "v(x)",
+      "s(x) = f(x) + v(x)",
+    ]);
+    expect(spec?.graphs.map((g) => g.visible)).toEqual([
+      undefined,
+      false,
+      undefined,
+    ]);
+  });
+  test("a graph without funktion has no label and anzeige needs a name", () => {
+    expect(
+      read('[[graph]]\nterm = "y = x"\n').spec?.graphs[0],
+    ).not.toHaveProperty("label");
+    expect(
+      read('[[graph]]\nterm = "y = x"\nanzeige = "x"\n').errors[0]?.code,
+    ).toBe("GRAPHIC_FUNCTION_NAME");
+    expect(
+      read('[[graph]]\nterm = "y = x"\nfunktion = "fx"\n').errors[0]?.code,
+    ).toBe("GRAPHIC_FUNCTION_NAME");
+  });
+});
