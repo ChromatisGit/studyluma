@@ -184,6 +184,18 @@
   gap: 14px;
   min-height: 0;
 }
+.lf__columns--center .lf__column {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+/* A slide is read from the projector: no small print under a Grafik */
+.lf__body .graphic__caption {
+  display: none;
+}
+.lf__columns--center .lf-md {
+  width: 100%;
+}
 .lf__column > .lf-image {
   width: 100%;
   height: 100%;
@@ -1547,4 +1559,95 @@
 }
 .lt-none__back {
   color: var(--color-text);
+}
+
+/* Grafikfolie: the functions at the left, the graph over the rest */
+.lf__body--graphic {
+  padding-bottom: 28px;
+}
+.lf__body--graphic .lf__title {
+  font-size: 34px;
+}
+/* The graph is drawn on the slide's paper, in colors that read from afar */
+.lf .lf__graphic {
+  --color-bg: var(--frame-paper);
+  --color-text: var(--frame-ink);
+  --color-bg-accent: var(--frame-grid);
+  --graphic-c0: #1d4ed8;
+  --graphic-c1: #15803d;
+  --graphic-c2: #c2410c;
+  --graphic-c3: #7e22ce;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 28px;
+  margin: 8px 0 0;
+  max-width: none;
+}
+.lf__graphic-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.lf-fn {
+  display: grid;
+  gap: 10px;
+}
+.lf-fn__line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 30px;
+  text-align: left;
+}
+.lf-fn__line:not(:disabled) {
+  cursor: pointer;
+}
+.lf-fn__line.is-off {
+  opacity: 0.35;
+}
+.lf-fn__swatch {
+  flex: none;
+  width: 34px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--lf-curve);
+}
+.lf-fn__line.is-off .lf-fn__swatch {
+  background: none;
+  box-shadow: inset 0 0 0 2px var(--lf-curve);
+}
+.lf-fn .graphic__slider {
+  grid-template-columns: 30px 1fr 96px;
+  gap: 14px;
+  padding: 0 10px;
+  font-size: 24px;
+}
+.lf-fn .graphic__name {
+  font-size: 28px;
+}
+.lf-fn .graphic__slider input {
+  height: 32px;
+  accent-color: var(--lf-family);
+}
+.lf-fn .graphic__slider output {
+  font-size: 24px;
+}
+.lf__graphic-plot {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lf-fn .graphic__slider input.is-fixed {
+  pointer-events: none;
 }

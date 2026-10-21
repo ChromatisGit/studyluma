@@ -31,23 +31,49 @@ export function MarkSymbol({ state }: { state: CheckState }) {
   );
 }
 
-/** A mark with its word and message, in the Korrekturrand. */
+/**
+ * A mark with its word and message, as a note under the part. `atLetter`: the
+ * symbol already stands by the part letter, so the note drops it and is only
+ * visible when there is something to say (screen readers still hear the word).
+ */
 export function Mark({
   result,
   isNew = false,
+  atLetter = false,
 }: {
   result: CheckResult;
   isNew?: boolean;
+  atLetter?: boolean;
 }) {
+  const silent = atLetter && !result.message && !result.note;
   return (
-    <div className={`mark mark--${result.state}${isNew ? " is-new" : ""}`}>
-      <MarkSymbol state={result.state} />
+    <div
+      className={`mark mark--${result.state}${isNew ? " is-new" : ""}${silent ? " visually-hidden" : ""}`}
+    >
+      {!atLetter && <MarkSymbol state={result.state} />}
       <div className="mark__text">
         <strong className="mark__word">{TEXT.states[result.state]}</strong>
         {result.message && <span className="mark__msg">{result.message}</span>}
         {result.note && <span className="mark__msg">{result.note}</span>}
       </div>
     </div>
+  );
+}
+
+/** The hand-drawn symbol for a part, in the gutter in front of its letter. */
+export function LetterMark({
+  state,
+  isNew = false,
+}: {
+  state: CheckState;
+  isNew?: boolean;
+}) {
+  return (
+    <span
+      className={`mark mark--letter mark--${state}${isNew ? " is-new" : ""}`}
+    >
+      <MarkSymbol state={state} />
+    </span>
   );
 }
 

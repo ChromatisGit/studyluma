@@ -180,6 +180,30 @@ const graphEntry = z
   .object({
     term: z.string().describe("The function, written like y = x^2."),
     name,
+    funktion: z
+      .string()
+      .refine(
+        (letter) =>
+          /^\p{L}$/u.test(letter) && !["x", "e", "π"].includes(letter),
+        {
+          message: "must be a single letter other than x, e",
+          params: { code: "GRAPHIC_FUNCTION_NAME" },
+        },
+      )
+      .optional()
+      .describe(
+        'Grafikfolie: the name of the function; the line reads "f(x) = term".',
+      ),
+    anzeige: z
+      .string()
+      .optional()
+      .describe(
+        'Grafikfolie: what stands right of "f(x) =" instead of the term, written like a formula; "" shows only "f(x)".',
+      ),
+    sichtbar: z
+      .boolean()
+      .default(true)
+      .describe("Grafikfolie: false starts with the curve hidden."),
   })
   .strict()
   .transform((entry, ctx) => {
@@ -193,6 +217,9 @@ const graphEntry = z
       source: parsed.expression,
       row: parsed.row,
       name: entry.name,
+      function: entry.funktion,
+      display: entry.anzeige,
+      visible: entry.sichtbar,
     };
   });
 
@@ -331,6 +358,14 @@ export const graphicSchema = z
         ),
       );
     data.graph.forEach((g, index) => {
+      if (g.display !== undefined && !g.function)
+        ctx.addIssue(
+          codedIssue(
+            "GRAPHIC_FUNCTION_NAME",
+            "anzeige needs funktion (the name of the function)",
+            ["graph", index, "term"],
+          ),
+        );
       for (const problem of functionProblems(g.row))
         ctx.addIssue(
           codedIssue("GRAPHIC_FUNCTION", `${problem} (in "${g.term}")`, [
@@ -359,6 +394,20 @@ export const graphicSchema = z
         source: g.source,
         row: g.row,
         ...(g.name ? { name: g.name } : {}),
+        ...(g.function
+          ? {
+              function: g.function,
+              // The compiler renders `display`; only it can typeset math.
+              label: {
+                source:
+                  g.display === ""
+                    ? `${g.function}(x)`
+                    : `${g.function}(x) = ${g.display ?? g.source}`,
+                display: "",
+              },
+            }
+          : {}),
+        ...(g.visible ? {} : { visible: false as const }),
       })),
       points: data.punkt.map((p) => ({
         position: p.position,

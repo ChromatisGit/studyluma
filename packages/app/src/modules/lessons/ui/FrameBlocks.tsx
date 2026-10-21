@@ -9,7 +9,7 @@ import { Check, Clock, FileText, Smartphone } from "lucide-react";
 import type { Merkkarte, RichNode, SlideSegment } from "../../catalog";
 import { RichContent, SummaryContent } from "../../content-renderer";
 import type { Slide } from "../domain/deck";
-import { isFill } from "../domain/layout";
+import { columnWidths, isFill } from "../domain/layout";
 import { fill } from "../../../helper/text";
 import { QuizBlock } from "./FrameQuiz";
 import TEXT from "./lessons.de.json";
@@ -123,27 +123,19 @@ export const ScrollSyncContext = createContext<{
   follow?: { slideId: string; ratio: number } | null;
 }>({});
 
-/** One piece of a slide's text: running content or a column layout. */
-export function SegmentView({ segment }: { segment: SlideSegment }) {
-  if (segment.type === "content") {
-    return isFill(segment) ? (
-      <div className="lf__fill">
-        <RichContent nodes={segment.content} className="lf-md" />
-      </div>
-    ) : (
-      <Nodes nodes={segment.content} />
-    );
-  }
+function ColumnsView({
+  columns,
+  centered,
+}: {
+  columns: Extract<SlideSegment, { type: "columns" }>["columns"];
+  centered: boolean | undefined;
+}) {
   return (
     <div
-      className="lf__columns"
-      style={{
-        gridTemplateColumns: segment.columns
-          .map((column) => `${column.width}fr`)
-          .join(" "),
-      }}
+      className={`lf__columns${centered ? " lf__columns--center" : ""}`}
+      style={{ gridTemplateColumns: columnWidths(columns) }}
     >
-      {segment.columns.map((column, i) => {
+      {columns.map((column, i) => {
         const fills = isFill({ type: "content", content: column.content });
         return (
           <div
@@ -159,6 +151,20 @@ export function SegmentView({ segment }: { segment: SlideSegment }) {
       })}
     </div>
   );
+}
+
+/** One piece of a slide's text: running content or a column layout. */
+export function SegmentView({ segment }: { segment: SlideSegment }) {
+  if (segment.type === "content") {
+    return isFill(segment) ? (
+      <div className="lf__fill">
+        <RichContent nodes={segment.content} className="lf-md" />
+      </div>
+    ) : (
+      <Nodes nodes={segment.content} />
+    );
+  }
+  return <ColumnsView columns={segment.columns} centered={segment.centered} />;
 }
 
 export function SegmentsView({ segments }: { segments: SlideSegment[] }) {

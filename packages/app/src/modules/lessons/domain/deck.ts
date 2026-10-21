@@ -1,6 +1,7 @@
 import type {
   Catalog,
   Foliensatz,
+  Graphic,
   Merkkarte,
   Placement,
   Quiz,
@@ -34,6 +35,8 @@ export type Slide = {
   notes: RichNode[];
   /** The tab the author chose (`::tag`); absent on embedded entries. */
   tag?: SlideTag;
+  /** `::grafikfolie`: the slide is one Grafik. */
+  graphicSlide?: { title: string; graphic: Graphic };
   /** The Merkkarten placed in the text (`::merkkarte`), by id. */
   cards: Record<string, Merkkarte>;
   worksheet?: Worksheet;
@@ -177,6 +180,7 @@ export function buildDeck(
       id: placement.id,
       cards: cardsIn(entry.segments, cards),
       ...(entry.tag ? { tag: entry.tag } : {}),
+      ...(entry.graphicSlide ? { graphicSlide: entry.graphicSlide } : {}),
       number: index + 1,
       kind: placement.kind,
       title:

@@ -642,6 +642,57 @@ anzahl = 1
       const slides = JSON.stringify(compileContent(root).bundle.foliensaetze);
       expect(slides).toContain('"type":"graphic"');
     });
+    describe("::grafikfolie", () => {
+      const toml =
+        '[[graph]]\nterm = "y = sin(x)"\nfunktion = "f"\n\n[[graph]]\nterm = "y = a * x"\nfunktion = "t"\nsichtbar = false\n\n[[parameter]]\nname = "a"\nvon = -1\nbis = 1\nschritt = 0.1\nstart = 0\n';
+      const slide = (body: string) => {
+        const root = make({ [`${CHAPTER}/grafiken/g.toml`]: toml });
+        edit(root, "folien/Stunde.md", (s) =>
+          s.replace(
+            "# Foliensatz: Baustein\n::bis 8:00",
+            `# "Grafik"\n${body}\n\n# Foliensatz: Baustein\n::bis 8:00`,
+          ),
+        );
+        return root;
+      };
+      test("a slide with only the Grafik keeps its functions", () => {
+        const root = slide(
+          "::tag Einstieg\n::grafikfolie [](../grafiken/g.toml)",
+        );
+        const result = compileContent(root);
+        expect(
+          result.diagnostics.filter((x) => x.severity === "error"),
+        ).toEqual([]);
+        const entry = result.bundle.foliensaetze
+          .find((x) => x.filename === "Stunde")!
+          .entries.find((x) => x.title === "Grafik")!;
+        expect(entry.segments).toEqual([]);
+        const graphs = entry.graphicSlide!.graphic.graphs;
+        expect(graphs.map((g) => g.function)).toEqual(["f", "t"]);
+        expect(graphs.map((g) => g.visible)).toEqual([undefined, false]);
+        expect(graphs[0]!.label!.source).toBe("f(x) = sin(x)");
+        expect(graphs[0]!.label!.display).toContain("<math");
+        expect(entry.graphicSlide!.title).toBe("");
+      });
+      test("other content, a second Grafik and a missing path are errors", () => {
+        expect(
+          codes(slide("::grafikfolie [](../grafiken/g.toml)\nText")),
+        ).toContain("GRAPHIC_SLIDE_BODY");
+        expect(
+          codes(
+            slide(
+              "::grafikfolie [](../grafiken/g.toml)\n::grafikfolie [](../grafiken/g.toml)",
+            ),
+          ),
+        ).toContain("GRAPHIC_SLIDE_DUPLICATE");
+        expect(codes(slide("::grafikfolie ../grafiken/g.toml"))).toContain(
+          "GRAPHIC_SYNTAX",
+        );
+        expect(
+          codes(slide("::grafikfolie [](../grafiken/fehlt.toml)")),
+        ).toContain("GRAPHIC_MISSING");
+      });
+    });
     test("reports Grafik problems", () => {
       const graph =
         "\n## Graph\n\nText.\n\n::grafik [G](../grafiken/g.toml)\n\n::antwort\ny = 2x\n";
@@ -918,6 +969,20 @@ anzahl = 1
       "Quadratische",
     ]);
     expect(columns.columns.map((c) => c.width)).toEqual([0.5, 0.5]);
+  });
+  test("a lone Mitte column is centred and ends at ---", () => {
+    const root = make();
+    edit(root, "folien/Stunde.md", (s) =>
+      s.replace("Was fällt euch auf?", "## Mitte\nx\n---\nNachher"),
+    );
+    const first = compileContent(root).bundle.foliensaetze.find(
+      (x) => x.filename === "Stunde",
+    )!.entries[0]!;
+    expect(first.segments.map((x) => x.type)).toEqual(["columns", "content"]);
+    const columns = first.segments[0]!;
+    if (columns.type !== "columns") throw new Error("columns expected");
+    expect(columns.centered).toBe(true);
+    expect(columns.columns.map((c) => c.width)).toEqual([1]);
   });
   test("keeps nested inclusion notes on the first placement", () => {
     const root = make();

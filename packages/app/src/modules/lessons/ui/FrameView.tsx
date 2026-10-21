@@ -16,6 +16,7 @@ import {
 } from "./FrameBlocks";
 import { BlankTask } from "./BlankTask";
 import { useQuizWaiting } from "./FrameQuiz";
+import { GraphicSlideBody, isGraphicSlide } from "./GraphicSlide";
 import TEXT from "./lessons.de.json";
 
 /** How far text may grow on a slide that is only to be read, and how far it shrinks to fit. */
@@ -62,15 +63,16 @@ function Tab({ slide }: { slide: Slide }) {
 function Body({ slide, sent }: { slide: Slide; sent: boolean }) {
   const layout = slideLayout(slide);
   const writing = layout === "slide" && isWritingSlide(slide);
+  const graphic = isGraphicSlide(slide);
   const fit = useFitText(
     [slide.id],
-    (layout === "slide" && !writing) || layout === "sheet",
+    (layout === "slide" && !writing && !graphic) || layout === "sheet",
   );
   const card = slide.kind === "merkkarte" ? slide.merkkarte : undefined;
   const waiting = useQuizWaiting(slide.id) && layout === "quiz";
   return (
     <div
-      className={`lf__body lf__body--${layout}${waiting ? " is-waiting" : ""}`}
+      className={`lf__body lf__body--${layout}${graphic ? " lf__body--graphic" : ""}${waiting ? " is-waiting" : ""}`}
       ref={fit}
     >
       {!card && !waiting && (
@@ -80,15 +82,19 @@ function Body({ slide, sent }: { slide: Slide; sent: boolean }) {
             : slide.title}
         </h1>
       )}
-      <div className="lf__blocks">
-        {card && <MerkkarteCard card={card} />}
-        <SegmentsView segments={slide.segments} />
-        {layout === "sheet" && <SheetCard slide={slide} sent={sent} />}
-        {layout === "quiz" && slide.quiz && (
-          <QuizBlock slideId={slide.id} title={slide.title} />
-        )}
-        {layout === "summary" && <InhaltView slide={slide} />}
-      </div>
+      {isGraphicSlide(slide) ? (
+        <GraphicSlideBody slide={slide} />
+      ) : (
+        <div className="lf__blocks">
+          {card && <MerkkarteCard card={card} />}
+          <SegmentsView segments={slide.segments} />
+          {layout === "sheet" && <SheetCard slide={slide} sent={sent} />}
+          {layout === "quiz" && slide.quiz && (
+            <QuizBlock slideId={slide.id} title={slide.title} />
+          )}
+          {layout === "summary" && <InhaltView slide={slide} />}
+        </div>
+      )}
     </div>
   );
 }
