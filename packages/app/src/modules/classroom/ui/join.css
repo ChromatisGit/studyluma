@@ -1,0 +1,79 @@
+/* After joining: a check mark drawn in chalk on the board, then the name. */
+.join-welcome {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--space-400, 1rem);
+  box-sizing: border-box;
+  background: var(--color-bg);
+}
+.join-welcome__board {
+  --chalk: #f4f1ea;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-300, 0.75rem);
+  width: min(100%, 26rem);
+  padding: var(--space-600, 2rem) var(--space-500, 1.5rem);
+  box-sizing: border-box;
+  border-radius: var(--radius-surface, 1rem);
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      rgb(255 255 255 / 0.06),
+      transparent 60%
+    ),
+    #2a1947;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+  color: var(--chalk);
+  animation: join-board 300ms ease-out both;
+}
+.join-welcome__check {
+  width: 7.5rem;
+  height: 6.25rem;
+  overflow: visible;
+}
+.join-welcome__check path {
+  fill: none;
+  stroke: var(--chalk);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0.92;
+  animation: join-chalk 700ms 250ms cubic-bezier(0.5, 0, 0.3, 1) forwards;
+}
+.join-welcome__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-style: italic;
+  text-align: center;
+  clip-path: inset(0 100% 0 0);
+  animation: join-write 700ms 950ms ease-out forwards;
+}
+@keyframes join-board {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+@keyframes join-chalk {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes join-write {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .join-welcome__board,
+  .join-welcome__check path,
+  .join-welcome__name {
+    animation: none;
+    stroke-dashoffset: 0;
+    clip-path: none;
+  }
+}

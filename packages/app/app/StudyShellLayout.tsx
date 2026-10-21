@@ -1,4 +1,3 @@
-import { useCallback, type ReactNode } from "react";
 import type { loader } from "./routes/shell.server";
 import {
   Link,
@@ -10,15 +9,10 @@ import {
 import { House, Map, UserRound } from "lucide-react";
 import type { NavigationItem } from "@chromatis/base/ui";
 import { shellLinks } from "../src/modules/shell";
+import { courseOverviewPath, coursePath } from "../src/modules/courses";
 import {
-  courseOverviewPath,
-  coursePath,
-  findChapter,
-} from "../src/modules/courses";
-import {
-  LiveQuizProvider,
+  LiveBanners,
   useSite,
-  type Target,
   type ViewerRole,
 } from "../src/modules/classroom";
 import {
@@ -26,53 +20,10 @@ import {
   type CurrentView,
   type SheetsData,
 } from "../src/modules/worksheets";
+import { StudentLive } from "./StudentLive";
 import { StudyShell, courseIcon } from "./StudyShell";
 import { worksheetLinks } from "./worksheetLinks";
 import TEXT from "./app.de.json";
-
-const quizPath = (courseId: string) => `${coursePath(courseId)}/quiz`;
-
-/** Where the worksheet the teacher sent lives: in the session's course, else in any that teaches it. */
-function useSheetPath() {
-  const site = useSite();
-  return useCallback(
-    (target: Target, courseId: string | null) => {
-      const teaching = site.courses.filter((course) =>
-        findChapter(course, target.chapterId),
-      );
-      const course =
-        teaching.find((item) => item.id === courseId) ?? teaching[0];
-      const chapter = course && findChapter(course, target.chapterId);
-      const sheet = site.index.worksheets[target.chapterId]?.find(
-        (item) => item.id === target.id,
-      );
-      return course && chapter && sheet
-        ? worksheetLinks(course.id, chapter.slug).sheet(sheet.slug)
-        : null;
-    },
-    [site],
-  );
-}
-
-/** The live quiz and the worksheets the teacher sends, for students. */
-function StudentLive({
-  enabled,
-  children,
-}: {
-  enabled: boolean;
-  children: ReactNode;
-}) {
-  const sheetPath = useSheetPath();
-  return (
-    <LiveQuizProvider
-      enabled={enabled}
-      quizPath={quizPath}
-      sheetPath={sheetPath}
-    >
-      {children}
-    </LiveQuizProvider>
-  );
-}
 
 function ChapterNavigation({
   chapter,
@@ -225,19 +176,21 @@ export default function ShellLayout() {
   const accountLabel = extra.account.label;
   const accountTo = extra.account.to;
   return (
-    <StudyShell
-      navigation={navigation}
-      pageWidth="wide"
-      chapterSection={chapterSection}
-      currentParentTo={currentCoursePath}
-      sidebarFooter={{
-        full: <AccountLink label={accountLabel} to={accountTo} />,
-        compact: <AccountLink label={accountLabel} to={accountTo} compact />,
-      }}
-    >
-      <StudentLive enabled={viewer === "student"}>
+    // Around the whole shell: the sidebar greys out worksheets by the phase too.
+    <StudentLive enabled={viewer === "student"}>
+      <StudyShell
+        navigation={navigation}
+        pageWidth="wide"
+        chapterSection={chapterSection}
+        currentParentTo={currentCoursePath}
+        sidebarFooter={{
+          full: <AccountLink label={accountLabel} to={accountTo} />,
+          compact: <AccountLink label={accountLabel} to={accountTo} compact />,
+        }}
+      >
+        <LiveBanners />
         <Outlet />
-      </StudentLive>
-    </StudyShell>
+      </StudyShell>
+    </StudentLive>
   );
 }

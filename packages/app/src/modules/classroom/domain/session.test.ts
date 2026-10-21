@@ -211,6 +211,7 @@ describe("released content", () => {
       applyIntent(fresh(), controller, { type: "target", target }, ids),
     );
     expect(sent.target).toEqual({ ...target, sendId: "run-1" });
+    expect(sent.phase).toBe("arbeitsblatt");
     expect(
       ok(applyIntent(sent, controller, { type: "target", target: null }, ids))
         .target,
@@ -229,6 +230,36 @@ describe("released content", () => {
         ),
       ).toEqual({ ok: false, reason: "forbidden" });
     }
+  });
+});
+
+describe("the phase", () => {
+  test("starts with Unterricht and follows the controller only", () => {
+    expect(fresh().phase).toBe("unterricht");
+    const working = ok(
+      applyIntent(
+        fresh(),
+        controller,
+        { type: "phase", phase: "aufgabe" },
+        ids,
+      ),
+    );
+    expect(working.phase).toBe("aufgabe");
+    const same = applyIntent(
+      working,
+      controller,
+      { type: "phase", phase: "aufgabe" },
+      ids,
+    );
+    expect(ok(same)).toBe(working);
+    expect(
+      applyIntent(
+        joined(fresh(), "p1"),
+        { role: "participant", participantId: "p1" },
+        { type: "phase", phase: "austausch" },
+        ids,
+      ),
+    ).toEqual({ ok: false, reason: "forbidden" });
   });
 });
 

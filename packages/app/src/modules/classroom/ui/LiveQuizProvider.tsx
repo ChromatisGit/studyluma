@@ -3,16 +3,25 @@ import {
   useContext,
   useEffect,
   useRef,
+  useState,
   type ReactNode,
 } from "react";
 import { Link, useLocation, useNavigate, useRevalidator } from "react-router";
 import { ArrowRight, Radio } from "lucide-react";
-import { SheetReporterContext } from "../../worksheets";
+import { SheetReporterContext, SheetsPausedContext } from "../../worksheets";
+import { fill } from "../../../helper/text";
 import { useStudentQuizzes } from "../application/useLiveQuiz";
+import {
+  allows,
+  needsCountdown,
+  RETURN_SECONDS,
+  type DeviceArea,
+} from "../domain/focus";
 import { sheetRedirect } from "../domain/redirect";
-import type { Target } from "../domain/session";
+import type { Phase, Target } from "../domain/session";
 import type { StudentQuizView } from "../domain/views";
 import TEXT from "./classroom.de.json";
+import "./calm.css";
 
 type LiveQuiz = ReturnType<typeof useStudentQuizzes>;
 
@@ -126,6 +135,110 @@ function useSessionRefresh(sync: string | undefined) {
   }, [sync, revalidator]);
 }
 
+type Shown = {
+  /** The session's phase as last seen. */
+  seen: Phase | undefined;
+  /** The phase the device shows; it lags behind during the countdown. */
+  shown: Phase | undefined;
+  counting: boolean;
+};
+
+/**
+ * The phase the device shows. Leaving a green phase holds the old one for a
+ * visible countdown (like the end of a breakout room); every other change
+ * shows at once, and a change back during the countdown cancels it.
+ */
+function useShownPhase(phase: Phase | undefined) {
+  const [state, setState] = useState<Shown>({
+    seen: phase,
+    shown: phase,
+    counting: false,
+  });
+  const [left, setLeft] = useState(RETURN_SECONDS);
+  let current = state;
+  if (phase !== state.seen) {
+    // Derived from the snapshot during render, so a page never sees a
+    // phase the device does not show yet.
+    current =
+      phase && state.shown && needsCountdown(state.shown, phase)
+        ? { seen: phase, shown: state.shown, counting: true }
+        : { seen: phase, shown: phase, counting: false };
+    setState(current);
+  }
+  useEffect(() => {
+    if (!state.counting) {
+      return;
+    }
+    const end = Date.now() + RETURN_SECONDS * 1000;
+    setLeft(RETURN_SECONDS);
+    const timer = setInterval(() => {
+      const rest = Math.ceil((end - Date.now()) / 1000);
+      if (rest > 0) {
+        setLeft(rest);
+        return;
+      }
+      setState((now) => ({ ...now, shown: now.seen, counting: false }));
+    }, 250);
+    return () => clearInterval(timer);
+  }, [state.counting]);
+  return { shown: current.shown, countdown: current.counting ? left : null };
+}
+
+/**
+ * Brings the student back to the calm view from a page the shown phase does
+ * not open (after the countdown, after a quiz, or a page typed in by hand).
+ */
+function useWayBack(
+  phase: Phase | undefined,
+  area: DeviceArea,
+  quizRunning: boolean | undefined,
+  calmPath: string,
+) {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (
+      phase !== undefined &&
+      quizRunning !== undefined &&
+      !allows(phase, area, quizRunning)
+    ) {
+      void navigate(calmPath, { replace: true });
+    }
+  }, [phase, area, quizRunning, calmPath, navigate]);
+}
+
+export type DeviceFocus = {
+  /** The phase the device shows; undefined outside a running session. */
+  phase: Phase | undefined;
+  /** Seconds until the device goes back; null when no countdown runs. */
+  countdown: number | null;
+  /** The student's name in the session. */
+  name: string | null;
+};
+
+const DeviceFocusContext = createContext<DeviceFocus>({
+  phase: undefined,
+  countdown: null,
+  name: null,
+});
+
+/** What the student device shows now. */
+export const useDeviceFocus = () => useContext(DeviceFocusContext);
+
+function ReturnCountdown({ seconds }: { seconds: number }) {
+  return (
+    <p className="device-return" role="status">
+      {fill(seconds === 1 ? TEXT.device.returnOne : TEXT.device.returnMany, {
+        seconds,
+      })}
+      <span
+        className="device-return__bar"
+        style={{ "--return-seconds": `${RETURN_SECONDS}s` } as object}
+        aria-hidden="true"
+      />
+    </p>
+  );
+}
+
 /**
  * The way back to a quiz that is running, on every page but the quiz itself.
  * The redirect happens once; this stays until the run ends.
@@ -151,23 +264,71 @@ function QuizBanner({
   );
 }
 
+const BannersContext = createContext<ReactNode>(null);
+
+/**
+ * The provider's notices (teacher away, quiz running, the way back). The
+ * provider wraps the whole shell, so the sidebar knows the phase as well;
+ * the notices go where the page content starts.
+ */
+export function LiveBanners() {
+  return <>{useContext(BannersContext)}</>;
+}
+
 export interface LiveQuizProviderProps {
   /** Only students take part; teachers run the quiz from the lesson. */
   enabled: boolean;
+  /** Where the open page belongs. */
+  area: DeviceArea;
+  /** The calm view, where the device goes back to. */
+  calmPath: string;
   quizPath: (courseId: string) => string;
   /** Where a sent worksheet is; null while it cannot be told yet. */
   sheetPath: (target: Target, courseId: string | null) => string | null;
   children: ReactNode;
 }
 
-/** One connection per tab for all pages of the shell. */
+/** The student's live session for all pages of the shell; place `LiveBanners` where the content starts. */
 export function LiveQuizProvider({
   enabled,
+  area,
+  calmPath,
   quizPath,
   sheetPath,
   children,
 }: LiveQuizProviderProps) {
   const live = useStudentQuizzes(enabled);
+  const following = enabled && !live.ended;
+  const { shown, countdown } = useShownPhase(
+    following ? live.phase : undefined,
+  );
+  const quizRunning =
+    following && live.views !== undefined
+      ? liveView(live.views) !== undefined
+      : undefined;
+  useWayBack(shown, area, quizRunning, calmPath);
+  const focus: DeviceFocus = { phase: shown, countdown, name: live.name };
+  const banners = (
+    <>
+      {enabled && live.ended && (
+        <p className="teacher-away" role="status">
+          {TEXT.unitEnded}
+        </p>
+      )}
+      {enabled && !live.ended && live.teacherAway && (
+        <p className="teacher-away" role="status">
+          {TEXT.teacherAway}
+        </p>
+      )}
+      {enabled && !live.ended && (
+        <QuizBanner views={live.views} quizPath={quizPath} />
+      )}
+      {/* A running quiz is where the device is; nothing to come back from. */}
+      {countdown !== null && !quizRunning && (
+        <ReturnCountdown seconds={countdown} />
+      )}
+    </>
+  );
   useQuizRedirect(enabled ? live.views : undefined, quizPath);
   useSheetRedirect(
     enabled ? live.sent : undefined,
@@ -177,22 +338,17 @@ export function LiveQuizProvider({
   useSessionRefresh(enabled ? live.sync : undefined);
   return (
     <LiveQuizContext.Provider value={live}>
-      <SheetReporterContext.Provider value={enabled ? live.reporter : null}>
-        {enabled && live.ended && (
-          <p className="teacher-away" role="status">
-            {TEXT.unitEnded}
-          </p>
-        )}
-        {enabled && !live.ended && live.teacherAway && (
-          <p className="teacher-away" role="status">
-            {TEXT.teacherAway}
-          </p>
-        )}
-        {enabled && !live.ended && (
-          <QuizBanner views={live.views} quizPath={quizPath} />
-        )}
-        {children}
-      </SheetReporterContext.Provider>
+      <DeviceFocusContext.Provider value={focus}>
+        <SheetsPausedContext.Provider
+          value={shown !== undefined && shown !== "arbeitsblatt"}
+        >
+          <SheetReporterContext.Provider value={enabled ? live.reporter : null}>
+            <BannersContext.Provider value={banners}>
+              {children}
+            </BannersContext.Provider>
+          </SheetReporterContext.Provider>
+        </SheetsPausedContext.Provider>
+      </DeviceFocusContext.Provider>
     </LiveQuizContext.Provider>
   );
 }
@@ -207,6 +363,8 @@ export function useLiveQuiz(): LiveQuiz {
       sent: undefined,
       ended: false,
       reporter: { progress: () => undefined, ampel: () => undefined },
+      phase: undefined,
+      name: null,
     }
   );
 }

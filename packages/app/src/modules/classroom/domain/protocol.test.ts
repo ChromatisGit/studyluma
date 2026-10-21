@@ -15,6 +15,18 @@ describe("client messages", () => {
     );
   });
 
+  test("a phase is one of the four words", () => {
+    expect(
+      parseClientMessage(frame({ type: "phase", phase: "austausch" })),
+    ).toEqual({
+      type: "intent",
+      intent: { type: "phase", phase: "austausch" },
+    });
+    for (const phase of ["quiz", "", null, "Aufgabe"]) {
+      expect(parseClientMessage(frame({ type: "phase", phase }))).toBeNull();
+    }
+  });
+
   test("a malformed target is not a message", () => {
     for (const target of [
       {},

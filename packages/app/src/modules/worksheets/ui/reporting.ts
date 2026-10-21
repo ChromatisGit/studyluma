@@ -7,6 +7,12 @@ import { useWorksheet } from "./WorksheetContext";
 /** Provided by the Classroom Session on a student device; null elsewhere. */
 export const SheetReporterContext = createContext<SheetReporter | null>(null);
 
+/**
+ * True on a student device while the lesson is not at a worksheet: the
+ * sheets and challenges stay visible but greyed out and not clickable.
+ */
+export const SheetsPausedContext = createContext(false);
+
 /** Typing makes the state change constantly; the class hears of it this often. */
 const REPORT_DELAY_MS = 1500;
 

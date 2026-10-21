@@ -1,9 +1,11 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Alert, Button, Input, Page, PageHeader } from "@chromatis/base/ui";
 import { normalizeJoinCode } from "../domain/joinCode";
 import { CLASSROOM_PATH } from "../application/useClassroom";
+import { fill } from "../../../helper/text";
 import TEXT from "./classroom.de.json";
 import "./quiz.css";
+import "./join.css";
 
 type Failure = "unknown" | "tooMany" | "full" | "failed";
 
@@ -29,14 +31,74 @@ async function join(code: string, name: string): Promise<Failure | null> {
   }
 }
 
+/** How long the success moment stays before the device moves on. */
+const WELCOME_MS = 2200;
+const WELCOME_REDUCED_MS = 900;
+
+/**
+ * The moment after joining: a check mark drawn as with chalk on the board,
+ * then the name. No dialog to dismiss; the device moves on by itself.
+ */
+function Welcome({ name, next }: { name: string; next: string }) {
+  useEffect(() => {
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    // A full load, so every page sees the new Classroom cookie.
+    const timer = setTimeout(
+      () => window.location.assign(next),
+      reduced ? WELCOME_REDUCED_MS : WELCOME_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [next]);
+  return (
+    <main className="join-welcome" role="status">
+      <div className="join-welcome__board">
+        <svg
+          className="join-welcome__check"
+          viewBox="0 0 120 100"
+          aria-hidden="true"
+        >
+          <defs>
+            <filter
+              id="join-chalk"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.9"
+                numOctaves="2"
+                seed="3"
+              />
+              <feDisplacementMap in="SourceGraphic" scale="3" />
+            </filter>
+          </defs>
+          <path
+            d="M14 54 C 24 60, 34 70, 44 82 C 60 56, 82 30, 108 12"
+            pathLength="1"
+            filter="url(#join-chalk)"
+          />
+        </svg>
+        <p className="join-welcome__name">
+          {fill(TEXT.device.joined, { name })}
+        </p>
+      </div>
+    </main>
+  );
+}
+
 /** Students join a Classroom Session with its code and a name, no account. */
 export function JoinPage({
   initialCode = "",
-  coursesPath,
+  nextPath,
   maxNameLength,
 }: {
   initialCode?: string;
-  coursesPath: string;
+  /** Where the device goes once it has joined: the calm view. */
+  nextPath: string;
   /** The longest name the session accepts. */
   maxNameLength: number;
 }) {
@@ -44,6 +106,7 @@ export function JoinPage({
   const [name, setName] = useState("");
   const [failure, setFailure] = useState<Failure | null>(null);
   const [busy, setBusy] = useState(false);
+  const [joined, setJoined] = useState<string | null>(null);
   const valid = normalizeJoinCode(code) !== null && name.trim().length > 0;
 
   async function submit(event: FormEvent) {
@@ -54,12 +117,15 @@ export function JoinPage({
     setBusy(true);
     const result = await join(code, name);
     if (result === null) {
-      // A full load, so every page sees the new Classroom cookie.
-      window.location.assign(coursesPath);
+      setJoined(name.replace(/\s+/g, " ").trim());
       return;
     }
     setFailure(result);
     setBusy(false);
+  }
+
+  if (joined !== null) {
+    return <Welcome name={joined} next={nextPath} />;
   }
 
   return (

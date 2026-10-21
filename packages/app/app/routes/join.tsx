@@ -12,7 +12,7 @@ export default function JoinRoute() {
   return (
     <JoinPage
       initialCode={code}
-      coursesPath="/courses"
+      nextPath="/unterricht"
       maxNameLength={maxNameLength}
     />
   );

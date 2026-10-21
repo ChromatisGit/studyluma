@@ -56,9 +56,10 @@ describe("declared routes", () => {
     expect(urls).toContain("/api/check");
   });
 
-  test("the classroom module owns the join, session, socket and probe routes", () => {
+  test("the classroom module owns the join, calm view, session, socket and probe routes", () => {
     expect(byModule("classroom").map((route) => route.url)).toEqual([
       "/join",
+      "/unterricht",
       "/:code",
       "/classroom",
       "/classroom/ws",

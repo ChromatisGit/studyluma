@@ -202,10 +202,18 @@ export type SlideSegment =
       centered?: boolean;
       columns: { width: number; title?: string; content: RichNode[] }[];
     };
-/** `::tag`: the tab of a slide. `erklaeren` and `aufgabe` carry a function; the rest are presets. */
-export type SlideTone =
-  "erklaeren" | "aufgabe" | "neutral" | "hinweis" | "wichtig" | "merke";
-export type SlideTag = { label: string; tone: SlideTone };
+/**
+ * `::tag`: the tab of a slide, one word of a fixed list. A slide without
+ * one is `Plenum`; `Aufgabe` and `Austausch` mean the students act.
+ */
+export type SlideTag =
+  | "Einstieg"
+  | "Wiederholung"
+  | "Plenum"
+  | "Merke"
+  | "Ausblick"
+  | "Aufgabe"
+  | "Austausch";
 export type EntryKind =
   "slide" | "worksheet" | "quiz" | "merkkarte" | "summary" | "foliensatz";
 export type SourceEntry = {

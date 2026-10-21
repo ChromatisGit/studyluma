@@ -3,7 +3,14 @@ import { describe, expect, test } from "bun:test";
 import { catalog, entry, para, placement, set } from "../../../test/catalog";
 import { deviation, formatSeconds, plannedEnd } from "./clock";
 import { buildDeck, plannedTimes, presentationFor } from "./deck";
-import { isFill, isWritingSlide, runningOrder, slideTab } from "./layout";
+import type { SlideTag } from "../../catalog";
+import {
+  isFill,
+  isWritingSlide,
+  runningOrder,
+  slidePhase,
+  slideTab,
+} from "./layout";
 import { newDeckState, reduceSession, strokeAt } from "./session";
 
 /**
@@ -310,19 +317,32 @@ describe("slides on the stage", () => {
   test("the tab shows what happens: the function of embedded entries, the author's tag on slides", () => {
     expect(slideTab(deck.slides[1]!)).toEqual({
       label: "Merkkarte",
-      tone: "merke",
+      tone: "standard",
     });
     expect(slideTab(deck.slides[2]!)).toEqual({ label: "Quiz", tone: "quiz" });
     expect(slideTab(deck.slides[3]!)).toEqual({
       label: "Inhalt",
-      tone: "inhalt",
+      tone: "standard",
     });
-    const tagged = {
-      ...deck.slides[0]!,
-      tag: { label: "Aufgabe", tone: "aufgabe" as const },
-    };
-    expect(slideTab(tagged)).toEqual({ label: "Aufgabe", tone: "aufgabe" });
-    expect(slideTab(deck.slides[0]!).tone).toBe("neutral");
+    const tagged = (tag: SlideTag) => ({ ...deck.slides[0]!, tag });
+    expect(slideTab(tagged("Aufgabe"))).toEqual({
+      label: "Aufgabe",
+      tone: "arbeit",
+    });
+    expect(slideTab(tagged("Merke")).tone).toBe("merke");
+    expect(slideTab(deck.slides[0]!)).toEqual({
+      label: "Plenum",
+      tone: "standard",
+    });
+  });
+
+  test("only green slides change what the devices show", () => {
+    const tagged = (tag: SlideTag) => ({ ...deck.slides[0]!, tag });
+    expect(slidePhase(deck.slides[0]!)).toBe("unterricht");
+    expect(slidePhase(tagged("Merke"))).toBe("unterricht");
+    expect(slidePhase(tagged("Aufgabe"))).toBe("aufgabe");
+    expect(slidePhase(tagged("Austausch"))).toBe("austausch");
+    expect(slidePhase(deck.slides[2]!)).toBe("unterricht");
   });
 
   test("a slide with ::platz keeps its text compact for writing", () => {

@@ -27,7 +27,6 @@ export type {
   RichNode,
   SlideSegment,
   SlideTag,
-  SlideTone,
   SourceEntry,
   Steps,
   Summary,

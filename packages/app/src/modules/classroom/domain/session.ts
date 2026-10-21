@@ -52,6 +52,18 @@ export type TargetInput = { kind: "sheet"; id: string; chapterId: string };
  */
 export type Target = TargetInput & { sendId: string };
 
+/**
+ * What the students do now; the teacher's browser derives it from the
+ * slide up front (its tag) and sends it only when it changes.
+ */
+export const PHASES = [
+  "unterricht",
+  "aufgabe",
+  "arbeitsblatt",
+  "austausch",
+] as const;
+export type Phase = (typeof PHASES)[number];
+
 export type Releases = {
   /** Chapters whose Inhalt students may read. */
   summaries: string[];
@@ -83,6 +95,7 @@ export type ClassroomSession = {
   placement: Placement | null;
   /** The sheet sent to the class, if any. */
   target: Target | null;
+  phase: Phase;
   releases: Releases;
   participants: Participant[];
   quiz: QuizRun | null;
@@ -113,6 +126,7 @@ export function createSession(
     controllerAbsentSince: now,
     placement: null,
     target: null,
+    phase: "unterricht",
     releases: { summaries: [], sheets: {}, solutions: [], rules: {} },
     participants: [],
     quiz: null,
@@ -402,10 +416,18 @@ function controllerIntent(
       ]);
     case "target": {
       const target = intent.target && { ...intent.target, sendId: newRunId() };
-      return accept({ ...session, target }, [
+      // A sent sheet opens the worksheets, also when sent from the overview.
+      const phase = target ? "arbeitsblatt" : session.phase;
+      return accept({ ...session, target, phase }, [
         { kind: "target-changed", target },
       ]);
     }
+    case "phase":
+      return accept(
+        session.phase === intent.phase
+          ? session
+          : { ...session, phase: intent.phase },
+      );
     case "release.sheet":
     case "release.summary":
     case "release.rule":

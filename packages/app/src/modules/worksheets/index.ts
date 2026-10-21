@@ -25,4 +25,4 @@ export { typstToRow } from "@studyluma/catalog-contract";
 export { tasksOf } from "./domain/structure";
 export type { TaskToBlankMessage } from "./ui/WorksheetContext";
 export type { SheetReporter } from "./domain/report";
-export { SheetReporterContext } from "./ui/reporting";
+export { SheetReporterContext, SheetsPausedContext } from "./ui/reporting";

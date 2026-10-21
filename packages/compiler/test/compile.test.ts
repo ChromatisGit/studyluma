@@ -1034,15 +1034,24 @@ anzahl = 1
     const first = compileContent(root).bundle.foliensaetze.find(
       (x) => x.filename === "Stunde",
     )!.entries[0]!;
-    expect(first.tag).toEqual({ label: "Aufgabe", tone: "aufgabe" });
-    edit(root, "folien/Stunde.md", (s) =>
-      s.replace("::tag Aufgabe", "::tag Einstieg wichtig"),
-    );
-    expect(
-      compileContent(root).bundle.foliensaetze.find(
-        (x) => x.filename === "Stunde",
-      )!.entries[0]!.tag,
-    ).toEqual({ label: "Einstieg", tone: "wichtig" });
+    expect(first.tag).toBe("Aufgabe");
+    const message = (tag: string) => {
+      edit(root, "folien/Stunde.md", (s) =>
+        s.replace(/::tag [^\n]*/, `::tag ${tag}`),
+      );
+      try {
+        compileContent(root);
+        return undefined;
+      } catch (e) {
+        if (!(e instanceof CompileFailure)) throw e;
+        return e.diagnostics.find((d) => d.code === "TAG_SYNTAX")?.message;
+      }
+    };
+    expect(message("Einstieg wichtig")).toContain("write ::tag Einstieg");
+    expect(message("Erklären")).toContain("is now ::tag Plenum");
+    expect(message("Knobelei hinweis")).toContain("is now ::tag Aufgabe");
+    expect(message("Freitext")).toContain("Einstieg|Wiederholung|Plenum");
+    expect(message("Austausch")).toBeUndefined();
   });
   test("::merkkarte places a Merkkarte on a slide", () => {
     const root = make();

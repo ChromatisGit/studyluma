@@ -10,7 +10,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button, Dialog } from "@chromatis/base/ui";
 import { useNavigate, useRevalidator } from "react-router";
 import { fill } from "../../../helper/text";
-import { useSite } from "../../classroom";
+import { useSendPhase, useSite } from "../../classroom";
 import { useCatalog } from "../../catalog";
 import { sheetsFor } from "../../courses";
 import {
@@ -30,6 +30,7 @@ import {
   entryId,
   entrySlide,
   runningOrder,
+  slidePhase,
   type OrderEntry,
 } from "../domain/layout";
 import type { DeckState } from "../domain/lesson";
@@ -289,6 +290,8 @@ export function TeacherView({
     onClassView: setClassView,
   });
   const currentId = session?.currentFrameId;
+  // Student devices follow the slide's phase; a blank surface keeps its slide's.
+  useSendPhase(unit && slide ? slidePhase(slide) : null);
   // The class view belongs to the slide it was opened on.
   useEffect(() => setClassView(false), [currentId]);
   // A task taken from the shown worksheet becomes a blank surface after the slide.
