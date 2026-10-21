@@ -1,6 +1,6 @@
 /* =====================================================================
    Worksheets: the layer on top of framework and StudyLuma theme.
-   Only what the framework doesn't have: sheet grid with Korrekturrand,
+   Only what the framework doesn't have: sheet grid,
    gaps, math field, marks, keypad, mode choice, Ampel, Musterlösung,
    Pult, chapter sidebar. Ported from the approved prototype.
    ===================================================================== */
@@ -22,9 +22,7 @@
   --tint-ok: color-mix(in srgb, var(--ok) 15%, var(--color-bg));
   --tint-almost: color-mix(in srgb, var(--almost) 20%, var(--color-bg));
   --tint-notyet: color-mix(in srgb, var(--notyet) 13%, var(--color-bg));
-  --rand: 11rem;
   --gutter: 3.25rem;
-  --colgap: var(--space-700);
 }
 .kapitel-app math {
   font-family: var(--font-math);
@@ -39,10 +37,7 @@
 .page-top__inner {
   max-width: var(
     --study-page-max-width,
-    calc(
-      var(--gutter) + 42rem + var(--colgap) + var(--rand) + 2 *
-        var(--page-gutter)
-    )
+    calc(var(--gutter) + 42rem + 2 * var(--page-gutter))
   );
   margin-inline: auto;
   padding-inline: var(--page-gutter);
@@ -54,27 +49,12 @@
   padding-block: var(--space-300) var(--space-700);
 }
 
-/* Sections: the Korrekturrand hairline runs through all of them */
-.ws {
-  position: relative;
-}
-.ws::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: calc(var(--page-gutter) + var(--rand) + var(--colgap) / 2);
-  width: var(--border-2);
-  background: color-mix(in srgb, var(--ink) 30%, transparent);
-  pointer-events: none;
-}
-
 .ws-section__intro {
   max-width: var(--measure);
   margin-bottom: var(--space-600);
 }
 
-/* Aufgabe: number gutter | content | Korrekturrand */
+/* Aufgabe: number gutter | content */
 .aufgabe {
   display: grid;
   grid-template-columns: var(--gutter) minmax(0, 1fr);
@@ -99,12 +79,6 @@
   gap: var(--space-400);
   min-width: 0;
 }
-.aufgabe__head,
-.aufgabe__intro,
-.aufgabe__foot,
-.loesung {
-  margin-right: calc(var(--rand) + var(--colgap));
-}
 .aufgabe__to-blank {
   margin-left: auto;
 }
@@ -127,11 +101,6 @@
   margin-top: var(--space-300);
 }
 
-.part {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--rand);
-  column-gap: var(--colgap);
-}
 .part__main {
   display: flex;
   gap: var(--space-300);
@@ -145,6 +114,8 @@
   gap: var(--space-300);
 }
 .part__letter {
+  position: relative;
+  align-self: flex-start;
   font-family: var(--font-display);
   font-style: italic;
   font-size: var(--text-lg);
@@ -162,6 +133,10 @@
 }
 .mark-slot {
   min-width: 0;
+}
+/* stays rendered for aria-live, but takes no gap while empty */
+.mark-slot:empty {
+  margin-top: calc(-1 * var(--space-300));
 }
 
 .aufgabe__foot {
@@ -187,7 +162,7 @@
 
 /* Folded optional Aufgabe: dashed = "not now" */
 
-/* ---- Marks in the Korrekturrand ---------------------------------------- */
+/* ---- Marks: symbol on the part letter, note under the part ------------- */
 .mark {
   display: flex;
   gap: var(--space-200);
@@ -234,6 +209,18 @@
   to {
     stroke-dashoffset: 0;
   }
+}
+/* the symbol stands in the number gutter, under the Aufgabe number, level with "a)" */
+.mark--letter {
+  position: absolute;
+  top: 50%;
+  left: calc(-1 * var(--gutter));
+  translate: 0 -50%;
+}
+/* a note without symbol (it stands by the letter): a line in the result colour */
+.mark-slot > .mark:not(.visually-hidden, :has(> .mark__sym)) {
+  padding-left: var(--space-300);
+  border-left: var(--border-2) solid currentColor;
 }
 .mark--inline {
   display: inline-flex;
@@ -678,7 +665,7 @@
 
 /* ---- Ampel: the only place with green, yellow and red ------------------ */
 .ampel {
-  margin: var(--space-600) calc(var(--rand) + var(--colgap)) 0 var(--gutter);
+  margin: var(--space-600) 0 0 var(--gutter);
   padding-top: var(--space-500);
   border-top: var(--border-2) solid var(--color-text);
   display: flex;
@@ -1179,35 +1166,6 @@
   border-top: var(--border-1) solid var(--color-border-subtle);
 }
 
-/* ---- Medium: keep gutter, marks move under the part (< 56rem) ---------- */
-@container page (max-width: 56rem) {
-  .ws::after {
-    display: none;
-  }
-  .part {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .aufgabe__head,
-  .aufgabe__intro,
-  .aufgabe__foot,
-  .loesung,
-  .ampel {
-    margin-right: 0;
-  }
-
-  .mark-slot:not(:empty) {
-    margin-top: var(--space-300);
-  }
-  .mark-slot:not(:empty)::before {
-    content: "";
-    display: block;
-    width: 1.25rem;
-    height: var(--border-2);
-    background: var(--ink);
-    margin: 0 0 var(--space-200) 0.3rem;
-    border-radius: 1px;
-  }
-}
 /* ---- Narrow / Split View (< 40rem): numbers move in front of the title - */
 @container page (max-width: 40rem) {
   .ws-section {
@@ -1237,6 +1195,18 @@
   }
   .part__letter {
     min-width: 1.25rem;
+  }
+  /* no gutter: the symbol moves in front of "a)"; every letter of the
+     Aufgabe makes the same room, so the parts stay aligned */
+  .aufgabe:has(.mark--letter) .part__letter {
+    padding-left: 1.85rem;
+  }
+  .mark--letter {
+    left: 0;
+  }
+  .mark--letter .mark__sym {
+    width: 1.5rem;
+    height: 1.5rem;
   }
   .loesung__row {
     padding-inline: var(--space-300) var(--space-100);
@@ -1276,16 +1246,6 @@
   flex-direction: column;
   gap: var(--space-300);
   padding-top: var(--space-500);
-}
-/* the Korrekturrand starts in the header and runs down through the page */
-.page-top__inner::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: calc(var(--page-gutter) + var(--rand) + var(--colgap) / 2);
-  width: var(--border-2);
-  background: color-mix(in srgb, var(--ink) 30%, transparent);
 }
 .sheet-id {
   display: flex;
@@ -1333,7 +1293,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-400);
-  margin: var(--space-600) calc(var(--rand) + var(--colgap)) 0 var(--gutter);
+  margin: var(--space-600) 0 0 var(--gutter);
   padding-top: var(--space-600);
   border-top: var(--border-1) solid var(--color-border-subtle);
 }
@@ -1484,14 +1444,6 @@
 }
 /* the Aufgabe number gets a result dot once it is checked */
 
-@container page (max-width: 56rem) {
-  .page-top__inner::after {
-    display: none;
-  }
-  .weiter {
-    margin-right: 0;
-  }
-}
 @container page (max-width: 40rem) {
   .page-top__inner {
     padding-top: var(--space-400);
@@ -1509,24 +1461,6 @@
   }
   .weiter__card {
     max-width: none;
-  }
-}
-
-.mark-slot:has(.mark--richtig)::before {
-  background: var(--ok) !important;
-}
-.mark-slot:has(.mark--fast)::before {
-  background: var(--almost) !important;
-}
-.mark-slot:has(.mark--nochNicht)::before {
-  background: var(--notyet) !important;
-}
-.freigabe {
-  margin-right: calc(var(--rand) + var(--colgap));
-}
-@container page (max-width: 56rem) {
-  .freigabe {
-    margin-right: 0;
   }
 }
 
@@ -1709,8 +1643,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-500);
-  margin: var(--space-600) calc(var(--rand) + var(--colgap)) var(--space-800)
-    var(--gutter);
+  margin: var(--space-600) 0 var(--space-800) var(--gutter);
 }
 .modewahl fieldset {
   border: 0;
@@ -1871,7 +1804,7 @@
   clip-path: inset(0 -100vmax);
 }
 .check__head {
-  margin: 0 calc(var(--rand) + var(--colgap)) var(--space-300) var(--gutter);
+  margin: 0 0 var(--space-300) var(--gutter);
   display: flex;
   flex-direction: column;
   gap: var(--space-200);
@@ -1929,17 +1862,12 @@
     color-mix(in srgb, #b98cf0 45%, transparent)
   );
 }
-.page-top--dark .page-top__inner::after {
-  background: color-mix(in srgb, #d6aeff 40%, transparent);
-}
 .ch-band {
   background: var(--color-bg-emphasis);
   color: var(--color-text-on-emphasis);
 }
 .ch-band__inner {
-  max-width: calc(
-    var(--gutter) + 42rem + var(--colgap) + var(--rand) + 2 * var(--page-gutter)
-  );
+  max-width: calc(var(--gutter) + 42rem + 2 * var(--page-gutter));
   margin-inline: auto;
   padding: 0 var(--page-gutter) var(--space-600);
   display: flex;
@@ -1958,12 +1886,6 @@
   font-weight: var(--weight-bold);
 }
 
-@container page (max-width: 56rem) {
-  .check__head,
-  .modewahl {
-    margin-right: 0;
-  }
-}
 @container page (max-width: 40rem) {
   .check__head,
   .modewahl,
@@ -1988,7 +1910,7 @@
   align-items: center;
   gap: var(--space-200) var(--space-400);
   flex-wrap: wrap;
-  width: calc(100% - var(--rand) - var(--colgap));
+  width: 100%;
   min-height: var(--target-min);
   padding: var(--space-300) var(--space-400);
   border: var(--border-2) dashed var(--color-border-control);
@@ -2042,11 +1964,6 @@ button.opt-box__head:hover {
 .aufgabe--opt,
 .aufgabe--locked {
   padding-block: var(--space-400);
-}
-@container page (max-width: 56rem) {
-  .opt-box__head {
-    width: 100%;
-  }
 }
 @container page (max-width: 40rem) {
   .opt-box__num {
@@ -2125,9 +2042,7 @@ button.opt-box__head:hover {
   transition: top var(--motion-default) var(--ease-standard);
 }
 .tabbar__inner {
-  max-width: calc(
-    var(--gutter) + 42rem + var(--colgap) + var(--rand) + 2 * var(--page-gutter)
-  );
+  max-width: calc(var(--gutter) + 42rem + 2 * var(--page-gutter));
   margin-inline: auto;
   padding-inline: calc(var(--page-gutter) - var(--space-400));
 }
@@ -2198,9 +2113,6 @@ body.has-keypad .mfield {
 /* A single task outside its sheet (landing page) */
 .task-sample .ws {
   padding: 0;
-}
-.task-sample .ws::after {
-  display: none;
 }
 .task-sample .aufgabe {
   padding-block: 0;

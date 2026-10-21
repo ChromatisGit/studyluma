@@ -15,7 +15,7 @@ import {
   type PartInfo,
 } from "../domain/structure";
 import { HelpButton, HelpContent } from "./Help";
-import { Mark } from "./Mark";
+import { LetterMark, Mark } from "./Mark";
 import { Solution } from "./Solution";
 import { StepsPanel } from "./StepsPanel";
 import { TaskView } from "./TaskView";
@@ -43,7 +43,14 @@ function PartView({
   return (
     <div className="part" id={multi ? part.id : undefined}>
       <div className="part__main">
-        {multi && <span className="part__letter">{letter})</span>}
+        {multi && (
+          <span className="part__letter">
+            {letter})
+            {result && (
+              <LetterMark state={result.state} isNew={!!ui.newMarks[part.id]} />
+            )}
+          </span>
+        )}
         <div className="part__content">
           {multi && part.title && <h4 className="part__title">{part.title}</h4>}
           {withSteps ? (
@@ -66,6 +73,15 @@ function PartView({
           ) : (
             <TaskView part={part} letter={letter} refText={refText} />
           )}
+          <div className="mark-slot" aria-live="polite">
+            {result && (
+              <Mark
+                result={result}
+                isNew={!!ui.newMarks[part.id]}
+                atLetter={multi}
+              />
+            )}
+          </div>
           <HelpContent part={part} info={info} />
           {multi && (
             <div className="hilfen">
@@ -73,9 +89,6 @@ function PartView({
             </div>
           )}
         </div>
-      </div>
-      <div className="mark-slot" aria-live="polite">
-        {result && <Mark result={result} isNew={!!ui.newMarks[part.id]} />}
       </div>
     </div>
   );
@@ -191,7 +204,7 @@ function LockedChallenge({ info }: { info: AufgabeInfo }) {
   );
 }
 
-/** An Aufgabe: number gutter, content, Korrekturrand. */
+/** An Aufgabe: number gutter and content. */
 export function AufgabeView({ info }: { info: AufgabeInfo }) {
   const { chapter, state, ui, setUi, teacher } = useWorksheet();
   const embedded = useContext(EmbedContext);
