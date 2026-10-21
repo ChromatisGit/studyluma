@@ -38,7 +38,7 @@ function QrCode({ text, label }: { text: string; label: string }) {
 /** The invitation as a slide: on the projector, and on the teacher's stage while it is shown. */
 export function JoinView({ join }: { join: JoinInfo }) {
   return (
-    <div className="lf lf--slide lf--tone-neutral lj">
+    <div className="lf lf--slide lf--tone-neutral lj" data-theme="light">
       <div className="lf__bar" />
       <div className="lf__tab">
         <span className="lf__tab-label">{TEXT.join.title}</span>

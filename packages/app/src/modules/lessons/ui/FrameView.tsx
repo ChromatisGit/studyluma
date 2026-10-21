@@ -112,7 +112,7 @@ export interface FrameViewProps {
 export function FrameView({ entry, sent = false, children }: FrameViewProps) {
   if (entry.kind === "blank") {
     return (
-      <div className="lf lf--flaeche">
+      <div className="lf lf--flaeche" data-theme="light">
         <span className="lf-zone__label lf__blank-label">{entry.label}</span>
         <BlankTask blank={entry.blank} parent={entry.parent} />
         {children}
@@ -127,6 +127,7 @@ export function FrameView({ entry, sent = false, children }: FrameViewProps) {
     <CardsContext.Provider value={slide.cards}>
       <div
         className={`lf lf--${layout} lf--tone-${tone}${writing ? " lf--writing" : ""}`}
+        data-theme="light"
       >
         <Tab slide={slide} />
         <Body slide={slide} sent={sent} />
