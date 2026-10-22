@@ -264,12 +264,12 @@ describe("compiler (new authoring syntax)", () => {
     );
     const root = make();
     edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("- Quotient bilden: ((2))", "- Quotient bilden"),
+      s.replace("- Quotient bilden: (($2$))", "- Quotient bilden"),
     );
     expect(codes(root)).toContain("STEPS_NO_GAP");
     edit(root, "aufgaben/Steigung.md", (s) =>
       s.replace(
-        "::schritte\n- Differenzen bestimmen: ((4)) und ((2))\n- Quotient bilden",
+        "::schritte\n- Differenzen bestimmen: (($4$)) und (($2$))\n- Quotient bilden",
         "::schritte\n1. Differenzen\n2. Quotient",
       ),
     );
@@ -318,8 +318,8 @@ describe("compiler (new authoring syntax)", () => {
     const root = make();
     edit(root, "aufgaben/Steigung.md", (s) =>
       s.replace(
-        "Die Steigung ist ((2)).",
-        "Die Steigung ist ((0,5 ~ 0,5)), ((1/3 ~ 0,33)).",
+        "Die Steigung ist (($2$)).",
+        "Die Steigung ist (($0,5$ ~ 0,5)), (($1/3$ ~ 0,33)).",
       ),
     );
     edit(
@@ -400,7 +400,7 @@ describe("compiler (new authoring syntax)", () => {
     for (const answer of ["sqrt(x - 15)", "f(x) = ln(x - 20)", "sqrt(x - 10)"])
       expect(warned(answer)).toHaveLength(1);
     expect(warned("sqrt(x - 15)")[0]).toContain("sqrt(x - 15)");
-    // Enough points, a constant, a number, a set and a word are fine.
+    // Enough points, a constant, a number and a set are fine.
     for (const answer of [
       "sqrt(x - 5)",
       "ln(x)",
@@ -408,7 +408,6 @@ describe("compiler (new authoring syntax)", () => {
       "sqrt(2)",
       "4",
       "{1; 5}",
-      "Parabel",
     ])
       expect(warned(answer)).toEqual([]);
   });
@@ -443,13 +442,72 @@ describe("compiler (new authoring syntax)", () => {
   test("a solution set or vector is not allowed in a gap", () => {
     const root = make();
     edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("Die Steigung ist ((2)).", "Die Menge ist (({1, 2}))."),
+      s.replace("Die Steigung ist (($2$)).", "Die Menge ist ((${1, 2}$))."),
     );
     expect(codes(root)).toContain("GAP_ANSWER_KIND");
     edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("(({1, 2}))", "((vec(1)))"),
+      s.replace("((${1, 2}$))", "(($vec(1)$))"),
     );
     expect(codes(root)).toContain("ANSWER_VECTOR");
+  });
+  describe("math and text gaps", () => {
+    const gapsOf = (line: string) => {
+      const root = make();
+      edit(root, "aufgaben/Steigung.md", (s) =>
+        s.replace("Die Steigung ist (($2$)).", line),
+      );
+      const gaps: any[] = [];
+      const walk = (node: unknown): void => {
+        if (!node || typeof node !== "object") return;
+        if ((node as { type?: string }).type === "gap") gaps.push(node);
+        Object.values(node).forEach(walk);
+      };
+      walk(compileContent(root).bundle);
+      return gaps;
+    };
+    const codesOf = (line: string) => {
+      const root = make();
+      edit(root, "aufgaben/Steigung.md", (s) =>
+        s.replace("Die Steigung ist (($2$)).", line),
+      );
+      return codes(root);
+    };
+    test("(($…$)) is always math, also pi, a letter and |x|", () => {
+      const [pi, x, abs, round] = gapsOf(
+        "Es ist (($pi$)), (($x$)), (($|-3|$)) und (($sqrt(2)$ ~ 1,41)).",
+      );
+      expect(pi.answer.checkRow).toBeDefined();
+      expect(x.answer.checkRow).toBeDefined();
+      expect(abs.choices).toEqual([]);
+      expect(abs.answer.exact).toBe("|-3|");
+      expect(round.answer).toMatchObject({ rounded: "1.41", decimals: 2 });
+    });
+    test("((…)) is always text", () => {
+      const [word] = gapsOf("Das ist die ((Steigung)).");
+      expect(word.answer).toEqual({ exact: "Steigung" });
+    });
+    test("a text gap that looks like math is an error", () => {
+      for (const wrong of ["((2))", "((pi))", "((x))", "((x^2))", "((cos x))"])
+        expect(codesOf(`Es ist ${wrong}.`)).toContain("GAP_TEXT_MATH");
+    });
+    test("dollars must surround the term", () => {
+      expect(codesOf("Es ist (($2$ + 1)).")).toContain("GAP_MATH");
+    });
+    test("a choice is compared as written, with or without dollars", () => {
+      const [choice] = gapsOf("Es gilt (($f(-x) = f(x)$ | $f(-x) = -f(x)$)).");
+      expect(choice.choices).toEqual(["$f(-x) = f(x)$", "$f(-x) = -f(x)$"]);
+      expect(choice.answer).toBeUndefined();
+    });
+    test("a choice in a table does not split the cell", () => {
+      const gaps = gapsOf(
+        "| $x$ | Lage |\n|---|---|\n| $|-1|$ | ((oben | unten)) |\n| (($pi$)) | ((f(x) | g(x))) |",
+      );
+      expect(gaps.slice(0, 3).map((g) => g.choices)).toEqual([
+        ["oben", "unten"],
+        [],
+        ["f(x)", "g(x)"],
+      ]);
+    });
   });
   describe("Grafiken", () => {
     const sheetOf = (root: string) =>
@@ -1077,8 +1135,8 @@ anzahl = 1
     );
     edit(root, "aufgaben/Steigung.md", (s) =>
       s.replace(
-        "Die Steigung ist ((2)).",
-        "Die Steigung ist ((2)).\n::braucht\n- Steigung",
+        "Die Steigung ist (($2$)).",
+        "Die Steigung ist (($2$)).\n::braucht\n- Steigung",
       ),
     );
     const found = codes(root);
@@ -1090,7 +1148,7 @@ anzahl = 1
       make({
         [`${CHAPTER}/aufgaben/Check.md`]: `+++\ntitel = "Check"\n+++\n# "A"\n\n## Antwort\n\n$1$\n\n::antwort\n1\n\n# Checkpoint\n\n${task}`,
       });
-    expect(codes(base("## Einsetzen\n\nEins ist ((1)).\n"))).toEqual([]);
+    expect(codes(base("## Einsetzen\n\nEins ist (($1$)).\n"))).toEqual([]);
     expect(codes(base("## Auswahl\n\nWas?\n\n- (x) a\n- ( ) b\n"))).toEqual([]);
     expect(codes(base("## Auftrag\n\nSchreibe.\n"))).toContain(
       "CHECKPOINT_TASK",
@@ -1100,7 +1158,7 @@ anzahl = 1
     ).toContain("CHECKPOINT_MARKER");
     expect(
       codes(
-        base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::schritte\n- a: ((1))\n"),
+        base("## Antwort\n\n$1$\n\n::antwort\n1\n\n::schritte\n- a: (($1$))\n"),
       ),
     ).toContain("CHECKPOINT_MARKER");
     expect(
@@ -1140,7 +1198,10 @@ anzahl = 1
   test("repeated gaps on one line get distinct IDs", () => {
     const root = make();
     edit(root, "aufgaben/Steigung.md", (s) =>
-      s.replace("Die Steigung ist ((2)).", "((sqrt(2) ~ 1.41)) und ((2))"),
+      s.replace(
+        "Die Steigung ist (($2$)).",
+        "(($sqrt(2)$ ~ 1.41)) und (($2$))",
+      ),
     );
     const sheet = compileContent(root).bundle.worksheets.find(
       (w) => w.filename === "Steigung",

@@ -32,7 +32,7 @@ Noch eine Einfachauswahl.
 
 ## Einsetzen
 
-Text ((Hallo)), Auswahl ((eins | zwei | drei)) und Mathematik ((12 * x^3)).
+Text ((Hallo)), Auswahl ((eins | zwei | drei)) und Mathematik (($12 * x^3$)).
 
 ## Auftrag
 

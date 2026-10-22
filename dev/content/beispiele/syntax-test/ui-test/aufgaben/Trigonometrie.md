@@ -51,11 +51,11 @@ Löse $sin(x) = 1/2$ für $0 <= x <= pi$.
 
 ## Einsetzen: "Lücken"
 
-Der Wert von $cos(0)$ ist ((1)) und der Wert von $ln(e)$ ist ((1)).
+Der Wert von $cos(0)$ ist (($1$)) und der Wert von $ln(e)$ ist (($1$)).
 
-Die Ableitung von $sin(x)$ ist ((cos(x))).
+Die Ableitung von $sin(x)$ ist (($cos(x)$)).
 
-Die Ableitung von $ln(x)$ ist ((1/x)).
+Die Ableitung von $ln(x)$ ist (($1/x$)).
 
 # "Grafiken"
 

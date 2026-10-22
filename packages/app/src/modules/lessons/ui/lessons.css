@@ -153,6 +153,34 @@
 .lf-md li + li {
   margin-top: 0.35em;
 }
+/* A table is read from the back of the room: it takes the slide's text size */
+.lf-md .table,
+.lf-md .table thead th {
+  font-size: inherit;
+}
+/* On a slide with ::platz a table takes the free space: its rows grow so the
+   empty cells have room for handwriting, and column lines guide it */
+.lf--writing .lf__blocks > .lf-md:has(> .md-table) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.lf--writing .lf-md > .md-table {
+  flex: 1;
+}
+.lf--writing .lf-md .table {
+  height: 100%;
+}
+.lf--writing .lf-md .table :is(th, td) {
+  vertical-align: middle;
+}
+.lf--writing .lf-md .table tr:first-child {
+  height: 0;
+}
+.lf--writing .lf-md .table :is(th, td) + :is(th, td) {
+  border-left: var(--border-1) solid var(--color-border-subtle);
+  padding-left: var(--space-400);
+}
 
 /* The label of a blank surface */
 .lf-zone__label {

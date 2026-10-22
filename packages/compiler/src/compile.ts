@@ -27,6 +27,8 @@ import {
   CATALOG_FORMAT_VERSION,
   CATALOG_META_FILE,
   CHECK_POINTS,
+  FUNCTION_NAMES,
+  UNSUPPORTED_FUNCTIONS,
   computeCatalogBuildId,
   decimalCommas,
   germanDecimals,
@@ -50,7 +52,6 @@ import {
   worksheetFrontSchema,
 } from "./config";
 import {
-  functionProblem,
   functionProblems,
   functionRow,
   letters,
@@ -118,6 +119,75 @@ const imageTypes: Record<string, string> = {
 
 /** A function name followed by a variable, a number or π: `sin x`, `ln 2`. */
 const BARE_CALL = /(?<!\p{L})(sin|cos|ln)\s+(?:pi(?!\p{L})|\p{L}(?!\p{L})|\d)/u;
+
+/** Splits a table row at `|` outside gaps `((a | b))` and outside math `$|x|$`. */
+function splitCells(row: string): string[] {
+  const cells: string[] = [];
+  let gap = false,
+    math = false,
+    depth = 0,
+    current = "";
+  for (let i = 0; i < row.length; i++) {
+    const c = row[i]!;
+    if (!gap && c === "(" && row[i + 1] === "(") {
+      gap = true;
+      depth = 0;
+      current += "((";
+      i++;
+      continue;
+    }
+    if (gap && c === "(") depth++;
+    else if (gap && c === ")") {
+      if (depth) depth--;
+      else if (row[i + 1] === ")") {
+        gap = false;
+        current += "))";
+        i++;
+        continue;
+      }
+    } else if (c === "$") math = !math;
+    else if (c === "|" && !gap && !math) {
+      cells.push(current);
+      current = "";
+      continue;
+    }
+    current += c;
+  }
+  cells.push(current);
+  return cells;
+}
+
+/** Names that are no letters of a product: functions, `pi` and Typst calls. */
+const NAMES = [
+  ...FUNCTION_NAMES,
+  ...UNSUPPORTED_FUNCTIONS,
+  "pi",
+  "sqrt",
+  "root",
+  "frac",
+  "abs",
+  "vec",
+];
+
+/**
+ * A run of three or more letters without a known name in it: `Parabel`.
+ * Letters next to each other multiply, so this would silently be a product.
+ */
+const wordIn = (term: string) =>
+  term
+    .replace(/"[^"]*"/g, "")
+    .match(/\p{L}{3,}/gu)
+    ?.find((run) => !NAMES.some((name) => run.includes(name)));
+
+/** A math gap: `$term$`, optionally followed by `~ rounding`. */
+const MATH_GAP = /^\$([^$]+)\$(?:\s*~\s*([^$]+))?$/;
+
+/** A text gap that reads like math: digits, operators, π, one letter or `sin x`. */
+const looksLikeMath = (text: string) =>
+  /\d|[=+*^/{}()<>~]/.test(text) ||
+  /^\p{L}$/u.test(text) ||
+  /(?<!\p{L})(?:pi|π)(?!\p{L})/u.test(text) ||
+  BARE_CALL.test(text);
 
 export class CompileFailure extends Error {
   constructor(readonly diagnostics: Diagnostic[]) {
@@ -382,8 +452,17 @@ export function compileContent(
       operation: math(split.operation, file, line),
     };
   }
-  /** One number or term: the exact value, a prepared row and an allowed rounding. */
+  /**
+   * One number or term: the exact value, a prepared row and an allowed rounding.
+   * It is always math, so `pi` or `x` alone is a term, never a word.
+   */
   function single(written: string, file: string, line: number): Answer {
+    if (written.includes("$"))
+      error(
+        "ANSWER_MATH",
+        `Write the answer without dollar signs: ${written.replace(/\$/g, "")}`,
+        loc(file, line),
+      );
     if (/\bdot(?:\.op)?\b/.test(written.replace(/"[^"]*"/g, "")))
       error(
         "ANSWER_MATH",
@@ -401,7 +480,14 @@ export function compileContent(
     let checkRow: ReturnType<typeof typstToRow> | undefined;
     if (!exact && !rounded)
       error("ANSWER_EMPTY", "Answer is empty", loc(file, line));
-    if (exact && /\d|[=+*^/{}()]/.test(exact)) {
+    const word = exact ? wordIn(exact) : undefined;
+    if (word)
+      error(
+        "ANSWER_WORD",
+        `${word} is a word, but the answer is a number or term; a word belongs in a text gap ((${word})), a product of letters is written with spaces (${[...word].join(" ")})`,
+        loc(file, line),
+      );
+    else if (exact) {
       math(exact, file, line);
       try {
         checkRow = typstToRow(exact);
@@ -419,14 +505,6 @@ export function compileContent(
         );
       }
     }
-    // A word answer stays text, but `sin x` is math that lacks its brackets.
-    const bare = !checkRow && exact ? BARE_CALL.exec(exact)?.[1] : undefined;
-    if (bare)
-      error(
-        "ANSWER_MATH",
-        `${bare} ${functionProblem(bare)} (in the answer ${exact})`,
-        loc(file, line),
-      );
     if (rounded) {
       math(rounded, file, line);
       if (!/^-?\d+(?:\.\d+)?$/.test(rounded))
@@ -535,8 +613,28 @@ export function compileContent(
         );
     return { exact: parsed.expression, checkRow: parsed.row };
   }
+  /** `(($3$))` is a number or term, `((Wort))` is text; nothing is guessed. */
   function gapAnswer(raw: string, file: string, line: number): Answer {
-    const own = answer(raw, file, line);
+    const text = raw.trim();
+    const m = MATH_GAP.exec(text);
+    if (!m) {
+      if (text.includes("$"))
+        error(
+          "GAP_MATH",
+          `Write a math gap as (($term$)), optionally followed by ~ and the rounding: ((${text}))`,
+          loc(file, line),
+        );
+      else if (!text) error("ANSWER_EMPTY", "Answer is empty", loc(file, line));
+      else if (looksLikeMath(text))
+        error(
+          "GAP_TEXT_MATH",
+          `((${text})) is compared as text but looks like math; write (($${text}$)) for a number or term`,
+          loc(file, line),
+        );
+      return text ? { exact: text } : {};
+    }
+    const body = m[2] ? `${m[1]!.trim()} ~ ${m[2].trim()}` : m[1]!.trim();
+    const own = answer(body, file, line);
     if (own.kind)
       error(
         "GAP_ANSWER_KIND",
@@ -572,18 +670,21 @@ export function compileContent(
             "Gap outside an Einsetzen task or step",
             loc(file, line),
           );
-        const parts = token
-          .slice(2, -2)
-          .split("|")
-          .map((s) => s.trim());
+        const inner = token.slice(2, -2).trim();
+        // `(($|x|$))` is one term, not a choice between `$` and `x`.
+        const parts = MATH_GAP.test(inner)
+          ? [inner]
+          : inner.split("|").map((s) => s.trim());
         const gapKey = `${file}:${line}`;
         const gapNumber = (gapCounters.get(gapKey) ?? 0) + 1;
         gapCounters.set(gapKey, gapNumber);
         out.push({
           type: "gap",
           id: id("gap", `${gapKey}:${gapNumber}`),
-          choices: parts.length > 1 ? parts : [],
-          answer: gapAnswer(parts[0] ?? "", file, line),
+          // A choice is compared as written; only a free gap has an answer.
+          ...(parts.length > 1
+            ? { choices: parts }
+            : { choices: [], answer: gapAnswer(parts[0] ?? "", file, line) }),
         });
       } else if (token.startsWith("!![") || token.startsWith("![")) {
         const m = /^!?!\[([^\]]*)\]\(([^)]*)\)$/.exec(token)!;
@@ -804,11 +905,9 @@ export function compileContent(
       ) {
         const rows: Inline[][][] = [];
         const split = (v: string) =>
-          v
-            .trim()
-            .replace(/^\||\|$/g, "")
-            .split("|")
-            .map((c) => inline(c.trim(), file, line.line, gaps));
+          splitCells(v.trim().replace(/^\||\|$/g, "")).map((c) =>
+            inline(c.trim(), file, line.line, gaps),
+          );
         rows.push(split(s));
         i += 2;
         while (i < lines.length && lines[i]!.text.trim().startsWith("|"))

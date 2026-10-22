@@ -10,8 +10,8 @@ titel = "Randfälle"
 a = 1
 
 ::schritte
-- Erster Schritt: ((1))
-- Zweiter Schritt: ((1))
+- Erster Schritt: (($1$))
+- Zweiter Schritt: (($1$))
 
 ## Antwort: "Schritt mit zwei Lücken"
 
@@ -21,7 +21,7 @@ Ein Schritt ist erst richtig, wenn alle seine Lücken stimmen.
 b = 2
 
 ::schritte
-- Beide Zahlen ablesen: ((1)) und ((2))
+- Beide Zahlen ablesen: (($1$)) und (($2$))
 
 ## Antwort: "Ein einzelner Schritt"
 
@@ -29,7 +29,7 @@ b = 2
 c = 3
 
 ::schritte
-- Lies ab: ((3))
+- Lies ab: (($3$))
 
 ## Gruppe: "Optionale Gruppe"
 
@@ -73,7 +73,7 @@ Hier sind alle vier Optionen richtig.
 
 ## Einsetzen: "Auswahl mit Mathematik"
 
-Der Wert von $x^2$ für $x = 3$ ist ((9)); die Ableitung ist ((2 x | x | 2)).
+Der Wert von $x^2$ für $x = 3$ ist (($9$)); die Ableitung ist ((2 x | x | 2)).
 
 ## Auftrag: "Auftrag mit Merkkarten-Tipp"
 
@@ -88,4 +88,4 @@ Und in einem anderen Kapitel: [Lösungsmenge](../../zweites-kapitel/inhalt.md#l�
 
 ## Einsetzen
 
-Ergänze ((5)).
+Ergänze (($5$)).

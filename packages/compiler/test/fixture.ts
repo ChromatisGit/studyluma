@@ -47,7 +47,7 @@ Gegeben ist die Gerade durch $A(1,2)$ und $B(3,6)$.
 
 ### Einsetzen
 
-Die Steigung ist ((2)).
+Die Steigung ist (($2$)).
 
 ---
 
@@ -61,8 +61,8 @@ Berechne $m$.
 m = 2
 
 ::schritte
-- Differenzen bestimmen: ((4)) und ((2))
-- Quotient bilden: ((2))
+- Differenzen bestimmen: (($4$)) und (($2$))
+- Quotient bilden: (($2$))
 
 ::tipp
 Welche Formel? [Steigung bestimmen](../inhalt.md#steigung-bestimmen)
@@ -133,7 +133,7 @@ Berechne $3 + 3$.
 6
 
 ::schritte
-- Rechnen: ((6))
+- Rechnen: (($6$))
 `,
   "quiz/Steigung erkennen.md": `# "Steigung erkennen"
 
