@@ -1732,3 +1732,61 @@
 .lf-fn .graphic__slider input.is-fixed {
   pointer-events: none;
 }
+
+/* Komponentenfolie: the component fills the slide below the tab and lays itself out */
+.lf__body--component {
+  padding-bottom: 28px;
+}
+.lf__body--component .lf__title {
+  font-size: 34px;
+}
+.lf .lf__component {
+  --color-bg: var(--frame-paper);
+  --color-text: var(--frame-ink);
+  --color-bg-accent: var(--frame-grid);
+  --graphic-c0: #1d4ed8;
+  --graphic-c1: #15803d;
+  --graphic-c2: #c2410c;
+  --graphic-c3: #7e22ce;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0 0;
+  font-size: 26px;
+}
+.lf__component > .component-frame--folie {
+  flex: 1;
+}
+.lf__component .component-button {
+  padding: 10px 22px;
+  border-width: 2px;
+  font-size: 26px;
+}
+.lf__component .graphic__slider {
+  grid-template-columns: 30px 1fr 96px;
+  gap: 14px;
+  font-size: 24px;
+}
+.lf__component .graphic__name {
+  font-size: 28px;
+}
+.lf__component .graphic__slider input {
+  height: 32px;
+}
+.lf__component .graphic__slider input.is-fixed,
+.lf__component .component-button:disabled {
+  pointer-events: none;
+}
+.lf__component .component-function {
+  flex: none;
+  font-size: 30px;
+}
+.lf__component .component-function .mfield {
+  font-size: inherit;
+  min-height: 1.6em;
+}
+.lf__component .component-function .mfield.is-locked {
+  background: none;
+  border-bottom-color: transparent;
+}

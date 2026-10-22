@@ -5,6 +5,7 @@ import {
   CATALOG_FILE,
   CATALOG_FORMAT_VERSION,
   CATALOG_META_FILE,
+  componentsIn,
   computeCatalogBuildId,
   serializeCatalogMeta,
   type Catalog,
@@ -56,6 +57,7 @@ export function metaOf(catalog: Catalog): CatalogArtifactMeta {
     formatVersion: CATALOG_FORMAT_VERSION,
     buildId: catalog.buildId,
     compiler: { name: "test-compiler", version: "1.0.0" },
+    components: componentsIn(catalog).map((name) => ({ name, version: "1" })),
   };
 }
 

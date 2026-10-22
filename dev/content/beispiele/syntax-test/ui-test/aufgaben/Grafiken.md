@@ -10,6 +10,17 @@ Betrachte die Normalparabel und die Gerade.
 
 ::grafik [Normalparabel und Gerade](../grafiken/normalparabel.toml)
 
+## Auftrag: "Komponente"
+
+Bewege den Punkt $P$ auf der Parabel. Der Zustand bleibt nur auf diesem Gerät.
+
+::komponente [probe](../grafiken/probe.toml)
+
+::tipp
+Auch ein Tipp kann eine Komponente zeigen.
+
+::komponente [probe](../grafiken/probe.toml)
+
 ## Auftrag: "Exponent"
 
 Verändere $n$ und beobachte das Verhalten für große $|x|$.

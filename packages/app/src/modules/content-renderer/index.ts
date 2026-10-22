@@ -30,6 +30,18 @@ export type {
   PlotFit,
 } from "./domain/graphicView";
 export type { DrawnFunction } from "./ui/Graphic";
+export {
+  ComponentBlock,
+  ComponentFieldContext,
+  ComponentHost,
+  ComponentViewsContext,
+} from "./ui/Component";
+export type {
+  ComponentStateUpdate,
+  ComponentView,
+  LoadComponentView,
+} from "./ui/Component";
+export { useBoxSize } from "./ui/useBoxSize";
 export { gapsOf, inputGraphicOf, walkInlines } from "./domain/rich";
 export type { GapNode } from "./domain/rich";
 export {

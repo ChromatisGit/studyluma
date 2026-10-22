@@ -206,6 +206,16 @@ describe("loading the catalog the build supplied", () => {
     ).toThrow(/names another build/);
   });
 
+  test("a catalog using a component the build does not activate is refused", () => {
+    const files = fixtureFiles(source, {
+      components: [{ name: "symmetrie", version: "1" }],
+    });
+    expect(() => loadCatalog(files)).toThrow(
+      /uses the component symmetrie.*config\/components\.toml/,
+    );
+    expect(loadCatalog(files, ["symmetrie"]).buildId).toBe(source.buildId);
+  });
+
   test("a malformed catalog is refused with what is wrong", () => {
     const broken = {
       ...source,

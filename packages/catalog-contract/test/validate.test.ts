@@ -96,6 +96,47 @@ describe("validateCatalogArtifact", () => {
     expect(errorsOf(writeArtifact(wrongPath))[0]).toContain("invalid path");
   });
 
+  test("the meta lists exactly the components the catalog uses", () => {
+    const node = {
+      type: "component" as const,
+      name: "probe",
+      title: "Probe",
+      props: { type: "component", name: "props are not searched" },
+    };
+    const catalog = tinyCatalog({
+      summaries: [
+        {
+          id: "s1",
+          chapterId: "c1",
+          title: "Inhalt",
+          content: [{ type: "content", content: [node] }],
+          merkkarten: [],
+        },
+      ],
+    });
+    expect(validateCatalogArtifact(writeArtifact(catalog))).toEqual({
+      ok: true,
+    });
+    const unlisted = writeArtifact(
+      catalog,
+      {},
+      {
+        ...metaOf(catalog),
+        components: [],
+      },
+    );
+    expect(errorsOf(unlisted).join("\n")).toContain("uses the component probe");
+    const unused = writeArtifact(
+      tinyCatalog(),
+      {},
+      {
+        ...metaOf(tinyCatalog()),
+        components: [{ name: "probe", version: "1" }],
+      },
+    );
+    expect(errorsOf(unused).join("\n")).toContain("lists the component probe");
+  });
+
   test("a course's current chapter must exist", () => {
     const base = tinyCatalog();
     const { buildId: _unused, ...content } = base;

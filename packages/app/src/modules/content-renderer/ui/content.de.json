@@ -10,6 +10,9 @@
     "alt": "Graph von {functions}",
     "range": "{name} von {from} bis {to}"
   },
+  "component": {
+    "missing": "Die Komponente „{name}“ ist hier nicht verfügbar."
+  },
   "code": {
     "copy": "Kopieren",
     "copied": "Kopiert"

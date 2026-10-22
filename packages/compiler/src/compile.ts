@@ -29,6 +29,7 @@ import {
   CHECK_POINTS,
   FUNCTION_NAMES,
   UNSUPPORTED_FUNCTIONS,
+  componentsIn,
   computeCatalogBuildId,
   decimalCommas,
   germanDecimals,
@@ -37,8 +38,17 @@ import {
   splitOperation,
   typstToRow,
   type CatalogArtifactMeta,
+  type CatalogComponent,
+  type ComponentUse,
   type SlideTag,
 } from "@studyluma/catalog-contract";
+import {
+  COMPONENT_NAME,
+  GRAPHIC_BLOCKS,
+  type CompileContext,
+  type ComponentDefinition,
+  type Placement as ComponentPlacement,
+} from "@studyluma/component-api";
 import compilerPackage from "../package.json" with { type: "json" };
 
 const MATHML_NAMESPACE = ' xmlns="http://www.w3.org/1998/Math/MathML"';
@@ -52,13 +62,15 @@ import {
   worksheetFrontSchema,
 } from "./config";
 import {
+  checkGraphic,
   functionProblems,
   functionRow,
   letters,
   parseGraphic,
 } from "./graphic";
+import { jsonProblem } from "./components";
 import { finitePoints } from "./constant";
-import { parseToml, type TomlOptions } from "./toml";
+import { parseToml, parseTomlDocument, type TomlOptions } from "./toml";
 import type {
   Answer,
   Asset,
@@ -220,6 +232,8 @@ export type CompileOptions = {
    * left out of the build, unread. Absent: all courses.
    */
   courses?: readonly string[];
+  /** The components the instance activates (`config/components.toml`). Absent: none. */
+  components?: readonly ComponentDefinition[];
 };
 export function compileContent(
   contentRoot: string,
@@ -228,6 +242,8 @@ export function compileContent(
   bundle: Bundle;
   diagnostics: Diagnostic[];
   files: Map<string, Uint8Array>;
+  /** The components the catalog uses, for `catalog.meta.json`. */
+  components: CatalogComponent[];
 } {
   const root = resolve(contentRoot);
   const realRoot = realpathSync(root);
@@ -388,6 +404,169 @@ export function compileContent(
       (code, message) => warn(code, `${path}: ${message}`, loc(file, line)),
     );
     return spec && withLabels(spec, file, line);
+  }
+  const componentByName = new Map(
+    (options.components ?? []).map((component) => [component.name, component]),
+  );
+  /**
+   * `::komponente [name](pfad.toml)` and `::komponentenfolie`: the line's name
+   * and path, or undefined after reporting `COMPONENT_SYNTAX`.
+   */
+  function componentLine(
+    text: string,
+    directive: "komponente" | "komponentenfolie",
+    file: string,
+    line: number,
+  ): { name: string; path: string } | undefined {
+    const m = new RegExp(
+      `^::${directive}\\s+\\[([^\\]]*)\\]\\(([^)]+)\\)$`,
+    ).exec(text.trim());
+    const name = m?.[1]!.trim();
+    if (!m || !name || !COMPONENT_NAME.test(name)) {
+      error(
+        "COMPONENT_SYNTAX",
+        `Expected ::${directive} [name](pfad/zur/datei.toml); the brackets hold the name of the component`,
+        loc(file, line),
+      );
+      return undefined;
+    }
+    return { name, path: m[2]!.trim() };
+  }
+  /**
+   * Reads a component file relative to the Markdown file and runs the
+   * component's compile step on it; the result travels inside the catalog.
+   */
+  function readComponent(
+    name: string,
+    path: string,
+    placement: ComponentPlacement,
+    file: string,
+    line: number,
+  ): ComponentUse | undefined {
+    const where = loc(file, line);
+    const component = componentByName.get(name);
+    if (!component) {
+      const known = [...componentByName.keys()];
+      error(
+        "COMPONENT_UNKNOWN",
+        `There is no component ${name}; ${known.length ? `this instance activates ${known.join(", ")}` : "this instance activates none"} (config/components.toml)`,
+        where,
+      );
+      return undefined;
+    }
+    if (!component.placements.includes(placement)) {
+      error(
+        "COMPONENT_PLACEMENT",
+        placement === "folie"
+          ? `The component ${name} has no layout for a whole slide; use ::komponente in the text`
+          : `The component ${name} only fills a whole slide; use ::komponentenfolie`,
+        where,
+      );
+      return undefined;
+    }
+    const absolute = resolve(dirname(join(root, file)), path);
+    if (absolute !== root && !absolute.startsWith(root + sep)) {
+      error(
+        "COMPONENT_ESCAPE",
+        `Component file escapes content root: ${path}`,
+        where,
+      );
+      return undefined;
+    }
+    if (!/\.toml$/i.test(path)) {
+      error("COMPONENT_TYPE", `A component file must be .toml: ${path}`, where);
+      return undefined;
+    }
+    if (!existsSync(absolute) || !statSync(absolute).isFile()) {
+      error("COMPONENT_MISSING", `Missing component file: ${path}`, where);
+      return undefined;
+    }
+    if (!realpathSync(absolute).startsWith(realRoot + sep)) {
+      error(
+        "COMPONENT_ESCAPE",
+        `Component file escapes content root: ${path}`,
+        where,
+      );
+      return undefined;
+    }
+    const document = parseTomlDocument(readFileSync(absolute, "utf8"));
+    if (!document.ok) {
+      const { issue } = document;
+      error(
+        issue.code,
+        `${path}: ${issue.message}${issue.line ? ` (line ${issue.line})` : ""}`,
+        where,
+      );
+      return undefined;
+    }
+    const allowed = [
+      ...component.keys,
+      ...(component.graphic ? GRAPHIC_BLOCKS : []),
+    ];
+    const unknown = Object.keys(document.value).filter(
+      (key) => !allowed.includes(key),
+    );
+    for (const key of unknown)
+      error(
+        "COMPONENT_KEY",
+        `${path}: unknown key "${key}"; ${name} knows ${allowed.length ? allowed.join(", ") : "no keys"}`,
+        where,
+      );
+    if (unknown.length) return undefined;
+    let failed = false;
+    const context: CompileContext = {
+      placement,
+      graphic: (value) => {
+        const blocks = Object.fromEntries(
+          Object.entries(value).filter(([key]) => GRAPHIC_BLOCKS.includes(key)),
+        );
+        const spec = checkGraphic(blocks, context.error, context.warn);
+        return spec && withLabels(spec, file, line);
+      },
+      error: (code, message) => {
+        failed = true;
+        error(code, `${path}: ${message}`, where);
+      },
+      warn: (code, message) => warn(code, `${path}: ${message}`, where),
+    };
+    const failure = (cause: unknown) =>
+      error(
+        "COMPONENT_COMPILE",
+        `${path}: the component ${name} failed: ${cause instanceof Error ? cause.message : String(cause)}`,
+        where,
+      );
+    let props: object | undefined;
+    try {
+      props = component.compile(document.value, context);
+    } catch (cause) {
+      failure(cause);
+      return undefined;
+    }
+    if (failed) return undefined;
+    const problem =
+      typeof props !== "object" || props === null || Array.isArray(props)
+        ? "compile must return an object or report an error"
+        : jsonProblem(props);
+    if (problem) {
+      failure(problem);
+      return undefined;
+    }
+    let title: unknown;
+    try {
+      title = component.description(props!);
+    } catch (cause) {
+      failure(cause);
+      return undefined;
+    }
+    if (typeof title !== "string" || !title.trim()) {
+      failure("description must return a text for screen readers");
+      return undefined;
+    }
+    return {
+      name,
+      title,
+      props: JSON.parse(JSON.stringify(props)) as ComponentUse["props"],
+    };
   }
   /** Typesets the formula of each named function (`f(x) = …`). */
   function withLabels(
@@ -860,6 +1039,21 @@ export function compileContent(
         i++;
         continue;
       }
+      if (/^::komponente\b/.test(s)) {
+        const directive = componentLine(s, "komponente", file, line.line);
+        const use =
+          directive &&
+          readComponent(
+            directive.name,
+            directive.path,
+            "text",
+            file,
+            line.line,
+          );
+        if (use) out.push({ type: "component", ...use });
+        i++;
+        continue;
+      }
       if (/^::/.test(s)) {
         error("MARKER_CONTEXT", `Invalid marker ${s}`, loc(file, line.line));
         i++;
@@ -1182,7 +1376,7 @@ export function compileContent(
     const counts = new Map<string, number>();
     for (const x of body) {
       const marker = /^::([\p{L}-]+)(?:\s+(.*))?$/u.exec(x.text.trim());
-      if (marker?.[1] === "grafik") {
+      if (marker?.[1] === "grafik" || marker?.[1] === "komponente") {
         blocks[current]!.push(x);
       } else if (marker) {
         const name = marker[1]!,
@@ -1934,7 +2128,7 @@ export function compileContent(
       } else if (card) card.current.push(x);
       else if (
         x.text.trim().startsWith("::") &&
-        !/^::(?:grafik|beispiel)\b/.test(x.text.trim())
+        !/^::(?:grafik|komponente|beispiel)\b/.test(x.text.trim())
       )
         error(
           "MARKER_INVALID",
@@ -2025,6 +2219,45 @@ export function compileContent(
         where,
       );
     entry.graphicSlide = { title: m[1]!.trim(), graphic };
+  }
+  /** `::komponentenfolie [name](pfad.toml)`: a slide that is only a component. */
+  function readComponentSlide(
+    entry: SourceEntry,
+    marks: Line[],
+    body: Line[],
+    file: string,
+  ) {
+    const mark = marks[0]!;
+    const where = loc(file, mark.line);
+    if (entry.kind !== "slide") {
+      error(
+        "MARKER_CONTEXT",
+        '::komponentenfolie requires a slide (# "Title")',
+        where,
+      );
+      return;
+    }
+    if (marks.length > 1) {
+      error("COMPONENT_SLIDE_DUPLICATE", "Duplicate ::komponentenfolie", where);
+      return;
+    }
+    if (body.some((x) => x.text.trim())) {
+      error(
+        "COMPONENT_SLIDE_BODY",
+        "A ::komponentenfolie slide has no other content; only ::tag, ::bis and ::notiz may stand beside it",
+        where,
+      );
+    }
+    const directive = componentLine(
+      mark.text,
+      "komponentenfolie",
+      file,
+      mark.line,
+    );
+    const use =
+      directive &&
+      readComponent(directive.name, directive.path, "folie", file, mark.line);
+    if (use) entry.componentSlide = use;
   }
   function parseFoliensatz(doc: Document) {
     const front = readFront(doc, foliensatzFrontSchema);
@@ -2128,7 +2361,8 @@ export function compileContent(
       };
       const current: Line[] = [],
         note: Line[] = [],
-        graphicLines: Line[] = [];
+        graphicLines: Line[] = [],
+        componentLines: Line[] = [];
       let inNote = false;
       for (const line of section.body) {
         const value = line.text.trim(),
@@ -2166,6 +2400,8 @@ export function compileContent(
           else entry.tag = tag as SlideTag;
         } else if (/^::grafikfolie\b/.test(value) && !inNote)
           graphicLines.push(line);
+        else if (/^::komponentenfolie\b/.test(value) && !inNote)
+          componentLines.push(line);
         else if (value === "::notiz") {
           if (inNote)
             error(
@@ -2179,7 +2415,8 @@ export function compileContent(
           !/^::platz(?:\s|$)/.test(value) &&
           !/^::merkkarte\b/.test(value) &&
           !/^::schreib(?:flaeche|en)\b/.test(value) &&
-          !/^::grafik\b/.test(value)
+          !/^::grafik\b/.test(value) &&
+          !/^::komponente\b/.test(value)
         )
           error(
             "MARKER_INVALID",
@@ -2190,8 +2427,16 @@ export function compileContent(
         else current.push(line);
       }
       if (note.length) entry.notes = rich(note, doc.file);
-      if (graphicLines.length)
+      if (graphicLines.length && componentLines.length)
+        error(
+          "COMPONENT_SLIDE_BODY",
+          "A slide is either a ::grafikfolie or a ::komponentenfolie",
+          loc(doc.file, componentLines[0]!.line),
+        );
+      else if (graphicLines.length)
         readGraphicSlide(entry, graphicLines, current, doc.file);
+      else if (componentLines.length)
+        readComponentSlide(entry, componentLines, current, doc.file);
       if (
         ["quiz", "foliensatz", "summary"].includes(kind) &&
         current.some((x) => x.text.trim())
@@ -2791,14 +3036,26 @@ export function compileContent(
     assets: [...assets.values()].sort((a, b) => a.id.localeCompare(b.id)),
   };
   const buildId = computeCatalogBuildId(base);
-  return { bundle: { ...base, buildId }, diagnostics, files };
+  return {
+    bundle: { ...base, buildId },
+    diagnostics,
+    files,
+    components: componentsIn(base).map((name) => ({
+      name,
+      version: componentByName.get(name)!.version,
+    })),
+  };
 }
 /** `catalog.meta.json` of a build: deterministic, it names no time and no machine. */
-export function catalogMeta(buildId: string): CatalogArtifactMeta {
+export function catalogMeta(
+  buildId: string,
+  components: CatalogComponent[] = [],
+): CatalogArtifactMeta {
   return {
     formatVersion: CATALOG_FORMAT_VERSION,
     buildId,
     compiler: { name: compilerPackage.name, version: compilerPackage.version },
+    components,
   };
 }
 
@@ -2808,7 +3065,8 @@ export function writeCatalogFiles(
   {
     bundle,
     files,
-  }: Pick<ReturnType<typeof compileContent>, "bundle" | "files">,
+    components,
+  }: Pick<ReturnType<typeof compileContent>, "bundle" | "files" | "components">,
 ) {
   mkdirSync(directory, { recursive: true });
   for (const [path, bytes] of files) {
@@ -2822,7 +3080,7 @@ export function writeCatalogFiles(
   );
   writeFileSync(
     join(directory, CATALOG_META_FILE),
-    serializeCatalogMeta(catalogMeta(bundle.buildId)),
+    serializeCatalogMeta(catalogMeta(bundle.buildId, components)),
   );
   writeFileSync(
     join(directory, "asset-manifest.json"),

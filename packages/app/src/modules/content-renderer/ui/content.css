@@ -389,3 +389,100 @@ mark {
   font-family: var(--font-display);
   font-size: 1.1rem;
 }
+
+/* Komponenten (::komponente, ::komponentenfolie): the view lays itself out, the frame gives the house layout */
+.component--text {
+  margin: 1rem 0;
+}
+.component--loading.component--text {
+  min-height: 340px;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--color-bg-accent) 40%, transparent);
+}
+.component--missing {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--color-bg-accent);
+  border-radius: 0.5rem;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}
+.component-frame--text {
+  display: grid;
+  gap: 0.75rem;
+}
+.component-frame--folie {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 1.75rem;
+  margin: 0;
+  max-width: none;
+}
+.component-frame__main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+.component-frame__main > * {
+  flex: 1;
+}
+.component-frame__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0.5rem;
+}
+.component-frame--folie .component-frame__controls {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.875rem;
+}
+.component-frame__controls .graphic__slider {
+  flex: 1 1 100%;
+}
+.component-plane--fill {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: none;
+}
+.component-button {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--color-bg-accent);
+  border-radius: 999px;
+  background: var(--color-bg);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.component-button.is-pressed {
+  border-color: var(--color-action-primary-bg);
+  background: color-mix(
+    in srgb,
+    var(--color-action-primary-bg) 14%,
+    var(--color-bg)
+  );
+}
+.component-button:disabled {
+  cursor: default;
+}
+.component-button:disabled:not(.is-pressed) {
+  opacity: 0.55;
+}
+.component-function {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.component-function__y {
+  flex: none;
+  font-family: var(--font-math);
+}
+.component-function .mfield {
+  flex: 1;
+  min-width: 0;
+}

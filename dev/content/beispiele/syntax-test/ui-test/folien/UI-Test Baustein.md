@@ -118,6 +118,20 @@ Text zwischen den Karten, danach Platz zum Schreiben.
 
 ::grafikfolie [](../grafiken/sinus-schieber.toml)
 
+# "Komponentenfolie"
+
+::tag Aufgabe
+::komponentenfolie [probe](../grafiken/probe.toml)
+
+::notiz
+Der Punkt folgt am Projektor und friert mit ihm ein.
+
+# "Komponente im Folientext"
+
+Eine Komponente im Text einer Folie: ihr Zustand bleibt in diesem Fenster.
+
+::komponente [probe](../grafiken/probe.toml)
+
 # "Folie mit Etikett"
 
 ::tag Einstieg

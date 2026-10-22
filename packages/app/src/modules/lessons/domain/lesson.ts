@@ -1,3 +1,4 @@
+import type { JsonValue } from "../../catalog";
 import type { GraphicChanges } from "../../content-renderer";
 
 /**
@@ -27,6 +28,9 @@ export type InkStroke = {
 /** What the lesson changed on a Grafikfolie, by slide; see `GraphicChanges`. */
 export type GraphicSlides = Record<string, GraphicChanges>;
 
+/** The state of each Komponentenfolie, by slide, as its view keeps it (JSON). */
+export type ComponentSlides = Record<string, JsonValue>;
+
 /** What the teacher does with one deck during a lesson. */
 export type DeckState = {
   currentFrameId: string;
@@ -46,9 +50,12 @@ export type DeckState = {
     hidden: boolean;
     sheetShown?: string | null;
     graphics?: GraphicSlides;
+    components?: ComponentSlides;
   } | null;
   /** Sliders and hidden curves of the Grafikfolien; they stay when the slide changes. */
   graphics?: GraphicSlides;
+  /** The state of the Komponentenfolien; it stays when the slide changes. */
+  components?: ComponentSlides;
   /** Slides whose sheet the class was sent to. */
   sent: string[];
   /** Ink taken off a frame by "clear", newest last, so undo can bring it back. */

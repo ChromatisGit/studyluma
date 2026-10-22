@@ -4,8 +4,12 @@ import {
   CATALOG_META_FILE,
   catalogShapeErrors,
   checkCatalogCompatibility,
+  checkCatalogComponents,
   type CatalogArtifactMeta,
 } from "@studyluma/catalog-contract";
+// The server reads which components the build activates; the module's index is the browser side.
+// eslint-disable-next-line chromatis/dependencies
+import { activeComponents } from "../../components/server/components.server";
 import type {
   Catalog,
   CatalogIndex,
@@ -71,14 +75,26 @@ function readJson(files: CatalogFiles, path: string): unknown {
 
 /**
  * Reads and validates a catalog artifact: its format must be one this app
- * reads, and `catalog.json` must be the build `catalog.meta.json` names.
- * Fails with a message that says what to do; it never rebuilds anything.
+ * reads, every component it uses must be one of `components` (the ones the
+ * build activates), and `catalog.json` must be the build `catalog.meta.json`
+ * names. Fails with a message that says what to do; it never rebuilds
+ * anything.
  */
-export function loadCatalog(files: CatalogFiles): Catalog {
+export function loadCatalog(
+  files: CatalogFiles,
+  components: readonly string[] = activeComponents(),
+): Catalog {
   const meta = readJson(files, CATALOG_META_FILE);
   const compatibility = checkCatalogCompatibility(meta);
   if (!compatibility.ok) {
     throw new CatalogUnavailableError(compatibility.errors);
+  }
+  const usable = checkCatalogComponents(
+    meta as CatalogArtifactMeta,
+    components,
+  );
+  if (!usable.ok) {
+    throw new CatalogUnavailableError(usable.errors);
   }
   const catalog = readJson(files, CATALOG_FILE);
   const problems = catalogShapeErrors(catalog);

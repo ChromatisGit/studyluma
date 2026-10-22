@@ -1,7 +1,14 @@
 import { describe, expect, test } from "bun:test";
-import { cpSync, existsSync, mkdtempSync, readFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import {
   validateCatalogArtifact,
   type Catalog,
@@ -105,5 +112,91 @@ describe("catalog build contribution", () => {
     await expect(
       run(dir, { content: "/etc", courses: ["mathe"] }),
     ).rejects.toThrow(/inside the instance/);
+  });
+});
+
+describe("components", () => {
+  /** A component folder whose index.ts needs no import (a plain definition). */
+  const probe = (name = "probe") =>
+    `export default {
+  name: ${JSON.stringify(name)},
+  version: "3",
+  placements: ["text"],
+  keys: ["wort"],
+  graphic: false,
+  compile: (file) => ({ wort: file.wort }),
+  description: (props) => "Probe " + props.wort,
+};
+`;
+  const withComponent = (files: Record<string, string>) => {
+    const dir = instance({
+      "math/lineare-funktionen/kapitel-a/p.toml": 'wort = "hallo"\n',
+    });
+    for (const [path, text] of Object.entries(files)) {
+      mkdirSync(dirname(join(dir.root, path)), { recursive: true });
+      writeFileSync(join(dir.root, path), text);
+    }
+    const inhalt = join(
+      dir.root,
+      "content/math/lineare-funktionen/kapitel-a/inhalt.md",
+    );
+    writeFileSync(
+      inhalt,
+      readFileSync(inhalt, "utf8") + "\n::komponente [probe](p.toml)\n",
+    );
+    return dir;
+  };
+  const runWith = (dir: ReturnType<typeof instance>, components: unknown) =>
+    contribution({
+      instanceRoot: dir.root,
+      outDir: dir.outDir,
+      environment: "local",
+      config: { catalog: { courses: ["mathe"] }, components },
+    });
+
+  test("loads the activated components and records them in the meta", async () => {
+    const dir = withComponent({ "src/components/probe/index.ts": probe() });
+    await runWith(dir, { components: ["./src/components/probe"] });
+    const meta = JSON.parse(
+      readFileSync(join(dir.outDir, "catalog/catalog.meta.json"), "utf8"),
+    );
+    expect(meta.components).toEqual([{ name: "probe", version: "3" }]);
+    expect(JSON.stringify(catalogOf(dir).summaries)).toContain(
+      '"title":"Probe hallo"',
+    );
+    expect(validateCatalogArtifact(join(dir.outDir, "catalog"))).toEqual({
+      ok: true,
+    });
+  });
+
+  test("a component the instance does not activate is unknown", async () => {
+    const dir = withComponent({ "src/components/probe/index.ts": probe() });
+    await expect(runWith(dir, undefined)).rejects.toThrow(/COMPONENT_UNKNOWN/);
+  });
+
+  test("a missing index.ts, a wrong name and a broken definition fail the build", async () => {
+    const dir = withComponent({
+      "src/components/probe/index.ts": probe("anders"),
+      "src/components/kaputt/index.ts": "export default { name: 'kaputt' };\n",
+    });
+    const failure = runWith(dir, {
+      components: [
+        "./src/components/probe",
+        "./src/components/kaputt",
+        "./src/components/fehlt",
+      ],
+    });
+    await expect(failure).rejects.toThrow(/name and folder must match/);
+    await expect(failure).rejects.toThrow(
+      /kaputt: index.ts must default-export/,
+    );
+    await expect(failure).rejects.toThrow(/fehlt: index.ts is missing/);
+  });
+
+  test("an entry that is not a folder below components/ is refused", async () => {
+    const dir = withComponent({});
+    await expect(
+      runWith(dir, { components: ["../elsewhere/probe"] }),
+    ).rejects.toThrow(/not a folder \.\/src\/components\/<name>/);
   });
 });

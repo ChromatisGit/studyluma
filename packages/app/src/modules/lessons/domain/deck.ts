@@ -1,5 +1,6 @@
 import type {
   Catalog,
+  ComponentUse,
   Foliensatz,
   Graphic,
   Merkkarte,
@@ -37,6 +38,8 @@ export type Slide = {
   tag?: SlideTag;
   /** `::grafikfolie`: the slide is one Grafik. */
   graphicSlide?: { title: string; graphic: Graphic };
+  /** `::komponentenfolie`: the slide is one component. */
+  componentSlide?: ComponentUse;
   /** The Merkkarten placed in the text (`::merkkarte`), by id. */
   cards: Record<string, Merkkarte>;
   worksheet?: Worksheet;
@@ -181,6 +184,7 @@ export function buildDeck(
       cards: cardsIn(entry.segments, cards),
       ...(entry.tag ? { tag: entry.tag } : {}),
       ...(entry.graphicSlide ? { graphicSlide: entry.graphicSlide } : {}),
+      ...(entry.componentSlide ? { componentSlide: entry.componentSlide } : {}),
       number: index + 1,
       kind: placement.kind,
       title:

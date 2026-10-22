@@ -1,3 +1,4 @@
+import type { JsonValue } from "../../catalog";
 import type { GraphicChanges, OwnFunction } from "../../content-renderer";
 import { entryId, runningOrder, type OrderEntry } from "./layout";
 import type { Deck } from "./deck";
@@ -15,7 +16,9 @@ export type SessionAction =
   | { type: "toggleHidden" }
   | { type: "toggleFreeze" }
   | { type: "send"; frameId: string }
-  | { type: "graphic"; slideId: string; change: GraphicChange };
+  | { type: "graphic"; slideId: string; change: GraphicChange }
+  /** The new state of a Komponentenfolie, as its view set it. */
+  | { type: "component"; slideId: string; state: JsonValue };
 
 /**
  * One move on a Grafikfolie: a slider, an authored curve shown or hidden, or
@@ -191,6 +194,7 @@ export function reduceSession(
               hidden: session.hidden,
               sheetShown: session.sheetShown ?? null,
               graphics: structuredClone(session.graphics ?? {}),
+              components: structuredClone(session.components ?? {}),
             },
           };
     case "graphic": {
@@ -203,6 +207,11 @@ export function reduceSession(
         graphics: { ...session.graphics, [action.slideId]: changed },
       };
     }
+    case "component":
+      return {
+        ...session,
+        components: { ...session.components, [action.slideId]: action.state },
+      };
     case "send":
       return session.sent.includes(action.frameId)
         ? session

@@ -919,6 +919,7 @@ anzahl = 1
           name: "@studyluma/compiler",
           version: compilerPackage.version,
         },
+        components: [],
       });
       expect(checkCatalogCompatibility(metaOf(build.path))).toEqual({
         ok: true,

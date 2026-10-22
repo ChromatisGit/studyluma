@@ -9,3 +9,9 @@
 /.chromatis/*
 !/.chromatis/runtime-migrations.json
 /.wrangler/
+/.chromatis/*
+!/.chromatis/runtime-migrations.json
+/.wrangler/
+/.chromatis/*
+!/.chromatis/runtime-migrations.json
+/.wrangler/

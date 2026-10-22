@@ -7,20 +7,29 @@
  *   third-party dependencies only (no Chromatis, never the app).
  * - app never imports the compiler, and the compiler is not in the app's
  *   dependency graph (checked on package.json, workspace links included).
+ * - component-api imports only its own files, the contract and React (types)
+ *   and depends on nothing but the contract.
+ * - A component folder (`src/components/<name>/` of an instance) keeps its two
+ *   sides apart: `index.ts` (build) imports no React and not the view,
+ *   `view.tsx` (browser) no compile code and not `index.ts`; of our packages
+ *   both import only @studyluma/component-api (the view its `/view` part).
  * - No package reaches into another package's files by relative path.
  * - Nothing under packages/ imports from dev/ (the Development instance with
  *   its test content, never distributed) or depends on its package; dev/ is private.
  *
- * Run from anywhere: bun scripts/check-boundaries.ts
+ * Run from anywhere: bun scripts/check-boundaries.ts; it checks dev/src/components
+ * too. An instance outside this repository checks its own component folders
+ * with `bun <this file> --components <instance>/src/components`.
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import ts from "typescript";
 
 const SCOPE = "@studyluma/";
 const CONTRACT = `${SCOPE}catalog-contract`;
 const COMPILER = `${SCOPE}compiler`;
 const APP = `${SCOPE}app`;
+const COMPONENT_API = `${SCOPE}component-api`;
 const SKIPPED = new Set([
   "node_modules",
   ".catalog",
@@ -167,6 +176,19 @@ function manifestProblems(
       forbid(dependency, "the contract has no runtime dependencies");
     }
   }
+  if (name === COMPONENT_API) {
+    for (const dependency of everything.filter(
+      (d) =>
+        d.startsWith("@chromatis/") || (d.startsWith(SCOPE) && d !== CONTRACT),
+    )) {
+      forbid(dependency, "the component API knows only the contract");
+    }
+    for (const dependency of declared(manifest, RUNTIME_FIELDS)) {
+      if (dependency !== CONTRACT) {
+        forbid(dependency, "the component API has no runtime dependencies");
+      }
+    }
+  }
   if (name === COMPILER) {
     for (const dependency of everything) {
       if (dependency.startsWith("@chromatis/") || dependency === APP) {
@@ -217,14 +239,91 @@ function importProblems(workspace: Workspace, dev?: Workspace): string[] {
         problem(specifier, "packages never import from dev/");
       } else if (name === CONTRACT) {
         problem(specifier, "the contract imports only its own files");
+      } else if (name === COMPONENT_API) {
+        if (dependency !== CONTRACT && dependency !== "react") {
+          problem(
+            specifier,
+            "the component API imports only the contract and React types",
+          );
+        }
       } else if (name === COMPILER) {
         if (dependency.startsWith("@chromatis/") || dependency === APP) {
           problem(specifier, "the compiler only knows the contract");
-        } else if (dependency !== CONTRACT && !own.has(dependency)) {
+        } else if (
+          dependency !== CONTRACT &&
+          dependency !== COMPONENT_API &&
+          !own.has(dependency)
+        ) {
           problem(specifier, "not a declared dependency of the compiler");
         }
       } else if (name === APP && dependency === COMPILER) {
         problem(specifier, "the app never imports the compiler");
+      }
+    }
+  }
+  return problems;
+}
+
+/** React and libraries that bring it; the build side of a component never loads them. */
+const REACT = /^(?:react|react-dom|mafs|lucide-react)(?:\/|$)/;
+
+/**
+ * The boundaries inside the component folders below `dir`
+ * (`<dir>/<name>/index.ts` and `view.tsx`).
+ */
+export function componentProblems(dir: string): string[] {
+  if (!existsSync(dir)) {
+    return [];
+  }
+  const problems: string[] = [];
+  for (const folder of readdirSync(dir, { withFileTypes: true })) {
+    if (!folder.isDirectory()) {
+      continue;
+    }
+    const base = join(dir, folder.name);
+    for (const file of sourceFiles(base)) {
+      const shown = `${folder.name}/${relative(base, file).split(sep).join("/")}`;
+      // React files belong to the view side, everything else to the build side.
+      const view = /\.[jt]sx$/.test(file);
+      const problem = (specifier: string, why: string) =>
+        problems.push(`component ${shown} imports ${specifier} (${why})`);
+      for (const specifier of importsOf(readFileSync(file, "utf8"))) {
+        if (isRelative(specifier)) {
+          const target = resolve(dirname(file), specifier);
+          const name = basename(target).replace(/\.[cm]?[jt]sx?$/, "");
+          const top = dirname(target) === base;
+          if (relative(base, target).startsWith("..")) {
+            problem(specifier, "reaches outside the component folder");
+          } else if (
+            !view &&
+            (/\.[jt]sx$/.test(target) || (top && name === "view"))
+          ) {
+            problem(specifier, "the build side never loads the view");
+          } else if (view && top && name === "index") {
+            problem(specifier, "the view never loads the build side");
+          }
+          continue;
+        }
+        const dependency = packageOf(specifier);
+        if (
+          dependency.startsWith("@chromatis/") ||
+          (dependency.startsWith(SCOPE) && dependency !== COMPONENT_API)
+        ) {
+          problem(specifier, "components know only @studyluma/component-api");
+        } else if (
+          view &&
+          (isBuiltin(specifier) || specifier === COMPONENT_API)
+        ) {
+          problem(
+            specifier,
+            "the view imports no compile code; use @studyluma/component-api/view",
+          );
+        } else if (
+          !view &&
+          (REACT.test(specifier) || specifier === `${COMPONENT_API}/view`)
+        ) {
+          problem(specifier, "the build side of a component imports no React");
+        }
       }
     }
   }
@@ -237,6 +336,7 @@ export function checkBoundaries(root: string): string[] {
   const dev = devInstance(root);
   return [
     ...(dev ? devProblems(dev) : []),
+    ...(dev ? componentProblems(join(dev.dir, "src", "components")) : []),
     ...all.flatMap((workspace) => [
       ...manifestProblems(workspace, all, dev),
       ...importProblems(workspace, dev),
@@ -245,8 +345,11 @@ export function checkBoundaries(root: string): string[] {
 }
 
 if (import.meta.main) {
-  const root = resolve(import.meta.dir, "..");
-  const problems = checkBoundaries(root);
+  const at = process.argv.indexOf("--components");
+  const problems =
+    at >= 0
+      ? componentProblems(resolve(process.argv[at + 1] ?? "components"))
+      : checkBoundaries(resolve(import.meta.dir, ".."));
   if (problems.length) {
     console.error(`Package boundaries violated:\n- ${problems.join("\n- ")}`);
     process.exit(1);

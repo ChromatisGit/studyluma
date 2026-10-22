@@ -40,6 +40,7 @@ import { SheetEmbed } from "./SheetEmbed";
 import { LiveQuizContext, QuizPreview } from "./FrameQuiz";
 import { FrameStage } from "./FrameStage";
 import { FrameView } from "./FrameView";
+import { ComponentSlideContext, useComponentSlides } from "./ComponentSlide";
 import { GraphicSlideContext, useGraphicSlides } from "./GraphicSlide";
 import { InkInput, InkStrokes, type InkTool } from "./InkLayer";
 import { JoinView } from "./JoinView";
@@ -104,24 +105,27 @@ function TeacherStage({
     sendLaser(point);
   };
   const graphics = useGraphicSlides(session.graphics, dispatch);
+  const components = useComponentSlides(session.components, dispatch);
   return (
     <FrameStage className="lt-stage">
       {monitoring ?? sheet ?? (
         <GraphicSlideContext.Provider value={graphics}>
-          <FrameView entry={entry} sent={session.sent.includes(slide.id)}>
-            <InkStrokes
-              strokes={strokes}
-              laser={tool === "laser" ? laser : null}
-            />
-            <InkInput
-              tool={tool}
-              frameId={id}
-              strokes={strokes}
-              onStroke={(stroke) => dispatch({ type: "stroke", stroke })}
-              onErase={(strokeId) => dispatch({ type: "erase", strokeId })}
-              onLaser={moveLaser}
-            />
-          </FrameView>
+          <ComponentSlideContext.Provider value={components}>
+            <FrameView entry={entry} sent={session.sent.includes(slide.id)}>
+              <InkStrokes
+                strokes={strokes}
+                laser={tool === "laser" ? laser : null}
+              />
+              <InkInput
+                tool={tool}
+                frameId={id}
+                strokes={strokes}
+                onStroke={(stroke) => dispatch({ type: "stroke", stroke })}
+                onErase={(strokeId) => dispatch({ type: "erase", strokeId })}
+                onLaser={moveLaser}
+              />
+            </FrameView>
+          </ComponentSlideContext.Provider>
         </GraphicSlideContext.Provider>
       )}
       {tool === "cursor" && hasPrevious && (

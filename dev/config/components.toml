@@ -1,0 +1,4 @@
+#:schema ../.chromatis/schemas/components.schema.json
+# The components this instance activates; each folder holds index.ts, view.tsx and a README.
+[default]
+components = ["./src/components/probe"]

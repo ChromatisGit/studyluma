@@ -16,6 +16,7 @@ import {
 } from "./FrameBlocks";
 import { BlankTask } from "./BlankTask";
 import { useQuizWaiting } from "./FrameQuiz";
+import { ComponentSlideBody, isComponentSlide } from "./ComponentSlide";
 import { GraphicSlideBody, isGraphicSlide } from "./GraphicSlide";
 import TEXT from "./lessons.de.json";
 
@@ -64,15 +65,17 @@ function Body({ slide, sent }: { slide: Slide; sent: boolean }) {
   const layout = slideLayout(slide);
   const writing = layout === "slide" && isWritingSlide(slide);
   const graphic = isGraphicSlide(slide);
+  const component = isComponentSlide(slide);
   const fit = useFitText(
     [slide.id],
-    (layout === "slide" && !writing && !graphic) || layout === "sheet",
+    (layout === "slide" && !writing && !graphic && !component) ||
+      layout === "sheet",
   );
   const card = slide.kind === "merkkarte" ? slide.merkkarte : undefined;
   const waiting = useQuizWaiting(slide.id) && layout === "quiz";
   return (
     <div
-      className={`lf__body lf__body--${layout}${graphic ? " lf__body--graphic" : ""}${waiting ? " is-waiting" : ""}`}
+      className={`lf__body lf__body--${layout}${graphic ? " lf__body--graphic" : ""}${component ? " lf__body--component" : ""}${waiting ? " is-waiting" : ""}`}
       ref={fit}
     >
       {!card && !waiting && (
@@ -84,6 +87,8 @@ function Body({ slide, sent }: { slide: Slide; sent: boolean }) {
       )}
       {isGraphicSlide(slide) ? (
         <GraphicSlideBody slide={slide} />
+      ) : isComponentSlide(slide) ? (
+        <ComponentSlideBody slide={slide} />
       ) : (
         <div className="lf__blocks">
           {card && <MerkkarteCard card={card} />}

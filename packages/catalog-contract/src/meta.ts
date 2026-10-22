@@ -13,7 +13,12 @@ export type CatalogArtifactMeta = {
   /** The content hash of the catalog (`Catalog.buildId`). */
   buildId: string;
   compiler: { name: string; version: string };
+  /** The components the catalog uses, by name, with the version that compiled them. */
+  components: CatalogComponent[];
 };
+
+/** A component a catalog uses (`catalog.meta.json`). */
+export type CatalogComponent = { name: string; version: string };
 
 /** Plain result of every check: no thrown errors, no framework types. */
 export type CheckResult = { ok: true } | { ok: false; errors: string[] };
@@ -46,6 +51,22 @@ export function catalogMetaErrors(meta: unknown): string[] {
   ) {
     errors.push(`${CATALOG_META_FILE}: compiler needs a name and a version`);
   }
+  const components = meta.components;
+  if (
+    !Array.isArray(components) ||
+    components.some(
+      (component) =>
+        !isObject(component) ||
+        typeof component.name !== "string" ||
+        !component.name ||
+        typeof component.version !== "string" ||
+        !component.version,
+    )
+  ) {
+    errors.push(
+      `${CATALOG_META_FILE}: components must list a name and a version each`,
+    );
+  }
   return errors;
 }
 
@@ -68,6 +89,28 @@ export function checkCatalogCompatibility(meta: unknown): CheckResult {
     };
   }
   return { ok: true };
+}
+
+/**
+ * Whether this build of the app has a view for every component the catalog
+ * uses. `known` are the names of the components the instance activated.
+ */
+export function checkCatalogComponents(
+  meta: Pick<CatalogArtifactMeta, "components">,
+  known: readonly string[],
+): CheckResult {
+  const missing = meta.components
+    .map((component) => component.name)
+    .filter((name) => !known.includes(name));
+  return missing.length
+    ? {
+        ok: false,
+        errors: missing.map(
+          (name) =>
+            `The catalog uses the component ${name}, which this instance does not activate (config/components.toml). Activate it or rebuild the catalog.`,
+        ),
+      }
+    : { ok: true };
 }
 
 /** `catalog.meta.json` exactly as it is written to disk. */

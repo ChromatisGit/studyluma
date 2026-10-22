@@ -123,7 +123,7 @@ function Curves({
  * stay Mafs'. Where the labels would touch, every second (fourth, …) is left
  * out, which keeps the round multiples.
  */
-function PiLabels({ grid }: { grid: PiGrid }) {
+export function PiLabels({ grid }: { grid: PiGrid }) {
   const { viewTransform } = useTransformContext();
   const { xPaneRange } = usePaneContext();
   const ticks = piTicks(xPaneRange, grid);
@@ -177,7 +177,7 @@ function PiLabels({ grid }: { grid: PiGrid }) {
   );
 }
 
-function Points({ points }: { points: GraphicSpec["points"] }) {
+export function Points({ points }: { points: GraphicSpec["points"] }) {
   return (
     <>
       {points.map((p, i) => (

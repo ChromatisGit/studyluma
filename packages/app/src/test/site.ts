@@ -148,6 +148,7 @@ export function fixtureFiles(
       formatVersion: CATALOG_FORMAT_VERSION,
       buildId: catalog.buildId,
       compiler: { name: "test", version: "0.0.0" },
+      components: [],
       ...meta,
     }),
   };

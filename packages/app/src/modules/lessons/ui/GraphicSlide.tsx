@@ -1,7 +1,6 @@
 import {
   createContext,
   useContext,
-  useLayoutEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -15,6 +14,7 @@ import {
   shownOf,
   SliderRow,
   slidersByGraph,
+  useBoxSize,
   valuesOf,
   withOwn,
   type OwnFunction,
@@ -55,26 +55,6 @@ export function useGraphicSlides(
 
 /** The curve line width on a Grafikfolie; the projector is read from afar. */
 const CURVE_WEIGHT = 4;
-
-/** The size the plot may take; it fits the axes into it with equal units. */
-function useSize() {
-  const [element, setElement] = useState<HTMLDivElement | null>(null);
-  const [size, setSize] = useState<{ width: number; height: number } | null>(
-    null,
-  );
-  useLayoutEffect(() => {
-    if (!element) {
-      return;
-    }
-    const measure = () =>
-      setSize({ width: element.clientWidth, height: element.clientHeight });
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [element]);
-  return { setElement, size };
-}
 
 function FormulaLine({
   slide,
@@ -248,7 +228,8 @@ export function GraphicSlideBody({ slide }: { slide: GraphicSlideOf }) {
   const values = valuesOf(graphic, own);
   const shown = shownOf(graphic, own);
   const sliders = slidersByGraph(graphic);
-  const { setElement, size } = useSize();
+  // The plot fits the axes into the space it gets, with equal units.
+  const { setElement, size } = useBoxSize();
   const fit =
     size && size.width > 0 && size.height > 0
       ? fitPlot(graphic.axes, size.width, size.height)

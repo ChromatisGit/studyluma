@@ -5,6 +5,7 @@
 - `config/app.toml` — deployment (target, domain `dev.studyluma.localhost`);
 - `config/catalog.toml` — content root and the published courses (`ui-test`, `randfaelle`);
 - `config/classroom.toml` — the classroom defaults, written out;
+- `config/components.toml` and `src/components/probe/` — a test component that runs every path of the component mechanism (own keys, Grafik blocks, its own errors and warnings, text and slide, state mirrored to the projector); used in `ui-test` (`aufgaben/Grafiken.md`, `folien/UI-Test Baustein.md`);
 - `content/` — test content, edge cases and UI fixtures (author syntax: see the compiler README);
 - `src/worker.workerd.test.ts` — builds the Cloudflare Worker and boots it in workerd;
 - `package.json` and the one-line `tsconfig.json` / `eslint.config.js` stubs.

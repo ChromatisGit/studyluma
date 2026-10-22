@@ -1,4 +1,5 @@
 import { computeCatalogBuildId } from "./buildId";
+import { componentsIn } from "./components";
 import { nodeBuiltins } from "./node";
 import {
   CATALOG_FILE,
@@ -34,7 +35,8 @@ function readJson(
 /**
  * Checks a catalog artifact directory without changing it: `catalog.meta.json`
  * and its compatibility, the structure of `catalog.json`, that both agree on
- * the build id, that the build id is the content hash of the catalog, and that
+ * the build id, that the build id is the content hash of the catalog, that
+ * the meta lists exactly the components the catalog uses, and that
  * every asset exists with the recorded size and digest. Never throws; the
  * result is a plain object.
  */
@@ -70,6 +72,20 @@ export function validateCatalogArtifact(dir: string): CheckResult {
   const { buildId, ...content } = catalog;
   if (computeCatalogBuildId(content) !== buildId) {
     errors.push(`${CATALOG_FILE} does not match its build id ${buildId}`);
+  }
+  const listed = (meta.value as CatalogArtifactMeta).components.map(
+    (component) => component.name,
+  );
+  const used = componentsIn(content);
+  for (const name of used.filter((name) => !listed.includes(name))) {
+    errors.push(
+      `${CATALOG_FILE} uses the component ${name}, which ${CATALOG_META_FILE} does not list`,
+    );
+  }
+  for (const name of listed.filter((name) => !used.includes(name))) {
+    errors.push(
+      `${CATALOG_META_FILE} lists the component ${name}, which ${CATALOG_FILE} does not use`,
+    );
   }
   for (const asset of catalog.assets) {
     if (!ASSET_PATH.test(asset.path)) {

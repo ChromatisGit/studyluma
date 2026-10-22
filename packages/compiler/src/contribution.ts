@@ -7,6 +7,7 @@
 import { rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { catalogConfig, type ConfigByModule } from "./catalog-config";
+import { componentEntries, loadComponents } from "./components";
 import { CompileFailure, compileContent, writeCatalogFiles } from "./compile";
 
 /** The argument Chromatis passes to every contribution. */
@@ -20,8 +21,8 @@ export type ContributionContext = Readonly<{
 }>;
 
 /**
- * Compiles the instance's content root, publishing the configured courses,
- * into `<outDir>/catalog/` (`catalog.json`, `catalog.meta.json`, `assets/`).
+ * Compiles the instance's content root, publishing the configured courses
+ * and using the components the instance activates, into `<outDir>/catalog/` (`catalog.json`, `catalog.meta.json`, `assets/`).
  */
 export default async function catalogContribution(
   context: ContributionContext,
@@ -29,9 +30,13 @@ export default async function catalogContribution(
   const { content, courses } = catalogConfig(context.config);
   const root = resolve(context.instanceRoot, content);
   const target = join(context.outDir, "catalog");
+  const components = await loadComponents(
+    context.instanceRoot,
+    componentEntries(context.config),
+  );
   let compiled: ReturnType<typeof compileContent>;
   try {
-    compiled = compileContent(root, { courses });
+    compiled = compileContent(root, { courses, components });
   } catch (error) {
     if (error instanceof CompileFailure) {
       throw new Error(`${content} does not compile:\n${error.message}`);

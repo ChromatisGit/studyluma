@@ -3,6 +3,7 @@ import {
   CATALOG_FORMAT_VERSION,
   catalogShapeErrors,
   checkCatalogCompatibility,
+  checkCatalogComponents,
   computeCatalogBuildId,
   serializeCatalogMeta,
 } from "../src";
@@ -44,6 +45,11 @@ describe("checkCatalogCompatibility", () => {
     ["a malformed build id", { ...metaOf(tinyCatalog()), buildId: "abc" }],
     ["a fractional version", { ...metaOf(tinyCatalog()), formatVersion: 1.5 }],
     ["a missing compiler", { formatVersion: 1, buildId: "a".repeat(64) }],
+    ["missing components", { ...metaOf(tinyCatalog()), components: undefined }],
+    [
+      "a component without a version",
+      { ...metaOf(tinyCatalog()), components: [{ name: "probe" }] },
+    ],
   ])("rejects %s", (_name, meta) => {
     const result = checkCatalogCompatibility(meta);
     expect(result.ok).toBe(false);
@@ -58,7 +64,33 @@ describe("catalog.meta.json", () => {
       "formatVersion",
       "buildId",
       "compiler",
+      "components",
     ]);
+  });
+});
+
+describe("checkCatalogComponents", () => {
+  const meta = {
+    components: [
+      { name: "symmetrie", version: "1" },
+      { name: "probe", version: "2" },
+    ],
+  };
+
+  test("accepts a catalog whose components the instance activates", () => {
+    expect(checkCatalogComponents(meta, ["probe", "symmetrie", "x"])).toEqual({
+      ok: true,
+    });
+  });
+
+  test("names every component the instance does not activate", () => {
+    const result = checkCatalogComponents(meta, ["probe"]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]).toContain("symmetrie");
+      expect(result.errors[0]).toContain("config/components.toml");
+    }
   });
 });
 

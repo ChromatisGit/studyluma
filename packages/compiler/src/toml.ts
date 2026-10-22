@@ -58,34 +58,38 @@ function pathText(path: readonly PropertyKey[]): string {
   );
 }
 
-/**
- * Parses TOML text and validates it against a schema. The schema defines the
- * fields, their defaults and which keys exist at all. Never throws.
- */
-export function parseToml<S extends z.ZodTypeAny>(
+/** Parses TOML text without a schema. Never throws. */
+export function parseTomlDocument(
   source: string,
-  schema: S,
-  options: TomlOptions,
-): TomlResult<z.output<S>> {
-  let document: unknown;
+):
+  | { ok: true; value: Record<string, unknown> }
+  | { ok: false; issue: TomlIssue } {
   try {
-    document = parse(source);
+    return { ok: true, value: parse(source) };
   } catch (error) {
     const syntax = error instanceof TomlError ? error : undefined;
     return {
       ok: false,
-      issues: [
-        {
-          code: "TOML_SYNTAX",
-          message: (error instanceof Error
-            ? error.message
-            : String(error)
-          ).split("\n")[0]!,
-          ...(syntax ? { line: syntax.line, column: syntax.column } : {}),
-        },
-      ],
+      issue: {
+        code: "TOML_SYNTAX",
+        message: (error instanceof Error ? error.message : String(error)).split(
+          "\n",
+        )[0]!,
+        ...(syntax ? { line: syntax.line, column: syntax.column } : {}),
+      },
     };
   }
+}
+
+/**
+ * Validates a parsed TOML document against a schema. The schema defines the
+ * fields, their defaults and which keys exist at all. Never throws.
+ */
+export function validateToml<S extends z.ZodTypeAny>(
+  document: unknown,
+  schema: S,
+  options: TomlOptions,
+): TomlResult<z.output<S>> {
   const result = schema.safeParse(document, { error: errorMap });
   if (result.success) {
     return { ok: true, value: result.data };
@@ -111,6 +115,21 @@ export function parseToml<S extends z.ZodTypeAny>(
     }
   }
   return { ok: false, issues };
+}
+
+/**
+ * Parses TOML text and validates it against a schema (`validateToml`).
+ * Never throws.
+ */
+export function parseToml<S extends z.ZodTypeAny>(
+  source: string,
+  schema: S,
+  options: TomlOptions,
+): TomlResult<z.output<S>> {
+  const document = parseTomlDocument(source);
+  return document.ok
+    ? validateToml(document.value, schema, options)
+    : { ok: false, issues: [document.issue] };
 }
 
 /** An issue with its own diagnostic code, for `refine`/`superRefine`/`transform`. */

@@ -1,7 +1,7 @@
 {
   "name": "@studyluma/compiler",
   "version": "0.2.0",
-  "description": "StudyLuma content compiler: author Markdown in, catalog artifact (see @studyluma/catalog-contract) out. Build time only.",
+  "description": "StudyLuma content compiler: author Markdown in, catalog artifact (see @studyluma/catalog-contract) out. Build time only; it loads the build side of an instance's components (@studyluma/component-api).",
   "type": "module",
   "bin": {
     "studyluma-compiler": "./cli.ts"
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@studyluma/catalog-contract": "workspace:*",
+    "@studyluma/component-api": "workspace:*",
     "kern-typ": "0.2.0",
     "smol-toml": "^1.3.4",
     "zod": "^4.1.0"

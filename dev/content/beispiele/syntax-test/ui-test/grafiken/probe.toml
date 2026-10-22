@@ -1,0 +1,9 @@
+# The test component probe (src/components/probe): a point on the parabola.
+start = 1
+
+[achsen]
+x = [-4, 4]
+y = [-2, 10]
+
+[[graph]]
+term = "y = x^2"

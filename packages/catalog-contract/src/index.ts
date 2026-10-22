@@ -11,10 +11,16 @@ export {
   CATALOG_META_FILE,
   catalogMetaErrors,
   checkCatalogCompatibility,
+  checkCatalogComponents,
   isBuildId,
   serializeCatalogMeta,
 } from "./meta";
-export type { CatalogArtifactMeta, CheckResult } from "./meta";
+export type {
+  CatalogArtifactMeta,
+  CatalogComponent,
+  CheckResult,
+} from "./meta";
+export { componentsIn } from "./components";
 export { catalogShapeErrors } from "./shape";
 export { computeCatalogBuildId } from "./buildId";
 export { validateCatalogArtifact } from "./validate";

@@ -86,7 +86,24 @@ export type RichNode =
   | { type: "space"; size: number }
   /** `::merkkarte`: a Merkkarte placed inside a slide's text. */
   | { type: "merkkarteCard"; targetId: string }
-  | { type: "graphic"; title: string; graphic: Graphic };
+  | { type: "graphic"; title: string; graphic: Graphic }
+  /** `::komponente`: an interactive building block of the instance. */
+  | ({ type: "component" } & ComponentUse);
+
+/** Plain JSON, as a component's compile step writes it into the catalog. */
+export type JsonValue =
+  string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
+/**
+ * One use of a component (`::komponente`, `::komponentenfolie`): its name,
+ * the text a screen reader reads (the component writes it) and what its
+ * compile step returned. The app finds the view by `name`.
+ */
+export type ComponentUse = {
+  name: string;
+  title: string;
+  props: { [key: string]: JsonValue };
+};
 
 export type Answer = {
   exact?: string;
@@ -234,6 +251,8 @@ export type SourceEntry = {
   tag?: SlideTag;
   /** `::grafikfolie`: the slide is one Grafik with its functions and sliders. */
   graphicSlide?: { title: string; graphic: Graphic };
+  /** `::komponentenfolie`: the slide is one component, filling it. */
+  componentSlide?: ComponentUse;
   /** Seconds since the start of the Foliensatz (`::bis`). */
   until?: number;
   /** Teacher only. */

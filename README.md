@@ -1,15 +1,16 @@
 # StudyLuma
 
-Teaching platform: course views, worksheets, lesson mode and temporary classroom sessions. This repository is a Bun workspace of three packages and the Development instance; the root only holds tooling (`scripts/`).
+Teaching platform: course views, worksheets, lesson mode and temporary classroom sessions. This repository is a Bun workspace of four packages and the Development instance; the root only holds tooling (`scripts/`).
 
 | Package                                                     | Role                                                                                                                                                                     |
 | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `packages/catalog-contract` (`@studyluma/catalog-contract`) | The compiled catalog: types, `CATALOG_FORMAT_VERSION`, `CatalogArtifactMeta`, compatibility and artifact validation, shared math helpers. Depends on nothing.            |
 | `packages/compiler` (`@studyluma/compiler`)                 | Author Markdown to catalog artifact; also the catalog build contribution. Build time only; depends on the contract.                                                      |
+| `packages/component-api` (`@studyluma/component-api`)       | The public surface of a component: `defineComponent` for its build step, the types of its view. Depends only on the contract.                                            |
 | `packages/app` (`@studyluma/app`)                           | The application, a Chromatis product package: modules, routes and the manifest instances discover. Depends on `@chromatis/base` and the contract; never on the compiler. |
 | `dev/` (`studyluma-dev`)                                    | The Development instance: development config, test content, edge cases and UI fixtures. Private, never distributed.                                                      |
 
-`scripts/check-boundaries.ts` enforces the boundaries mechanically (imports and package dependencies): the contract imports only itself, the compiler only the contract, the app never the compiler, and nothing under `packages/` touches `dev/`. `scripts/check-pack.ts` lists what each package would pack (`bun pm pack --dry-run`) and fails on dev content, tests, fixtures, tooling configs, an exported file or a declared route or manifest file the `files` whitelist leaves out.
+`scripts/check-boundaries.ts` enforces the boundaries mechanically (imports and package dependencies): the contract imports only itself, the component API only the contract (and React types), the compiler only the contract and the component API, the app never the compiler, and nothing under `packages/` touches `dev/`. It also keeps the two sides of every component apart (`dev/src/components/`, or any instance's with `--components <dir>`): `index.ts` imports no React, `view.tsx` no compile code. `scripts/check-pack.ts` lists what each package would pack (`bun pm pack --dry-run`) and fails on dev content, tests, fixtures, tooling configs, an exported file or a declared route or manifest file the `files` whitelist leaves out.
 
 ## Workspace
 
@@ -17,7 +18,7 @@ StudyLuma lives in the outer Bun workspace `/home/ch/dev/studyluma-planning` tog
 
 ## From content to running app
 
-An instance (Dev, Holst, Demo) depends on `@chromatis/base` and `@studyluma/app` (and `@studyluma/compiler` as a dev dependency) and holds only its decisions: `config/app.toml` (deployment target and domain, optionally `[modules] disabled`, `[routes] omit`), `config/catalog.toml` (content root and the published course ids), optionally `config/classroom.toml` and `config/shell.toml` (extra sidebar entries, account link), its `content/` and `package.json`. Chromatis discovers the app's manifest (`dist/chromatis.manifest.json`, generated from the modules and the route declaration) and runs the lifecycle:
+An instance (Dev, Holst, Demo) depends on `@chromatis/base` and `@studyluma/app` (and `@studyluma/compiler` as a dev dependency) and holds only its decisions: `config/app.toml` (deployment target and domain, optionally `[modules] disabled`, `[routes] omit`), `config/catalog.toml` (content root and the published course ids), optionally `config/classroom.toml`, `config/shell.toml` (extra sidebar entries, account link) and `config/components.toml` (the components it activates, folders `src/components/<name>/`), its `content/` and `package.json`. Chromatis discovers the app's manifest (`dist/chromatis.manifest.json`, generated from the modules and the route declaration) and runs the lifecycle:
 
 1. Validate configuration against the module schemas.
 2. Run the `catalog` contribution (`@studyluma/compiler/contribution`): compile the instance's content, only the published courses, into `.chromatis/artifacts/catalog/` (`catalog.json`, `catalog.meta.json`, `asset-manifest.json`, `assets/`).

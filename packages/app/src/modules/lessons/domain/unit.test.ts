@@ -126,6 +126,29 @@ describe("unit", () => {
   });
 });
 
+describe("Komponentenfolien", () => {
+  test("a Komponentenfolie keeps its state across slides and freezes with the projector", () => {
+    let unit = reduceUnit(started(), main, {
+      type: "component",
+      slideId: "m2",
+      state: { check: "achse", run: 1 },
+    });
+    unit = reduceUnit(unit, main, { type: "go", frameId: "m3", now: 9 });
+    expect(deckState(unit, main).components).toEqual({
+      m2: { check: "achse", run: 1 },
+    });
+    unit = reduceUnit(unit, main, { type: "toggleFreeze" });
+    unit = reduceUnit(unit, main, {
+      type: "component",
+      slideId: "m2",
+      state: { check: "punkt", run: 2 },
+    });
+    const state = deckState(unit, main);
+    expect(state.frozen?.components?.m2).toEqual({ check: "achse", run: 1 });
+    expect(state.components?.m2).toEqual({ check: "punkt", run: 2 });
+  });
+});
+
 describe("functions typed in on a Grafikfolie", () => {
   const row = (value: string) => [{ t: "c" as const, v: value }];
   const own = (index: number, value: OwnFunction | null) =>

@@ -8,7 +8,7 @@ import {
 import type { MathRow } from "@studyluma/catalog-contract";
 import { constantValue } from "./constant";
 import type { GraphicSpec } from "./schema";
-import { codedIssue, parseToml } from "./toml";
+import { codedIssue, parseTomlDocument, validateToml } from "./toml";
 
 const DEFAULT_RANGE: [number, number] = [-5, 5];
 /** `x-raster`: the x grid in multiples of π, as the denominator of the step. */
@@ -435,7 +435,28 @@ export function parseGraphic(
   problem: (code: string, message: string) => void,
   warn: (code: string, message: string) => void = () => {},
 ): GraphicSpec | undefined {
-  const result = parseToml(source, graphicSchema, {
+  const document = parseTomlDocument(source);
+  if (!document.ok) {
+    const { issue } = document;
+    problem(
+      issue.code,
+      issue.line ? `${issue.message} (line ${issue.line})` : issue.message,
+    );
+    return undefined;
+  }
+  return checkGraphic(document.value, problem, warn);
+}
+
+/**
+ * Validates the parsed table of a Grafik file, or the Grafik blocks of a
+ * component file; reports like `parseGraphic`.
+ */
+export function checkGraphic(
+  document: unknown,
+  problem: (code: string, message: string) => void,
+  warn: (code: string, message: string) => void = () => {},
+): GraphicSpec | undefined {
+  const result = validateToml(document, graphicSchema, {
     code: "GRAPHIC_CONFIG",
     unknownKeyCode: "GRAPHIC_KEY",
   });
@@ -449,10 +470,6 @@ export function parseGraphic(
       );
     return result.value;
   }
-  for (const issue of result.issues)
-    problem(
-      issue.code,
-      issue.line ? `${issue.message} (line ${issue.line})` : issue.message,
-    );
+  for (const issue of result.issues) problem(issue.code, issue.message);
   return undefined;
 }

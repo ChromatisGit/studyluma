@@ -1,6 +1,7 @@
 import { createElement, Fragment, useContext, type ReactNode } from "react";
 import type { DerivationStep } from "@studyluma/catalog-contract";
 import type { RichInline, RichNode } from "../domain/rich";
+import { ComponentBlock } from "./Component";
 import { Graphic } from "./Graphic";
 import { RichReferenceContext } from "./RichReferenceContext";
 
@@ -127,6 +128,24 @@ function Derivation({ steps }: { steps: DerivationStep[] }) {
   );
 }
 
+/** A code block or a formula on a line of its own. */
+function Block({
+  node,
+}: {
+  node: Extract<RichNode, { type: "code" } | { type: "math" }>;
+}) {
+  return node.type === "code" ? (
+    <pre>
+      <code>{node.value}</code>
+    </pre>
+  ) : (
+    <div
+      className="math-display"
+      dangerouslySetInnerHTML={{ __html: node.display }}
+    />
+  );
+}
+
 export function RichContent({
   nodes,
   renderGap,
@@ -192,25 +211,16 @@ export function RichContent({
               </div>
             );
           case "code":
-            return (
-              <pre key={index}>
-                <code>{node.value}</code>
-              </pre>
-            );
           case "math":
-            return (
-              <div
-                key={index}
-                className="math-display"
-                dangerouslySetInnerHTML={{ __html: node.display }}
-              />
-            );
+            return <Block key={index} node={node} />;
           case "derivation":
             return <Derivation key={index} steps={node.steps} />;
           case "graphic":
             return (
               <Graphic key={index} graphic={node.graphic} title={node.title} />
             );
+          case "component":
+            return <ComponentBlock key={index} use={node} />;
           case "space":
             return (
               <div

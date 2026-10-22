@@ -1,6 +1,7 @@
 import { isRouteErrorResponse, Outlet, useLoaderData } from "react-router";
 import type { loader } from "./root.server";
 import { SiteProvider } from "../src/modules/classroom";
+import { ComponentViewsProvider } from "../src/modules/components";
 import { EmptyState, Page } from "@chromatis/base/ui";
 import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/700.css";
@@ -17,7 +18,9 @@ export default function App() {
   const site = useLoaderData<typeof loader>();
   return (
     <SiteProvider site={site}>
-      <Outlet />
+      <ComponentViewsProvider>
+        <Outlet />
+      </ComponentViewsProvider>
     </SiteProvider>
   );
 }

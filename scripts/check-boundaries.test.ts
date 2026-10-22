@@ -2,7 +2,11 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { checkBoundaries, importsOf } from "./check-boundaries";
+import {
+  checkBoundaries,
+  componentProblems,
+  importsOf,
+} from "./check-boundaries";
 
 const roots: string[] = [];
 afterAll(() => roots.forEach((root) => rmSync(root, { recursive: true })));
@@ -204,5 +208,64 @@ describe("checkBoundaries", () => {
       });
       expect(checkBoundaries(root)).toEqual([]);
     });
+  });
+});
+
+describe("component folders", () => {
+  const folder = (files: Record<string, string>) =>
+    join(repo({}, files), "components");
+
+  test("index.ts with the API and view.tsx with React are fine", () => {
+    const dir = folder({
+      "components/probe/index.ts": `import { defineComponent } from "@studyluma/component-api";\nimport { helper } from "./helper";`,
+      "components/probe/helper.ts": "export const helper = 1;",
+      "components/probe/view.tsx": `import { useEffect } from "react";\nimport type { ViewProps } from "@studyluma/component-api/view";\nimport { helper } from "./helper";`,
+    });
+    expect(componentProblems(dir)).toEqual([]);
+  });
+
+  test("the build side imports no React and not the view", () => {
+    const dir = folder({
+      "components/probe/index.ts": `import "react";\nimport "mafs";\nimport "./view";\nimport "@studyluma/component-api/view";`,
+      "components/probe/view.tsx": "",
+    });
+    const problems = componentProblems(dir).join("\n");
+    expect(problems).toContain("probe/index.ts imports react");
+    expect(problems).toContain("probe/index.ts imports mafs");
+    expect(problems).toContain("probe/index.ts imports ./view");
+    expect(problems).toContain("imports @studyluma/component-api/view");
+  });
+
+  test("the view imports no compile code and not the build side", () => {
+    const dir = folder({
+      "components/probe/index.ts": "",
+      "components/probe/view.tsx": `import "node:fs";\nimport "./index";\nimport { defineComponent } from "@studyluma/component-api";\nimport "@studyluma/compiler";\nimport "@chromatis/base/ui";\nimport "../other/view";`,
+    });
+    const problems = componentProblems(dir).join("\n");
+    expect(problems).toContain("view.tsx imports node:fs");
+    expect(problems).toContain("view.tsx imports ./index");
+    expect(problems).toContain("view.tsx imports @studyluma/component-api (");
+    expect(problems).toContain("view.tsx imports @studyluma/compiler");
+    expect(problems).toContain("view.tsx imports @chromatis/base/ui");
+    expect(problems).toContain("reaches outside the component folder");
+  });
+});
+
+describe("component-api", () => {
+  test("knows only the contract and React types", () => {
+    const root = repo(
+      {
+        ...clean,
+        "@studyluma/component-api": {
+          dependencies: { "@studyluma/catalog-contract": "workspace:*" },
+        },
+      },
+      {
+        "packages/component-api/src/index.ts": `import type { Graphic } from "@studyluma/catalog-contract";\nimport type { ReactNode } from "react";\nimport { z } from "zod";`,
+      },
+    );
+    const problems = checkBoundaries(root);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain("imports zod");
   });
 });
