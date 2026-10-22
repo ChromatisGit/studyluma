@@ -3,4 +3,4 @@
  * `catalog.meta.json`, the app accepts exactly this version. Bump it whenever
  * the catalog types change in a way an older reader cannot handle.
  */
-export const CATALOG_FORMAT_VERSION = 4 as const;
+export const CATALOG_FORMAT_VERSION = 5 as const;

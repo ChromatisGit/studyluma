@@ -249,6 +249,58 @@ describe("compiler (new authoring syntax)", () => {
     edit(root, "aufgaben/Steigung.md", (s) => s.replace("::mehrfach\n\n", ""));
     expect(codes(root)).toContain("SELECTION_RULE");
   });
+  test("options are shuffled unless ::feste-reihenfolge keeps them", () => {
+    const sources = (options: { content: unknown[] }[]) =>
+      options.map((option) => JSON.stringify(option.content));
+    const optionsOf = (root: string) => {
+      const { bundle } = compileContent(root);
+      const sheet = bundle.worksheets.find((w) => w.filename === "Steigung")!;
+      const part = tasksOf(sheet)[1]!.items[0]!;
+      if (part.type !== "part") throw new Error("part expected");
+      return {
+        task: sources(part.part.options!),
+        quiz: sources(bundle.quizzes[0]!.questions[0]!.options),
+      };
+    };
+    const root = make();
+    // Five options: the chance that a shuffle keeps them in order is 1/120.
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace(
+        "- (x) Aussage C",
+        "- (x) Aussage C\n- ( ) Aussage D\n- ( ) Aussage E",
+      ),
+    );
+    const shuffled = optionsOf(root);
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace("::mehrfach\n", "::mehrfach\n::feste-reihenfolge\n"),
+    );
+    edit(root, "quiz/Steigung erkennen.md", (s) =>
+      s.replace(
+        "## Auswahl\n\nWelche Steigung",
+        "## Auswahl\n\n::feste-reihenfolge\n\nWelche Steigung",
+      ),
+    );
+    expect(codes(root)).toEqual([]);
+    const fixed = optionsOf(root);
+    expect(fixed.task.map((s) => /Aussage (\w)/.exec(s)?.[1])).toEqual([
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+    ]);
+    expect(shuffled.task).not.toEqual(fixed.task);
+    expect([...shuffled.task].sort()).toEqual([...fixed.task].sort());
+    expect(fixed.quiz.map((s) => /"source":"(\d)"/.exec(s)?.[1])).toEqual([
+      "1",
+      "2",
+      "3",
+    ]);
+    edit(root, "aufgaben/Steigung.md", (s) =>
+      s.replace("## Auftrag\n", "## Auftrag\n\n::feste-reihenfolge\n"),
+    );
+    expect(codes(root)).toContain("ORDER_CONTEXT");
+  });
   test("::schritte holds the steps of a part, each with a gap", () => {
     const { bundle } = compileContent(fixture);
     const sheet = bundle.worksheets.find((w) => w.filename === "Steigung")!;
@@ -493,20 +545,35 @@ describe("compiler (new authoring syntax)", () => {
     test("dollars must surround the term", () => {
       expect(codesOf("Es ist (($2$ + 1)).")).toContain("GAP_MATH");
     });
-    test("a choice is compared as written, with or without dollars", () => {
+    const valuesOf = (gap: { choices: { value: string }[] }) =>
+      gap.choices.map((choice) => choice.value).sort();
+    test("a choice is compared as written and shows its formulas", () => {
       const [choice] = gapsOf("Es gilt (($f(-x) = f(x)$ | $f(-x) = -f(x)$)).");
-      expect(choice.choices).toEqual(["$f(-x) = f(x)$", "$f(-x) = -f(x)$"]);
-      expect(choice.answer).toBeUndefined();
+      expect(valuesOf(choice)).toEqual(["$f(-x) = -f(x)$", "$f(-x) = f(x)$"]);
+      for (const { content } of choice.choices)
+        expect(content.map((node: { type: string }) => node.type)).toEqual([
+          "math",
+        ]);
+      expect(choice.answer).toEqual({ exact: "$f(-x) = f(x)$" });
     });
     test("a choice in a table does not split the cell", () => {
       const gaps = gapsOf(
         "| $x$ | Lage |\n|---|---|\n| $|-1|$ | ((oben | unten)) |\n| (($pi$)) | ((f(x) | g(x))) |",
       );
-      expect(gaps.slice(0, 3).map((g) => g.choices)).toEqual([
+      expect(gaps.slice(0, 3).map(valuesOf)).toEqual([
         ["oben", "unten"],
         [],
         ["f(x)", "g(x)"],
       ]);
+    });
+    test("dropdown entries are shuffled, the same way in every build", () => {
+      const line = "Es ist ((a | b | c | d)) ".repeat(6);
+      const gaps = gapsOf(line).slice(0, 6);
+      expect(gaps.map((gap) => gap.answer.exact)).toEqual(Array(6).fill("a"));
+      expect(gaps.some((gap) => gap.choices[0].value !== "a")).toBe(true);
+      expect(JSON.stringify(gapsOf(line).slice(0, 6))).toBe(
+        JSON.stringify(gaps),
+      );
     });
   });
   describe("Grafiken", () => {

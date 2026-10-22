@@ -186,7 +186,11 @@ function walk(value: unknown, visit: Visitor): void {
   Object.values(node).forEach((child) => walk(child, visit));
 }
 
-/** Gaps keep their kind; the expected answer never leaves the server. */
+/**
+ * Gaps keep their kind; the expected answer never leaves the server. A
+ * dropdown's entries come shuffled from the compiler, so their order tells
+ * nothing.
+ */
 function hideGapAnswers(value: unknown): void {
   walk(value, (node) => {
     if (node.type !== "gap") {
@@ -200,12 +204,6 @@ function hideGapAnswers(value: unknown): void {
           ? "math"
           : "text";
     delete node.answer;
-    // Dropdown choices reveal the correct one by position; the order is neutral on the client.
-    if (Array.isArray(node.choices)) {
-      node.choices = [...(node.choices as string[])].sort((a, b) =>
-        a.localeCompare(b, "de"),
-      );
-    }
   });
 }
 

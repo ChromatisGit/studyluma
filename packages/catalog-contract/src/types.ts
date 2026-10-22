@@ -56,13 +56,17 @@ export type RichInline =
   | {
       type: "gap";
       id: string;
-      choices: string[];
+      /** A dropdown's entries, already shuffled; empty for a free gap. */
+      choices: GapChoice[];
       /** Public form only: what the field looks like once the answer is gone. */
       inputKind?: "dropdown" | "math" | "text";
-      /** Private. */
+      /** Private. A dropdown's right entry is `exact`, its `value`. */
       answer?: Answer;
     }
   | { type: "merkkarteRef"; targetId: string; title: string };
+
+/** A dropdown entry: what is chosen and compared, and how it is shown. */
+export type GapChoice = { value: string; content: RichInline[] };
 
 /** A formula as written and as rendered MathML. */
 export type MathPart = { source: string; display: string };

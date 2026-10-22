@@ -1,7 +1,7 @@
-import { ChevronDown } from "lucide-react";
 import { fill } from "../../../helper/text";
 import type { GapNode } from "../../content-renderer";
 import type { CheckState } from "../domain/contract";
+import { GapSelect } from "./GapSelect";
 import { MarkSymbol } from "./Mark";
 import { MathField } from "./MathField";
 import { useWorksheet } from "./WorksheetContext";
@@ -57,19 +57,13 @@ export function GapInput({
   if (kind === "dropdown") {
     return (
       <span className={className} data-state={state}>
-        <select
-          aria-label={label}
-          required
-          disabled={locked}
+        <GapSelect
+          choices={gap.choices}
           value={typeof value === "string" ? value : ""}
-          onChange={(event) => save(event.target.value)}
-        >
-          <option value="" disabled />
-          {gap.choices.map((option) => (
-            <option key={option}>{option}</option>
-          ))}
-        </select>
-        <ChevronDown className="icon icon--sm chev" aria-hidden="true" />
+          label={label}
+          locked={locked}
+          onChange={save}
+        />
       </span>
     );
   }

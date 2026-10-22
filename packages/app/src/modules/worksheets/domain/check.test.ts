@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { gap, part } from "../../../test/catalog";
 import {
+  checkGap,
   checkGaps,
   checkMath,
   checkPart,
@@ -180,6 +181,34 @@ describe("parts", () => {
 
   test("an Auftrag is never checked", () => {
     expect(checkPart(part("p", "Auftrag"), "text", m)).toBeNull();
+  });
+
+  test("multiples of π count in every way of writing them", () => {
+    const stateOf = (expected: string, typed: string) => {
+      const node = gap("g", expected, { math: true });
+      if (node.type !== "gap") {
+        throw new Error("gap expected");
+      }
+      return checkGap(node, row(typed), m)?.state;
+    };
+    for (const typed of ["pi/2", "1/2pi", "1/2 pi", "(1/2)pi", "pi dot 1/2"]) {
+      expect(stateOf("pi/2", typed)).toBe("richtig");
+    }
+    for (const typed of ["3pi/2", "3/2pi", "pi + pi/2"]) {
+      expect(stateOf("pi/2 + pi", typed)).toBe("richtig");
+    }
+    // π/2 + 1 ≈ 2.57 and 3π/2 ≈ 4.71 are different numbers.
+    expect(stateOf("pi/2 + 1", "3pi/2")).toBe("nochNicht");
+  });
+
+  test("a dropdown is right by its answer, wherever the entry stands", () => {
+    const dropdown = gap("g", "$g(x)$", { choices: ["$f(x)$", "$g(x)$"] });
+    if (dropdown.type !== "gap") {
+      throw new Error("gap expected");
+    }
+    expect(checkGap(dropdown, "$g(x)$", m)?.state).toBe("richtig");
+    expect(checkGap(dropdown, "$f(x)$", m)?.state).toBe("nochNicht");
+    expect(checkGap(dropdown, "", m)).toBeNull();
   });
 
   test("gaps: free gaps are named, text ignores case, math gaps follow the number rules", () => {

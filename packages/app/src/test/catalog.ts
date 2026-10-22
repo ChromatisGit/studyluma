@@ -25,7 +25,10 @@ export const gap = (
 ): RichInline => ({
   type: "gap",
   id,
-  choices: options.choices ?? [],
+  choices: (options.choices ?? []).map((value) => ({
+    value,
+    content: inline(value),
+  })),
   answer: {
     exact,
     ...(options.math ? { checkRow: typstToRow(exact) } : {}),

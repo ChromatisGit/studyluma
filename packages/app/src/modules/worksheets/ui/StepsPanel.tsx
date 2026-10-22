@@ -123,7 +123,7 @@ export function StepsPanel({
   useEffect(() => {
     if (active > seen.current && active < items.length) {
       activeRow.current
-        ?.querySelector<HTMLElement>(".mfield, input, select")
+        ?.querySelector<HTMLElement>(".mfield, input, .gap__select")
         ?.focus();
     }
     seen.current = active;

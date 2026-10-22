@@ -13,6 +13,8 @@ Textfeld: ((Testwort))
 
 Auswahlfeld: ((richtig | falsch | auch falsch))
 
+Auswahlfeld mit Formeln: (($f(-x) = f(x)$ | $f(-x) = -f(x)$ | $f(x) = 0$))
+
 Mathematische Lücken: (($2 * x$)), (($3/4$)) und (($sqrt(2)$ ~ 1.41)).
 
 | $x$ | $0$ | $1$ | $2$ |

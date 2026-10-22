@@ -93,6 +93,18 @@ type Document = {
 };
 const hash = (value: string | Uint8Array) =>
   createHash("sha256").update(value).digest("hex");
+/**
+ * The items in an order that looks random, the same in every build for the
+ * same key: teacher, projector and students all see one order.
+ */
+function shuffled<T>(items: readonly T[], key: string): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = parseInt(hash(`${key}:${i}`).slice(0, 8), 16) % (i + 1);
+    [out[i], out[j]] = [out[j]!, out[i]!];
+  }
+  return out;
+}
 const id = (type: string, key: string) => `${type}_${hash(key).slice(0, 16)}`;
 /** URL name of a chapter folder or worksheet file: lowercase, hyphens for spaces, without its `01-` ordering prefix. */
 const slugOf = (name: string) =>
@@ -678,12 +690,22 @@ export function compileContent(
         const gapKey = `${file}:${line}`;
         const gapNumber = (gapCounters.get(gapKey) ?? 0) + 1;
         gapCounters.set(gapKey, gapNumber);
+        const gapId = id("gap", `${gapKey}:${gapNumber}`);
         out.push({
           type: "gap",
-          id: id("gap", `${gapKey}:${gapNumber}`),
-          // A choice is compared as written; only a free gap has an answer.
+          id: gapId,
+          // A choice is compared as written: the first one, before shuffling.
           ...(parts.length > 1
-            ? { choices: parts }
+            ? {
+                choices: shuffled(
+                  parts.map((value) => ({
+                    value,
+                    content: inline(value, file, line),
+                  })),
+                  gapId,
+                ),
+                answer: { exact: parts[0]! },
+              }
             : { choices: [], answer: gapAnswer(parts[0] ?? "", file, line) }),
         });
       } else if (token.startsWith("!![") || token.startsWith("![")) {
@@ -1139,10 +1161,13 @@ export function compileContent(
     "fehler",
     "tipp",
     "mehrfach",
+    "feste-reihenfolge",
     "schritte",
     "loesung",
     "textfeld",
   ];
+  /** Markers that only switch something on. */
+  const PART_FLAGS = ["mehrfach", "feste-reihenfolge", "textfeld"];
   function parsePart(
     type: TaskPart["type"],
     title: string | undefined,
@@ -1173,7 +1198,7 @@ export function compileContent(
           current = name;
           continue;
         }
-        if (name === "mehrfach" || name === "textfeld") {
+        if (PART_FLAGS.includes(name)) {
           flags.add(name);
           if (arg)
             error(
@@ -1226,6 +1251,12 @@ export function compileContent(
       );
     if (flags.has("mehrfach") && type !== "Auswahl")
       error("MULTIPLE_CONTEXT", "::mehrfach requires Auswahl", loc(file, line));
+    if (flags.has("feste-reihenfolge") && type !== "Auswahl")
+      error(
+        "ORDER_CONTEXT",
+        "::feste-reihenfolge requires Auswahl",
+        loc(file, line),
+      );
     if (flags.has("textfeld") && type !== "Auftrag")
       error(
         "TEXTFIELD_CONTEXT",
@@ -1368,15 +1399,21 @@ export function compileContent(
         `The answer ${expected?.exact} is defined at only ${points} of the ${CHECK_POINTS.length} points between x = ${Math.min(...CHECK_POINTS)} and x = ${Math.max(...CHECK_POINTS)} where entries are compared, so entries may never count as correct. Use a term that is defined on more of that range.`,
         loc(file, blocks.antwort?.[0]?.line ?? line),
       );
+    const partId = id("part", `${file}:${line}`);
     return {
-      id: id("part", `${file}:${line}`),
+      id: partId,
       type,
       ...(title ? { title } : {}),
       content,
       ...(expected ? { answer: expected, label: expected.label } : {}),
       ...(answers ? { answers } : {}),
       ...(type === "Auswahl"
-        ? { options, multiple: flags.has("mehrfach") }
+        ? {
+            options: flags.has("feste-reihenfolge")
+              ? options
+              : shuffled(options, partId),
+            multiple: flags.has("mehrfach"),
+          }
         : {}),
       ...(steps ? { steps } : {}),
       markers,
@@ -1706,6 +1743,7 @@ export function compileContent(
       else if (q.head !== "Auswahl")
         error("QUIZ_QUESTION", "Expected ## Auswahl", loc(doc.file, q.line));
       let multiple = false;
+      let fixedOrder = false;
       let afterOptions = false;
       const prompt: Line[] = [],
         options: Quiz["questions"][number]["options"] = [];
@@ -1732,6 +1770,14 @@ export function compileContent(
               loc(doc.file, x.line),
             );
           multiple = true;
+        } else if (s === "::feste-reihenfolge") {
+          if (fixedOrder)
+            error(
+              "QUIZ_ORDER",
+              "::feste-reihenfolge must occur once per question",
+              loc(doc.file, x.line),
+            );
+          fixedOrder = true;
         } else if (s.startsWith("::"))
           error(
             "MARKER_INVALID",
@@ -1760,10 +1806,11 @@ export function compileContent(
           `Invalid options for question ${quiz.questions.length + 1}`,
           loc(doc.file, q.line),
         );
+      const questionId = id("question", `${doc.file}:${q.line}`);
       quiz.questions.push({
-        id: id("question", `${doc.file}:${q.line}`),
+        id: questionId,
         prompt: rich(prompt, doc.file),
-        options,
+        options: fixedOrder ? options : shuffled(options, questionId),
         multiple,
       });
     }

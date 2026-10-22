@@ -242,7 +242,7 @@ export function checkGap(
 ): CheckResult | null {
   if (gap.choices.length > 1) {
     return typeof value === "string" && value
-      ? result(value === gap.choices[0] ? "richtig" : "nochNicht")
+      ? result(value === gap.answer?.exact ? "richtig" : "nochNicht")
       : null;
   }
   const answer = gap.answer as Answer | undefined;

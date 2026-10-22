@@ -86,15 +86,19 @@ describe("the catalog for browsers", () => {
     expect(found.length).toBeGreaterThan(0);
   });
 
-  test("gaps keep their kind and a neutral order of choices", () => {
+  test("gaps keep their kind and the compiler's order of choices", () => {
     const [gaps] = parts(publicCatalog());
     const kinds = (
       gaps!.content[0] as {
-        children: { inputKind: string; choices: string[] }[];
+        children: { inputKind: string; choices: { value: string }[] }[];
       }
     ).children;
     expect(kinds.map((g) => g.inputKind)).toEqual(["text", "dropdown", "math"]);
-    expect(kinds[1]?.choices).toEqual(["auch falsch", "falsch", "richtig"]);
+    expect(kinds[1]?.choices.map((choice) => choice.value)).toEqual([
+      "richtig",
+      "falsch",
+      "auch falsch",
+    ]);
   });
 
   test("a set or vector answer tells the field what it is, not what it contains", () => {

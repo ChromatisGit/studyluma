@@ -243,7 +243,7 @@
   vertical-align: baseline;
 }
 .gap input,
-.gap select {
+.gap .gap__select {
   font: inherit;
   color: inherit;
   background: transparent;
@@ -260,11 +260,47 @@
   min-width: 5ch;
   max-width: 100%;
 }
-.gap select {
-  appearance: none;
-  -webkit-appearance: none;
+.gap__picker {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+}
+.gap .gap__select {
+  display: inline-flex;
+  align-items: baseline;
+  min-width: 5ch;
   padding-right: 1.5em;
+  text-align: start;
   cursor: pointer;
+}
+.gap .gap__select:disabled {
+  cursor: default;
+}
+.gap__options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  min-width: 100%;
+  margin: var(--space-100) 0 0;
+  padding: var(--space-100) 0;
+  list-style: none;
+  white-space: nowrap;
+  line-height: 1.6;
+  background: var(--color-bg);
+  border: var(--border-1) solid var(--color-border-control);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.15);
+}
+.gap__options [role="option"] {
+  padding: var(--space-100) var(--space-200);
+  cursor: pointer;
+}
+.gap__options [role="option"].is-highlighted {
+  background: var(--color-bg-hover);
+}
+.gap__options [role="option"][aria-selected="true"] {
+  font-weight: 600;
 }
 .gap--select .chev {
   position: absolute;
@@ -275,19 +311,19 @@
   color: var(--color-text-muted);
 }
 .gap input:not(:placeholder-shown),
-.gap select:valid {
+.gap .gap__select[data-filled] {
   border-bottom-style: solid;
   border-bottom-color: var(--color-text);
 }
 .gap input:focus,
-.gap select:focus {
+.gap .gap__select:focus {
   outline: none;
   background: var(--color-bg-accent);
   border-bottom-color: var(--ink);
   border-bottom-style: solid;
 }
 .gap input:focus-visible,
-.gap select:focus-visible {
+.gap .gap__select:focus-visible {
   box-shadow: 0 0 0 var(--focus-width) var(--color-border-focus);
   border-radius: 2px;
 }
@@ -790,6 +826,9 @@
   padding: var(--space-200) var(--space-200)
     max(var(--space-200), env(safe-area-inset-bottom, 0px));
   animation: kp-in var(--motion-default) var(--ease-standard);
+  /* quick taps stay single taps: iOS joins them into a double-click
+     wherever touch-action is auto, gaps between the keys included */
+  touch-action: manipulation;
 }
 .keypad[hidden] {
   display: none;
@@ -1391,42 +1430,42 @@
   background: var(--notyet);
 }
 
-:is(.mfield, .gap input, .gap select)[data-state],
-.gap[data-state] :is(input, select) {
+:is(.mfield, .gap input, .gap .gap__select)[data-state],
+.gap[data-state] :is(input, .gap__select) {
   transition: background-color var(--motion-default) var(--ease-standard);
 }
 .mfield[data-state="richtig"],
-.gap[data-state="richtig"] :is(input, select) {
+.gap[data-state="richtig"] :is(input, .gap__select) {
   background: var(--tint-ok);
   border-bottom-color: var(--ok);
   border-bottom-style: solid;
 }
 .mfield[data-state="fast"],
-.gap[data-state="fast"] :is(input, select) {
+.gap[data-state="fast"] :is(input, .gap__select) {
   background: var(--tint-almost);
   border-bottom-color: var(--almost);
   border-bottom-style: solid;
 }
 .mfield[data-state="nochNicht"],
-.gap[data-state="nochNicht"] :is(input, select) {
+.gap[data-state="nochNicht"] :is(input, .gap__select) {
   background: var(--tint-notyet);
   border-bottom-color: var(--notyet);
   border-bottom-style: solid;
 }
-.gap[data-state="nochNicht"] :is(input, select, .mfield) {
+.gap[data-state="nochNicht"] :is(input, .gap__select, .mfield) {
   border-bottom-color: transparent;
 }
-.gap :is(input, select) {
+.gap :is(input, .gap__select) {
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
 }
 /* Keep feedback on the editable control, not the whole table cell. */
-.md-table .gap[data-state="richtig"] :is(input, select, .mfield) {
+.md-table .gap[data-state="richtig"] :is(input, .gap__select, .mfield) {
   background: var(--tint-ok);
 }
-.md-table .gap[data-state="fast"] :is(input, select, .mfield) {
+.md-table .gap[data-state="fast"] :is(input, .gap__select, .mfield) {
   background: var(--tint-almost);
 }
-.md-table .gap[data-state="nochNicht"] :is(input, select, .mfield) {
+.md-table .gap[data-state="nochNicht"] :is(input, .gap__select, .mfield) {
   background: var(--tint-notyet);
 }
 .option:has(.choice__input[data-state]) {
