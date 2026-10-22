@@ -3,7 +3,9 @@ import {
   useEffect,
   useRef,
   type ClipboardEvent,
+  type FocusEvent,
   type KeyboardEvent,
+  type PointerEvent,
 } from "react";
 import type { CheckState } from "../domain/contract";
 import { speak } from "../domain/editor";
@@ -12,6 +14,7 @@ import { MathView } from "./MathView";
 import { useWorksheet } from "./WorksheetContext";
 import { readField, type FieldRef } from "./fieldValues";
 import { keyboardAction } from "./keyboard";
+import { isMathTarget } from "./useActiveField";
 import { speechWords } from "./texts";
 import { useMathKeys } from "./useMathKeys";
 
@@ -27,18 +30,59 @@ export interface MathFieldProps {
 }
 
 /** A field that just became right lets go of the cursor and the keypad. */
-function useReleaseWhenLocked(locked: boolean) {
+function useReleaseWhenLocked(
+  locked: boolean,
+  holds: boolean,
+  release: () => void,
+) {
   const element = useRef<HTMLSpanElement>(null);
   useEffect(() => {
-    if (locked && element.current?.contains(document.activeElement)) {
+    if (!locked) {
+      return;
+    }
+    if (element.current?.contains(document.activeElement)) {
       (document.activeElement as HTMLElement).blur();
     }
-  }, [locked]);
+    if (holds) {
+      release();
+    }
+  }, [locked, holds, release]);
   return element;
 }
 
-const isMathTarget = (element: Element | null) =>
-  !!element?.closest(".mfield, .keypad");
+/** Focus and taps that make a field active, and focus that ends it. */
+function useFieldFocus(field: FieldRef, locked: boolean) {
+  const { activate, deactivate } = useWorksheet();
+  const onBlur = () =>
+    setTimeout(() => {
+      // Focus that moved on (Tab, another input) ends the field. Focus that
+      // fell to the page is left to the tap check in useActiveField.
+      const next = document.activeElement;
+      if (next && next !== document.body && !isMathTarget(next)) {
+        deactivate();
+      }
+    }, 0);
+  if (locked) {
+    return { onBlur };
+  }
+  return {
+    onBlur,
+    onFocus: (event: FocusEvent<HTMLSpanElement>) => {
+      activate(field);
+      const element = event.currentTarget;
+      requestAnimationFrame(() => element.scrollIntoView({ block: "nearest" }));
+    },
+    // A tap on the field opens the keys again after "Schließen", and
+    // focuses it where Safari did not.
+    onPointerUp: (event: PointerEvent<HTMLSpanElement>) => {
+      if (event.currentTarget.contains(document.activeElement)) {
+        activate(field);
+      } else {
+        event.currentTarget.focus();
+      }
+    },
+  };
+}
 
 /**
  * A math input. It never opens the system keyboard; typing goes through
@@ -54,10 +98,12 @@ export function MathField({
   segments,
 }: MathFieldProps) {
   const worksheet = useWorksheet();
-  const { active, activate, deactivate, index, response, edit } = worksheet;
+  const { active, deactivate, index, response, edit } = worksheet;
   const runKey = useMathKeys();
-  const isActive = !locked && active?.ref.key === field.key;
-  const element = useReleaseWhenLocked(locked);
+  const holds = active?.ref.key === field.key;
+  const isActive = !locked && holds;
+  const element = useReleaseWhenLocked(locked, holds, deactivate);
+  const focusHandlers = useFieldFocus(field, locked);
   const kind = index.parts.get(field.partId)?.part.answerKind;
   const stored = readField(response(field.partId), field, kind);
   const row = isActive && active ? active.editor.root : stored;
@@ -113,23 +159,7 @@ export function MathField({
       aria-label={label}
       aria-readonly={locked || undefined}
       inputMode="none"
-      onFocus={(event) => {
-        if (locked) {
-          return;
-        }
-        activate(field);
-        const element = event.currentTarget;
-        requestAnimationFrame(() =>
-          element.scrollIntoView({ block: "nearest" }),
-        );
-      }}
-      onBlur={() =>
-        setTimeout(() => {
-          if (!isMathTarget(document.activeElement)) {
-            deactivate();
-          }
-        }, 0)
-      }
+      {...focusHandlers}
       onKeyDown={locked ? undefined : onKeyDown}
       onPaste={locked ? undefined : onPaste}
     >
