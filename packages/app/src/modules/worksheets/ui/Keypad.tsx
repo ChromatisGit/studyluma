@@ -1,4 +1,9 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  type ReactNode,
+  type SyntheticEvent,
+} from "react";
 import {
   RichInlineContent,
   type RichInline,
@@ -10,14 +15,7 @@ import { MathView } from "./MathView";
 import { InlineMark } from "./Mark";
 import { useWorksheet } from "./WorksheetContext";
 import type { FieldRef } from "./fieldValues";
-import {
-  digitKeys,
-  functionKeys,
-  letterKeys,
-  topKeys,
-  type KeyDef,
-  type KeypadPage,
-} from "./keypadKeys";
+import { KeypadButtons } from "./KeypadButtons";
 import { refLabel, TEXT } from "./texts";
 import { useMathKeys } from "./useMathKeys";
 
@@ -65,27 +63,6 @@ function PromptLine({ part, field }: { part: TaskPart; field: FieldRef }) {
   );
 }
 
-function KeyButton({
-  def,
-  onPress,
-}: {
-  def: KeyDef;
-  onPress: (def: KeyDef) => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`kp-key kp-key--${def.className ?? "op"}`}
-      aria-label={def.aria}
-      aria-disabled={def.later ? true : undefined}
-      onPointerDown={(event) => event.preventDefault()}
-      onClick={() => onPress(def)}
-    >
-      {def.label}
-    </button>
-  );
-}
-
 /** Task, answer and mark together, like a calculator's display. */
 function KeypadDisplay({ part, message }: { part: TaskPart; message: string }) {
   const { active, keysOpen, openKeys, resultFor, edit } = useWorksheet();
@@ -100,7 +77,6 @@ function KeypadDisplay({ part, message }: { part: TaskPart; message: string }) {
         type="button"
         className="kp-display__prompt"
         aria-expanded={expanded}
-        onPointerDown={(event) => event.preventDefault()}
         onClick={() => setExpanded(!expanded)}
       >
         <PromptLine part={part} field={active.ref} />
@@ -118,7 +94,6 @@ function KeypadDisplay({ part, message }: { part: TaskPart; message: string }) {
           <button
             type="button"
             className="btn btn--secondary btn--sm kp-expand"
-            onPointerDown={(event) => event.preventDefault()}
             onClick={() => openKeys(true)}
           >
             {TEXT.keypad.keys}
@@ -142,12 +117,10 @@ function KeypadDisplay({ part, message }: { part: TaskPart; message: string }) {
 export function Keypad() {
   const worksheet = useWorksheet();
   const { active, index, keysOpen, resultFor } = worksheet;
-  const [page, setPage] = useState<KeypadPage>("123");
   const [message, setMessage] = useState<string | null>(null);
   const runKey = useMathKeys(setMessage);
 
   useEffect(() => {
-    setPage("123");
     setMessage(null);
   }, [active?.ref.key]);
 
@@ -167,48 +140,28 @@ export function Keypad() {
   const result = resultFor(active.ref);
   const info = index.parts.get(part.id)?.info;
 
-  const press = (def: KeyDef) => {
-    if (def.page) {
-      setPage(def.page);
-      return;
-    }
-    if (def.later) {
-      setMessage(fill(TEXT.keypad.laterMessage, { key: def.later }));
-      return;
-    }
-    if (def.action) {
-      setMessage(null);
-      runKey(def.action, TEXT.keypad.semicolon);
-      if (def.className === "letter") {
-        setPage("123");
-      }
-    }
-  };
-  const lower =
-    page === "abc" ? letterKeys : page === "fx" ? functionKeys : digitKeys;
   const shownMessage =
     message ?? [result?.message, result?.note].filter(Boolean).join(" ");
+  // No tap anywhere on the keypad, keys, gaps or display, takes the focus
+  // from the field. Safari on iOS does not always honour pointerdown alone.
+  const keepFocus = (event: SyntheticEvent) => event.preventDefault();
 
   return (
     <div
       className={`keypad${keysOpen ? "" : " is-bar"}`}
       aria-label={info ? refLabel(info) : undefined}
+      onPointerDown={keepFocus}
+      onMouseDown={keepFocus}
     >
       <div className="kp-inner">
         <KeypadDisplay part={part} message={shownMessage} />
         {keysOpen && (
-          <div className="kp-keys">
-            <div className="kp-top">
-              {topKeys(variable).map((def) => (
-                <KeyButton key={def.id} def={def} onPress={press} />
-              ))}
-            </div>
-            <div className={`kp-lower kp-lower--${page}`}>
-              {lower.map((def) => (
-                <KeyButton key={def.id} def={def} onPress={press} />
-              ))}
-            </div>
-          </div>
+          <KeypadButtons
+            key={active.ref.key}
+            variable={variable}
+            onAction={(action) => runKey(action, TEXT.keypad.semicolon)}
+            onMessage={setMessage}
+          />
         )}
       </div>
     </div>

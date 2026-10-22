@@ -21,6 +21,8 @@ export { chapterStore } from "./infrastructure/localChapterStore";
 export { TaskSample } from "./ui/TaskSample";
 export { AuswahlOptions } from "./ui/AuswahlOptions";
 export type { AuswahlOptionsProps } from "./ui/AuswahlOptions";
+export { MathEntry } from "./ui/MathEntry";
+export type { MathEntryProps } from "./ui/MathEntry";
 export { typstToRow } from "@studyluma/catalog-contract";
 export { tasksOf } from "./domain/structure";
 export type { TaskToBlankMessage } from "./ui/WorksheetContext";

@@ -1,8 +1,7 @@
 import { useCallback } from "react";
-import type { MathEditor } from "../domain/editor";
 import { useWorksheet } from "./WorksheetContext";
 import { usesSemicolon } from "./fieldValues";
-import type { KeyAction } from "./keyboard";
+import { editorCommand, type KeyAction } from "./keyboard";
 
 /** Runs keypad and keyboard actions on the active math field. */
 export function useMathKeys(onMessage?: (message: string) => void) {
@@ -23,35 +22,17 @@ export function useMathKeys(onMessage?: (message: string) => void) {
       if (!active) {
         return;
       }
-      const run = (command: (editor: MathEditor) => void, save = true) =>
-        edit(command, save);
+      const own = editorCommand(action);
+      if (own) {
+        return edit(own.command, own.save);
+      }
       switch (action.kind) {
-        case "char":
-          return run((editor) => editor.char(action.value));
-        case "frac":
-          return run((editor) => editor.frac(action.fromKeyboard));
-        case "function":
-          return run((editor) => editor.fn(action.name));
-        case "sqrt":
-          return run((editor) => editor.sqrt());
-        case "squared":
-          return run((editor) => editor.sup(true));
-        case "power":
-          return run((editor) => editor.sup());
-        case "superscript":
-          return run((editor) => editor.power(action.digit));
-        case "left":
-          return run((editor) => editor.left(), false);
-        case "right":
-          return run((editor) => editor.right(), false);
-        case "back":
-          return run((editor) => editor.back());
         case "close":
           return openKeys(false);
         case "semicolon": {
           const kind = index.parts.get(active.ref.partId)?.part.answerKind;
           if (usesSemicolon(kind, active.ref)) {
-            return run((editor) => editor.char(";"));
+            return edit((editor) => editor.char(";"));
           }
           if (semicolonMessage) {
             onMessage?.(semicolonMessage);

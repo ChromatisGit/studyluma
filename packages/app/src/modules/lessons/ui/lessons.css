@@ -1664,6 +1664,64 @@
 .lf-fn .graphic__slider output {
   font-size: 24px;
 }
+/* Functions typed in during the lesson: swatch, y =, field and remove */
+.lf-fn__line--own:not(:disabled) {
+  cursor: default;
+}
+.lf-fn__toggle,
+.lf-fn__remove {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+}
+.lf-fn__toggle:not(:disabled),
+.lf-fn__remove {
+  cursor: pointer;
+}
+.lf-fn__y {
+  flex: none;
+  font-family: var(--font-math);
+}
+.lf-fn__line--own .mfield {
+  flex: 1;
+  min-width: 0;
+  font-size: inherit;
+  min-height: 1.6em;
+}
+.lf-fn__line--own .mfield.is-locked {
+  background: none;
+  border-bottom-color: transparent;
+}
+.lf-fn__remove {
+  padding-inline: 4px;
+  opacity: 0.55;
+}
+.lf-fn__remove:hover {
+  opacity: 1;
+}
+.lf-fn__add {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
+  padding: 6px 14px;
+  border: 2px dashed currentColor;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 24px;
+  opacity: 0.6;
+  cursor: pointer;
+}
+.lf-fn__add:hover {
+  opacity: 1;
+}
 .lf__graphic-plot {
   min-width: 0;
   min-height: 0;

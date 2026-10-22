@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import type { Graphic } from "@studyluma/catalog-contract";
-import { fitPlot, shownOf, slidersByGraph, valuesOf } from "./graphicView";
+import {
+  fitPlot,
+  shownOf,
+  slidersByGraph,
+  valuesOf,
+  withOwn,
+} from "./graphicView";
 import { typstToRow } from "@studyluma/catalog-contract";
 
 const axes = { x: [-7, 7] as [number, number], y: [-8, 8] as [number, number] };
@@ -53,5 +59,19 @@ describe("Grafikfolie state", () => {
       true,
       true,
     ]);
+  });
+
+  test("functions typed in during the lesson follow the authored ones", () => {
+    const square = typstToRow("x^2");
+    const line = typstToRow("a x");
+    const own = [{ row: square }, { row: line, hidden: true as const }];
+    const all = withOwn(g, { own });
+    expect(all.graphs.map((graph) => graph.row)).toEqual([
+      ...g.graphs.map((graph) => graph.row),
+      square,
+      line,
+    ]);
+    expect(shownOf(g, { own })).toEqual([true, false, true, true, false]);
+    expect(withOwn(g)).toBe(g);
   });
 });

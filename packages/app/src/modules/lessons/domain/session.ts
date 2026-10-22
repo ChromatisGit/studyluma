@@ -1,3 +1,4 @@
+import type { GraphicChanges, OwnFunction } from "../../content-renderer";
 import { entryId, runningOrder, type OrderEntry } from "./layout";
 import type { Deck } from "./deck";
 import type { Blank, InkStroke, DeckState } from "./lesson";
@@ -16,10 +17,42 @@ export type SessionAction =
   | { type: "send"; frameId: string }
   | { type: "graphic"; slideId: string; change: GraphicChange };
 
-/** One move on a Grafikfolie: a slider, or a curve shown or hidden. */
+/**
+ * One move on a Grafikfolie: a slider, an authored curve shown or hidden, or
+ * a function typed in during the lesson. `own` at the end of the list adds
+ * one, null removes it.
+ */
 export type GraphicChange =
   | { kind: "value"; name: string; value: number }
-  | { kind: "visible"; index: number; visible: boolean };
+  | { kind: "visible"; index: number; visible: boolean }
+  | { kind: "own"; index: number; own: OwnFunction | null };
+
+function changeGraphic(
+  current: GraphicChanges,
+  change: GraphicChange,
+): GraphicChanges {
+  switch (change.kind) {
+    case "value":
+      return {
+        ...current,
+        values: { ...current.values, [change.name]: change.value },
+      };
+    case "visible":
+      return {
+        ...current,
+        visible: { ...current.visible, [change.index]: change.visible },
+      };
+    case "own": {
+      const own = [...(current.own ?? [])];
+      if (change.own) {
+        own[Math.min(change.index, own.length)] = change.own;
+      } else {
+        own.splice(change.index, 1);
+      }
+      return { ...current, own };
+    }
+  }
+}
 
 export function newDeckState(deck: Deck): DeckState {
   return {
@@ -161,23 +194,10 @@ export function reduceSession(
             },
           };
     case "graphic": {
-      const own = session.graphics?.[action.slideId] ?? {};
-      const changed =
-        action.change.kind === "value"
-          ? {
-              ...own,
-              values: {
-                ...own.values,
-                [action.change.name]: action.change.value,
-              },
-            }
-          : {
-              ...own,
-              visible: {
-                ...own.visible,
-                [action.change.index]: action.change.visible,
-              },
-            };
+      const changed = changeGraphic(
+        session.graphics?.[action.slideId] ?? {},
+        action.change,
+      );
       return {
         ...session,
         graphics: { ...session.graphics, [action.slideId]: changed },

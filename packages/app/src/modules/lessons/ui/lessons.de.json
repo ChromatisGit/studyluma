@@ -1,4 +1,11 @@
 {
+  "graphicSlide": {
+    "add": "Funktion",
+    "addLabel": "Eigene Funktion hinzufügen",
+    "own": "Eigene Funktion {number}",
+    "toggle": "Kurve ein- oder ausblenden",
+    "remove": "Funktion entfernen"
+  },
   "frame": {
     "blank": "Freie Fläche",
     "slide": "Folie",

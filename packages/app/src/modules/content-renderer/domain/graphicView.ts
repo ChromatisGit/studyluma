@@ -1,4 +1,4 @@
-import type { Graphic } from "@studyluma/catalog-contract";
+import type { Graphic, MathRow } from "@studyluma/catalog-contract";
 import { tryParse, variablesIn } from "./evaluate";
 import { snapToStep } from "./sliders";
 
@@ -31,12 +31,31 @@ export function fitPlot(
   return { width, height, y: [middle - half, middle + half] };
 }
 
+/** A function typed in during the lesson. */
+export type OwnFunction = { row: MathRow; hidden?: true };
+
 /** What a lesson changed on a Grafikfolie; whatever is missing stays as authored. */
 export type GraphicChanges = {
   values?: Record<string, number>;
-  /** By index of the graph. */
+  /** By index of the authored graph. */
   visible?: Record<string, boolean>;
+  /** Functions typed in during the lesson, drawn after the authored ones. */
+  own?: OwnFunction[];
 };
+
+/** The Grafik with the functions typed in during the lesson as further graphs. */
+export function withOwn(graphic: Graphic, changes?: GraphicChanges): Graphic {
+  const own = changes?.own ?? [];
+  return own.length
+    ? {
+        ...graphic,
+        graphs: [
+          ...graphic.graphs,
+          ...own.map(({ row }) => ({ source: "", row })),
+        ],
+      }
+    : graphic;
+}
 
 /** The sliders at their authored start. */
 export function startValues(graphic: Graphic): Record<string, number> {
@@ -56,11 +75,17 @@ export function valuesOf(
   return { ...startValues(graphic), ...changes?.values };
 }
 
-/** Per graph whether it is drawn: the authored start, then what the lesson changed. */
+/**
+ * Per graph whether it is drawn: the authored start, then what the lesson
+ * changed; the functions typed in during the lesson follow.
+ */
 export function shownOf(graphic: Graphic, changes?: GraphicChanges): boolean[] {
-  return graphic.graphs.map(
-    (g, index) => changes?.visible?.[index] ?? g.visible !== false,
-  );
+  return [
+    ...graphic.graphs.map(
+      (g, index) => changes?.visible?.[index] ?? g.visible !== false,
+    ),
+    ...(changes?.own ?? []).map((own) => !own.hidden),
+  ];
 }
 
 /**

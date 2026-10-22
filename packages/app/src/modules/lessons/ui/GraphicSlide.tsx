@@ -6,6 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { Plus, X } from "lucide-react";
+import { fill } from "../../../helper/text";
 import {
   describeGraphic,
   fitPlot,
@@ -14,10 +16,14 @@ import {
   SliderRow,
   slidersByGraph,
   valuesOf,
+  withOwn,
+  type OwnFunction,
 } from "../../content-renderer";
+import { MathEntry } from "../../worksheets";
 import type { GraphicSlides } from "../domain/lesson";
 import type { GraphicChange } from "../domain/session";
 import type { Slide } from "../domain/deck";
+import TEXT from "./lessons.de.json";
 
 /**
  * What the lesson changed on the Grafikfolien, and how to change it. Only the
@@ -115,6 +121,125 @@ type GraphicSlideOf = Slide & {
   graphicSlide: NonNullable<Slide["graphicSlide"]>;
 };
 
+/** A function typed in during the lesson: swatch, `y =` and the field. */
+function OwnLine({
+  slideId,
+  index,
+  color,
+  own,
+  fresh,
+  onLeave,
+}: {
+  slideId: string;
+  /** Among the functions typed in. */
+  index: number;
+  /** Among all curves, for the color. */
+  color: number;
+  own: OwnFunction;
+  fresh: boolean;
+  onLeave: () => void;
+}) {
+  const { onChange } = useContext(GraphicSlideContext);
+  const set = (next: OwnFunction | null) =>
+    onChange?.(slideId, { kind: "own", index, own: next });
+  const shown = !own.hidden;
+  return (
+    <div
+      className={`lf-fn__line lf-fn__line--own${shown ? "" : " is-off"}`}
+      style={{ "--lf-curve": `var(--graphic-c${color % 4})` } as never}
+    >
+      <button
+        type="button"
+        className="lf-fn__toggle"
+        aria-pressed={shown}
+        aria-label={TEXT.graphicSlide.toggle}
+        disabled={!onChange}
+        onClick={() => set(shown ? { ...own, hidden: true } : { row: own.row })}
+      >
+        <span className="lf-fn__swatch" aria-hidden="true" />
+      </button>
+      <span className="lf-fn__formula lf-fn__y">
+        <i>y</i> =
+      </span>
+      <MathEntry
+        row={own.row}
+        label={fill(TEXT.graphicSlide.own, { number: index + 1 })}
+        locked={!onChange}
+        autoFocus={fresh}
+        onChange={(row) => set({ ...own, row })}
+        // An entry left empty is not kept.
+        onDone={() => {
+          onLeave();
+          if (!own.row.length) {
+            set(null);
+          }
+        }}
+      />
+      {onChange && (
+        <button
+          type="button"
+          className="lf-fn__remove"
+          aria-label={TEXT.graphicSlide.remove}
+          // The field keeps the focus: leaving it would drop an empty entry first.
+          onPointerDown={(event) => event.preventDefault()}
+          onClick={() => set(null)}
+        >
+          <X className="icon" aria-hidden="true" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** The functions typed in during the lesson, and on the stage the way to add one. */
+function OwnLines({
+  slideId,
+  own,
+  first,
+}: {
+  slideId: string;
+  own: OwnFunction[];
+  /** How many curves come before, for the colors. */
+  first: number;
+}) {
+  const { onChange } = useContext(GraphicSlideContext);
+  // The entry just added takes the focus.
+  const [fresh, setFresh] = useState<number | null>(null);
+  return (
+    <>
+      {own.map((entry, index) => (
+        <OwnLine
+          key={index}
+          slideId={slideId}
+          index={index}
+          color={first + index}
+          own={entry}
+          fresh={fresh === index}
+          onLeave={() => setFresh(null)}
+        />
+      ))}
+      {onChange && (
+        <button
+          type="button"
+          className="lf-fn__add"
+          aria-label={TEXT.graphicSlide.addLabel}
+          onClick={() => {
+            setFresh(own.length);
+            onChange(slideId, {
+              kind: "own",
+              index: own.length,
+              own: { row: [] },
+            });
+          }}
+        >
+          <Plus className="icon" aria-hidden="true" />
+          {TEXT.graphicSlide.add}
+        </button>
+      )}
+    </>
+  );
+}
+
 /** The body of a Grafikfolie: the functions at the left, the graph filling the rest. */
 export function GraphicSlideBody({ slide }: { slide: GraphicSlideOf }) {
   const { changes, onChange } = useContext(GraphicSlideContext);
@@ -155,11 +280,16 @@ export function GraphicSlideBody({ slide }: { slide: GraphicSlideOf }) {
             ))}
           </FormulaLine>
         ))}
+        <OwnLines
+          slideId={slide.id}
+          own={own?.own ?? []}
+          first={graphic.graphs.length}
+        />
       </div>
       <div className="lf__graphic-plot" ref={setElement}>
         {fit && (
           <GraphicPlot
-            graphic={graphic}
+            graphic={withOwn(graphic, own)}
             values={values}
             shown={shown}
             fit={fit}

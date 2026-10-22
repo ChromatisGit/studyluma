@@ -22,8 +22,13 @@ export {
   shownOf,
   slidersByGraph,
   valuesOf,
+  withOwn,
 } from "./domain/graphicView";
-export type { GraphicChanges, PlotFit } from "./domain/graphicView";
+export type {
+  GraphicChanges,
+  OwnFunction,
+  PlotFit,
+} from "./domain/graphicView";
 export type { DrawnFunction } from "./ui/Graphic";
 export { gapsOf, inputGraphicOf, walkInlines } from "./domain/rich";
 export type { GapNode } from "./domain/rich";

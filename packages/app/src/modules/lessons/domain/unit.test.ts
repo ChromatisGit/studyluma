@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import type { OwnFunction } from "../../content-renderer";
 import type { Deck, Slide } from "./deck";
 import {
   deckState,
@@ -122,5 +123,29 @@ describe("unit", () => {
     const state = deckState(unit, main);
     expect(state.frozen?.graphics?.m1?.values?.a).toBe(0.5);
     expect(state.graphics?.m1?.values?.a).toBe(1);
+  });
+});
+
+describe("functions typed in on a Grafikfolie", () => {
+  const row = (value: string) => [{ t: "c" as const, v: value }];
+  const own = (index: number, value: OwnFunction | null) =>
+    ({
+      type: "graphic",
+      slideId: "m2",
+      change: { kind: "own", index, own: value },
+    }) as const;
+
+  test("are added, changed and removed", () => {
+    let unit = reduceUnit(started(), main, own(0, { row: row("x") }));
+    unit = reduceUnit(unit, main, own(1, { row: row("2") }));
+    unit = reduceUnit(unit, main, own(0, { row: row("y"), hidden: true }));
+    expect(deckState(unit, main).graphics?.m2?.own).toEqual([
+      { row: row("y"), hidden: true },
+      { row: row("2") },
+    ]);
+    unit = reduceUnit(unit, main, own(0, null));
+    expect(deckState(unit, main).graphics?.m2?.own).toEqual([
+      { row: row("2") },
+    ]);
   });
 });

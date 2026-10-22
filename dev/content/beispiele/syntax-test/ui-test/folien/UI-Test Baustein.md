@@ -114,6 +114,10 @@ Text zwischen den Karten, danach Platz zum Schreiben.
 
 ::bis 12:30
 
+# "Grafikfolie"
+
+::grafikfolie [](../grafiken/sinus-schieber.toml)
+
 # "Folie mit Etikett"
 
 ::tag Einstieg

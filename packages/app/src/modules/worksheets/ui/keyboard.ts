@@ -1,5 +1,6 @@
 import type { KeyboardEvent } from "react";
 import type { FunctionName } from "../../content-renderer";
+import type { MathEditor } from "../domain/editor";
 
 /** What a key on the keypad or keyboard does in a math field. */
 export type KeyAction =
@@ -72,6 +73,44 @@ export function keyboardAction(event: KeyboardEvent): KeyAction | null {
       return code === "Backquote" || code === "Equal"
         ? { kind: "power" }
         : null;
+    default:
+      return null;
+  }
+}
+
+/**
+ * What a key does to the editor itself; `save` is false where it only moves
+ * the cursor. null for the keys whose meaning depends on the field (check,
+ * close, semicolon).
+ */
+export function editorCommand(
+  action: KeyAction,
+): { command: (editor: MathEditor) => void; save: boolean } | null {
+  const run = (command: (editor: MathEditor) => void, save = true) => ({
+    command,
+    save,
+  });
+  switch (action.kind) {
+    case "char":
+      return run((editor) => editor.char(action.value));
+    case "frac":
+      return run((editor) => editor.frac(action.fromKeyboard));
+    case "function":
+      return run((editor) => editor.fn(action.name));
+    case "sqrt":
+      return run((editor) => editor.sqrt());
+    case "squared":
+      return run((editor) => editor.sup(true));
+    case "power":
+      return run((editor) => editor.sup());
+    case "superscript":
+      return run((editor) => editor.power(action.digit));
+    case "left":
+      return run((editor) => editor.left(), false);
+    case "right":
+      return run((editor) => editor.right(), false);
+    case "back":
+      return run((editor) => editor.back());
     default:
       return null;
   }

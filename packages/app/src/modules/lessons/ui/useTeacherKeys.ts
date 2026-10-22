@@ -50,8 +50,11 @@ export function keyFor(
 
 const dialogIsOpen = () => document.querySelector("dialog[open]") !== null;
 
+// A math field on a Grafikfolie is a textbox of its own.
 const isTyping = (target: HTMLElement) =>
-  target.closest("input, textarea, select, [contenteditable]") !== null;
+  target.closest(
+    'input, textarea, select, [contenteditable], [role="textbox"]',
+  ) !== null;
 
 /** Keyboard and presenter control; Enter stays with the focused button. */
 export function useTeacherKeys(onKey: (key: TeacherKey) => void) {
