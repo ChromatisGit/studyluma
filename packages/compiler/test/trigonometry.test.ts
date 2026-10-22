@@ -102,7 +102,7 @@ describe("functionProblems()", () => {
 describe("answers with sin, cos and ln", () => {
   test("an Antwort and a gap with functions compile", () => {
     const root = sheet(
-      "\n## Antwort\n\nAbleite.\n\n::antwort\n2 sin(x)\n\n## Antwort\n\nQuadrat.\n\n::antwort\nsin^2(x)\n\n## Antwort\n\nWert.\n\n::antwort\nsin(pi/6) ~ 0.5\n\n## Einsetzen\n\nEs gilt ((cos(pi x))) und ((ln(x))).\n",
+      "\n## Antwort\n\nAbleite.\n\n::antwort\n2 sin(x)\n\n## Antwort\n\nQuadrat.\n\n::antwort\nsin^2(x)\n\n## Antwort\n\nWert.\n\n::antwort\nsin(pi/6) ~ 0.5\n\n## Einsetzen\n\nEs gilt (($cos(pi x)$)) und (($ln(x)$)).\n",
     );
     expect(diagnostics(root)).toEqual([]);
     const { bundle } = compileContent(root);
@@ -132,17 +132,29 @@ describe("answers with sin, cos and ln", () => {
   });
 
   test("the same in a gap and inside a solution set", () => {
-    const gap = sheet("\n## Einsetzen\n\nEs gilt ((2 cos x)).\n\n");
+    const gap = sheet("\n## Einsetzen\n\nEs gilt (($2 cos x$)).\n\n");
     expect(diagnostics(gap).map((d) => d.code)).toContain("ANSWER_MATH");
     const set = sheet("\n## Antwort\n\nLöse.\n\n::antwort\n{2 ln x; 1}\n");
     expect(diagnostics(set).map((d) => d.code)).toContain("ANSWER_MATH");
   });
 
-  test("a plain word answer that merely contains letters is still text", () => {
-    const root = sheet(
-      "\n## Antwort\n\nWie heißt die Funktion?\n\n::antwort\nsin\n",
-    );
-    expect(diagnostics(root)).toEqual([]);
+  test("::antwort is always math: pi and one letter are terms", () => {
+    for (const answer of ["pi", "x", "e", "2ab"]) {
+      const root = sheet(`\n## Antwort\n\nGib an.\n\n::antwort\n${answer}\n`);
+      expect(diagnostics(root)).toEqual([]);
+    }
+  });
+
+  test("a word in ::antwort is an error, not a product of letters", () => {
+    for (const word of ["Parabel", "Hochpunkt", "abc"]) {
+      const root = sheet(`\n## Antwort\n\nWie?\n\n::antwort\n${word}\n`);
+      expect(diagnostics(root).map((d) => d.code)).toEqual(["ANSWER_WORD"]);
+    }
+  });
+
+  test("::antwort is written without dollar signs", () => {
+    const root = sheet("\n## Antwort\n\nGib an.\n\n::antwort\n$pi$\n");
+    expect(diagnostics(root).map((d) => d.code)).toContain("ANSWER_MATH");
   });
 });
 
@@ -240,7 +252,7 @@ describe("functions that do not exist, and inverse functions", () => {
   });
 
   test("the same in a gap, a set and a vector element", () => {
-    const gap = sheet("\n## Einsetzen\n\nEs gilt ((tan(x))).\n\n");
+    const gap = sheet("\n## Einsetzen\n\nEs gilt (($tan(x)$)).\n\n");
     expect(messages(gap, "ANSWER_MATH")).toHaveLength(1);
     const set = sheet("\n## Antwort\n\nLöse.\n\n::antwort\n{arcsin(1); 1}\n");
     expect(messages(set, "ANSWER_MATH")[0]).toContain(
@@ -295,7 +307,7 @@ describe("functions that do not exist, and inverse functions", () => {
   test("sin^(-1) is refused in answers, gaps and Grafik terms", () => {
     const answer = sheet("\n## Antwort\n\nW.\n\n::antwort\nsin^(-1)(x)\n");
     expect(messages(answer, "ANSWER_MATH")[0]).toContain("inverse function");
-    const gap = sheet("\n## Einsetzen\n\nEs gilt ((cos^(-1)(x))).\n\n");
+    const gap = sheet("\n## Einsetzen\n\nEs gilt (($cos^(-1)(x)$)).\n\n");
     expect(messages(gap, "ANSWER_MATH")[0]).toContain(
       "cos with a negative exponent",
     );
@@ -323,13 +335,15 @@ describe("functions that do not exist, and inverse functions", () => {
   test("a bare function name is an error even without digit or operator", () => {
     const answer = sheet("\n## Antwort\n\nAbleite.\n\n::antwort\nsin x\n");
     expect(messages(answer, "ANSWER_MATH")[0]).toContain("sin needs brackets");
-    const gap = sheet("\n## Einsetzen\n\nEs gilt ((cos x)) und ((ln 2)).\n\n");
+    const gap = sheet(
+      "\n## Einsetzen\n\nEs gilt (($cos x$)) und (($ln 2$)).\n\n",
+    );
     expect(messages(gap, "ANSWER_MATH")).toHaveLength(2);
     const pi = sheet("\n## Antwort\n\nW.\n\n::antwort\nsin pi\n");
     expect(messages(pi, "ANSWER_MATH")).toHaveLength(1);
   });
 
-  test("words that merely contain a function name stay text", () => {
+  test("words that merely contain a function name stay text in a text gap", () => {
     for (const word of [
       "sinus",
       "Sinus und Kosinus",
@@ -337,7 +351,7 @@ describe("functions that do not exist, and inverse functions", () => {
       "cos",
       "sin und cos",
     ]) {
-      const root = sheet(`\n## Antwort\n\nWie?\n\n::antwort\n${word}\n`);
+      const root = sheet(`\n## Einsetzen\n\nWie? ((${word}))\n`);
       expect(diagnostics(root)).toEqual([]);
     }
   });

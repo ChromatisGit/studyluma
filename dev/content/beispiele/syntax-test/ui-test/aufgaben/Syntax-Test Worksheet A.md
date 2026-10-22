@@ -13,11 +13,11 @@ Textfeld: ((Testwort))
 
 Auswahlfeld: ((richtig | falsch | auch falsch))
 
-Mathematische Lücken: ((2 * x)), ((3/4)) und ((sqrt(2) ~ 1.41)).
+Mathematische Lücken: (($2 * x$)), (($3/4$)) und (($sqrt(2)$ ~ 1.41)).
 
 | $x$ | $0$ | $1$ | $2$ |
 | --- | --- | --- | --- |
-| $f(x)$ | ((0)) | ((1)) | ((4)) |
+| $f(x)$ | (($0$)) | (($1$)) | (($4$)) |
 
 ## Gruppe: "Auswahlaufgaben"
 
@@ -70,8 +70,8 @@ Nutze bei Bedarf die Merkkarte:
 [Testregel Eins](../inhalt.md#testregel-eins)
 
 ::schritte
-- Lies den Testwert $a$ ab: ((3))
-- Bestimme den Nenner: ((3))
+- Lies den Testwert $a$ ab: (($3$))
+- Bestimme den Nenner: (($3$))
 
 ::loesung
 $y = 1/3$
@@ -84,7 +84,7 @@ Berechne einen Testwert und runde.
 ~ 0.33
 
 ::schritte
-- Starte mit $1/3$ und runde: ((0.33))
+- Starte mit $1/3$ und runde: (($0.33$))
 
 ::loesung
 $0.33$
@@ -97,7 +97,7 @@ Gib entweder den exakten oder den gerundeten Wert ein. Diese Aufgabe hat keinen 
 z = 1/3 ~ 0.33
 
 ::schritte
-- Bestimme den exakten Wert: ((1/3))
+- Bestimme den exakten Wert: (($1/3$))
 
 ::loesung
 $z = 1/3$
@@ -123,7 +123,7 @@ Bestimme einen Testwert.
 a = 2
 
 ::schritte
-- Lies die Zahl ab: ((2))
+- Lies die Zahl ab: (($2$))
 
 ::loesung
 $a = 2$
@@ -141,7 +141,7 @@ Dieser Text liegt auf Ebene der gesamten Aufgabe zwischen zwei Aufgabenteilen.
 
 ### Einsetzen: "Teil C"
 
-Ergänze ((Test)) und ((4 * x)).
+Ergänze ((Test)) und (($4 * x$)).
 
 ### Auftrag: "Teil D"
 

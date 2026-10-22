@@ -15,8 +15,8 @@ x = 6
 Verdopple 3.
 
 ::schritte
-- Starte mit $3$: ((3))
-- Verdopple den Wert: ((6))
+- Starte mit $3$: (($3$))
+- Verdopple den Wert: (($6$))
 
 ::loesung
 $x = 6$
