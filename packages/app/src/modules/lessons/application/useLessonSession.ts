@@ -7,6 +7,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { clockStartFor, type ClockStart, type Period } from "../domain/clock";
+import type { TeacherQuizView } from "../../classroom";
 import type { Deck } from "../domain/deck";
 import type { DeckState } from "../domain/lesson";
 import type { SessionAction } from "../domain/session";
@@ -85,6 +86,7 @@ export function useLessonSession(
   const state = unit ? deckState(unit, deck) : null;
   const stateRef = useRef<{ message: ProjectorMessage } | null>(null);
   const joinRef = useRef<JoinInfo | null>(null);
+  const quizRef = useRef<TeacherQuizView | null>(null);
   useLayoutEffect(() => {
     seconds.current = clock.seconds;
     stateRef.current = state
@@ -109,6 +111,7 @@ export function useLessonSession(
             channel.current?.send(stateRef.current.message);
           }
           channel.current?.send({ type: "join", join: joinRef.current });
+          channel.current?.send({ type: "quiz", view: quizRef.current });
         }
       } else if (message.type === "bye") {
         projectorSeen.current = 0;
@@ -199,6 +202,15 @@ export function useLessonSession(
     channel.current?.send({ type: "join", join });
   }, []);
 
+  /**
+   * The running quiz, for the projector. The projector does not follow the
+   * classroom itself: a session started after it opened would stay unseen.
+   */
+  const sendQuiz = useCallback((view: TeacherQuizView | null) => {
+    quizRef.current = view;
+    channel.current?.send({ type: "quiz", view });
+  }, []);
+
   return {
     unit,
     session: state satisfies DeckState | null,
@@ -206,6 +218,7 @@ export function useLessonSession(
     sendLaser,
     sendScroll,
     sendJoin,
+    sendQuiz,
     setClockStart,
     clock,
     projectorConnected,
@@ -220,6 +233,7 @@ export function useProjectorFeed() {
     deck: DeckState;
   } | null>(null);
   const [join, setJoin] = useState<JoinInfo | null>(null);
+  const [quiz, setQuiz] = useState<TeacherQuizView | null>(null);
   const [laser, setLaser] = useState<[number, number] | null>(null);
   const [scroll, setScroll] = useState<{
     slideId: string;
@@ -232,6 +246,8 @@ export function useProjectorFeed() {
         setFeed({ presentationId, projectorPath, deck });
       } else if (message.type === "join") {
         setJoin(message.join);
+      } else if (message.type === "quiz") {
+        setQuiz(message.view);
       } else if (message.type === "laser") {
         setLaser(message.point);
       } else if (message.type === "scroll") {
@@ -258,5 +274,5 @@ export function useProjectorFeed() {
       link?.close();
     };
   }, []);
-  return { feed, join, laser, scroll };
+  return { feed, join, quiz, laser, scroll };
 }

@@ -1,3 +1,4 @@
+import type { TeacherQuizView } from "../../classroom";
 import type { DeckState } from "../domain/lesson";
 
 /** The invitation the projector shows instead of the slide. */
@@ -21,6 +22,8 @@ export type ProjectorMessage =
       deck: DeckState;
     }
   | { type: "join"; join: JoinInfo | null }
+  /** The running quiz of the slide on the stage; null: none. */
+  | { type: "quiz"; view: TeacherQuizView | null }
   | { type: "laser"; point: [number, number] | null }
   | { type: "scroll"; slideId: string; ratio: number }
   | { type: "hello" }

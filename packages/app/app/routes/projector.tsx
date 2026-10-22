@@ -12,7 +12,6 @@ export default function ProjectorRoute() {
   const { courseId = "", chapterSlug = "" } = useParams();
   return (
     <ProjectorView
-      courseId={courseId}
       deck={deck}
       chapterPath={chapterPath(courseId, chapterSlug)}
     />

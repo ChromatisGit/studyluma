@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useTeacherQuiz } from "../../classroom";
 import { useProjectorFeed } from "../application/useLessonSession";
 import type { Deck } from "../domain/deck";
 import { entryId, entrySlide, runningOrder } from "../domain/layout";
@@ -20,19 +19,16 @@ import "./lessons.css";
  * laser pointer. No controls, no notes; blanked shows a calm empty surface.
  */
 export function ProjectorView({
-  courseId,
   deck,
   chapterPath,
 }: {
-  courseId: string;
   deck: Deck;
   chapterPath: string;
 }) {
-  const { feed, join, laser, scroll } = useProjectorFeed();
+  const { feed, join, quiz: view, laser, scroll } = useProjectorFeed();
   const navigate = useNavigate();
-  const { view } = useTeacherQuiz(courseId);
-  const quiz =
-    view && !view.ended && view.chapterId === deck.chapterId ? view : null;
+  // The teacher window sends the quiz; the projector holds no session of its own.
+  const quiz = view && view.chapterId === deck.chapterId ? view : null;
   // The teacher moved to another deck of the unit: follow to its page.
   const elsewhere = !!feed && feed.presentationId !== deck.id;
   const target = feed?.projectorPath;

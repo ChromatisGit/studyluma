@@ -226,6 +226,7 @@ export function TeacherView({
     sendLaser,
     sendScroll,
     sendJoin,
+    sendQuiz,
     setClockStart,
     clock,
     projectorConnected,
@@ -237,6 +238,8 @@ export function TeacherView({
   useEndedSessionGuard(unit);
   const invite = useInvitation(sendJoin);
   const quiz = useFrameQuiz(courseId, deck, session, sessionDispatch);
+  const { live: liveQuiz } = quiz;
+  useEffect(() => sendQuiz(liveQuiz), [liveQuiz, sendQuiz]);
   // Moves off a running quiz's slide are confirmed first.
   const { dispatch } = quiz;
   // While the invitation is on the stage there is no slide to move away from.
